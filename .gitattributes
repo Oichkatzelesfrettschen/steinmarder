@@ -1,0 +1,4 @@
+*.sass !text !filter !merge !diff
+*.reg !text !filter !merge !diff
+*.csv !text !filter !merge !diff
+*.svg !text !filter !merge !diff
