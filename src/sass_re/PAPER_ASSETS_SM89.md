@@ -57,7 +57,7 @@ Claims:
 | Direct local source/IR emission of `P2R.B1/B2/B3` | not reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
 | Local plain `P2R ... 0x7f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
 | Local plain `P2R ... 0x0f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
-| PTX/clang/Triton/simple `ptxas` version sweep | no direct `P2R.B*` unlock | [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md) |
+| PTX/clang/Triton/simple `ptxas` version sweep | no direct `P2R.B*` unlock | [Thought_Processes.md](Thought_Processes.md) |
 | Cubin-side local `P2R.B1/B2/B3` | materialized and runnable | [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md) |
 | Best current interpretation | source/IR form-selection problem, not opcode-existence problem | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
 

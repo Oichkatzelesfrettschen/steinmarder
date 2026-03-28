@@ -1044,7 +1044,7 @@ Post-refresh cleanup and final direct follow-ups:
   - `src/sass_re/scripts/auto_explorer.py`
   - `src/sass_re/auto_explorer_search_space.toml`
   - `src/sass_re/scripts/auto_explorer_queue.py`
-  - `src/sass_re/AUTO_EXPLORER.md`
+  - `src/sass_re/Thought_Processes.md` (auto-explorer rationale)
   The first explorer run matches the hand-built frontier:
   - top runtime continuations:
     `uniform_blockred_sys64_store`,

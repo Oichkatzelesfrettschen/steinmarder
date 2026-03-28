@@ -58,7 +58,7 @@ Likely placement:
 Primary sources:
 
 - [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md)
-- [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md)
+- [Thought_Processes.md](Thought_Processes.md)
 - [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 
 ### Figure A1: `P2R` evidence ladder

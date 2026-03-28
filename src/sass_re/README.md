@@ -7,8 +7,8 @@ The Ada workflow is now manifest-driven and recursive: it walks the full
 See [RESULTS.md](RESULTS.md) for measurements and confirmed findings, and see
 [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md) for the
 current SM89 mnemonic inventory. The integrated current-state interpretation is
-in [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md). The remaining frontier
-roadmap is tracked in [FRONTIER_ROADMAP.md](FRONTIER_ROADMAP.md).
+in [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md). Research methodology and
+decision history are documented in [Thought_Processes.md](Thought_Processes.md).
 
 ## Current corpus
 
@@ -514,8 +514,8 @@ adds the first Python auto-explorer over this frontier:
     [`auto_explorer_search_space.toml`](auto_explorer_search_space.toml)
   - queue helper:
     [`auto_explorer_queue.py`](scripts/auto_explorer_queue.py)
-  - design note:
-    [`AUTO_EXPLORER.md`](AUTO_EXPLORER.md)
+  - design rationale:
+    [`Thought_Processes.md`](Thought_Processes.md) (section 1, "Why the auto-explorer")
 It ingests `.sass` plus `ncu` artifacts, classifies runtime regimes, and
 scores the next candidate probe families. Its current top-ranked runtime
 continuations are:
