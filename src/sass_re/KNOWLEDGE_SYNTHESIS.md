@@ -19,8 +19,8 @@ Current inventory state:
 
 Primary references:
 
-- [SM89_SASS_INSTRUCTION_REFERENCE.md](/home/eirikr/Github/YSU-engine/src/sass_re/SM89_SASS_INSTRUCTION_REFERENCE.md)
-- [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md)
+- [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md)
+- [RESULTS.md](RESULTS.md)
 
 Important consequence:
 

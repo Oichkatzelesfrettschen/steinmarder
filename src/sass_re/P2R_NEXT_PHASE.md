@@ -30,11 +30,11 @@ Goal:
 
 Executable scaffold:
 
-- [search_p2r_ptx.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/search_p2r_ptx.py)
+- [search_p2r_ptx.py](scripts/search_p2r_ptx.py)
 
 First run:
 
-- [p2r_ptx_search_20260322_215940](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_ptx_search_20260322_215940)
+- [p2r_ptx_search_20260322_215940](results/runs/p2r_ptx_search_20260322_215940)
 
 Initial result:
 
@@ -55,11 +55,11 @@ Goal:
 
 Executable scaffold:
 
-- [mine_library_p2r_windows.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/mine_library_p2r_windows.py)
+- [mine_library_p2r_windows.py](scripts/mine_library_p2r_windows.py)
 
 Current live run:
 
-- [library_p2r_windows_20260322_215940](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/library_p2r_windows_20260322_215940)
+- [library_p2r_windows_20260322_215940](results/runs/library_p2r_windows_20260322_215940)
 
 Targets:
 
@@ -77,9 +77,9 @@ Current result:
 - TensorRT `sm89` builder resource is not directly `cuobjdump`-readable as
   device code
 - summarized predecessor frequencies are in
-  [library_p2r_window_summary_20260322_220437](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/library_p2r_window_summary_20260322_220437)
+  [library_p2r_window_summary_20260322_220437](results/runs/library_p2r_window_summary_20260322_220437)
 - richer motif clustering is in
-  [library_p2r_motif_summary_20260322_230100](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/library_p2r_motif_summary_20260322_230100)
+  [library_p2r_motif_summary_20260322_230100](results/runs/library_p2r_motif_summary_20260322_230100)
 - the strongest new local targets are:
   - `B2`: `P2R.B2 -> R2P -> LEA/LEA.HI.X` and `P2R.B2 -> BAR.SYNC -> ULDC`
   - `B3`: `P2R.B2 -> P2R.B3 -> BAR.SYNC -> ULDC` and
@@ -116,9 +116,9 @@ Toolchain recommendation:
 First frontend result:
 
 - clang can emit LLVM IR and PTX for the probe bundle under
-  [p2r_clang_frontend_retry_20260322_220709](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_clang_frontend_retry_20260322_220709)
+  [p2r_clang_frontend_retry_20260322_220709](results/runs/p2r_clang_frontend_retry_20260322_220709)
 - re-lowering that clang PTX through `ptxas` under
-  [p2r_clang_ptxas_20260322_220720](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_clang_ptxas_20260322_220720)
+  [p2r_clang_ptxas_20260322_220720](results/runs/p2r_clang_ptxas_20260322_220720)
   still does not emit `P2R.B*` or plain `P2R`; it collapses to dense
   `LOP3.LUT P*` / `PLOP3.LUT`
 
@@ -126,7 +126,7 @@ Second frontend result:
 
 - Triton can emit a full `source -> TTIR -> TTGIR -> LLIR -> PTX -> CUBIN`
   ladder under
-  [p2r_triton_search_20260322_230100](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_triton_search_20260322_230100)
+  [p2r_triton_search_20260322_230100](results/runs/p2r_triton_search_20260322_230100)
 - Triton still does not emit `P2R.B*` or plain `P2R`
 - unlike the PTX and clang basins, Triton also avoids `PLOP3.LUT` on the
   current variants and instead lands a cleaner
@@ -149,7 +149,7 @@ Current design:
   it is the cleanest side-by-side path to a CUDA `11.8` capable tree while
   leaving the primary CUDA install untouched
 - local sidecar package skeleton lives at
-  [/home/eirikr/Github/pkgbuilds/nvhpc-sidecar-2411-multi/PKGBUILD](/home/eirikr/Github/pkgbuilds/nvhpc-sidecar-2411-multi/PKGBUILD)
+  `nvhpc-sidecar-2411-multi/PKGBUILD` (external sidecar package)
 - it installs under `/opt/nvidia/hpc_sdk_sidecar`
 - it keeps compilers opt-in through:
   - `/opt/nvidia/nvhpc-sidecar.sh`
@@ -166,7 +166,7 @@ Status:
   - `ptxas 11.8.89`
   - `ptxas 12.6.77`
 - first cross-version PTXAS matrix is in
-  [p2r_ptxas_matrix_20260322_225854](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_ptxas_matrix_20260322_225854)
+  [p2r_ptxas_matrix_20260322_225854](results/runs/p2r_ptxas_matrix_20260322_225854)
 - after matching the PTX dialect to each assembler:
   - CUDA 13.1 / PTX 8.8
   - sidecar 12.6 / PTX 8.5
@@ -179,7 +179,7 @@ Status:
 Additional host-compiler control:
 
 - a non-interfering archived GCC 13 sidecar package now lives at
-  [/home/eirikr/Github/pkgbuilds/gcc13-sidecar-bin/PKGBUILD](/home/eirikr/Github/pkgbuilds/gcc13-sidecar-bin/PKGBUILD)
+  `gcc13-sidecar-bin/PKGBUILD` (external sidecar package)
 - it installs archived Arch `gcc13 13.3.0` binaries side-by-side and provides
   `/usr/bin/g++-13`
 - helper env script:
@@ -193,7 +193,7 @@ Additional host-compiler control:
 Cross-version `nvcc -G` retry:
 
 - rerun is at
-  [p2r_nvcc_debug_matrix_20260322_232226](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_nvcc_debug_matrix_20260322_232226)
+  [p2r_nvcc_debug_matrix_20260322_232226](results/runs/p2r_nvcc_debug_matrix_20260322_232226)
 - CUDA 13.1 remains the only meaningful debug lane locally
 - sidecar 11.8 with `g++-13` still fails on `_Float32/_Float64` glibc header
   parsing and math declaration drift
@@ -230,20 +230,20 @@ Goal:
 Current phase-3 tooling:
 
 - step scope:
-  [NEXT120_P2R_PHASE3.md](/home/eirikr/Github/YSU-engine/src/sass_re/NEXT120_P2R_PHASE3.md)
+  [NEXT120_P2R_PHASE3.md](NEXT120_P2R_PHASE3.md)
 - seed extractor:
-  [extract_p2r_motif_seeds.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/extract_p2r_motif_seeds.py)
+  [extract_p2r_motif_seeds.py](scripts/extract_p2r_motif_seeds.py)
 - constrained mutator:
-  [search_p2r_ptx_cegis.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/search_p2r_ptx_cegis.py)
+  [search_p2r_ptx_cegis.py](scripts/search_p2r_ptx_cegis.py)
 - patchpoint inspector:
-  [inspect_cubin_p2r_patchpoints.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/inspect_cubin_p2r_patchpoints.py)
+  [inspect_cubin_p2r_patchpoints.py](scripts/inspect_cubin_p2r_patchpoints.py)
 - semantic shortlist planner:
-  [plan_p2r_cubin_semantic_patch.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/plan_p2r_cubin_semantic_patch.py)
+  [plan_p2r_cubin_semantic_patch.py](scripts/plan_p2r_cubin_semantic_patch.py)
 
 Executed results:
 
 - extracted seeds:
-  [p2r_motif_seeds_20260322_233001](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_motif_seeds_20260322_233001)
+  [p2r_motif_seeds_20260322_233001](results/runs/p2r_motif_seeds_20260322_233001)
 - top exact classes are now explicit:
   - dominant `B2`: `ISETP.GE -> P2R.B2 -> LDS.64`
   - rich `B2`: `ISETP.GE -> P2R.B2 -> R2P -> LEA/LEA.HI.X`
@@ -261,9 +261,9 @@ Executed results:
   even `R2P/LEA`-class and `BAR.SYNC`-class seeds remain version-invariant and
   still do not select `P2R.B*` or `R2P`
 - the best local patchpoints are now ranked in
-  [p2r_patchpoints_dedup_20260322_233108](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_patchpoints_dedup_20260322_233108)
+  [p2r_patchpoints_dedup_20260322_233108](results/runs/p2r_patchpoints_dedup_20260322_233108)
 - the first semantic patch shortlist is in
-  [p2r_cubin_semantic_patch_20260322_233138](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_semantic_patch_20260322_233138)
+  [p2r_cubin_semantic_patch_20260322_233138](results/runs/p2r_cubin_semantic_patch_20260322_233138)
 - that shortlist currently leans toward `B3` as the best first semantic patch
   target on the strongest local plain-`P2R` sites
 
@@ -285,37 +285,37 @@ Current status:
 First cubin-side breakthrough:
 
 - the top local plain-`P2R 0x7f` site in
-  [probe_p2r_two_stage_bank_exact_O3.cubin](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_symbolic_matrix_20260322_194108/probe_p2r_two_stage_bank_exact_O3.cubin)
+  [probe_p2r_two_stage_bank_exact_O3.cubin](results/runs/p2r_symbolic_matrix_20260322_194108/probe_p2r_two_stage_bank_exact_O3.cubin)
   is unique and patchable
 - replacing its 128-bit instruction pair with the derived `B2` and `B3` pairs
   yields real re-disassembly as:
   - `P2R.B2 R0, PR, R0, 0x78`
   - `P2R.B3 R0, PR, R0, 0x78`
 - patch-trial artifacts:
-  [p2r_cubin_patch_trial_20260322_233700](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_patch_trial_20260322_233700)
+  [p2r_cubin_patch_trial_20260322_233700](results/runs/p2r_cubin_patch_trial_20260322_233700)
 - the derived patch sketches are in
-  [p2r_patch_sketches_20260322_233503](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_patch_sketches_20260322_233503)
+  [p2r_patch_sketches_20260322_233503](results/runs/p2r_patch_sketches_20260322_233503)
 - the control-half validation is in
-  [p2r_patch_validation_20260322_233549](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_patch_validation_20260322_233549)
+  [p2r_patch_validation_20260322_233549](results/runs/p2r_patch_validation_20260322_233549)
 
 First runtime split:
 
 - patched `two_stage` cubins are runtime-stable under the driver harness and
   match the sampled baseline outputs:
-  [p2r_cubin_runtime_trial_20260322_233706](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_runtime_trial_20260322_233706)
+  [p2r_cubin_runtime_trial_20260322_233706](results/runs/p2r_cubin_runtime_trial_20260322_233706)
 - patched `byteview` cubins re-disassemble correctly, but the guarded launch
   path does not complete within the timeout budget:
-  [p2r_cubin_runtime_trial_byteview_guarded_20260322_233856](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_runtime_trial_byteview_guarded_20260322_233856)
+  [p2r_cubin_runtime_trial_byteview_guarded_20260322_233856](results/runs/p2r_cubin_runtime_trial_byteview_guarded_20260322_233856)
 - that is the current best semantic boundary:
   some local plain-`P2R` sites tolerate byte-lane substitution, others do not
 
 Second semantic-validation tranche:
 
 - reusable cubin patch and matrix tooling now exists:
-  - [patch_p2r_cubin.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/patch_p2r_cubin.py)
-  - [validate_p2r_cubin_pattern_matrix.sh](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/validate_p2r_cubin_pattern_matrix.sh)
+  - [patch_p2r_cubin.py](scripts/patch_p2r_cubin.py)
+  - [validate_p2r_cubin_pattern_matrix.sh](scripts/validate_p2r_cubin_pattern_matrix.sh)
 - the multi-pattern `two_stage` matrix is now in
-  [p2r_cubin_pattern_matrix_20260322_234513](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_pattern_matrix_20260322_234513)
+  [p2r_cubin_pattern_matrix_20260322_234513](results/runs/p2r_cubin_pattern_matrix_20260322_234513)
 - that sharper matrix overturns the earlier overly-optimistic single-pattern
   read:
   - `P2R.B2` and `P2R.B3` substitutions both execute cleanly
@@ -332,9 +332,9 @@ Sibling-candidate expansion:
 - a unique `B2`-leaning site inside the same cubin family,
   `probe_p2r_b2_nibble_exact`, now has direct local patched disassembly as
   `P2R.B2 R6, PR, R0, 0x78` and `P2R.B3 R6, PR, R0, 0x78` under
-  [p2r_semantic_expansion_20260322_234457](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_semantic_expansion_20260322_234457)
+  [p2r_semantic_expansion_20260322_234457](results/runs/p2r_semantic_expansion_20260322_234457)
 - its runtime matrix is in
-  [p2r_cubin_pattern_matrix_20260322_234517](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_pattern_matrix_20260322_234517)
+  [p2r_cubin_pattern_matrix_20260322_234517](results/runs/p2r_cubin_pattern_matrix_20260322_234517)
 - that site is runtime-stable on all tested patterns
   - patterns `0`, `1`, and `3` deterministically differ from baseline
   - pattern `2` matches baseline
@@ -344,7 +344,7 @@ Sibling-candidate expansion:
   direct local patched disassembly as `P2R.B2 R3, PR, R0, 0x78` and
   `P2R.B3 R3, PR, R0, 0x78` in the same expansion bundle
 - its runtime matrix is in
-  [p2r_cubin_pattern_matrix_20260322_234522](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_pattern_matrix_20260322_234522)
+  [p2r_cubin_pattern_matrix_20260322_234522](results/runs/p2r_cubin_pattern_matrix_20260322_234522)
 - that site is also runtime-stable on all tested patterns
   - all four tested patterns differ from baseline
   - `B2` and `B3` differ from each other on patterns `0`, `1`, and `2`
@@ -357,7 +357,7 @@ Occurrence-targeted tripack follow-up:
   `probe_p2r_b2_tripack_prefix_exact`
 - patched disassembly is in the same semantic expansion bundle, and the
   runtime matrix is
-  [p2r_cubin_pattern_matrix_20260322_234632](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_pattern_matrix_20260322_234632)
+  [p2r_cubin_pattern_matrix_20260322_234632](results/runs/p2r_cubin_pattern_matrix_20260322_234632)
 - this higher-scoring multi-`P2R` context is runtime-stable on all four tested
   patterns, but differs from baseline on all four
 - `B2` and `B3` again collapse to the same observed outputs on all four tested
@@ -381,7 +381,7 @@ Updated semantic boundary:
 - the same `two_stage` top site now also patches cleanly to
   `P2R.B1 R0, PR, R0, 0x78` under the semantic expansion bundle
 - its multi-pattern matrix is in
-  [p2r_cubin_pattern_matrix_20260322_235427](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_cubin_pattern_matrix_20260322_235427)
+  [p2r_cubin_pattern_matrix_20260322_235427](results/runs/p2r_cubin_pattern_matrix_20260322_235427)
 - `B1` follows the same high-level shape as the earlier `B2/B3` two-stage
   substitutions:
   - patterns `0` and `1` are inert

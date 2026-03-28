@@ -106,7 +106,7 @@ Result:
 
 The normalized analysis artifact is:
 
-- [summary.txt](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_frontier_analysis_20260322_204026/summary.txt)
+- [summary.txt](results/runs/p2r_frontier_analysis_20260322_204026/summary.txt)
 
 The strongest source-space approximations are:
 
@@ -152,9 +152,9 @@ That makes the strongest current conclusion:
 
 The final three runs are:
 
-- [p2r_plop3_source_20260322_202900](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_plop3_source_20260322_202900)
-- [p2r_plop3_samecarrier_20260322_202951](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_plop3_samecarrier_20260322_202951)
-- [p2r_plop3_selpack_20260322_203047](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_plop3_selpack_20260322_203047)
+- [p2r_plop3_source_20260322_202900](results/runs/p2r_plop3_source_20260322_202900)
+- [p2r_plop3_samecarrier_20260322_202951](results/runs/p2r_plop3_samecarrier_20260322_202951)
+- [p2r_plop3_selpack_20260322_203047](results/runs/p2r_plop3_selpack_20260322_203047)
 
 These close the last meaningful source-space axis:
 

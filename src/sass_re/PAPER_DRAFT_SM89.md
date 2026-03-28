@@ -7,9 +7,9 @@ story that is already evidence-backed today.
 
 Primary bounded source of truth:
 
-- [PAPER_CLAIMS_MATRIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_CLAIMS_MATRIX.md)
-- [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
+- [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 
 ## Draft Abstract
 
@@ -41,12 +41,12 @@ Relevant claims:
 
 Relevant assets:
 
-- [table_a1_sm89_inventory_summary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a1_sm89_inventory_summary.csv)
-- [table_a2_p2r_frontier_status.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a2_p2r_frontier_status.csv)
-- [table_a3_uplop3_structural_boundary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a3_uplop3_structural_boundary.csv)
-- [uplop3_runtime_class_map.generated.svg](/home/eirikr/Github/YSU-engine/src/sass_re/figures/uplop3_runtime_class_map.generated.svg)
-- [table_a4_live_uplop3_site_ranking.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a4_live_uplop3_site_ranking.csv)
-- [table_a5_tool_effectiveness_matrix.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a5_tool_effectiveness_matrix.csv)
+- [table_a1_sm89_inventory_summary.csv](tables/table_a1_sm89_inventory_summary.csv)
+- [table_a2_p2r_frontier_status.csv](tables/table_a2_p2r_frontier_status.csv)
+- [table_a3_uplop3_structural_boundary.csv](tables/table_a3_uplop3_structural_boundary.csv)
+- [uplop3_runtime_class_map.generated.svg](figures/uplop3_runtime_class_map.generated.svg)
+- [table_a4_live_uplop3_site_ranking.csv](tables/table_a4_live_uplop3_site_ranking.csv)
+- [table_a5_tool_effectiveness_matrix.csv](tables/table_a5_tool_effectiveness_matrix.csv)
 
 ## Draft Section 7.4: Ada-Only Frontier Status
 

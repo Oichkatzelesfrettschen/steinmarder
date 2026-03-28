@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "/home/eirikr/Github/YSU-engine/src/sass_re/lto/dlto_stage_helpers.cuh"
+#include "lto/dlto_stage_helpers.cuh"
 
 static int check_cuda(cudaError_t err, const char *file, int line) {
     if (err != cudaSuccess) {

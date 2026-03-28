@@ -7,9 +7,9 @@ experiment units.
 
 Artifacts:
 
-- [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md)
-- [SM89_SASS_INSTRUCTION_REFERENCE.md](/home/eirikr/Github/YSU-engine/src/sass_re/SM89_SASS_INSTRUCTION_REFERENCE.md)
-- [table_a1_sm89_inventory_summary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a1_sm89_inventory_summary.csv)
+- [RESULTS.md](RESULTS.md)
+- [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md)
+- [table_a1_sm89_inventory_summary.csv](tables/table_a1_sm89_inventory_summary.csv)
 
 Method summary:
 
@@ -24,15 +24,15 @@ Figure/table target:
 
 Validation check:
 
-- [verify_paper_assets.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/verify_paper_assets.py)
+- [verify_paper_assets.py](scripts/verify_paper_assets.py)
 
 ## Theme 2: `P2R` Frontier
 
 Artifacts:
 
-- [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md)
-- [P2R_NEXT_PHASE.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_NEXT_PHASE.md)
-- [table_a2_p2r_frontier_status.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a2_p2r_frontier_status.csv)
+- [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md)
+- [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md)
+- [table_a2_p2r_frontier_status.csv](tables/table_a2_p2r_frontier_status.csv)
 
 Method summary:
 
@@ -52,9 +52,9 @@ Validation check:
 
 Artifacts:
 
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
-- [table_a3_uplop3_structural_boundary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a3_uplop3_structural_boundary.csv)
-- [uplop3_runtime_class_map.generated.svg](/home/eirikr/Github/YSU-engine/src/sass_re/figures/uplop3_runtime_class_map.generated.svg)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
+- [table_a3_uplop3_structural_boundary.csv](tables/table_a3_uplop3_structural_boundary.csv)
+- [uplop3_runtime_class_map.generated.svg](figures/uplop3_runtime_class_map.generated.svg)
 
 Method summary:
 
@@ -74,9 +74,9 @@ Validation check:
 
 Artifacts:
 
-- [table_a4_live_uplop3_site_ranking.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a4_live_uplop3_site_ranking.csv)
-- [uplop3_pair_baseline_numeric.csv](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/uplop3_pair_baseline_numeric.csv)
-- [MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
+- [table_a4_live_uplop3_site_ranking.csv](tables/table_a4_live_uplop3_site_ranking.csv)
+- [uplop3_pair_baseline_numeric.csv](processed/monograph_20260323/uplop3_pair_baseline_numeric.csv)
+- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
 
 Method summary:
 
@@ -96,8 +96,8 @@ Validation check:
 
 Artifacts:
 
-- [table_a5_tool_effectiveness_matrix.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a5_tool_effectiveness_matrix.csv)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [table_a5_tool_effectiveness_matrix.csv](tables/table_a5_tool_effectiveness_matrix.csv)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 
 Method summary:
 

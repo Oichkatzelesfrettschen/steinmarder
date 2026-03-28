@@ -12,13 +12,13 @@ under `processed/monograph_20260323/`.
 
 Primary sources:
 
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
-- [PAPER_CLAIMS_MATRIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_CLAIMS_MATRIX.md)
-- [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- [MONOGRAPH_BUILD.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_BUILD.md)
-- [MONOGRAPH_THEOREM_APPENDIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_THEOREM_APPENDIX.md)
-- [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md)
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
+- [PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
+- [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- [MONOGRAPH_BUILD.md](MONOGRAPH_BUILD.md)
+- [MONOGRAPH_THEOREM_APPENDIX.md](MONOGRAPH_THEOREM_APPENDIX.md)
+- [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
 
 ## 1. Problem Statement
 
@@ -237,7 +237,7 @@ structure matters at the encoding level.
 
 The current runtime-class counts are archived in:
 
-- [uplop3_runtime_class_counts.csv](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/uplop3_runtime_class_counts.csv)
+- [uplop3_runtime_class_counts.csv](processed/monograph_20260323/uplop3_runtime_class_counts.csv)
 
 The coarse partition is:
 
@@ -260,7 +260,7 @@ The best current live local sites, ranked by library overlap, are:
 
 This ranking is archived in:
 
-- [uplop3_live_site_numeric.csv](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/uplop3_live_site_numeric.csv)
+- [uplop3_live_site_numeric.csv](processed/monograph_20260323/uplop3_live_site_numeric.csv)
 
 ### 5.6 Pair-baseline law
 
@@ -273,7 +273,7 @@ The pair-baseline results show a causal asymmetry:
 
 The processed ratios are archived in:
 
-- [uplop3_pair_baseline_numeric.csv](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/uplop3_pair_baseline_numeric.csv)
+- [uplop3_pair_baseline_numeric.csv](processed/monograph_20260323/uplop3_pair_baseline_numeric.csv)
 
 This suggests a three-role vocabulary:
 
@@ -296,7 +296,7 @@ The empirical workflow also converged on a practical law:
 
 This is archived in:
 
-- [tool_effectiveness_numeric.csv](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/tool_effectiveness_numeric.csv)
+- [tool_effectiveness_numeric.csv](processed/monograph_20260323/tool_effectiveness_numeric.csv)
 
 The mathematical implication is that semantic information and performance
 information are not interchangeable observables. A patch can be semantically
@@ -306,11 +306,11 @@ performance counters as proxies for semantic divergence.
 ## 7. Visual And Organizational Synthesis
 
 The processed archive under
-[processed/monograph_20260323](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323)
+[processed/monograph_20260323](processed/monograph_20260323)
 normalizes the evidence into plot-ready tables. The corresponding monograph
 LaTeX file is:
 
-- [sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
+- [sm89_monograph.tex](tex/sm89_monograph.tex)
 
 The visualization package is designed to support:
 

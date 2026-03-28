@@ -3,7 +3,7 @@
 1. [x] Confirm local environment feasibility for PTX/frontend sweeps.
 2. [x] Launch broad installed-library `P2R.B*` mining.
 3. [x] Launch first direct PTX predicate-logic search.
-4. [x] Capture next-phase scope in [P2R_NEXT_PHASE.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_NEXT_PHASE.md).
+4. [x] Capture next-phase scope in [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md).
 5. [x] Verify that cuBLAS contributes no immediate `P2R.B*` hits in the first sweep.
 6. [x] Verify that TensorRT `sm89` builder resource is not directly `cuobjdump`-readable.
 7. [x] Summarize cuDNN mined `P2R.B1` predecessor op frequencies.

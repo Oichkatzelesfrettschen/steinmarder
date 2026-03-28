@@ -34,11 +34,11 @@ Files:
 
 Primary producer:
 
-- [generate_monograph_assets.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/generate_monograph_assets.py)
+- [generate_monograph_assets.py](scripts/generate_monograph_assets.py)
 
 Primary consumers:
 
-- [MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
-- [sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
-- [sm89_monograph.pdf](/home/eirikr/Github/YSU-engine/src/sass_re/tex/build/sm89_monograph.pdf)
-- [SHA256SUMS](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/SHA256SUMS)
+- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+- [sm89_monograph.tex](tex/sm89_monograph.tex)
+- [sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
+- [SHA256SUMS](processed/monograph_20260323/SHA256SUMS)

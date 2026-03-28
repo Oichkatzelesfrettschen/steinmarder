@@ -6,7 +6,7 @@ First-party measurements taken with CUDA 13.1 on Windows.
 
 The SASS RE toolkit is no longer limited to the legacy top-level probe list.
 The current automation walks the full recursive probe tree via
-[`probe_manifest.py`](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/probe_manifest.py).
+[`probe_manifest.py`](scripts/probe_manifest.py).
 
 Current manifest-backed corpus:
 
@@ -22,7 +22,7 @@ Current manifest-backed corpus:
 ## 2026-03-20 Full Recursive Refresh
 
 Canonical aggregate run:
-[`src/sass_re/results/runs/full_recursive_20260320_142438`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/full_recursive_20260320_142438)
+[`src/sass_re/results/runs/full_recursive_20260320_142438`](results/runs/full_recursive_20260320_142438)
 
 Note:
 - The current manifest is slightly larger than this run. Two final-cluster
@@ -100,8 +100,8 @@ for `UPLOP3` frontier work:
 - seeded differential fuzzing
 
 The first tandem anchor runs are:
-- [`uplop3_uniform_tandem_20260323_092500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_tandem_20260323_092500)
-- [`uplop3_cutlass_tandem_20260323_092500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_cutlass_tandem_20260323_092500)
+- [`uplop3_uniform_tandem_20260323_092500`](results/runs/uplop3_uniform_tandem_20260323_092500)
+- [`uplop3_cutlass_tandem_20260323_092500`](results/runs/uplop3_cutlass_tandem_20260323_092500)
 
 These sharpen the tool split:
 - seeded differential fuzzing is the strongest semantic discriminator
@@ -117,8 +117,8 @@ They also sharpen the ranking of the live local branches:
   (`18/24` seeded cases with diffs)
 
 A follow-up second-tier tandem tranche then refined the live-site ranking:
-- [`uplop3_uniform_occ2_tandem_20260323_094000`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_occ2_tandem_20260323_094000)
-- [`uplop3_cutlass_occ4_tandem_20260323_094000`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_cutlass_occ4_tandem_20260323_094000)
+- [`uplop3_uniform_occ2_tandem_20260323_094000`](results/runs/uplop3_uniform_occ2_tandem_20260323_094000)
+- [`uplop3_cutlass_occ4_tandem_20260323_094000`](results/runs/uplop3_cutlass_occ4_tandem_20260323_094000)
 
 That result says:
 - `uniform_occ2` behaves like a credible secondary anchor:
@@ -127,9 +127,9 @@ That result says:
   `occ4_occ5` is extremely broad (`23/24` seeded cases with diffs)
 
 A richer anchor tranche then tightened the top of the ranking:
-- [`uplop3_uniform_occ1_rich_tandem_20260323_095500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_occ1_rich_tandem_20260323_095500)
-- [`uplop3_uniform_occ2_rich_tandem_20260323_095500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_occ2_rich_tandem_20260323_095500)
-- [`uplop3_cutlass_occ5_rich_tandem_20260323_095500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_cutlass_occ5_rich_tandem_20260323_095500)
+- [`uplop3_uniform_occ1_rich_tandem_20260323_095500`](results/runs/uplop3_uniform_occ1_rich_tandem_20260323_095500)
+- [`uplop3_uniform_occ2_rich_tandem_20260323_095500`](results/runs/uplop3_uniform_occ2_rich_tandem_20260323_095500)
+- [`uplop3_cutlass_occ5_rich_tandem_20260323_095500`](results/runs/uplop3_cutlass_occ5_rich_tandem_20260323_095500)
 
 Those runs show:
 - `uniform_occ1` remains a real anchor, but `occ1_occ2_occ5` broadens it more
@@ -140,8 +140,8 @@ Those runs show:
 - `occ2_occ4_occ5` remains the broadest CUTLASS widener (`18/24` diffs)
 
 A partner-centered follow-up then clarified the causal roles:
-- [`uplop3_uniform_occ5_tandem_20260323_101500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_occ5_tandem_20260323_101500)
-- [`uplop3_cutlass_occ2_tandem_20260323_101500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_cutlass_occ2_tandem_20260323_101500)
+- [`uplop3_uniform_occ5_tandem_20260323_101500`](results/runs/uplop3_uniform_occ5_tandem_20260323_101500)
+- [`uplop3_cutlass_occ2_tandem_20260323_101500`](results/runs/uplop3_cutlass_occ2_tandem_20260323_101500)
 
 That result says:
 - on the uniform branch, `occ5` behaves more like a sensitizer than an anchor
@@ -150,9 +150,9 @@ That result says:
 
 A sharper pair-baseline tranche then treated `occ2_occ5` itself as the baseline
 state on both branches:
-- [`uplop3_uniform_pair_baseline_20260323_094600`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_pair_baseline_20260323_094600)
-- [`uplop3_cutlass_pair_baseline_20260323_094718`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_cutlass_pair_baseline_20260323_094718)
-- [`uplop3_uniform_pair_baseline_20260323_094600__uplop3_cutlass_pair_baseline_20260323_094718__pair_summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_uniform_pair_baseline_20260323_094600__uplop3_cutlass_pair_baseline_20260323_094718__pair_summary.txt)
+- [`uplop3_uniform_pair_baseline_20260323_094600`](results/runs/uplop3_uniform_pair_baseline_20260323_094600)
+- [`uplop3_cutlass_pair_baseline_20260323_094718`](results/runs/uplop3_cutlass_pair_baseline_20260323_094718)
+- [`uplop3_uniform_pair_baseline_20260323_094600__uplop3_cutlass_pair_baseline_20260323_094718__pair_summary.txt`](results/runs/uplop3_uniform_pair_baseline_20260323_094600__uplop3_cutlass_pair_baseline_20260323_094718__pair_summary.txt)
 
 That result says:
 - on the uniform branch, `occ1` remains the true extra widener, but the full
@@ -166,7 +166,7 @@ That result says:
 ## 2026-03-20 Postfix Recursive Refresh
 
 Postfix aggregate run:
-[`src/sass_re/results/runs/full_recursive_20260320_182500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/full_recursive_20260320_182500)
+[`src/sass_re/results/runs/full_recursive_20260320_182500`](results/runs/full_recursive_20260320_182500)
 
 This rerun folds in the two late final-cluster probes plus the generic-runner
 fixes.
@@ -182,7 +182,7 @@ fixes.
 
 Postfix `ncu` cleanup after the aggregate run:
 
-- [`src/sass_re/results/runs/final_ncu_tail_retest_20260320`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/final_ncu_tail_retest_20260320)
+- [`src/sass_re/results/runs/final_ncu_tail_retest_20260320`](results/runs/final_ncu_tail_retest_20260320)
   clears all three remaining direct failures from the postfix run:
   `probe_control_flow.cu`, `probe_tiling_2d_stencil.cu`, and
   `probe_uniform_stage_toggle_pipeline.cu`.
@@ -193,13 +193,13 @@ Postfix `ncu` cleanup after the aggregate run:
 Post-refresh cleanup and final direct follow-ups:
 
 - Runner-fix validation under
-  [`src/sass_re/results/runs/runner_fix_validation_20260320/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runner_fix_validation_20260320/summary.txt)
+  [`src/sass_re/results/runs/runner_fix_validation_20260320/summary.txt`](results/runs/runner_fix_validation_20260320/summary.txt)
   converts the old `UNSUPPORTED RUNNER` cases for `probe_mx_microscaling.cu`,
   `probe_uniform_exotic.cu`, `probe_uniform_strict_address.cu`,
   `probe_uniform_u64_strict.cu`, `probe_uplop3_uniform_predicates.cu`, and the
   `data_movement2` local-width probes into clean generic-runner `ncu` passes.
 - Custom-runner validation under
-  [`src/sass_re/results/runs/custom_runner_validation_20260321_012900/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/custom_runner_validation_20260321_012900/summary.txt)
+  [`src/sass_re/results/runs/custom_runner_validation_20260321_012900/summary.txt`](results/runs/custom_runner_validation_20260321_012900/summary.txt)
   now converts `probe_barrier_arrive_wait.cu`,
   `probe_barrier_coop_groups_sync.cu`, and
   `probe_tiling_hierarchical.cu` into clean dedicated-runner `ncu` passes.
@@ -207,26 +207,26 @@ Post-refresh cleanup and final direct follow-ups:
   cooperative-groups runner intentionally omits the still-unsafe multilevel
   kernel from runtime execution while preserving it for disassembly.
 - Runner-tail validation under
-  [`src/sass_re/results/runs/runner_tail_validation_20260321_014800/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runner_tail_validation_20260321_014800/summary.txt)
+  [`src/sass_re/results/runs/runner_tail_validation_20260321_014800/summary.txt`](results/runs/runner_tail_validation_20260321_014800/summary.txt)
   now converts `probe_cooperative_launch.cu` and
   `barrier_sync2/probe_depbar_explicit.cu` into clean dedicated-runner `ncu`
   passes. The cooperative runner launches the grid-sync kernel via
   `cudaLaunchCooperativeKernel` when the device reports support.
 - Failure-retest validation under
-  [`src/sass_re/results/runs/ncu_fail_retest_20260320/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/ncu_fail_retest_20260320/summary.txt)
+  [`src/sass_re/results/runs/ncu_fail_retest_20260320/summary.txt`](results/runs/ncu_fail_retest_20260320/summary.txt)
   now clears representative old `ncu FAIL` cases including
   `probe_barrier_membar_variants.cu`, `probe_tiling_scatter_gather.cu`,
   `shared_atomics/probe_satom_int32_add.cu`,
   `data_movement/probe_dm_gather_scatter_idx.cu`, and
   `edge_atomics2/probe_edge2_local_atomic.cu`.
 - The final direct predicate/uniform tranche under
-  [`src/sass_re/results/runs/final_cluster_followup_20260320/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/final_cluster_followup_20260320/summary.txt)
+  [`src/sass_re/results/runs/final_cluster_followup_20260320/summary.txt`](results/runs/final_cluster_followup_20260320/summary.txt)
   strengthens the negative evidence: the optimized local path still does not
   reproduce `P2R.B1/B2/B3`, `UPLOP3.LUT`, or `USHF.L.U64.HI`. The
   debug lane again shows only the nearby neighborhood `P2R`, `PLOP3.LUT`, and
   `SHF.L.U64.HI`.
 - An exact predicate/uniform frontier tranche under
-  [`src/sass_re/results/runs/predicate_uniform_frontier_20260321_031500/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/predicate_uniform_frontier_20260321_031500/summary.txt)
+  [`src/sass_re/results/runs/predicate_uniform_frontier_20260321_031500/summary.txt`](results/runs/predicate_uniform_frontier_20260321_031500/summary.txt)
   reconciles an important erratum and narrows the true remaining gap. `R2P`
   is already directly observed locally in `probe_transcendentals.sass` and
   `probe_fp64_transcendentals.sass`, while the new exact probes still do not
@@ -235,7 +235,7 @@ Post-refresh cleanup and final direct follow-ups:
   `UISETP.NE.U32.AND`, `ULDC.64`, `HMMA.1688.F32.TF32`, and
   `LDGSTS.E.BYPASS.LTC128B.128(.ZFILL)`.
 - A targeted documented-flag hunt on the highest-yield subset under
-  [`src/sass_re/results/runs/high_yield_flag_hunt_20260320/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/high_yield_flag_hunt_20260320/summary.txt)
+  [`src/sass_re/results/runs/high_yield_flag_hunt_20260320/summary.txt`](results/runs/high_yield_flag_hunt_20260320/summary.txt)
   shows that:
   - `-O0 -G -dopt=on`, `--extra-device-vectorization`,
     `--extra-device-vectorization --restrict`, and
@@ -247,7 +247,7 @@ Post-refresh cleanup and final direct follow-ups:
     additional raw load spellings, specifically `LDG.E.STRONG.GPU`,
     `LDG.E.S8.STRONG.GPU`, and `LDG.E.U8.STRONG.GPU`
 - A dedicated multi-translation-unit `-dlto` tranche under
-  [`src/sass_re/results/runs/dlto_tranche_20260320_213954/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/dlto_tranche_20260320_213954/summary.txt)
+  [`src/sass_re/results/runs/dlto_tranche_20260320_213954/summary.txt`](results/runs/dlto_tranche_20260320_213954/summary.txt)
   now validates real cross-TU device link-time optimization on the local Ada
   toolchain. Relative to the no-LTO build, the with-LTO build:
   - removes helper call plumbing from the kernel body
@@ -257,7 +257,7 @@ Post-refresh cleanup and final direct follow-ups:
   - drops debug-style reconvergence helpers such as `BSSY` and `BSYNC` from
     the no-LTO split-function path
 - A focused runtime-performance tranche under
-  [`src/sass_re/results/runs/runtime_perf_tranche_20260320_214330/run.log`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_perf_tranche_20260320_214330/run.log)
+  [`src/sass_re/results/runs/runtime_perf_tranche_20260320_214330/run.log`](results/runs/runtime_perf_tranche_20260320_214330/run.log)
   now turns three Ada-side execution levers into measured local evidence:
   - `cudaAccessPolicyWindow` / persisting L2:
     `l2_persist_off_ms=0.006321`, `l2_persist_on_ms=0.005586`,
@@ -275,7 +275,7 @@ Post-refresh cleanup and final direct follow-ups:
     while the current async overlap microkernel is not yet compute-heavy enough
     to amortize its staging overhead
 - A focused HMM / Unified Memory tranche under
-  [`src/sass_re/results/runs/runtime_hmm_tranche_20260321_020217/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_hmm_tranche_20260321_020217/summary.txt)
+  [`src/sass_re/results/runs/runtime_hmm_tranche_20260321_020217/summary.txt`](results/runs/runtime_hmm_tranche_20260321_020217/summary.txt)
   now turns the already-enabled desktop HMM path into measured local evidence:
   - platform capability:
     `managed_memory=1`, `concurrent_managed_access=1`,
@@ -296,7 +296,7 @@ Post-refresh cleanup and final direct follow-ups:
     chosen advice mix is catastrophically wrong for a write-heavy managed
     kernel and should not be generalized as a default optimization
 - A focused GreenBoost runtime tranche under
-  [`src/sass_re/results/runs/runtime_greenboost_tranche_20260321_082925/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_tranche_20260321_082925/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_tranche_20260321_082925/summary.txt`](results/runs/runtime_greenboost_tranche_20260321_082925/summary.txt)
   now turns the upstream March 2026 GreenBoost release into measured local
   evidence on this Ada desktop:
   - local packaging/install path:
@@ -321,7 +321,7 @@ Post-refresh cleanup and final direct follow-ups:
     UVM after a large setup penalty, and Path C is the only cleanly resolved
     overflow path in this controlled local configuration
 - A follow-up driver-API-native tranche under
-  [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_20260321_083427/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_driver_tranche_20260321_083427/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_20260321_083427/summary.txt`](results/runs/runtime_greenboost_driver_tranche_20260321_083427/summary.txt)
   sharpens that interpretation:
   - baseline driver allocation:
     `alloc_ms=0.147430`
@@ -339,9 +339,9 @@ Post-refresh cleanup and final direct follow-ups:
     problem after successful overflow routing into the DMA-BUF registration
     path
 - A newer context-mode and raw-hostreg follow-up under
-  [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_ctxmodes_20260321_085750/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_driver_tranche_ctxmodes_20260321_085750/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_ctxmodes_20260321_085750/summary.txt`](results/runs/runtime_greenboost_driver_tranche_ctxmodes_20260321_085750/summary.txt)
   and
-  [`src/sass_re/results/runs/runtime_hostreg_probe_20260321_085842/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_hostreg_probe_20260321_085842/summary.txt)
+  [`src/sass_re/results/runs/runtime_hostreg_probe_20260321_085842/summary.txt`](results/runs/runtime_hostreg_probe_20260321_085842/summary.txt)
   tightens that diagnosis:
   - the driver runner reports `ctx_flags=0x8`, `ctx_has_map_host=1`, and
     `can_map_host_memory=1` in both the primary-context and explicit
@@ -357,7 +357,7 @@ Post-refresh cleanup and final direct follow-ups:
     handling, not to a general local inability to map registered host memory
     into a CUDA device pointer
 - A symbol-level follow-up under
-  [`src/sass_re/results/runs/runtime_hostreg_symbol_probe_20260321_090753/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_hostreg_symbol_probe_20260321_090753/summary.txt)
+  [`src/sass_re/results/runs/runtime_hostreg_symbol_probe_20260321_090753/summary.txt`](results/runs/runtime_hostreg_symbol_probe_20260321_090753/summary.txt)
   then isolates the exact compatibility fault:
   - the legacy unsuffixed `cuMemHostGetDevicePointer` symbol returns
     `CUDA_ERROR_INVALID_CONTEXT` on this local driver stack
@@ -371,11 +371,11 @@ Post-refresh cleanup and final direct follow-ups:
   `cuMemHostRegister_v2` and `cuMemHostGetDevicePointer_v2`.
 - With that patch installed, both GreenBoost overflow paths now work locally:
   - driver-native validation:
-    [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_v2pref_20260321_091139/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_driver_tranche_v2pref_20260321_091139/summary.txt)
+    [`src/sass_re/results/runs/runtime_greenboost_driver_tranche_v2pref_20260321_091139/summary.txt`](results/runs/runtime_greenboost_driver_tranche_v2pref_20260321_091139/summary.txt)
     shows `resolved_path=DMA_BUF` for Path A and `resolved_path=HOSTREG` for
     Path B
   - runtime-API validation:
-    [`src/sass_re/results/runs/runtime_greenboost_tranche_v2pref_20260321_091159/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_tranche_v2pref_20260321_091159/summary.txt)
+    [`src/sass_re/results/runs/runtime_greenboost_tranche_v2pref_20260321_091159/summary.txt`](results/runs/runtime_greenboost_tranche_v2pref_20260321_091159/summary.txt)
     shows the same successful path resolution
   - current 512 MiB runtime-path measurements after the fix:
     - Path A (`DMA_BUF`):
@@ -392,7 +392,7 @@ Post-refresh cleanup and final direct follow-ups:
     far slower than real VRAM residency for this bandwidth-heavy test, so the
     next phase is performance characterization rather than basic bring-up.
 - A stronger multi-pattern GreenBoost performance tranche under
-  [`src/sass_re/results/runs/runtime_greenboost_perf_tranche_20260321_094142/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_perf_tranche_20260321_094142/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_perf_tranche_20260321_094142/summary.txt`](results/runs/runtime_greenboost_perf_tranche_20260321_094142/summary.txt)
   now shows how that penalty changes with access regime:
   - baseline VRAM path at 256 MiB:
     - `stream_rw`: `5.863424 ms` (`341.10 GiB/s`)
@@ -426,7 +426,7 @@ Post-refresh cleanup and final direct follow-ups:
     arithmetic intensity is high enough. Path C remains the best local
     overflow path for the tested patterns.
 - A first oversubscription-focused tranche under
-  [`src/sass_re/results/runs/runtime_greenboost_oversub_tranche_20260321_094432/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_oversub_tranche_20260321_094432/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_oversub_tranche_20260321_094432/summary.txt`](results/runs/runtime_greenboost_oversub_tranche_20260321_094432/summary.txt)
   then pushed the working set to `14 GiB`, beyond current free VRAM, and
   exposed a new GreenBoost-specific frontier:
   - requested Path A (`GREENBOOST_USE_DMA_BUF=1`) does not stay on DMA-BUF at
@@ -455,7 +455,7 @@ Post-refresh cleanup and final direct follow-ups:
     large-allocation DMA-BUF eligibility, and controlled hot-window versus
     full-range oversubscription behavior.
 - A dedicated DMA-BUF size sweep under
-  [`src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_094708/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_094708/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_094708/summary.txt`](results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_094708/summary.txt)
   now turns that first question into measured local evidence:
   - `4 GiB` remains real `DMA_BUF`
   - `8 GiB` fails `GB_IOCTL_PIN_USER_PTR` with `Invalid argument` and falls
@@ -466,7 +466,7 @@ Post-refresh cleanup and final direct follow-ups:
     somewhere between `4 GiB` and `8 GiB`. Above that, the practical behavior
     is HostReg fallback, not persistent DMA-BUF-backed overflow.
 - A tighter bisect under
-  [`src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_104547/summary.txt`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_104547/summary.txt)
+  [`src/sass_re/results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_104547/summary.txt`](results/runs/runtime_greenboost_dmabuf_size_sweep_20260321_104547/summary.txt)
   sharpens that bound:
   - `4.125 GiB`, `4.25 GiB`, and `4.375 GiB` all fail
     `GB_IOCTL_PIN_USER_PTR` with `Invalid argument`
@@ -1362,7 +1362,7 @@ Post-refresh cleanup and final direct follow-ups:
 ## 2026-03-20 Full-Corpus 6x4 Flag Sweep
 
 Final full-corpus flag sweep:
-[`src/sass_re/results/runs/flag_sweep_postfix_parallel6x4_20260320_233059`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/flag_sweep_postfix_parallel6x4_20260320_233059)
+[`src/sass_re/results/runs/flag_sweep_postfix_parallel6x4_20260320_233059`](results/runs/flag_sweep_postfix_parallel6x4_20260320_233059)
 
 This run replays the full 343-probe compile-enabled corpus through the
 manifest-backed flag matrix with bounded parallelism:
@@ -1421,37 +1421,37 @@ Full-corpus takeaways from this sweep:
   instruction families beyond that cluster.
 
 Focused validation artifacts for this implementation pass are under
-[`src/sass_re/results/plan_impl_20260319_230717`](/home/eirikr/Github/YSU-engine/src/sass_re/results/plan_impl_20260319_230717).
+[`src/sass_re/results/plan_impl_20260319_230717`](results/plan_impl_20260319_230717).
 
 The dedicated accelerator tranche artifacts are under
-[`src/sass_re/results/runs/tranche_accel_20260319_235626`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/tranche_accel_20260319_235626).
+[`src/sass_re/results/runs/tranche_accel_20260319_235626`](results/runs/tranche_accel_20260319_235626).
 
 The scripted revalidation pass is under
-[`src/sass_re/results/runs/tranche_accel_20260320_065036`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/tranche_accel_20260320_065036).
+[`src/sass_re/results/runs/tranche_accel_20260320_065036`](results/runs/tranche_accel_20260320_065036).
 
 The forced inline-PTX packed-video tranche is under
-[`src/sass_re/results/runs/video_isa_inline_ptx_20260320_084601`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/video_isa_inline_ptx_20260320_084601).
+[`src/sass_re/results/runs/video_isa_inline_ptx_20260320_084601`](results/runs/video_isa_inline_ptx_20260320_084601).
 
 The debug-vs-optimized packed-video comparison run is under
-[`src/sass_re/results/runs/video_flag_compare_20260320_090000`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/video_flag_compare_20260320_090000).
+[`src/sass_re/results/runs/video_flag_compare_20260320_090000`](results/runs/video_flag_compare_20260320_090000).
 
 The scalar-video and variant inline-PTX tranche is under
-[`src/sass_re/results/runs/video_scalar_variant_ptx_20260320_092500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/video_scalar_variant_ptx_20260320_092500).
+[`src/sass_re/results/runs/video_scalar_variant_ptx_20260320_092500`](results/runs/video_scalar_variant_ptx_20260320_092500).
 
 The scalar-video debug-vs-optimized comparison run is under
-[`src/sass_re/results/runs/video_extended_flag_compare_20260320_091500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/video_extended_flag_compare_20260320_091500).
+[`src/sass_re/results/runs/video_extended_flag_compare_20260320_091500`](results/runs/video_extended_flag_compare_20260320_091500).
 
 The dedicated `R2UR` / `MEMBAR.SC.VC` / selector-video follow-up run is under
-[`src/sass_re/results/runs/debug_followups_20260320_090904`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/debug_followups_20260320_090904).
+[`src/sass_re/results/runs/debug_followups_20260320_090904`](results/runs/debug_followups_20260320_090904).
 
 The completed deep-OptiX + cuDNN tranche bundle is under
-[`src/sass_re/results/runs/tranche_ml_optix_20260320_104244`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/tranche_ml_optix_20260320_104244).
+[`src/sass_re/results/runs/tranche_ml_optix_20260320_104244`](results/runs/tranche_ml_optix_20260320_104244).
 
 The architecture-filtered cuDNN library mining bundle is under
-[`src/sass_re/results/runs/cudnn_library_sm86_mining_20260320_103900`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/cudnn_library_sm86_mining_20260320_103900).
+[`src/sass_re/results/runs/cudnn_library_sm86_mining_20260320_103900`](results/runs/cudnn_library_sm86_mining_20260320_103900).
 
 The latest strict `UPLOP3` / `P2R` follow-up bundle is under
-[`src/sass_re/results/runs/uplop3_p2r_followup_20260320`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/uplop3_p2r_followup_20260320).
+[`src/sass_re/results/runs/uplop3_p2r_followup_20260320`](results/runs/uplop3_p2r_followup_20260320).
 
 Confirmed additions from that bundle:
 
@@ -1521,7 +1521,7 @@ One-off mnemonic classification after the video/debug sweeps:
   optimized code paths that do predicate-heavy control flow or TMU boundary
   logic, so it should stay in the main inventory rather than a debug appendix.
   The dedicated predicate-logic follow-up bundle at
-  [`src/sass_re/results/runs/predicate_logic_followup_20260320_091700`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/predicate_logic_followup_20260320_091700)
+  [`src/sass_re/results/runs/predicate_logic_followup_20260320_091700`](results/runs/predicate_logic_followup_20260320_091700)
   confirms an important nuance: the minimal direct `-O3 -Xptxas -O3` build of
   `probe_predicate_pressure.cu` does not surface `PLOP3.LUT`, but the same
   probe compiled with the full high-signal compile-profile lane

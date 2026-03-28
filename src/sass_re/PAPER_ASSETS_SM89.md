@@ -9,14 +9,14 @@ and it does not overstate direct source/IR closure for `P2R.B*` or
 
 Monograph-level synthesis and plot-ready archive:
 
-- [MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
-- [sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
-- [build_monograph_pdf.sh](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/build_monograph_pdf.sh)
-- [verify_monograph_pdf.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/verify_monograph_pdf.py)
-- [sm89_monograph.pdf](/home/eirikr/Github/YSU-engine/src/sass_re/tex/build/sm89_monograph.pdf)
-- [MONOGRAPH_BUILD.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_BUILD.md)
-- [MONOGRAPH_THEOREM_APPENDIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_THEOREM_APPENDIX.md)
-- [processed/monograph_20260323/README.md](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/README.md)
+- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+- [sm89_monograph.tex](tex/sm89_monograph.tex)
+- [build_monograph_pdf.sh](scripts/build_monograph_pdf.sh)
+- [verify_monograph_pdf.py](scripts/verify_monograph_pdf.py)
+- [sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
+- [MONOGRAPH_BUILD.md](MONOGRAPH_BUILD.md)
+- [MONOGRAPH_THEOREM_APPENDIX.md](MONOGRAPH_THEOREM_APPENDIX.md)
+- [processed/monograph_20260323/README.md](processed/monograph_20260323/README.md)
 
 ## Table A1. SM89 Inventory Summary
 
@@ -27,12 +27,12 @@ Claims:
 
 | Metric | Value | Evidence |
 |---|---:|---|
-| Recursive probe files | 349 | [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md) |
-| Compile-enabled probe files | 343 | [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md) |
-| Canonical optimized mnemonic frontier | 379 | [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md) |
-| Strongest discovery-lane frontier | 382 | [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md) |
-| Checked-in SM89 catalog rows | 470 | [SM89_SASS_INSTRUCTION_REFERENCE.md](/home/eirikr/Github/YSU-engine/src/sass_re/SM89_SASS_INSTRUCTION_REFERENCE.md) |
-| Remaining unreproduced direct-local source/IR cluster | `P2R.B1/B2/B3`, `UPLOP3.LUT` | [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md) |
+| Recursive probe files | 349 | [RESULTS.md](RESULTS.md) |
+| Compile-enabled probe files | 343 | [RESULTS.md](RESULTS.md) |
+| Canonical optimized mnemonic frontier | 379 | [RESULTS.md](RESULTS.md) |
+| Strongest discovery-lane frontier | 382 | [RESULTS.md](RESULTS.md) |
+| Checked-in SM89 catalog rows | 470 | [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md) |
+| Remaining unreproduced direct-local source/IR cluster | `P2R.B1/B2/B3`, `UPLOP3.LUT` | [RESULTS.md](RESULTS.md) |
 
 Bounded interpretation:
 
@@ -40,7 +40,7 @@ Bounded interpretation:
 - `382` is a lane-specific discovery maximum, not the canonical optimized
   baseline.
 - Generated table artifact:
-  [table_a1_sm89_inventory_summary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a1_sm89_inventory_summary.csv)
+  [table_a1_sm89_inventory_summary.csv](tables/table_a1_sm89_inventory_summary.csv)
 
 ## Table A2. `P2R` Frontier Status
 
@@ -54,12 +54,12 @@ Claims:
 
 | Axis | Current result | Evidence |
 |---|---|---|
-| Direct local source/IR emission of `P2R.B1/B2/B3` | not reproduced | [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md) |
-| Local plain `P2R ... 0x7f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md) |
-| Local plain `P2R ... 0x0f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md) |
-| PTX/clang/Triton/simple `ptxas` version sweep | no direct `P2R.B*` unlock | [P2R_NEXT_PHASE.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_NEXT_PHASE.md) |
-| Cubin-side local `P2R.B1/B2/B3` | materialized and runnable | [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md) |
-| Best current interpretation | source/IR form-selection problem, not opcode-existence problem | [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md) |
+| Direct local source/IR emission of `P2R.B1/B2/B3` | not reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
+| Local plain `P2R ... 0x7f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
+| Local plain `P2R ... 0x0f` | reproduced | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
+| PTX/clang/Triton/simple `ptxas` version sweep | no direct `P2R.B*` unlock | [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md) |
+| Cubin-side local `P2R.B1/B2/B3` | materialized and runnable | [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md) |
+| Best current interpretation | source/IR form-selection problem, not opcode-existence problem | [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md) |
 
 Bounded interpretation:
 
@@ -67,7 +67,7 @@ Bounded interpretation:
 - It does not claim that no other older sysroot or deeper IR layer could ever
   unlock direct source/IR `P2R.B*`.
 - Generated table artifact:
-  [table_a2_p2r_frontier_status.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a2_p2r_frontier_status.csv)
+  [table_a2_p2r_frontier_status.csv](tables/table_a2_p2r_frontier_status.csv)
 
 ## Table A3. `UPLOP3` Structural Boundary
 
@@ -79,17 +79,17 @@ Claims:
 
 | Patch path / class | Current result | Evidence |
 |---|---|---|
-| `ULOP3 -> UPLOP3` | structurally invalid | [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md) |
-| `PLOP3 -> UPLOP3` | structurally valid | [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md) |
-| Local runtime classes | inert and stable-but-different | [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md) |
-| Direct local source/IR emission of `UPLOP3.LUT` | not reproduced | [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md) |
+| `ULOP3 -> UPLOP3` | structurally invalid | [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md) |
+| `PLOP3 -> UPLOP3` | structurally valid | [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md) |
+| Local runtime classes | inert and stable-but-different | [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md) |
+| Direct local source/IR emission of `UPLOP3.LUT` | not reproduced | [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md) |
 
 Bounded interpretation:
 
 - The breakthrough is structural and semantic, not source-level emission.
 - The local substrate is `PLOP3`, not `ULOP3`.
 - Generated table artifact:
-  [table_a3_uplop3_structural_boundary.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a3_uplop3_structural_boundary.csv)
+  [table_a3_uplop3_structural_boundary.csv](tables/table_a3_uplop3_structural_boundary.csv)
 
 ## Figure A2. `UPLOP3` Runtime Class Map
 
@@ -130,12 +130,12 @@ Suggested caption:
 
 Primary sources:
 
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 - Rendered artifact:
-  [uplop3_runtime_class_map.svg](/home/eirikr/Github/YSU-engine/src/sass_re/figures/uplop3_runtime_class_map.svg)
+  [uplop3_runtime_class_map.svg](figures/uplop3_runtime_class_map.svg)
 - Generated artifact:
-  [uplop3_runtime_class_map.generated.svg](/home/eirikr/Github/YSU-engine/src/sass_re/figures/uplop3_runtime_class_map.generated.svg)
+  [uplop3_runtime_class_map.generated.svg](figures/uplop3_runtime_class_map.generated.svg)
 
 ## Table A4. Live `UPLOP3` Site Ranking
 
@@ -156,9 +156,9 @@ Claims:
 
 Primary sources:
 
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
 - Generated table artifact:
-  [table_a4_live_uplop3_site_ranking.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a4_live_uplop3_site_ranking.csv)
+  [table_a4_live_uplop3_site_ranking.csv](tables/table_a4_live_uplop3_site_ranking.csv)
 
 ## Table A5. Tool Effectiveness Matrix
 
@@ -176,10 +176,10 @@ Claims:
 
 Primary sources:
 
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 - Generated table artifact:
-  [table_a5_tool_effectiveness_matrix.csv](/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a5_tool_effectiveness_matrix.csv)
+  [table_a5_tool_effectiveness_matrix.csv](tables/table_a5_tool_effectiveness_matrix.csv)
 
 ## Usage Note
 

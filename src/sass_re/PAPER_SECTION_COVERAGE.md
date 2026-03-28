@@ -27,7 +27,7 @@ Currently supportable now:
 - explicit language that the broader Pascal-vs-Ada comparison remains scaffolded
   but not fully evidenced yet
 - standalone manuscript fragment:
-  [PAPER_DRAFT_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_DRAFT_SM89.md)
+  [PAPER_DRAFT_SM89.md](PAPER_DRAFT_SM89.md)
 
 Still blocked on future evidence:
 
@@ -68,13 +68,13 @@ Still blocked on future evidence:
 Currently supportable now:
 
 - claim ledger:
-  [PAPER_CLAIMS_MATRIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_CLAIMS_MATRIX.md)
+  [PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
 - coverage plan:
-  [PAPER_FIGURE_TABLE_PLAN.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_FIGURE_TABLE_PLAN.md)
+  [PAPER_FIGURE_TABLE_PLAN.md](PAPER_FIGURE_TABLE_PLAN.md)
 - instantiated assets:
-  [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+  [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 - manuscript-fragment verifier:
-  [verify_paper_draft.py](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/verify_paper_draft.py)
+  [verify_paper_draft.py](scripts/verify_paper_draft.py)
 
 ## Bounded-Language Rule
 

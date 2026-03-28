@@ -9,9 +9,9 @@ Primary claim families:
 
 Core assets:
 
-- [MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
-- [sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
-- [PAPER_DRAFT_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_DRAFT_SM89.md)
+- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+- [sm89_monograph.tex](tex/sm89_monograph.tex)
+- [PAPER_DRAFT_SM89.md](PAPER_DRAFT_SM89.md)
 
 Sections:
 

@@ -4,21 +4,21 @@ This repo now has a first Python auto-explorer scaffold for the SASS RE
 frontier:
 
 - script:
-  [`scripts/auto_explorer.py`](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/auto_explorer.py)
+  [`scripts/auto_explorer.py`](scripts/auto_explorer.py)
 - search-space registry:
-  [`auto_explorer_search_space.toml`](/home/eirikr/Github/YSU-engine/src/sass_re/auto_explorer_search_space.toml)
+  [`auto_explorer_search_space.toml`](auto_explorer_search_space.toml)
 - queue helper:
-  [`scripts/auto_explorer_queue.py`](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/auto_explorer_queue.py)
+  [`scripts/auto_explorer_queue.py`](scripts/auto_explorer_queue.py)
 - first generated report:
-  [`auto_explorer_20260322_141500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_20260322_141500)
+  [`auto_explorer_20260322_141500`](results/runs/auto_explorer_20260322_141500)
 - first generated queue:
-  [`auto_explorer_queue_20260322_143000`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_queue_20260322_143000)
+  [`auto_explorer_queue_20260322_143000`](results/runs/auto_explorer_queue_20260322_143000)
 - refreshed report after executing the top-ranked branch:
-  [`auto_explorer_20260322_143500`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_20260322_143500)
+  [`auto_explorer_20260322_143500`](results/runs/auto_explorer_20260322_143500)
 - refreshed reports after the narrow SYS64 and bridge follow-ups:
-  [`auto_explorer_20260322_171047`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_20260322_171047)
+  [`auto_explorer_20260322_171047`](results/runs/auto_explorer_20260322_171047)
   and
-  [`auto_explorer_20260322_171324`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_20260322_171324)
+  [`auto_explorer_20260322_171324`](results/runs/auto_explorer_20260322_171324)
 
 ## Short answer
 
@@ -225,9 +225,9 @@ And the symbolic boundary stays:
 The first ranked runtime candidate was executed directly:
 
 - tranche:
-  [`combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_143100`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_143100)
+  [`combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_143100`](results/runs/combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_143100)
 - probe:
-  [`probe_combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe.cu`](/home/eirikr/Github/YSU-engine/src/sass_re/probes/probe_combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe.cu)
+  [`probe_combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe.cu`](probes/probe_combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe.cu)
 
 It validated the explorer's direction and widened the branch further than the
 proposal requested. The emitted SASS now carries, in one executable kernel:
@@ -277,17 +277,17 @@ Two newer runtime-safe branches now sit between the lighter uniform-helper
 family and the heavier fused SYS-store family:
 
 - uniform + divergent + SYS64 bridge:
-  [`combo_uniform_divergent_atomg64sys_profile_safe_tranche_20260322_170855`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_divergent_atomg64sys_profile_safe_tranche_20260322_170855)
+  [`combo_uniform_divergent_atomg64sys_profile_safe_tranche_20260322_170855`](results/runs/combo_uniform_divergent_atomg64sys_profile_safe_tranche_20260322_170855)
 - divergent + SYS64 store bridge:
-  [`combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171218`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171218)
+  [`combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171218`](results/runs/combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171218)
 - uniform + block-red + SYS64 depth bridge:
-  [`combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_172135`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_172135)
+  [`combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_172135`](results/runs/combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_172135)
 - uniform + divergent + SYS64 bridge under `-dlcm=cg`:
-  [`combo_uniform_divergent_atomg64sys_profile_safe_tranche_dlcm_cg_20260322_173400`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_divergent_atomg64sys_profile_safe_tranche_dlcm_cg_20260322_173400)
+  [`combo_uniform_divergent_atomg64sys_profile_safe_tranche_dlcm_cg_20260322_173400`](results/runs/combo_uniform_divergent_atomg64sys_profile_safe_tranche_dlcm_cg_20260322_173400)
 - uniform + divergent + block-red + SYS64 store bridge:
-  [`combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_172130`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_172130)
+  [`combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_172130`](results/runs/combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_172130)
 - uniform + divergent + block-red + SYS64 store bridge under `-dlcm=cg`:
-  [`combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_172203`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_172203)
+  [`combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_172203`](results/runs/combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_172203)
 
 The uniform-divergent bridge keeps:
 
@@ -459,15 +459,15 @@ That strengthens the same high-level rule again: cache-policy mutation is not
 the primary driver once this fused SYS64 body exists.
 
 After folding those new branches back into a broader explorer refresh under
-[`auto_explorer_20260322_190600`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_20260322_190600)
+[`auto_explorer_20260322_190600`](results/runs/auto_explorer_20260322_190600)
 and
-[`auto_explorer_queue_20260322_190600`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/auto_explorer_queue_20260322_190600),
+[`auto_explorer_queue_20260322_190600`](results/runs/auto_explorer_queue_20260322_190600),
 the runtime queue is now exhausted. The explorer no longer sees a genuinely
 unseen runtime-safe branch in the current registry; only the symbolic
 `P2R.B1/B2/B3` boundary remains.
 
 A fresh symbolic rerun under
-[`p2r_symbolic_refresh_20260322_190301`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_symbolic_refresh_20260322_190301)
+[`p2r_symbolic_refresh_20260322_190301`](results/runs/p2r_symbolic_refresh_20260322_190301)
 then tightened that remaining gap again. Both refreshed lanes,
 plain `-O3` and `--maxrregcount=32`, still re-confirm only:
 
@@ -480,10 +480,10 @@ The refreshed `-O3` SASS is byte-for-byte identical to the earlier
 symbolic boundary rather than a flaky one.
 
 A wider symbolic matrix under
-[`p2r_symbolic_matrix_20260322_194108`](/home/eirikr/Github/YSU-engine/src/sass_re/results/runs/p2r_symbolic_matrix_20260322_194108)
+[`p2r_symbolic_matrix_20260322_194108`](results/runs/p2r_symbolic_matrix_20260322_194108)
 then ranked the remaining local shapes against the cuDNN-mined `P2R.B*`
 windows using
-[`score_p2r_symbolic_boundary.py`](/home/eirikr/Github/YSU-engine/src/sass_re/scripts/score_p2r_symbolic_boundary.py).
+[`score_p2r_symbolic_boundary.py`](scripts/score_p2r_symbolic_boundary.py).
 That ranking is stable across both `-O3` and `--maxrregcount=32`:
 
 - best current `B1` approximation:

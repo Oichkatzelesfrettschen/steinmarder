@@ -7,23 +7,23 @@ SM89 synthesis.
 
 Core source documents:
 
-- [MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
-- [MONOGRAPH_GLOSSARY.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_GLOSSARY.md)
-- [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+- [MONOGRAPH_GLOSSARY.md](MONOGRAPH_GLOSSARY.md)
+- [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 Processed numeric and plot inputs:
 
-- [processed/monograph_20260323/README.md](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/README.md)
-- [SHA256SUMS](/home/eirikr/Github/YSU-engine/src/sass_re/processed/monograph_20260323/SHA256SUMS)
+- [processed/monograph_20260323/README.md](processed/monograph_20260323/README.md)
+- [SHA256SUMS](processed/monograph_20260323/SHA256SUMS)
 
 TeX package:
 
-- [sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
-- [appendix_selection_laws.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/appendix_selection_laws.tex)
-- [fig_inventory_closure.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/fig_inventory_closure.tex)
-- [fig_p2r_frontier.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/fig_p2r_frontier.tex)
-- [fig_uplop3_runtime.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/fig_uplop3_runtime.tex)
-- [fig_pair_baseline.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/fig_pair_baseline.tex)
+- [sm89_monograph.tex](tex/sm89_monograph.tex)
+- [appendix_selection_laws.tex](tex/appendix_selection_laws.tex)
+- [fig_inventory_closure.tex](tex/fig_inventory_closure.tex)
+- [fig_p2r_frontier.tex](tex/fig_p2r_frontier.tex)
+- [fig_uplop3_runtime.tex](tex/fig_uplop3_runtime.tex)
+- [fig_pair_baseline.tex](tex/fig_pair_baseline.tex)
 
 ## Reproducible Build
 
@@ -52,7 +52,7 @@ python3 src/sass_re/scripts/verify_paper_draft.py
 
 ## Primary Output
 
-- [sm89_monograph.pdf](/home/eirikr/Github/YSU-engine/src/sass_re/tex/build/sm89_monograph.pdf)
+- [sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
 
 ## Boundary
 

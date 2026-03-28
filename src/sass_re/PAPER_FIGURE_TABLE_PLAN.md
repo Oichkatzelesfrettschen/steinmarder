@@ -30,8 +30,8 @@ Likely placement:
 
 Primary sources:
 
-- [SM89_SASS_INSTRUCTION_REFERENCE.md](/home/eirikr/Github/YSU-engine/src/sass_re/SM89_SASS_INSTRUCTION_REFERENCE.md)
-- [RESULTS.md](/home/eirikr/Github/YSU-engine/src/sass_re/RESULTS.md)
+- [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md)
+- [RESULTS.md](RESULTS.md)
 
 ### Table A2: `P2R` frontier status
 
@@ -57,9 +57,9 @@ Likely placement:
 
 Primary sources:
 
-- [P2R_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_FRONTIER_ANALYSIS.md)
-- [P2R_NEXT_PHASE.md](/home/eirikr/Github/YSU-engine/src/sass_re/P2R_NEXT_PHASE.md)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [P2R_FRONTIER_ANALYSIS.md](P2R_FRONTIER_ANALYSIS.md)
+- [P2R_NEXT_PHASE.md](P2R_NEXT_PHASE.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 
 ### Figure A1: `P2R` evidence ladder
 
@@ -99,8 +99,8 @@ Likely placement:
 
 Primary sources:
 
-- [UPLOP3_FRONTIER_ANALYSIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/UPLOP3_FRONTIER_ANALYSIS.md)
-- [KNOWLEDGE_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/KNOWLEDGE_SYNTHESIS.md)
+- [UPLOP3_FRONTIER_ANALYSIS.md](UPLOP3_FRONTIER_ANALYSIS.md)
+- [KNOWLEDGE_SYNTHESIS.md](KNOWLEDGE_SYNTHESIS.md)
 
 ### Figure A2: `UPLOP3` runtime class map
 

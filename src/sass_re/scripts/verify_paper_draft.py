@@ -18,12 +18,12 @@ REQUIRED_HEADINGS = [
 ]
 
 REQUIRED_ASSET_TARGETS = [
-    "/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a1_sm89_inventory_summary.csv",
-    "/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a2_p2r_frontier_status.csv",
-    "/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a3_uplop3_structural_boundary.csv",
-    "/home/eirikr/Github/YSU-engine/src/sass_re/figures/uplop3_runtime_class_map.generated.svg",
-    "/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a4_live_uplop3_site_ranking.csv",
-    "/home/eirikr/Github/YSU-engine/src/sass_re/tables/table_a5_tool_effectiveness_matrix.csv",
+    "tables/table_a1_sm89_inventory_summary.csv",
+    "tables/table_a2_p2r_frontier_status.csv",
+    "tables/table_a3_uplop3_structural_boundary.csv",
+    "figures/uplop3_runtime_class_map.generated.svg",
+    "tables/table_a4_live_uplop3_site_ranking.csv",
+    "tables/table_a5_tool_effectiveness_matrix.csv",
 ]
 
 FORBIDDEN_PHRASES = [

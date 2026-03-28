@@ -7,24 +7,24 @@
 ---
 
 Current claim ledger:
-[PAPER_CLAIMS_MATRIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_CLAIMS_MATRIX.md)
+[PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
 
 Current figure/table coverage plan:
-[PAPER_FIGURE_TABLE_PLAN.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_FIGURE_TABLE_PLAN.md)
+[PAPER_FIGURE_TABLE_PLAN.md](PAPER_FIGURE_TABLE_PLAN.md)
 
 Current instantiated SM89 paper assets:
-[PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+[PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 Current standalone Ada-only manuscript fragment:
-[PAPER_DRAFT_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_DRAFT_SM89.md)
+[PAPER_DRAFT_SM89.md](PAPER_DRAFT_SM89.md)
 
 Current monograph-level synthesis and LaTeX/PGFPlots package:
-[MONOGRAPH_SM89_SYNTHESIS.md](/home/eirikr/Github/YSU-engine/src/sass_re/MONOGRAPH_SM89_SYNTHESIS.md)
-[sm89_monograph.tex](/home/eirikr/Github/YSU-engine/src/sass_re/tex/sm89_monograph.tex)
-[sm89_monograph.pdf](/home/eirikr/Github/YSU-engine/src/sass_re/tex/build/sm89_monograph.pdf)
+[MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+[sm89_monograph.tex](tex/sm89_monograph.tex)
+[sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
 
 Current section coverage map:
-[PAPER_SECTION_COVERAGE.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_SECTION_COVERAGE.md)
+[PAPER_SECTION_COVERAGE.md](PAPER_SECTION_COVERAGE.md)
 
 ## Abstract
 
@@ -188,7 +188,7 @@ Current Ada-only claim coverage already available:
 - `UPLOP3` structural and runtime status: `C09`-`C17`
 
 Current Ada-only assets available:
-- Table A1 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+- Table A1 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 ### 4.1 Instruction Set Changes
 
@@ -271,8 +271,8 @@ Current Ada-only frontier claims that can be inserted here now:
 - `UPLOP3` structural boundary claims: `C09`-`C11`
 
 Current Ada-only assets available:
-- Table A2 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- Table A3 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+- Table A2 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A3 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 ### 7.1 Instruction Word Format
 
@@ -334,9 +334,9 @@ Current Ada-only synthesis claims that fit here now:
 - frontier ranking and next-step framing: `C17`-`C18`
 
 Current Ada-only assets available:
-- Figure A2 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- Table A4 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- Table A5 in [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
+- Figure A2 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A4 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A5 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 ### 8.1 ISA Design Philosophy Evolution
 
@@ -407,10 +407,10 @@ differential fuzzing is the primary semantic discriminator,
 ## 9. Reproducibility
 
 For current Ada-only frontier claims, the bounded evidence source of truth is:
-- [PAPER_CLAIMS_MATRIX.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_CLAIMS_MATRIX.md)
-- [PAPER_FIGURE_TABLE_PLAN.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_FIGURE_TABLE_PLAN.md)
-- [PAPER_ASSETS_SM89.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_ASSETS_SM89.md)
-- [PAPER_SECTION_COVERAGE.md](/home/eirikr/Github/YSU-engine/src/sass_re/PAPER_SECTION_COVERAGE.md)
+- [PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
+- [PAPER_FIGURE_TABLE_PLAN.md](PAPER_FIGURE_TABLE_PLAN.md)
+- [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- [PAPER_SECTION_COVERAGE.md](PAPER_SECTION_COVERAGE.md)
 
 All code, scripts, and raw data are available at:
 **https://github.com/ismail0098-lang/YSU-engine** (`src/sass_re/`)
