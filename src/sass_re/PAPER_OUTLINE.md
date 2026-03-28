@@ -413,7 +413,7 @@ For current Ada-only frontier claims, the bounded evidence source of truth is:
 - [PAPER_SECTION_COVERAGE.md](PAPER_SECTION_COVERAGE.md)
 
 All code, scripts, and raw data are available at:
-**https://github.com/ismail0098-lang/YSU-engine** (`src/sass_re/`)
+**https://github.com/Oichkatzelesfrettschen/steinmarder** (`src/sass_re/`)
 
 ### To reproduce:
 

@@ -35,8 +35,8 @@ These follow [NERF_CUSTOM_FORMAT.md](NERF_CUSTOM_FORMAT.md).
 
 ## 4) Runtime load (gpu_demo)
 ```powershell
-$env:YSU_NERF_HASHGRID="models/nerf_hashgrid.bin"
-$env:YSU_NERF_OCC="models/occupancy_grid.bin"
+$env:SM_NERF_HASHGRID="models/nerf_hashgrid.bin"
+$env:SM_NERF_OCC="models/occupancy_grid.bin"
 ```
 You should see log lines like:
 ```

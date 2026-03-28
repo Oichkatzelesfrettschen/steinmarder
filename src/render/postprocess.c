@@ -101,7 +101,7 @@ static void blur_v(const float* src, float* dst, int w, int h) {
     }
 }
 
-void ysu_apply_bloom_tonemap_u8(
+void sm_apply_bloom_tonemap_u8(
     const float* hdr_rgba, int w, int h,
     unsigned char* out_rgb_u8,
     const PostFX* fx_in

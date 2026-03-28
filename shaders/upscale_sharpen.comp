@@ -22,7 +22,7 @@ layout(set = 0, binding = 0, rgba16f) uniform readonly  image2D u_input;     /* 
 layout(set = 0, binding = 1, rgba16f) uniform writeonly image2D o_history;    /* history buffer for next frame */
 layout(set = 0, binding = 2, rgba16f) uniform writeonly image2D o_display;    /* final display target */
 
-/* ─── Push constants (mirrors YsuSharpenPC) ─── */
+/* ─── Push constants (mirrors SmSharpenPC) ─── */
 layout(push_constant) uniform PC {
     uint  w_hi, h_hi;
     float sharpness;     /* 0.0 = no sharpening, 1.0 = maximum */

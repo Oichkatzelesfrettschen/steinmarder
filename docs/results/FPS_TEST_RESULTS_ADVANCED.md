@@ -52,8 +52,8 @@ The newly implemented advanced denoise features (not yet compiled into this exec
 #### 1. History Reset
 - **Feature**: Clears denoise history buffer every N frames
 - **Parameters**: 
- - `YSU_GPU_DENOISE_HISTORY_RESET=1`
- - `YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60` (default)
+ - `SM_GPU_DENOISE_HISTORY_RESET=1`
+ - `SM_GPU_DENOISE_HISTORY_RESET_FRAME=60` (default)
 - **Expected Cost**: ~0.1ms per reset (every 60 frames)
 - **Impact**: Minimal performance cost (<0.2% FPS reduction)
 - **Benefit**: Eliminates ghosting on camera cuts/scene changes
@@ -67,9 +67,9 @@ The newly implemented advanced denoise features (not yet compiled into this exec
 #### 3. Adaptive Denoise
 - **Feature**: Dynamic denoise frequency based on frame phase
 - **Parameters**:
- - `YSU_GPU_DENOISE_ADAPTIVE=1`
- - `YSU_GPU_DENOISE_ADAPTIVE_MIN=1` (warmup, frames 0-30)
- - `YSU_GPU_DENOISE_ADAPTIVE_MAX=8` (steady-state, frames 31+)
+ - `SM_GPU_DENOISE_ADAPTIVE=1`
+ - `SM_GPU_DENOISE_ADAPTIVE_MIN=1` (warmup, frames 0-30)
+ - `SM_GPU_DENOISE_ADAPTIVE_MAX=8` (steady-state, frames 31+)
 - **Expected Performance**:
  - **Warmup phase** (0-30 frames): ~44 FPS (full denoising)
  - **Steady-state** (31+ frames): ~46-48 FPS (sparse denoising)
@@ -158,41 +158,41 @@ Despite minimal gains, the tests validate:
 ### 2. Test with Complex Scene
 ```powershell
 # Run with 3M triangle model
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_FRAMES = 120
-$env:YSU_GPU_OBJ = "TestSubjects/3M.obj" # Must exist
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 4
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_FRAMES = 120
+$env:SM_GPU_OBJ = "TestSubjects/3M.obj" # Must exist
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_SKIP = 4
 .\gpu_demo.exe
 ```
 
 ### 3. Benchmark Advanced Features
 ```powershell
 # Test adaptive denoise
-$env:YSU_GPU_DENOISE_ADAPTIVE = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE_MIN = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
+$env:SM_GPU_DENOISE_ADAPTIVE = 1
+$env:SM_GPU_DENOISE_ADAPTIVE_MIN = 1
+$env:SM_GPU_DENOISE_ADAPTIVE_MAX = 8
 .\gpu_demo.exe
 
 # Test history reset
-$env:YSU_GPU_DENOISE_HISTORY_RESET = 1
-$env:YSU_GPU_DENOISE_HISTORY_RESET_FRAME = 60
+$env:SM_GPU_DENOISE_HISTORY_RESET = 1
+$env:SM_GPU_DENOISE_HISTORY_RESET_FRAME = 60
 .\gpu_demo.exe
 ```
 
 ### 4. Full Stack Test
 ```powershell
 # Enable all optimizations
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_RENDER_SCALE = 0.5 # Session 13
-$env:YSU_GPU_TEMPORAL = 1 # Session 12
-$env:YSU_GPU_TEMPORAL_FRAMES = 16 # Session 12
-$env:YSU_GPU_DENOISE = 1 # Option 1
-$env:YSU_GPU_DENOISE_ADAPTIVE = 1 # Advanced
-$env:YSU_GPU_DENOISE_HISTORY_RESET = 1 # Advanced
-$env:YSU_GPU_TEMPORAL_DENOISE = 1 # Option 2 (when complete)
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_RENDER_SCALE = 0.5 # Session 13
+$env:SM_GPU_TEMPORAL = 1 # Session 12
+$env:SM_GPU_TEMPORAL_FRAMES = 16 # Session 12
+$env:SM_GPU_DENOISE = 1 # Option 1
+$env:SM_GPU_DENOISE_ADAPTIVE = 1 # Advanced
+$env:SM_GPU_DENOISE_HISTORY_RESET = 1 # Advanced
+$env:SM_GPU_TEMPORAL_DENOISE = 1 # Option 2 (when complete)
 .\gpu_demo.exe
 ```
 

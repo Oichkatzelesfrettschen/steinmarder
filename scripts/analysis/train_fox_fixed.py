@@ -21,5 +21,5 @@ subprocess.run(cmd)
 
 print("\n" + "="*60)
 print("Training complete! Now render with:")
-print('  $env:YSU_RENDER_MODE="2"; $env:YSU_GPU_SPP="64"; $env:YSU_GPU_TEMPORAL="0"; .\\gpu_demo.exe')
+print('  $env:SM_RENDER_MODE="2"; $env:SM_GPU_SPP="64"; $env:SM_GPU_TEMPORAL="0"; .\\gpu_demo.exe')
 print("="*60)

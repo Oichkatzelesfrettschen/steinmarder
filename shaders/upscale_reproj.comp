@@ -25,7 +25,7 @@ layout(set = 0, binding = 3) uniform sampler2D u_history_hi;    /* previous fram
 layout(set = 0, binding = 4, rgba16f) uniform writeonly image2D o_reproj_hi;   /* reprojected color */
 layout(set = 0, binding = 5, r16f)    uniform writeonly image2D o_confidence;  /* confidence mask */
 
-/* ─── Push constants (mirrors YsuReprojPC in ysu_upscale.h) ─── */
+/* ─── Push constants (mirrors SmReprojPC in sm_upscale.h) ─── */
 layout(push_constant) uniform PC {
     uint  w_lo, h_lo;
     uint  w_hi, h_hi;

@@ -1,4 +1,4 @@
-/* linker.ld - The Memory Map for YSU OS */
+/* linker.ld - The Memory Map for steinmarder OS */
 ENTRY(_start)                /* Tells the linker the entry point is in boot.asm */
 
 SECTIONS
@@ -14,7 +14,7 @@ SECTIONS
         *(.text)            /* Then all other code */
     }
 
-    /* Second: Read-only data (like your "YSU OS" string) */
+    /* Second: Read-only data (like your "steinmarder OS" string) */
     .rodata BLOCK(4K) : ALIGN(4K)
     {
         *(.rodata)

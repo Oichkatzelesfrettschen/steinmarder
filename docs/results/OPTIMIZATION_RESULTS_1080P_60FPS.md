@@ -157,7 +157,7 @@ Result: 60+ FPS at native 1080p with 8+ samples
  - ~5-10% potential gain
 
 ### C Code Changes (triangle.c):
-1. **ysu_hit_triangle_c()**:
+1. **sm_hit_triangle_c()**:
  - Epsilon constant factored out
  - Combined range checks
  - Clearer early termination

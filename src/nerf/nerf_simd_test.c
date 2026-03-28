@@ -28,17 +28,17 @@ typedef struct {
     uint32_t sample_count;
 } BenchTimer;
 
-static inline uint64_t ysu_rdtsc(void) {
+static inline uint64_t sm_rdtsc(void) {
     return __builtin_ia32_rdtsc();
 }
 
 BenchTimer bench_start(const char *name) {
-    BenchTimer t = {name, ysu_rdtsc(), 0, 0};
+    BenchTimer t = {name, sm_rdtsc(), 0, 0};
     return t;
 }
 
 void bench_end(BenchTimer *t) {
-    uint64_t end = ysu_rdtsc();
+    uint64_t end = sm_rdtsc();
     t->total_cycles += (end - t->start_cycle);
     t->sample_count++;
 }
@@ -73,7 +73,7 @@ void test_data_loading(void) {
     printf("Loading from: %s, %s\n", hashgrid_path, occ_path);
     
     clock_t t0 = clock();
-    NeRFData *data = ysu_nerf_data_load(hashgrid_path, occ_path);
+    NeRFData *data = sm_nerf_data_load(hashgrid_path, occ_path);
     clock_t t1 = clock();
     
     if (!data) {
@@ -92,7 +92,7 @@ void test_data_loading(void) {
            data->config.center.x, data->config.center.y, data->config.center.z,
            data->config.scale);
     
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Test 2: Hashgrid Lookup ===== */
@@ -100,7 +100,7 @@ void test_data_loading(void) {
 void test_hashgrid_lookup(void) {
     printf("\n=== TEST 2: Hashgrid Lookup ===\n");
     
-    NeRFData *data = ysu_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
+    NeRFData *data = sm_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
     if (!data) {
         printf("FAIL: Could not load NeRF data\n");
         return;
@@ -119,8 +119,8 @@ void test_hashgrid_lookup(void) {
     BenchTimer timer = bench_start("Hashgrid lookup (8 rays)");
     
     for (int iter = 0; iter < 100; iter++) {
-        timer.start_cycle = ysu_rdtsc();
-        ysu_hashgrid_lookup_batch(positions, &data->config, data->hashgrid_data, features);
+        timer.start_cycle = sm_rdtsc();
+        sm_hashgrid_lookup_batch(positions, &data->config, data->hashgrid_data, features);
         bench_end(&timer);
     }
     
@@ -130,7 +130,7 @@ void test_hashgrid_lookup(void) {
     printf("  Sample features[0]: [%.3f, %.3f, %.3f, %.3f, ...]\n",
            features[0][0], features[0][1], features[0][2], features[0][3]);
     
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Test 3: MLP Inference ===== */
@@ -138,7 +138,7 @@ void test_hashgrid_lookup(void) {
 void test_mlp_inference(void) {
     printf("\n=== TEST 3: MLP Inference ===\n");
     
-    NeRFData *data = ysu_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
+    NeRFData *data = sm_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
     if (!data) {
         printf("FAIL: Could not load NeRF data\n");
         return;
@@ -159,8 +159,8 @@ void test_mlp_inference(void) {
     BenchTimer timer = bench_start("MLP inference (8 rays)");
     
     for (int iter = 0; iter < 100; iter++) {
-        timer.start_cycle = ysu_rdtsc();
-        ysu_mlp_inference_batch(
+        timer.start_cycle = sm_rdtsc();
+        sm_mlp_inference_batch(
             (const float(*)[27])features,
             &data->config,
             data->mlp_weights,
@@ -179,7 +179,7 @@ void test_mlp_inference(void) {
     printf("  Sample RGB[1]: (%.3f, %.3f, %.3f), Sigma: %.3f\n",
            rgb_out[1][0], rgb_out[1][1], rgb_out[1][2], sigma_out[1]);
     
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Test 4: Occupancy Lookup ===== */
@@ -187,7 +187,7 @@ void test_mlp_inference(void) {
 void test_occupancy_lookup(void) {
     printf("\n=== TEST 4: Occupancy Lookup ===\n");
     
-    NeRFData *data = ysu_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
+    NeRFData *data = sm_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
     if (!data) {
         printf("FAIL: Could not load NeRF data\n");
         return;
@@ -206,8 +206,8 @@ void test_occupancy_lookup(void) {
     BenchTimer timer = bench_start("Occupancy lookup (8 rays)");
     
     for (int iter = 0; iter < 1000; iter++) {
-        timer.start_cycle = ysu_rdtsc();
-        ysu_occupancy_lookup_batch(positions, &data->config, data->occupancy_grid, occ_out);
+        timer.start_cycle = sm_rdtsc();
+        sm_occupancy_lookup_batch(positions, &data->config, data->occupancy_grid, occ_out);
         bench_end(&timer);
     }
     
@@ -220,7 +220,7 @@ void test_occupancy_lookup(void) {
     }
     printf("\n");
     
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Test 5: Full Volume Integration ===== */
@@ -228,7 +228,7 @@ void test_occupancy_lookup(void) {
 void test_volume_integration(void) {
     printf("\n=== TEST 5: Volume Integration (Full NeRF Rendering) ===\n");
     
-    NeRFData *data = ysu_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
+    NeRFData *data = sm_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
     if (!data) {
         printf("FAIL: Could not load NeRF data\n");
         return;
@@ -286,7 +286,7 @@ void test_volume_integration(void) {
                 batch.active[i] = (x + i < width) ? 1 : 0;
             }
             
-            ysu_volume_integrate_batch(&batch, &data->config, data, &fb, 128, 4.0f, 8.0f);
+            sm_volume_integrate_batch(&batch, &data->config, data, &fb, 128, 4.0f, 8.0f);
         }
     }
     
@@ -316,7 +316,7 @@ void test_volume_integration(void) {
     }
     
     free(fb.pixels);
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Comprehensive Benchmark ===== */
@@ -324,7 +324,7 @@ void test_volume_integration(void) {
 void benchmark_component_breakdown(void) {
     printf("\n=== BENCHMARK: Component Breakdown ===\n");
     
-    NeRFData *data = ysu_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
+    NeRFData *data = sm_nerf_data_load("models/nerf_hashgrid.bin", "models/occupancy_grid.bin");
     if (!data) {
         printf("FAIL: Could not load NeRF data\n");
         return;
@@ -355,8 +355,8 @@ void benchmark_component_breakdown(void) {
     /* Hashgrid */
     BenchTimer t_grid = bench_start("Hashgrid lookup");
     for (int iter = 0; iter < 1000; iter++) {
-        t_grid.start_cycle = ysu_rdtsc();
-        ysu_hashgrid_lookup_batch(positions, &data->config, data->hashgrid_data, features);
+        t_grid.start_cycle = sm_rdtsc();
+        sm_hashgrid_lookup_batch(positions, &data->config, data->hashgrid_data, features);
         bench_end(&t_grid);
     }
     bench_report(&t_grid, "us");
@@ -364,8 +364,8 @@ void benchmark_component_breakdown(void) {
     /* MLP */
     BenchTimer t_mlp = bench_start("MLP inference");
     for (int iter = 0; iter < 1000; iter++) {
-        t_mlp.start_cycle = ysu_rdtsc();
-        ysu_mlp_inference_batch((const float(*)[27])feat_batch, &data->config,
+        t_mlp.start_cycle = sm_rdtsc();
+        sm_mlp_inference_batch((const float(*)[27])feat_batch, &data->config,
                                data->mlp_weights, data->mlp_biases, rgb, sigma);
         bench_end(&t_mlp);
     }
@@ -374,8 +374,8 @@ void benchmark_component_breakdown(void) {
     /* Occupancy */
     BenchTimer t_occ = bench_start("Occupancy lookup");
     for (int iter = 0; iter < 10000; iter++) {
-        t_occ.start_cycle = ysu_rdtsc();
-        ysu_occupancy_lookup_batch(positions, &data->config, data->occupancy_grid, occ_out);
+        t_occ.start_cycle = sm_rdtsc();
+        sm_occupancy_lookup_batch(positions, &data->config, data->occupancy_grid, occ_out);
         bench_end(&t_occ);
     }
     bench_report(&t_occ, "us");
@@ -388,7 +388,7 @@ void benchmark_component_breakdown(void) {
     printf("  But with 8 cores: ~200 seconds, or ~5 FPS\n");
     printf("  With 64x64 resolution: ~2.5 seconds = 0.4 FPS baseline\n");
     
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
 }
 
 /* ===== Main Test Suite ===== */

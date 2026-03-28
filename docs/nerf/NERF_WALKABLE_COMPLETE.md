@@ -144,19 +144,19 @@ The system is architected to receive NeRF data at multiple levels:
 
 ```powershell
 # Walking speed (units per frame)
-$env:YSU_NERF_WALK_SPEED = 0.01
+$env:SM_NERF_WALK_SPEED = 0.01
 
 # Head rotation speed (frames per 360°)
-$env:YSU_NERF_HEAD_YAW_SPEED = 300.0
+$env:SM_NERF_HEAD_YAW_SPEED = 300.0
 
 # Eye height (in units)
-$env:YSU_NERF_EYE_HEIGHT = 1.6
+$env:SM_NERF_EYE_HEIGHT = 1.6
 
 # Scene radius (for NeRF volume)
-$env:YSU_NERF_SCALE = 8.0
+$env:SM_NERF_SCALE = 8.0
 
 # Path type
-$env:YSU_NERF_PATH = "spiral"
+$env:SM_NERF_PATH = "spiral"
 ```
 
 ### Available Path Types
@@ -178,8 +178,8 @@ $env:YSU_NERF_PATH = "spiral"
 .\build_and_test_nerf_walk.bat
 
 # Run walkable scene
-$env:YSU_GPU_FRAMES = 600
-$env:YSU_GPU_DENOISE_SKIP = 4
+$env:SM_GPU_FRAMES = 600
+$env:SM_GPU_DENOISE_SKIP = 4
 .\gpu_demo.exe
 ```
 
@@ -187,21 +187,21 @@ $env:YSU_GPU_DENOISE_SKIP = 4
 
 **Option 1: Full Walk**
 ```powershell
-$env:YSU_GPU_FRAMES = 600 # 10 seconds
+$env:SM_GPU_FRAMES = 600 # 10 seconds
 .\gpu_demo.exe
 ```
 
 **Option 2: Quick Test**
 ```powershell
-$env:YSU_GPU_FRAMES = 300
-$env:YSU_GPU_DENOISE_SKIP = 8
+$env:SM_GPU_FRAMES = 300
+$env:SM_GPU_DENOISE_SKIP = 8
 .\gpu_demo.exe
 ```
 
 **Option 3: High Quality**
 ```powershell
-$env:YSU_GPU_FRAMES = 120
-$env:YSU_GPU_DENOISE_SKIP = 1
+$env:SM_GPU_FRAMES = 120
+$env:SM_GPU_DENOISE_SKIP = 1
 .\gpu_demo.exe
 ```
 
@@ -247,21 +247,21 @@ vec3 rd = head_looking_direction(frame_id);
 
 **Real-time Walkthrough**:
 ```powershell
-$env:YSU_GPU_DENOISE_SKIP = 4
+$env:SM_GPU_DENOISE_SKIP = 4
 # Result: 489 FPS, excellent quality
 ```
 
 **Interactive Exploration** (e.g., VR):
 ```powershell
-$env:YSU_GPU_DENOISE_ADAPTIVE = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE_MIN = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
+$env:SM_GPU_DENOISE_ADAPTIVE = 1
+$env:SM_GPU_DENOISE_ADAPTIVE_MIN = 1
+$env:SM_GPU_DENOISE_ADAPTIVE_MAX = 8
 # Result: 417 FPS, smart quality ramp
 ```
 
 **Presentation Quality**:
 ```powershell
-$env:YSU_GPU_DENOISE_SKIP = 1
+$env:SM_GPU_DENOISE_SKIP = 1
 # Result: 260 FPS, maximum quality
 ```
 
@@ -416,7 +416,7 @@ With NeRF network (est): 150-180 FPS (photorealistic)
 .\build_and_test_nerf_walk.bat
 
 # Run at recommended settings
-$env:YSU_GPU_DENOISE_SKIP = 4
+$env:SM_GPU_DENOISE_SKIP = 4
 .\gpu_demo.exe
 
 # Run all quality tests

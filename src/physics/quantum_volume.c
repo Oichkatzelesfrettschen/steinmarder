@@ -4,7 +4,7 @@
  *   Pass 1 (quantum_wavefunction.comp): evaluate Σ|ψ_i|² on 3D SSBO grid
  *   Pass 2 (quantum_raymarch.comp): volume raymarch → 2D output image
  *
- * Follows YSU engine conventions:
+ * Follows steinmarder engine conventions:
  *   - Manual vkAllocateMemory (no VMA)
  *   - SSBO for volumetric data (no 3D textures)
  *   - Push constants for per-dispatch params

@@ -17,7 +17,7 @@ Since GPU compute is now the bottleneck (not readback), we reduce the pixel coun
 
 ### 1. Render Pipeline
 ```
-Input: YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5
+Input: SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5
 
 Action:
 1. Parse resolution: W=1920, H=1080
@@ -46,7 +46,7 @@ With 16-frame temporal: ~100-112 ms per batch = 80-90 FPS average
 **Lines 570-600**: Add render scale parameter with default 0.5
 ```c
 float render_scale = 0.5f; // Default 0.5 = 2x speedup
-if(env_render_scale) render_scale = ysu_env_float("YSU_GPU_RENDER_SCALE", 0.5f);
+if(env_render_scale) render_scale = sm_env_float("SM_GPU_RENDER_SCALE", 0.5f);
 if(render_scale < 0.1f) render_scale = 0.1f;
 if(render_scale > 1.0f) render_scale = 1.0f;
 
@@ -65,8 +65,8 @@ if(render_scale < 1.0f){
 ### Default (2x Speedup)
 ```bash
 # Automatic render_scale=0.5 (default)
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_SPP=1 \
-YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_SPP=1 \
+SM_GPU_FRAMES=16 SM_GPU_TEMPORAL=1 ./gpu_demo.exe
 
 # Actual render: 960×540
 # Output: 960×540
@@ -76,8 +76,8 @@ YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
 ### Higher Quality (1.5x Speedup)
 ```bash
 # Render at 0.66 scale (1278×720 internal)
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.66 \
-YSU_GPU_SPP=1 YSU_GPU_FRAMES=16 ./gpu_demo.exe
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.66 \
+SM_GPU_SPP=1 SM_GPU_FRAMES=16 ./gpu_demo.exe
 
 # Actual render: 1278×720
 # Better quality at ~55-60 FPS
@@ -86,8 +86,8 @@ YSU_GPU_SPP=1 YSU_GPU_FRAMES=16 ./gpu_demo.exe
 ### Maximum Speedup (4x Reduction)
 ```bash
 # Render at 0.25 scale (480×270 internal)
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.25 \
-YSU_GPU_SPP=1 YSU_GPU_FRAMES=16 YSU_GPU_NO_IO=1 ./gpu_demo.exe
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.25 \
+SM_GPU_SPP=1 SM_GPU_FRAMES=16 SM_GPU_NO_IO=1 ./gpu_demo.exe
 
 # Actual render: 480×270
 # Maximum speed: 100-150+ FPS (low quality)
@@ -98,9 +98,9 @@ YSU_GPU_SPP=1 YSU_GPU_FRAMES=16 YSU_GPU_NO_IO=1 ./gpu_demo.exe
 ### Full Stack: Temporal + Render Scale
 ```bash
 # 80 FPS at ~1080p equivalent (rendered at 540p)
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_SPP=1 \
-YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 YSU_GPU_READBACK_SKIP=16 \
-YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_NO_IO=1 ./gpu_demo.exe
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_SPP=1 \
+SM_GPU_FRAMES=16 SM_GPU_TEMPORAL=1 SM_GPU_READBACK_SKIP=16 \
+SM_GPU_RENDER_SCALE=0.5 SM_GPU_NO_IO=1 ./gpu_demo.exe
 
 # Performance breakdown:
 # - Render: 6-7ms (960×540 at 25% pixels)
@@ -122,8 +122,8 @@ YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_NO_IO=1 ./gpu_demo.exe
 
 ```bash
 # Render at 0.75 scale + temporal + 2 SPP
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.75 \
-YSU_GPU_SPP=2 YSU_GPU_FRAMES=8 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.75 \
+SM_GPU_SPP=2 SM_GPU_FRAMES=8 SM_GPU_TEMPORAL=1 ./gpu_demo.exe
 
 # Results:
 # - Render: 1440×810 (56% of pixels = 1.8x faster)
@@ -135,13 +135,13 @@ YSU_GPU_SPP=2 YSU_GPU_FRAMES=8 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
 
 | Variable | Default | Effect |
 |----------|---------|--------|
-| `YSU_GPU_RENDER_SCALE` | 0.5 | Scale resolution (0.1-1.0) |
-| `YSU_GPU_W` | 1920 | Output width (after scaling) |
-| `YSU_GPU_H` | 1080 | Output height (after scaling) |
-| `YSU_GPU_SPP` | 1 | Samples per pixel |
-| `YSU_GPU_FRAMES` | 1 | Batch frame count |
-| `YSU_GPU_TEMPORAL` | 1 | Enable temporal accumulation |
-| `YSU_GPU_NO_IO` | 0 | Skip readback for max speed |
+| `SM_GPU_RENDER_SCALE` | 0.5 | Scale resolution (0.1-1.0) |
+| `SM_GPU_W` | 1920 | Output width (after scaling) |
+| `SM_GPU_H` | 1080 | Output height (after scaling) |
+| `SM_GPU_SPP` | 1 | Samples per pixel |
+| `SM_GPU_FRAMES` | 1 | Batch frame count |
+| `SM_GPU_TEMPORAL` | 1 | Enable temporal accumulation |
+| `SM_GPU_NO_IO` | 0 | Skip readback for max speed |
 
 ## Implementation Status
 
@@ -168,16 +168,16 @@ YSU_GPU_SPP=2 YSU_GPU_FRAMES=8 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
 
 2. **Test basic speedup**:
  ```bash
- YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
- YSU_GPU_FRAMES=16 YSU_GPU_NO_IO=1 ./gpu_demo.exe
+ SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5 \
+ SM_GPU_FRAMES=16 SM_GPU_NO_IO=1 ./gpu_demo.exe
  ```
 
 3. **Measure FPS** and adjust scale factor based on quality/speed preference
 
 4. **With window display**:
  ```bash
- YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
- YSU_GPU_FRAMES=20 YSU_GPU_WINDOW=1 ./gpu_demo.exe
+ SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5 \
+ SM_GPU_FRAMES=20 SM_GPU_WINDOW=1 ./gpu_demo.exe
  ```
 
 ## Conclusion

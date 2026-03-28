@@ -5,7 +5,7 @@
  * screen position.  Motion vector = prev_screen - curr_screen.
  *
  * Output is in pixel coordinates (low-res), jitter NOT included.
- * This matches the YSU DLSS system's expected motion vector format.
+ * This matches the steinmarder DLSS system's expected motion vector format.
  *
  * Workgroup: 16×16 threads, one thread per low-res pixel.
  */

@@ -1,7 +1,7 @@
 # Quad-Aware OBJ Loader Implementation - Summary
 
 ## Overview
-Successfully implemented quad-aware OBJ loading for the YSU GPU raytracer. The system now preserves native quad topology from Blender and other 3D modelers instead of triangulating all geometry.
+Successfully implemented quad-aware OBJ loading for the steinmarder GPU raytracer. The system now preserves native quad topology from Blender and other 3D modelers instead of triangulating all geometry.
 
 ## Changes Made
 
@@ -90,7 +90,7 @@ The quad-aware loader is now ready to integrate with:
  - Add quad intersection testing in BVH traversal
  - Maintain acceleration structure for both tri/quad geometry
 
-2. **Scene Loading (ysu_main.c / gpu_vulkan_demo.c)**
+2. **Scene Loading (sm_main.c / gpu_vulkan_demo.c)**
  - Update OBJ loading calls to use new quad-aware function
  - Handle both triangle and quad arrays in scene setup
 
@@ -128,7 +128,7 @@ Quads are 33% more efficient than dual-triangle representation (1 quad vs 2 tria
  - Maintain quadrant information for shading
  ```
 
-2. Update `ysu_main.c`/`gpu_vulkan_demo.c`:
+2. Update `sm_main.c`/`gpu_vulkan_demo.c`:
  ```c
  // Replace old loading:
  gpu_load_obj_triangles(path, &tris, &tri_count);
@@ -152,4 +152,4 @@ Quads are 33% more efficient than dual-triangle representation (1 quad vs 2 tria
 - Compatible with Blender quad exports
 - Handles malformed faces gracefully (skips invalid geometry)
 - Proper memory management (malloc/realloc/free pattern)
-- Consistent with existing codebase conventions (ysu_ prefixes, xrealloc, etc.)
+- Consistent with existing codebase conventions (sm_ prefixes, xrealloc, etc.)

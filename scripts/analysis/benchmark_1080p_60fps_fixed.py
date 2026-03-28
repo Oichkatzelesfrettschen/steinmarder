@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-YSU Engine - Optimization Benchmark (1080p 60 FPS Target)
+steinmarder - Optimization Benchmark (1080p 60 FPS Target)
 Measures performance improvements from ray-triangle and BVH optimizations
 Windows-compatible version (no Unicode characters)
 """
@@ -13,11 +13,11 @@ from PIL import Image
 def benchmark_config(name, width, height, frames, denoise, description):
     """Run a benchmark configuration and return timing"""
     env = os.environ.copy()
-    env['YSU_GPU_W'] = str(width)
-    env['YSU_GPU_H'] = str(height)
-    env['YSU_GPU_OBJ'] = 'TestSubjects/3M.obj'
-    env['YSU_GPU_FRAMES'] = str(frames)
-    env['YSU_NEURAL_DENOISE'] = '1' if denoise else '0'
+    env['SM_GPU_W'] = str(width)
+    env['SM_GPU_H'] = str(height)
+    env['SM_GPU_OBJ'] = 'TestSubjects/3M.obj'
+    env['SM_GPU_FRAMES'] = str(frames)
+    env['SM_NEURAL_DENOISE'] = '1' if denoise else '0'
     
     print("\n" + "=" * 70)
     print("BENCHMARK: " + name)
@@ -54,7 +54,7 @@ def benchmark_config(name, width, height, frames, denoise, description):
         return 0, False
 
 print("\n" + "=" * 70)
-print("YSU ENGINE - 1080P 60 FPS OPTIMIZATION BENCHMARK")
+print("STEINMARDER - 1080P 60 FPS OPTIMIZATION BENCHMARK")
 print("=" * 70)
 print("\nOptimizations Tested:")
 print("  [+] Shader register reduction")

@@ -19,13 +19,13 @@ echo.
 
 REM Test 1: 1 SPP WITHOUT denoiser (very noisy)
 echo [1/3] Rendering 1 SPP WITHOUT denoiser (very noisy)...
-set YSU_GPU_WINDOW=1
-set YSU_GPU_W=320
-set YSU_GPU_H=180
-set YSU_GPU_SPP=1
-set YSU_GPU_DUMP_ONESHOT=1
-set YSU_NEURAL_DENOISE=0
-set YSU_GPU_SEED=42
+set SM_GPU_WINDOW=1
+set SM_GPU_W=320
+set SM_GPU_H=180
+set SM_GPU_SPP=1
+set SM_GPU_DUMP_ONESHOT=1
+set SM_NEURAL_DENOISE=0
+set SM_GPU_SEED=42
 
 gpu_demo.exe >nul 2>&1
 if exist window_dump.ppm (
@@ -38,7 +38,7 @@ if exist window_dump.ppm (
 
 REM Test 2: 1 SPP WITH denoiser (should be much cleaner)
 echo [2/3] Rendering 1 SPP WITH denoiser (cleaned up)...
-set YSU_NEURAL_DENOISE=1
+set SM_NEURAL_DENOISE=1
 
 gpu_demo.exe >nul 2>&1
 if exist window_dump.ppm (
@@ -51,8 +51,8 @@ if exist window_dump.ppm (
 
 REM Test 3: 16 SPP clean reference (multiple samples)
 echo [3/3] Rendering 16 SPP reference (clean)...
-set YSU_GPU_SPP=16
-set YSU_NEURAL_DENOISE=0
+set SM_GPU_SPP=16
+set SM_NEURAL_DENOISE=0
 
 gpu_demo.exe >nul 2>&1
 if exist window_dump.ppm (

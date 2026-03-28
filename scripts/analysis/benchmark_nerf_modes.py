@@ -17,13 +17,13 @@ from pathlib import Path
 def run_renderer(mode, model, occ, duration=10):
     """Run renderer and capture FPS from output."""
     env = os.environ.copy()
-    env['YSU_GPU_WINDOW'] = '1'
-    env['YSU_GPU_W'] = '2048'
-    env['YSU_GPU_H'] = '1024'
-    env['YSU_GPU_RENDER_SCALE'] = '0.5'
-    env['YSU_RENDER_MODE'] = str(mode)
-    env['YSU_NERF_HASHGRID'] = model
-    env['YSU_NERF_OCC'] = occ
+    env['SM_GPU_WINDOW'] = '1'
+    env['SM_GPU_W'] = '2048'
+    env['SM_GPU_H'] = '1024'
+    env['SM_GPU_RENDER_SCALE'] = '0.5'
+    env['SM_RENDER_MODE'] = str(mode)
+    env['SM_NERF_HASHGRID'] = model
+    env['SM_NERF_OCC'] = occ
     
     print(f"  Running mode {mode}... (close window after {duration}s)")
     

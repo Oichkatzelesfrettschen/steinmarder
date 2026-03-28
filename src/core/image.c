@@ -1,5 +1,5 @@
 // image.c - PPM writer (P6 binary)
-// Optional PostFX: Bloom + Tonemap via env toggles (YSU_POSTFX / YSU_BLOOM)
+// Optional PostFX: Bloom + Tonemap via env toggles (SM_POSTFX / SM_BLOOM)
 
 #include <stdio.h>
 #include <math.h>
@@ -31,13 +31,13 @@ static unsigned char to_u8_gamma22(float x) {
     return (unsigned char)v;
 }
 
-static int ysu_env_int(const char *name, int defv) {
+static int sm_env_int(const char *name, int defv) {
     const char *s = getenv(name);
     if (!s || !s[0]) return defv;
     return atoi(s);
 }
 
-static float ysu_env_float(const char *name, float defv) {
+static float sm_env_float(const char *name, float defv) {
     const char *s = getenv(name);
     if (!s || !s[0]) return defv;
     return (float)atof(s);
@@ -59,8 +59,8 @@ static void image_write_ppm_u8(const char *filename, int width, int height, cons
 unsigned char* image_rgb_from_hdr(const Vec3 *pixels, int width, int height) {
     if (!pixels || width <= 0 || height <= 0) return NULL;
 
-    // Toggle: enable postfx if YSU_POSTFX=1 or YSU_BLOOM=1
-    int postfx = ysu_env_int("YSU_POSTFX", 0) || ysu_env_int("YSU_BLOOM", 0);
+    // Toggle: enable postfx if SM_POSTFX=1 or SM_BLOOM=1
+    int postfx = sm_env_int("SM_POSTFX", 0) || sm_env_int("SM_BLOOM", 0);
 
     size_t n = (size_t)width * (size_t)height;
 
@@ -94,23 +94,23 @@ unsigned char* image_rgb_from_hdr(const Vec3 *pixels, int width, int height) {
     }
 
     PostFX fx;
-    fx.exposure         = ysu_env_float("YSU_EXPOSURE",        1.0f);
+    fx.exposure         = sm_env_float("SM_EXPOSURE",        1.0f);
     {
         /* getenv() returns NULL when the variable is unset; passing NULL to
          * printf("%s") is UB and crashes on MSVC. Use fallback strings. */
-        const char *pfx = getenv("YSU_POSTFX");  if (!pfx) pfx = "unset";
-        const char *blm = getenv("YSU_BLOOM");   if (!blm) blm = "unset";
-        const char *exp = getenv("YSU_EXPOSURE"); if (!exp) exp = "unset";
+        const char *pfx = getenv("SM_POSTFX");  if (!pfx) pfx = "unset";
+        const char *blm = getenv("SM_BLOOM");   if (!blm) blm = "unset";
+        const char *exp = getenv("SM_EXPOSURE"); if (!exp) exp = "unset";
         printf("[image] POSTFX=%s BLOOM=%s EXPOSURE=%s (fx.exposure=%.3f)\n",
                pfx, blm, exp, fx.exposure);
     }
        
-    fx.bloom_threshold  = ysu_env_float("YSU_BLOOM_THRESHOLD", 1.2f);
-    fx.bloom_knee       = ysu_env_float("YSU_BLOOM_KNEE",      0.6f);
-    fx.bloom_intensity  = ysu_env_float("YSU_BLOOM_INTENSITY", 0.15f);
-    fx.bloom_iterations = ysu_env_int  ("YSU_BLOOM_ITERS",     2);
+    fx.bloom_threshold  = sm_env_float("SM_BLOOM_THRESHOLD", 1.2f);
+    fx.bloom_knee       = sm_env_float("SM_BLOOM_KNEE",      0.6f);
+    fx.bloom_intensity  = sm_env_float("SM_BLOOM_INTENSITY", 0.15f);
+    fx.bloom_iterations = sm_env_int  ("SM_BLOOM_ITERS",     2);
 
-    ysu_apply_bloom_tonemap_u8(hdr, width, height, ldr, &fx);
+    sm_apply_bloom_tonemap_u8(hdr, width, height, ldr, &fx);
 
     free(hdr);
     return ldr;

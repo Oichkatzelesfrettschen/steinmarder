@@ -21,7 +21,7 @@
  *   B0: [64]  B1: [64]  B2: [4]
  *
  * *** LAYOUT WARNING — CPU vs GPU mismatch ***
- *   The CPU inference kernel (src/nerf/nerf_simd.c :: ysu_mlp_inference_batch)
+ *   The CPU inference kernel (src/nerf/nerf_simd.c :: sm_mlp_inference_batch)
  *   stores W0 as [in][hidden] = [27][64], accessing w0[i * hidden_dim + h].
  *   This GPU kernel stores W0 as [hidden][in] = [64][27], accessing
  *   W0[neuron * MLP_IN + j].  These layouts are the TRANSPOSE of each other.
@@ -33,7 +33,7 @@
  *
  *   If you intend to share checkpoints between GPU and CPU code, transpose W0
  *   and W1 at checkpoint-export time, or add a load-time transpose in
- *   ysu_nerf_load() in src/nerf/nerf_simd.c.
+ *   sm_nerf_load() in src/nerf/nerf_simd.c.
  *
  * Target: SM 8.9 (Ada Lovelace)
  */

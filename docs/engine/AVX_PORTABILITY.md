@@ -14,10 +14,10 @@
 
 ### 1. Runtime CPU Detection
 
-At startup, `ysu_detect_cpu_features()` checks CPU capabilities:
+At startup, `sm_detect_cpu_features()` checks CPU capabilities:
 
 ```c
-CPUFeatures features = ysu_detect_cpu_features();
+CPUFeatures features = sm_detect_cpu_features();
 if (features.has_avx2) {
  // Use SIMD sigmoid/relu
 } else {
@@ -116,22 +116,22 @@ typedef struct {
  bool has_avx512f;
 } CPUFeatures;
 
-CPUFeatures ysu_detect_cpu_features(void);
+CPUFeatures sm_detect_cpu_features(void);
 ```
 
 ### In `nerf_simd.c`
 ```c
 /* Runtime CPUID-based detection */
-CPUFeatures ysu_detect_cpu_features(void) {
+CPUFeatures sm_detect_cpu_features(void) {
  // Checks CPU flags at runtime
  // Returns which features are available
 }
 
 /* Both SIMD and scalar implementations */
 #ifdef __AVX2__
- __m256 ysu_sigmoid_avx2(...)
+ __m256 sm_sigmoid_avx2(...)
 #else
- float ysu_sigmoid_scalar(...)
+ float sm_sigmoid_scalar(...)
 #endif
 ```
 
@@ -148,13 +148,13 @@ CPUFeatures ysu_detect_cpu_features(void) {
 Call once at startup:
 
 ```c
-CPUFeatures cpu = ysu_detect_cpu_features();
+CPUFeatures cpu = sm_detect_cpu_features();
 ```
 
 Then use as normal — the code automatically picks the right path:
 
 ```c
-ysu_volume_integrate_batch(...); // Uses AVX2 if available, scalar otherwise
+sm_volume_integrate_batch(...); // Uses AVX2 if available, scalar otherwise
 ```
 
 **No changes needed to your code** — it's all transparent!

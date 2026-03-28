@@ -7,7 +7,7 @@
 //   are O(0.01..0.33), well within e4m3 range (max ~448). However, the
 //   limited precision causes ~1% rounding error per step, limiting to
 //   short-time dynamics and qualitative flow features only.
-// YSU trick: uchar4 vectorized loads (4 fp8 values = 4 bytes in one 32-bit
+// steinmarder trick: uchar4 vectorized loads (4 fp8 values = 4 bytes in one 32-bit
 //   transaction). Stride 20 bytes per cell ensures 4-byte alignment for all idx
 //   (20 is divisible by 4); 5 uchar4 loads cover all 20 slots, indices 0-18
 //   are active, index 19 is unused padding.

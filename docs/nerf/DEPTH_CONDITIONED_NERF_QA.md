@@ -195,13 +195,13 @@ The overhead is small because:
 
 ```powershell
 # Baseline (uniform sampling)
-$env:YSU_RENDER_MODE="3"
-$env:YSU_NERF_STEPS="64"
+$env:SM_RENDER_MODE="3"
+$env:SM_NERF_STEPS="64"
 # Measure: FPS_baseline
 
 # Depth-Conditioned
-$env:YSU_RENDER_MODE="26"
-$env:YSU_NERF_STEPS="16"
+$env:SM_RENDER_MODE="26"
+$env:SM_NERF_STEPS="16"
 # Measure: FPS_depth
 
 # Speedup = FPS_depth / FPS_baseline
@@ -396,7 +396,7 @@ Potential speedup: 2-4x for dense Gaussian scenes
 ### Q: Prepass is too slow?
 
 **A:** Optimize:
-1. Increase YSU_DEPTH_THREADS
+1. Increase SM_DEPTH_THREADS
 2. Use coarser proxy mesh
 3. Simplify BVH (lower resolution marching cubes)
 
@@ -417,4 +417,4 @@ Potential speedup: 2-4x for dense Gaussian scenes
 ---
 
 *Last updated: February 2026*
-*Contact: YSU Engine Research Team*
+*Contact: steinmarder Research Team*

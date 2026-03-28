@@ -23,11 +23,11 @@ static NeRFFramebuffer g_nerf_framebuffer = {0};
 
 /* ===== Initialization (call once at startup) ===== */
 
-void ysu_nerf_init(const char *hashgrid_path, const char *occ_path, uint32_t width, uint32_t height) {
+void sm_nerf_init(const char *hashgrid_path, const char *occ_path, uint32_t width, uint32_t height) {
     printf("\n[NeRF] Initializing CPU SIMD NeRF renderer...\n");
     
     /* Load NeRF data from binary */
-    g_nerf_data = ysu_nerf_data_load(hashgrid_path, occ_path);
+    g_nerf_data = sm_nerf_data_load(hashgrid_path, occ_path);
     if (!g_nerf_data) {
         fprintf(stderr, "[NeRF] ERROR: Failed to load NeRF data\n");
         return;
@@ -53,9 +53,9 @@ void ysu_nerf_init(const char *hashgrid_path, const char *occ_path, uint32_t wid
            g_nerf_data->config.mlp_out_dim);
 }
 
-void ysu_nerf_shutdown(void) {
+void sm_nerf_shutdown(void) {
     if (g_nerf_data) {
-        ysu_nerf_data_free(g_nerf_data);
+        sm_nerf_data_free(g_nerf_data);
         g_nerf_data = NULL;
     }
     if (g_nerf_framebuffer.pixels) {
@@ -66,7 +66,7 @@ void ysu_nerf_shutdown(void) {
 
 /* ===== Main Rendering Function (call once per frame) ===== */
 
-void ysu_render_nerf_frame(
+void sm_render_nerf_frame(
     const Camera *camera,
     uint32_t width,
     uint32_t height,
@@ -75,7 +75,7 @@ void ysu_render_nerf_frame(
     float bounds_max
 ) {
     if (!g_nerf_data || !g_nerf_framebuffer.pixels) {
-        fprintf(stderr, "[NeRF] ERROR: Not initialized. Call ysu_nerf_init() first\n");
+        fprintf(stderr, "[NeRF] ERROR: Not initialized. Call sm_nerf_init() first\n");
         return;
     }
     
@@ -120,7 +120,7 @@ void ysu_render_nerf_frame(
                 }
                 
                 /* Render batch */
-                ysu_volume_integrate_batch(
+                sm_volume_integrate_batch(
                     &batch,
                     &g_nerf_data->config,
                     g_nerf_data,
@@ -148,9 +148,9 @@ void ysu_render_nerf_frame(
     printf("[NeRF] Rendered %u rays in %.2f ms (%.1f rays/ms)\n",
            ray_count, elapsed_ms, ray_count / elapsed_ms);
 
-    /* Debug PNG dump: gated behind YSU_NERF_DEBUG_PNG (matches render_nerf_cpu pattern). */
-    if (getenv("YSU_NERF_DEBUG_PNG")) {
-        const char *exp_s = getenv("YSU_NERF_EXPOSURE");
+    /* Debug PNG dump: gated behind SM_NERF_DEBUG_PNG (matches render_nerf_cpu pattern). */
+    if (getenv("SM_NERF_DEBUG_PNG")) {
+        const char *exp_s = getenv("SM_NERF_EXPOSURE");
         float exposure = exp_s ? atof(exp_s) : 1.0f;
         printf("[NeRF] Writing debug PNGs (exposure=%.2f)...\n", exposure);
         uint32_t w = g_nerf_framebuffer.width;
@@ -204,12 +204,12 @@ void ysu_render_nerf_frame(
             printf("[NeRF] Wrote nerf_alpha.png\n");
             free(a8);
         }
-    } /* end YSU_NERF_DEBUG_PNG */
+    } /* end SM_NERF_DEBUG_PNG */
 }
 
 /* ===== Framebuffer Export ===== */
 
-void ysu_nerf_framebuffer_to_ppm(const char *filename) {
+void sm_nerf_framebuffer_to_ppm(const char *filename) {
     if (!g_nerf_framebuffer.pixels) return;
     
     FILE *f = fopen(filename, "wb");
@@ -239,7 +239,7 @@ void ysu_nerf_framebuffer_to_ppm(const char *filename) {
     printf("[NeRF] Wrote %s\n", filename);
 }
 
-void ysu_nerf_framebuffer_to_alpha_ppm(const char *filename) {
+void sm_nerf_framebuffer_to_alpha_ppm(const char *filename) {
     if (!g_nerf_framebuffer.pixels) return;
     
     FILE *f = fopen(filename, "wb");
@@ -270,23 +270,23 @@ void ysu_nerf_framebuffer_to_alpha_ppm(const char *filename) {
 
 /* ===== Environment Variable Helpers ===== */
 
-uint32_t ysu_nerf_get_steps(void) {
-    const char *env = getenv("YSU_NERF_STEPS");
+uint32_t sm_nerf_get_steps(void) {
+    const char *env = getenv("SM_NERF_STEPS");
     return env ? atoi(env) : 32;
 }
 
-float ysu_nerf_get_density(void) {
-    const char *env = getenv("YSU_NERF_DENSITY");
+float sm_nerf_get_density(void) {
+    const char *env = getenv("SM_NERF_DENSITY");
     return env ? atof(env) : 1.0f;
 }
 
-float ysu_nerf_get_bounds(void) {
-    const char *env = getenv("YSU_NERF_BOUNDS");
+float sm_nerf_get_bounds(void) {
+    const char *env = getenv("SM_NERF_BOUNDS");
     return env ? atof(env) : 4.0f;
 }
 
 /* Expose internal framebuffer for external copying/debugging */
-NeRFFramebuffer* ysu_nerf_get_framebuffer(void) {
+NeRFFramebuffer* sm_nerf_get_framebuffer(void) {
     return &g_nerf_framebuffer;
 }
 
@@ -300,11 +300,11 @@ NeRFFramebuffer* ysu_nerf_get_framebuffer(void) {
  * In the main render function:
  * 
  * void render_scene_nerf_simd(const Camera *cam, Framebuffer *fb) {
- *     uint32_t steps = ysu_nerf_get_steps();
- *     float density = ysu_nerf_get_density();
- *     float bounds = ysu_nerf_get_bounds();
+ *     uint32_t steps = sm_nerf_get_steps();
+ *     float density = sm_nerf_get_density();
+ *     float bounds = sm_nerf_get_bounds();
  *     
- *     ysu_render_nerf_frame(cam, fb->width, fb->height, steps, density, bounds);
+ *     sm_render_nerf_frame(cam, fb->width, fb->height, steps, density, bounds);
  *     
  *     // Copy NeRF framebuffer to output framebuffer
  *     for (uint32_t y = 0; y < fb->height; y++) {
@@ -320,9 +320,9 @@ NeRFFramebuffer* ysu_nerf_get_framebuffer(void) {
  * 
  * At startup (in main):
  * 
- *     ysu_nerf_init("models/nerf_hashgrid.bin", "models/occupancy_grid.bin", width, height);
+ *     sm_nerf_init("models/nerf_hashgrid.bin", "models/occupancy_grid.bin", width, height);
  * 
  * At shutdown (in main cleanup):
  * 
- *     ysu_nerf_shutdown();
+ *     sm_nerf_shutdown();
  */

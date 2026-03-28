@@ -1,16 +1,16 @@
 @echo off
 REM Quick test of mode 17 with diagnostics
 
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_NERF_OCC=models/nerf_occ.bin
-set YSU_RENDER_MODE=17
-set YSU_W=800
-set YSU_H=600
-set YSU_SPP=1
-set YSU_DEPTH=2
-set YSU_USE_BVH=1
-set YSU_NERF_STEPS=32
-set YSU_NERF_BOUNDS=8.0
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_NERF_OCC=models/nerf_occ.bin
+set SM_RENDER_MODE=17
+set SM_W=800
+set SM_H=600
+set SM_SPP=1
+set SM_DEPTH=2
+set SM_USE_BVH=1
+set SM_NERF_STEPS=32
+set SM_NERF_BOUNDS=8.0
 
 echo.
 echo Mode 17 Diagnostic Test

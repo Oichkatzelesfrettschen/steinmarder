@@ -4,16 +4,16 @@
 #include <string.h>
 #include <stdint.h>
 
-#ifdef YSU_HAVE_ONNX
+#ifdef SM_HAVE_ONNX
 #include "onnxruntime_c_api.h"   // third_party/onnxruntime/include
 
-static int ysu_env_int(const char *name, int defv) {
+static int sm_env_int(const char *name, int defv) {
     const char *s = getenv(name);
     if (!s || !s[0]) return defv;
     return atoi(s);
 }
 
-static const char* ysu_env_str(const char *name, const char *defv) {
+static const char* sm_env_str(const char *name, const char *defv) {
     const char *s = getenv(name);
     return (s && s[0]) ? s : defv;
 }
@@ -53,16 +53,16 @@ static void nchw_to_pixels(const float *src, Vec3 *pixels, int w, int h) {
     }
 }
 
-void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height)
+void sm_neural_denoise_maybe(Vec3 *pixels, int width, int height)
 {
     if (!pixels || width <= 0 || height <= 0) return;
 
-    int enabled = ysu_env_int("YSU_NEURAL_DENOISE", 0) ? 1 : 0;
+    int enabled = sm_env_int("SM_NEURAL_DENOISE", 0) ? 1 : 0;
     if (!enabled) return;
 
-    const char *model_path = ysu_env_str("YSU_ONNX_MODEL", "");
+    const char *model_path = sm_env_str("SM_ONNX_MODEL", "");
     if (!model_path[0]) {
-        printf("[ONNX] YSU_ONNX_MODEL not set -> skip.\n");
+        printf("[ONNX] SM_ONNX_MODEL not set -> skip.\n");
         return;
     }
 
@@ -78,14 +78,14 @@ void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height)
     OrtMemoryInfo *mem = NULL;
 
     // 1) Env
-    if (api->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "YSU", &env) != NULL) goto fail;
+    if (api->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "steinmarder", &env) != NULL) goto fail;
 
     // 2) SessionOptions
     if (api->CreateSessionOptions(&so) != NULL) goto fail;
 
     // Recommendation: render already uses MT -> keep ORT to single/low thread count
-    int intra = ysu_env_int("YSU_ONNX_INTRA", 1);
-    int inter = ysu_env_int("YSU_ONNX_INTER", 1);
+    int intra = sm_env_int("SM_ONNX_INTRA", 1);
+    int inter = sm_env_int("SM_ONNX_INTER", 1);
     api->SetIntraOpNumThreads(so, intra);
     api->SetInterOpNumThreads(so, inter);
 
@@ -195,11 +195,11 @@ fail:
     if (mem)  api->ReleaseMemoryInfo(mem);
     if (env)  api->ReleaseEnv(env);
 }
-#else  /* !YSU_HAVE_ONNX */
-void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height)
+#else  /* !SM_HAVE_ONNX */
+void sm_neural_denoise_maybe(Vec3 *pixels, int width, int height)
 {
     (void)pixels; (void)width; (void)height;
     /* ONNX Runtime not available — denoise silently skipped.
-     * Build with -DYSU_HAVE_ONNX and link onnxruntime to enable. */
+     * Build with -DSM_HAVE_ONNX and link onnxruntime to enable. */
 }
-#endif /* YSU_HAVE_ONNX */
+#endif /* SM_HAVE_ONNX */

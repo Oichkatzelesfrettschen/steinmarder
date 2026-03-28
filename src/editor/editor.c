@@ -149,15 +149,15 @@ int main(void) {
     const int screenWidth  = 1280;
     const int screenHeight = 720;
 
-    InitWindow(screenWidth, screenHeight, "YSU 360 Viewer - ysu_360.ppm");
+    InitWindow(screenWidth, screenHeight, "steinmarder 360 Viewer - sm_360.ppm");
     SetTargetFPS(60);
 
     Texture2D panoTex = {0};
     PpmInfo panoInfo = {0};
 
-    // 360 render file: ysu_360.ppm
-    if (!LoadPPMToTexture("ysu_360.ppm", &panoTex, &panoInfo)) {
-        printf("ysu_360.ppm not found or unreadable. Run ysuengine.exe first.\n");
+    // 360 render file: sm_360.ppm
+    if (!LoadPPMToTexture("sm_360.ppm", &panoTex, &panoInfo)) {
+        printf("sm_360.ppm not found or unreadable. Run steinmarder.exe first.\n");
     }
 
     // Load shader from in-memory string
@@ -180,10 +180,10 @@ int main(void) {
     const float mouseSens = 0.005f; // sensitivity
 
     while (!WindowShouldClose()) {
-        // R: Reload 360 file (when ysuengine produces a new render)
+        // R: Reload 360 file (when steinmarder produces a new render)
         if (IsKeyPressed(KEY_R)) {
-            if (LoadPPMToTexture("ysu_360.ppm", &panoTex, &panoInfo)) {
-                printf("ysu_360.ppm reloaded.\n");
+            if (LoadPPMToTexture("sm_360.ppm", &panoTex, &panoInfo)) {
+                printf("sm_360.ppm reloaded.\n");
             }
         }
 
@@ -245,9 +245,9 @@ int main(void) {
 
             DrawText("LMB / ALT+LMB: look around", 10, 10, 18, RAYWHITE);
             DrawText("Mouse wheel: zoom in/out", 10, 32, 16, RAYWHITE);
-            DrawText("R: reload ysu_360.ppm", 10, 52, 16, RAYWHITE);
+            DrawText("R: reload sm_360.ppm", 10, 52, 16, RAYWHITE);
         } else {
-            DrawText("ysu_360.ppm not found. Run ysuengine.exe first.", 40, screenHeight/2 - 10, 20, RAYWHITE);
+            DrawText("sm_360.ppm not found. Run steinmarder.exe first.", 40, screenHeight/2 - 10, 20, RAYWHITE);
         }
 
         EndDrawing();

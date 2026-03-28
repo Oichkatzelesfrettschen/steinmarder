@@ -12,7 +12,7 @@
  * Paper: "Depth-Conditioned Heterogeneous NeRF: CPU-Guided Sparse Sampling 
  *         for Real-Time Neural Rendering"
  * 
- * Author: YSU Engine Research Team
+ * Author: steinmarder Research Team
  * Date: February 2026
  */
 

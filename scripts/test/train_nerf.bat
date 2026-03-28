@@ -60,7 +60,7 @@ echo Model saved to: %OUT_MODEL%
 echo Occupancy saved to: %OUT_OCC%
 echo.
 echo To render:
-echo   set YSU_RENDER_MODE=26
-echo   set YSU_NERF_HASHGRID=%OUT_MODEL%
-echo   set YSU_NERF_OCC=%OUT_OCC%
+echo   set SM_RENDER_MODE=26
+echo   set SM_NERF_HASHGRID=%OUT_MODEL%
+echo   set SM_NERF_OCC=%OUT_OCC%
 echo   gpu_vulkan_demo.exe

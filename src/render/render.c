@@ -6,8 +6,8 @@
  * CHECKPOINT: See .github/CHECKPOINTS.md for the full agent checklist.
  * Key items relevant to this file:
  *  - Thread pool: `WorkerLocal` alignment and `render_scene_mt` usage.
- *  - RNG seeding: `ysu_seed_pixel`, tile_base derivation, and deterministic behavior.
- *  - Adaptive sampling env toggles: YSU_ADAPTIVE, YSU_SPP_MIN, YSU_SPP_BATCH.
+ *  - RNG seeding: `sm_seed_pixel`, tile_base derivation, and deterministic behavior.
+ *  - Adaptive sampling env toggles: SM_ADAPTIVE, SM_SPP_MIN, SM_SPP_BATCH.
  */
 
 #include <stdlib.h>
@@ -56,24 +56,24 @@ static _Atomic uint64_t g_adapt_early_pixels  = 0;
 static _Atomic uint64_t g_adapt_max_pixels    = 0;
 #endif
 
-static int ysu_env_int(const char* name, int defv) {
+static int sm_env_int(const char* name, int defv) {
     const char* s = getenv(name);
     if (!s || !s[0]) return defv;
     return atoi(s);
 }
 
-static float ysu_env_float(const char* name, float defv) {
+static float sm_env_float(const char* name, float defv) {
     const char* s = getenv(name);
     if (!s || !s[0]) return defv;
     return (float)atof(s);
 }
 
-static void ysu_adapt_load_config(void) {
-    g_adapt_enabled  = ysu_env_int("YSU_ADAPTIVE", 0) ? 1 : 0;
-    g_adapt_spp_min  = ysu_env_int("YSU_SPP_MIN", 16);
-    g_adapt_spp_batch= ysu_env_int("YSU_SPP_BATCH", 4);
-    g_adapt_rel_err  = ysu_env_float("YSU_REL_ERR", 0.02f);
-    g_adapt_abs_err  = ysu_env_float("YSU_ABS_ERR", 0.001f);
+static void sm_adapt_load_config(void) {
+    g_adapt_enabled  = sm_env_int("SM_ADAPTIVE", 0) ? 1 : 0;
+    g_adapt_spp_min  = sm_env_int("SM_SPP_MIN", 16);
+    g_adapt_spp_batch= sm_env_int("SM_SPP_BATCH", 4);
+    g_adapt_rel_err  = sm_env_float("SM_REL_ERR", 0.02f);
+    g_adapt_abs_err  = sm_env_float("SM_ABS_ERR", 0.001f);
 
     if (g_adapt_spp_min < 8) g_adapt_spp_min = 8;
     if (g_adapt_spp_batch < 1) g_adapt_spp_batch = 1;
@@ -81,7 +81,7 @@ static void ysu_adapt_load_config(void) {
     if (g_adapt_abs_err < 0.0f) g_adapt_abs_err = 0.0f;
 }
 
-static inline float ysu_luminance(Vec3 c) {
+static inline float sm_luminance(Vec3 c) {
     // Rec.709-ish
     return 0.2126f*c.x + 0.7152f*c.y + 0.0722f*c.z;
 }
@@ -93,9 +93,9 @@ static inline float clampf(float x, float a, float b) {
 static inline float maxf(float a, float b) { return a > b ? a : b; }
 
 // ------------------------- RNG (xorshift32) -------------------------
-typedef struct { uint32_t state; } YSU_Rng;
+typedef struct { uint32_t state; } SM_Rng;
 
-static inline uint32_t ysu_rng_u32(YSU_Rng *r) {
+static inline uint32_t sm_rng_u32(SM_Rng *r) {
     uint32_t x = r->state;
     x ^= x << 13;
     x ^= x >> 17;
@@ -104,7 +104,7 @@ static inline uint32_t ysu_rng_u32(YSU_Rng *r) {
     return x;
 }
 
-static inline uint32_t ysu_hash_u32(uint32_t x) {
+static inline uint32_t sm_hash_u32(uint32_t x) {
     x ^= x >> 16;
     x *= 0x7feb352du;
     x ^= x >> 15;
@@ -114,38 +114,38 @@ static inline uint32_t ysu_hash_u32(uint32_t x) {
 }
 
 // Seed a per-pixel RNG deterministically from a base seed + pixel coords (+ optional salt).
-static inline uint32_t ysu_seed_pixel(uint32_t base, uint32_t px, uint32_t py, uint32_t salt) {
+static inline uint32_t sm_seed_pixel(uint32_t base, uint32_t px, uint32_t py, uint32_t salt) {
     uint32_t x = base;
     x ^= px * 0x9E3779B1u;
     x ^= py * 0x85EBCA77u;
     x ^= salt * 0xC2B2AE3Du;
-    x = ysu_hash_u32(x);
+    x = sm_hash_u32(x);
     return (x == 0u) ? 1u : x;
 }
 
-static inline float ysu_rng_f01(YSU_Rng *r) {
-    return (ysu_rng_u32(r) >> 8) * (1.0f / 16777216.0f);
+static inline float sm_rng_f01(SM_Rng *r) {
+    return (sm_rng_u32(r) >> 8) * (1.0f / 16777216.0f);
 }
 
 /* Public RNG helpers (declared in render.h) */
-float ysu_rng_next01(uint32_t *state) {
+float sm_rng_next01(uint32_t *state) {
     if (!state) return 0.0f;
-    YSU_Rng r;
+    SM_Rng r;
     r.state = (*state != 0u) ? *state : 1u;
-    float u = ysu_rng_f01(&r);
+    float u = sm_rng_f01(&r);
     *state = r.state;
     return u;
 }
 
-int ysu_russian_roulette(uint32_t *state, float p_survive) {
+int sm_russian_roulette(uint32_t *state, float p_survive) {
     if (p_survive <= 0.0f) return 0;
     if (p_survive >= 1.0f) return 1;
-    float u = ysu_rng_next01(state);
+    float u = sm_rng_next01(state);
     return (u < p_survive) ? 1 : 0;
 }
 
-static int ysu_suggest_threads(void) {
-    const char *env = getenv("YSU_THREADS");
+static int sm_suggest_threads(void) {
+    const char *env = getenv("SM_THREADS");
     if (env && env[0]) {
         int v = atoi(env);
         if (v > 0) return v;
@@ -173,21 +173,21 @@ static Vec3  g_fog_color   = {0.6f, 0.7f, 0.8f};
 // debug
 static DebugView g_debug = DEBUG_NONE;
 
-static void ysu_fx_load_once(void) {
+static void sm_fx_load_once(void) {
     if (g_fx_init) return;
     g_fx_init = 1;
 
     // Fog toggles
-    g_fog_enabled = getenv("YSU_FOG") ? 1 : 0;
-    if (getenv("YSU_FOG_DENSITY")) g_fog_density = (float)atof(getenv("YSU_FOG_DENSITY"));
-    if (getenv("YSU_FOG_COLOR_R")) g_fog_color.x = (float)atof(getenv("YSU_FOG_COLOR_R"));
-    if (getenv("YSU_FOG_COLOR_G")) g_fog_color.y = (float)atof(getenv("YSU_FOG_COLOR_G"));
-    if (getenv("YSU_FOG_COLOR_B")) g_fog_color.z = (float)atof(getenv("YSU_FOG_COLOR_B"));
+    g_fog_enabled = getenv("SM_FOG") ? 1 : 0;
+    if (getenv("SM_FOG_DENSITY")) g_fog_density = (float)atof(getenv("SM_FOG_DENSITY"));
+    if (getenv("SM_FOG_COLOR_R")) g_fog_color.x = (float)atof(getenv("SM_FOG_COLOR_R"));
+    if (getenv("SM_FOG_COLOR_G")) g_fog_color.y = (float)atof(getenv("SM_FOG_COLOR_G"));
+    if (getenv("SM_FOG_COLOR_B")) g_fog_color.z = (float)atof(getenv("SM_FOG_COLOR_B"));
 
     if (g_fog_density < 0.0f) g_fog_density = 0.0f;
 
     // Debug view
-    const char* d = getenv("YSU_DEBUG");
+    const char* d = getenv("SM_DEBUG");
     if (d && d[0]) {
         if (!strcmp(d, "albedo")) g_debug = DEBUG_ALBEDO;
         else if (!strcmp(d, "normal")) g_debug = DEBUG_NORMAL;
@@ -197,7 +197,7 @@ static void ysu_fx_load_once(void) {
     }
 }
 
-static inline Vec3 ysu_apply_fog(Vec3 color, float dist) {
+static inline Vec3 sm_apply_fog(Vec3 color, float dist) {
     if (!g_fog_enabled) return color;
 
     // Beer-Lambert
@@ -219,7 +219,7 @@ typedef struct {
     Vec3 emission;
 } Hit;
 
-static Vec3 ysu_sky(Ray r) {
+static Vec3 sm_sky(Ray r) {
     Vec3 u = vec3_unit(r.direction);
     float t = 0.5f * (u.y + 1.0f);
     Vec3 a = vec3(1.0f, 1.0f, 1.0f);
@@ -327,7 +327,7 @@ static Vec3 shade_debug(const Hit* h, Vec3 shaded_color) {
             return vec3(d, d, d);
         }
         case DEBUG_LUMINANCE: {
-            float l = clampf(ysu_luminance(shaded_color), 0.0f, 1.0f);
+            float l = clampf(sm_luminance(shaded_color), 0.0f, 1.0f);
             // simple heat (blue->red)
             return vec3(l, 0.0f, 1.0f - l);
         }
@@ -337,7 +337,7 @@ static Vec3 shade_debug(const Hit* h, Vec3 shaded_color) {
 }
 
 Vec3 ray_color_internal(Ray r, int depth) {
-    ysu_fx_load_once();
+    sm_fx_load_once();
 
     Hit h = {0};
     if (scene_hit(r, 0.001f, 1e30f, &h)) {
@@ -349,7 +349,7 @@ Vec3 ray_color_internal(Ray r, int depth) {
         Vec3 col = vec3_add(diffuse, h.emission);
 
         // Fog based on hit distance
-        col = ysu_apply_fog(col, h.t);
+        col = sm_apply_fog(col, h.t);
 
         // Debug override
         col = shade_debug(&h, col);
@@ -359,8 +359,8 @@ Vec3 ray_color_internal(Ray r, int depth) {
     }
 
     // Miss => sky + fog over a "far distance" so it fades nicely
-    Vec3 sky = ysu_sky(r);
-    sky = ysu_apply_fog(sky, 60.0f); // far fog for horizon
+    Vec3 sky = sm_sky(r);
+    sky = sm_apply_fog(sky, 60.0f); // far fog for horizon
     sky = shade_debug(&h, sky);
     return sky;
 }
@@ -377,14 +377,14 @@ void render_scene_st(Vec3 *pixels,
     if (samples_per_pixel < 1) samples_per_pixel = 1;
     if (max_depth < 1) max_depth = 1;
 
-    ysu_adapt_load_config();
-    ysu_fx_load_once();
+    sm_adapt_load_config();
+    sm_fx_load_once();
 
     atomic_store(&g_adapt_total_samples, 0);
     atomic_store(&g_adapt_early_pixels, 0);
     atomic_store(&g_adapt_max_pixels, 0);
 
-    YSU_Rng rng;
+    SM_Rng rng;
     rng.state = ((uint32_t)time(NULL) ^ 0xA511E9B3u);
     if (rng.state == 0) rng.state = 1;
 
@@ -407,8 +407,8 @@ void render_scene_st(Vec3 *pixels,
             int spp_min = (g_adapt_spp_min < spp_max) ? g_adapt_spp_min : spp_max;
 
             for (int s = 0; s < spp_max; ++s) {
-                float u = ((float)i + ysu_rng_f01(&rng)) * inv_wm1;
-                float v = ((float)j + ysu_rng_f01(&rng)) * inv_hm1;
+                float u = ((float)i + sm_rng_f01(&rng)) * inv_wm1;
+                float v = ((float)j + sm_rng_f01(&rng)) * inv_hm1;
 
                 Ray rr = camera_get_ray(cam, u, v);
                 Vec3 c = ray_color_internal(rr, max_depth);
@@ -417,7 +417,7 @@ void render_scene_st(Vec3 *pixels,
                 spp_used++;
 
                 if (g_adapt_enabled) {
-                    float lum = ysu_luminance(c);
+                    float lum = sm_luminance(c);
                     float n = (float)spp_used;
                     float delta = lum - mean;
                     mean += delta / n;
@@ -522,18 +522,18 @@ static void render_tile_chunk(RenderPool *p, WorkerLocal *wl, int job) {
     int spp_max = p->spp;
     int spp_min = (g_adapt_spp_min < spp_max) ? g_adapt_spp_min : spp_max;
 
-    uint32_t tile_base = ysu_hash_u32(wl->rng_state
+    uint32_t tile_base = sm_hash_u32(wl->rng_state
                                    ^ p->seed_base
                                    ^ (uint32_t)(job * 0xA511E9B3u));
     if (tile_base == 0u) tile_base = 1u;
 
-    YSU_Rng rng = {0};
+    SM_Rng rng = {0};
 
     for (int j = y0; j < y1; ++j) {
         Vec3* row = p->pixels + (p->height - 1 - j) * p->width;
 
         for (int i = x0; i < x1; ++i) {
-            rng.state = ysu_seed_pixel(tile_base, (uint32_t)i, (uint32_t)j, (uint32_t)tid);
+            rng.state = sm_seed_pixel(tile_base, (uint32_t)i, (uint32_t)j, (uint32_t)tid);
 
             float accx = 0.0f, accy = 0.0f, accz = 0.0f;
             int spp_used = 0;
@@ -542,8 +542,8 @@ static void render_tile_chunk(RenderPool *p, WorkerLocal *wl, int job) {
             float mean = 0.0f, m2 = 0.0f;
 
             for (int s = 0; s < spp_max; ++s) {
-                float u = ((float)i + ysu_rng_f01(&rng)) * inv_wm1;
-                float v = ((float)j + ysu_rng_f01(&rng)) * inv_hm1;
+                float u = ((float)i + sm_rng_f01(&rng)) * inv_wm1;
+                float v = ((float)j + sm_rng_f01(&rng)) * inv_hm1;
 
                 Ray rr = camera_get_ray(p->cam, u, v);
                 Vec3 c = ray_color_internal(rr, p->depth);
@@ -552,7 +552,7 @@ static void render_tile_chunk(RenderPool *p, WorkerLocal *wl, int job) {
                 spp_used++;
 
                 if (g_adapt_enabled) {
-                    float lum = ysu_luminance(c);
+                    float lum = sm_luminance(c);
                     float n = (float)spp_used;
                     float delta = lum - mean;
                     mean += delta / n;
@@ -580,7 +580,7 @@ static void render_tile_chunk(RenderPool *p, WorkerLocal *wl, int job) {
         }
     }
 
-    wl->rng_state = ysu_hash_u32(wl->rng_state ^ rng.state ^ (uint32_t)job);
+    wl->rng_state = sm_hash_u32(wl->rng_state ^ rng.state ^ (uint32_t)job);
 }
 
 static void *pool_worker(void *arg) {
@@ -648,7 +648,7 @@ static void pool_shutdown(void) {
 static void pool_init_if_needed(int create_threads) {
     if (g_pool.threads) return;
 
-    g_pool.pool_threads = (create_threads > 0) ? create_threads : ysu_suggest_threads();
+    g_pool.pool_threads = (create_threads > 0) ? create_threads : sm_suggest_threads();
     if (g_pool.pool_threads < 1) g_pool.pool_threads = 1;
 
     pthread_mutex_init(&g_pool.mtx, NULL);
@@ -669,7 +669,7 @@ static void pool_init_if_needed(int create_threads) {
 
     for (int i = 0; i < g_pool.pool_threads; ++i) {
         g_pool.locals[i].tid = i;
-        g_pool.locals[i].rng_state = ysu_hash_u32((uint32_t)time(NULL)
+        g_pool.locals[i].rng_state = sm_hash_u32((uint32_t)time(NULL)
                                    ^ (uint32_t)(i * 0x9E3779B9u)
                                    ^ (uint32_t)(uintptr_t)(&g_pool.locals[i]));
         pthread_create(&g_pool.threads[i], NULL, pool_worker, &g_pool.locals[i]);
@@ -694,14 +694,14 @@ void render_scene_mt(Vec3 *pixels,
     if (samples_per_pixel < 1) samples_per_pixel = 1;
     if (max_depth < 1) max_depth = 1;
 
-    ysu_adapt_load_config();
-    ysu_fx_load_once();
+    sm_adapt_load_config();
+    sm_fx_load_once();
 
     atomic_store(&g_adapt_total_samples, 0);
     atomic_store(&g_adapt_early_pixels, 0);
     atomic_store(&g_adapt_max_pixels, 0);
 
-    if (thread_count <= 0) thread_count = ysu_suggest_threads();
+    if (thread_count <= 0) thread_count = sm_suggest_threads();
     if (thread_count < 1) thread_count = 1;
 
     if (tile_size <= 0) tile_size = 64;
@@ -771,23 +771,23 @@ void render_nerf_cpu(Vec3 *pixels,
                      int image_height,
                      Camera cam)
 {
-    const char* hashgrid_path = getenv("YSU_NERF_HASHGRID");
-    const char* occ_path = getenv("YSU_NERF_OCC");
+    const char* hashgrid_path = getenv("SM_NERF_HASHGRID");
+    const char* occ_path = getenv("SM_NERF_OCC");
     
     if (!hashgrid_path || !occ_path) {
-        fprintf(stderr, "[NeRF] YSU_NERF_HASHGRID and YSU_NERF_OCC not set\n");
+        fprintf(stderr, "[NeRF] SM_NERF_HASHGRID and SM_NERF_OCC not set\n");
         return;
     }
     
-    NeRFData *nerf_data = ysu_nerf_data_load(hashgrid_path, occ_path);
+    NeRFData *nerf_data = sm_nerf_data_load(hashgrid_path, occ_path);
     if (!nerf_data) {
         fprintf(stderr, "[NeRF] failed to load NeRF data\n");
         return;
     }
     
-    uint32_t nerf_steps = (uint32_t)ysu_env_int("YSU_NERF_STEPS", 32);
-    float nerf_density = ysu_env_float("YSU_NERF_DENSITY", 1.0f);
-    float nerf_bounds = ysu_env_float("YSU_NERF_BOUNDS", 4.0f);
+    uint32_t nerf_steps = (uint32_t)sm_env_int("SM_NERF_STEPS", 32);
+    float nerf_density = sm_env_float("SM_NERF_DENSITY", 1.0f);
+    float nerf_bounds = sm_env_float("SM_NERF_BOUNDS", 4.0f);
     
     printf("[NeRF] rendering %dx%d with %u steps, density=%.2f, bounds=%.2f\n",
            image_width, image_height, nerf_steps, nerf_density, nerf_bounds);
@@ -809,12 +809,12 @@ void render_nerf_cpu(Vec3 *pixels,
     
     if (!fb.pixels) {
         fprintf(stderr, "[NeRF] failed to allocate framebuffer\n");
-        ysu_nerf_data_free(nerf_data);
+        sm_nerf_data_free(nerf_data);
         return;
     }
     
-    /* Debug: test a single position through the MLP (only if YSU_NERF_DEBUG_MLP=1) */
-    if (getenv("YSU_NERF_DEBUG_MLP")) {
+    /* Debug: test a single position through the MLP (only if SM_NERF_DEBUG_MLP=1) */
+    if (getenv("SM_NERF_DEBUG_MLP")) {
         Vec3 test_pos = {0.0f, 0.0f, 0.0f};
         Vec3 norm_pos;
         norm_pos.x = (test_pos.x - nerf_data->config.center.x) / nerf_data->config.scale;
@@ -846,7 +846,7 @@ void render_nerf_cpu(Vec3 *pixels,
         float rgb_out[SIMD_BATCH_SIZE][3] = {0};
         float sigma_out[SIMD_BATCH_SIZE] = {0};
         
-        ysu_mlp_inference_batch((const float(*)[27])feat_batch, &nerf_data->config,
+        sm_mlp_inference_batch((const float(*)[27])feat_batch, &nerf_data->config,
                                 nerf_data->mlp_weights, nerf_data->mlp_biases,
                                 rgb_out, sigma_out);
         
@@ -879,7 +879,7 @@ void render_nerf_cpu(Vec3 *pixels,
                 batch.active[i] = (x + i < (uint32_t)image_width) ? 1 : 0;
             }
             
-            ysu_volume_integrate_batch(&batch, &nerf_data->config, nerf_data, &fb, nerf_steps, nerf_density, nerf_bounds);
+            sm_volume_integrate_batch(&batch, &nerf_data->config, nerf_data, &fb, nerf_steps, nerf_density, nerf_bounds);
         }
     }
     
@@ -893,8 +893,8 @@ void render_nerf_cpu(Vec3 *pixels,
     
     printf("[NeRF] rendered in %.2f ms\n", elapsed_ms);
     
-    /* Debug: print stats for center pixel (only if YSU_NERF_DEBUG_STATS=1) */
-    if (getenv("YSU_NERF_DEBUG_STATS")) {
+    /* Debug: print stats for center pixel (only if SM_NERF_DEBUG_STATS=1) */
+    if (getenv("SM_NERF_DEBUG_STATS")) {
         uint32_t cx = fb.width / 2;
         uint32_t cy = fb.height / 2;
         uint32_t cidx = cy * fb.width + cx;
@@ -914,8 +914,8 @@ void render_nerf_cpu(Vec3 *pixels,
                nonzero_alpha, fb.width * fb.height, max_alpha, sum_rgb / (fb.width * fb.height * 3));
     }
     
-    /* Debug: dump raw NeRF framebuffer to PPM (only if YSU_NERF_DEBUG_PPM=1) */
-    if (getenv("YSU_NERF_DEBUG_PPM")) {
+    /* Debug: dump raw NeRF framebuffer to PPM (only if SM_NERF_DEBUG_PPM=1) */
+    if (getenv("SM_NERF_DEBUG_PPM")) {
         FILE *df = fopen("nerf_debug.ppm", "wb");
         if (df) {
             uint32_t w = fb.width;
@@ -940,11 +940,11 @@ void render_nerf_cpu(Vec3 *pixels,
         }
     }
 
-    /* Debug: write Reinhard tonemapped PNG (only if YSU_NERF_DEBUG_PNG=1) */
-    if (getenv("YSU_NERF_DEBUG_PNG")) {
+    /* Debug: write Reinhard tonemapped PNG (only if SM_NERF_DEBUG_PNG=1) */
+    if (getenv("SM_NERF_DEBUG_PNG")) {
         uint32_t w = fb.width;
         uint32_t h = fb.height;
-        const char *exp_s = getenv("YSU_NERF_EXPOSURE");
+        const char *exp_s = getenv("SM_NERF_EXPOSURE");
         float exposure = exp_s ? (float)atof(exp_s) : 1.0f;
         unsigned char *rgb8 = (unsigned char*)malloc((size_t)w * (size_t)h * 3);
         if (rgb8) {
@@ -989,7 +989,7 @@ void render_nerf_cpu(Vec3 *pixels,
     }
 
     free(fb.pixels);
-    ysu_nerf_data_free(nerf_data);
+    sm_nerf_data_free(nerf_data);
 }
 
 void render_scene(Vec3 *pixels,
@@ -1007,17 +1007,17 @@ void render_scene(Vec3 *pixels,
 // ================================================================
 
 // Example: Render NeRF using existing HDR Vec3 buffer and config helpers
-// (You must call ysu_nerf_init at startup and ysu_nerf_shutdown at shutdown)
+// (You must call sm_nerf_init at startup and sm_nerf_shutdown at shutdown)
 void render_scene_nerf_simd(Vec3 *pixels, int image_width, int image_height, Camera cam) {
-    uint32_t steps = ysu_nerf_get_steps();
-    float density = ysu_nerf_get_density();
-    float bounds = ysu_nerf_get_bounds();
+    uint32_t steps = sm_nerf_get_steps();
+    float density = sm_nerf_get_density();
+    float bounds = sm_nerf_get_bounds();
 
     /* Render into the internal NeRF framebuffer */
-    ysu_render_nerf_frame(&cam, (uint32_t)image_width, (uint32_t)image_height, steps, density, bounds);
+    sm_render_nerf_frame(&cam, (uint32_t)image_width, (uint32_t)image_height, steps, density, bounds);
 
     /* Get pointer to internal framebuffer and copy into HDR Vec3 buffer */
-    NeRFFramebuffer *nb = ysu_nerf_get_framebuffer();
+    NeRFFramebuffer *nb = sm_nerf_get_framebuffer();
     if (!nb || !nb->pixels) return;
 
     size_t px_count = (size_t)image_width * (size_t)image_height;
@@ -1027,6 +1027,6 @@ void render_scene_nerf_simd(Vec3 *pixels, int image_width, int image_height, Cam
 }
 
 // At startup (in main):
-//     ysu_nerf_init("models/nerf_hashgrid.bin", "models/occupancy_grid.bin", width, height);
+//     sm_nerf_init("models/nerf_hashgrid.bin", "models/occupancy_grid.bin", width, height);
 // At shutdown (in main cleanup):
-//     ysu_nerf_shutdown();
+//     sm_nerf_shutdown();

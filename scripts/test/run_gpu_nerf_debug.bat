@@ -2,18 +2,18 @@
 REM Debug script to test NeRF integration step-by-step
 REM This runs various debug render modes to diagnose issues
 
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_NERF_OCC=models/nerf_occ.bin
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_NERF_OCC=models/nerf_occ.bin
 
-set YSU_W=800
-set YSU_H=600
-set YSU_SPP=1
-set YSU_DEPTH=2
-set YSU_USE_BVH=1
-set YSU_NERF_STEPS=32
+set SM_W=800
+set SM_H=600
+set SM_SPP=1
+set SM_DEPTH=2
+set SM_USE_BVH=1
+set SM_NERF_STEPS=32
 
 echo ===================================
-echo   YSU NeRF Debug Modes
+echo   steinmarder NeRF Debug Modes
 echo ===================================
 echo.
 echo Testing NeRF integration with debug render modes
@@ -45,7 +45,7 @@ echo   7. Mode 2:  Hybrid mesh+NeRF blend
 echo.
 
 set /p MODE="Enter debug mode (7-20) or 2 for hybrid: "
-set YSU_RENDER_MODE=%MODE%
+set SM_RENDER_MODE=%MODE%
 
 echo.
 echo Running mode %MODE%...

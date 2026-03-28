@@ -115,12 +115,13 @@ extern "C" __global__ void lbm_step_fp64_soa_kernel(
 
     if (force_mag_sq >= 1e-80) {
         double prefactor = 1.0 - 0.5 * inv_tau;
+        double u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             double eix = (double)CX_F64S[i], eiy = (double)CY_F64S[i], eiz = (double)CZ_F64S[i];
-            double em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            double ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
             double ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            double ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            double em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W_F64S[i] * (em_u_dot_f * 3.0 + ei_dot_u * ei_dot_f * 9.0);
         }
     }

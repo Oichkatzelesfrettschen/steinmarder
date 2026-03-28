@@ -26,7 +26,7 @@ void bilateral_denoise(Vec3 *pixels, int width, int height,
                        float sigma_s, float sigma_r, int radius);
 
 // Environment-controlled version
-// Reads: YSU_BILATERAL_DENOISE, YSU_BILATERAL_SIGMA_S, YSU_BILATERAL_SIGMA_R, YSU_BILATERAL_RADIUS
+// Reads: SM_BILATERAL_DENOISE, SM_BILATERAL_SIGMA_S, SM_BILATERAL_SIGMA_R, SM_BILATERAL_RADIUS
 void bilateral_denoise_maybe(Vec3 *pixels, int width, int height);
 
 #ifdef __cplusplus

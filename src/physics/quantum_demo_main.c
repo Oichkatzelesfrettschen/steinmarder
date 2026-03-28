@@ -1,6 +1,6 @@
 /* quantum_demo_main.c — Standalone demo for quantum wavefunction visualization.
  *
- * Initializes Vulkan (headless or windowed via YSU_QV_WINDOW=1),
+ * Initializes Vulkan (headless or windowed via SM_QV_WINDOW=1),
  * configures an atom/orbital, dispatches the two-pass compute pipeline,
  * and either writes output.ppm (headless) or opens an interactive window.
  *
@@ -15,21 +15,21 @@
  *   ESC         Quit
  *
  * Environment variables:
- *   YSU_QV_WINDOW=1      Open interactive GLFW window
- *   YSU_QV_ATOM=Z        Visualize full atom (e.g. Z=6 for Carbon)
- *   YSU_QV_N=n           Hydrogen orbital principal quantum number
- *   YSU_QV_L=l           Angular momentum
- *   YSU_QV_M=m           Magnetic quantum number
- *   YSU_QV_GRID=128      Grid resolution (128³ default)
- *   YSU_QV_W=800         Image width
- *   YSU_QV_H=600         Image height
- *   YSU_QV_DENSITY=50    Density multiplier
- *   YSU_QV_GAMMA=0.5     Density power curve
- *   YSU_QV_COLOR=0       Color mode (0=physical, 2=phase, 3=xray)
- *   YSU_QV_MODE=0        Output mode (0=|ψ|², 1=signed, 2=phase)
- *   YSU_QV_CAM_DIST=40   Camera distance in Bohr radii
- *   YSU_QV_CAM_THETA=30  Camera elevation (degrees)
- *   YSU_QV_CAM_PHI=45    Camera azimuth (degrees)
+ *   SM_QV_WINDOW=1      Open interactive GLFW window
+ *   SM_QV_ATOM=Z        Visualize full atom (e.g. Z=6 for Carbon)
+ *   SM_QV_N=n           Hydrogen orbital principal quantum number
+ *   SM_QV_L=l           Angular momentum
+ *   SM_QV_M=m           Magnetic quantum number
+ *   SM_QV_GRID=128      Grid resolution (128³ default)
+ *   SM_QV_W=800         Image width
+ *   SM_QV_H=600         Image height
+ *   SM_QV_DENSITY=50    Density multiplier
+ *   SM_QV_GAMMA=0.5     Density power curve
+ *   SM_QV_COLOR=0       Color mode (0=physical, 2=phase, 3=xray)
+ *   SM_QV_MODE=0        Output mode (0=|ψ|², 1=signed, 2=phase)
+ *   SM_QV_CAM_DIST=40   Camera distance in Bohr radii
+ *   SM_QV_CAM_THETA=30  Camera elevation (degrees)
+ *   SM_QV_CAM_PHI=45    Camera azimuth (degrees)
  *
  * Build (headless only):
  *   gcc -std=c11 -O2 -o quantum_demo quantum_demo_main.c quantum_volume.c -lvulkan-1 -lm
@@ -54,7 +54,7 @@
 #include "nuclear_reaction.h"
 #include "reactor_thermal.h"
 #include "atomic_fission.h"
-#include "ysu_upscale.h"
+#include "sm_upscale.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,7 +64,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-/* ─── Env helpers (same pattern as ysu_main.c) ─── */
+/* ─── Env helpers (same pattern as sm_main.c) ─── */
 static int env_int(const char *name, int def) {
     const char *v = getenv(name);
     return v ? atoi(v) : def;
@@ -116,13 +116,13 @@ static GLFWwindow     *g_window   = NULL;
 
 /* ── DLSS Temporal Super-Resolution state ── */
 static int              g_dlss_enabled = 0;
-static int              g_dlss_quality = 2;  /* YSU_UPSCALE_QUALITY_BALANCED */
+static int              g_dlss_quality = 2;  /* SM_UPSCALE_QUALITY_BALANCED */
 static int              g_W_lo = 0, g_H_lo = 0;
 static int              g_W_hi = 0, g_H_hi = 0;
 
 #ifdef QV_ENABLE_WINDOW
 static int              g_dlss_active  = 0;
-static YsuUpscaleCtx    g_upscale;
+static SmUpscaleCtx    g_upscale;
 static int              g_upscale_inited = 0;
 
 /* DLSS images */
@@ -172,7 +172,7 @@ typedef struct {
 
 static int init_vulkan(int windowed) {
     VkApplicationInfo app = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
-    app.pApplicationName = "YSU Quantum Vis";
+    app.pApplicationName = "steinmarder Quantum Vis";
     app.apiVersion       = VK_API_VERSION_1_2;
 
     VkInstanceCreateInfo ici = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
@@ -845,7 +845,7 @@ static int dlss_init_system(QuantumVis *qv) {
     }
 
     /* Init DLSS upscale context */
-    YsuUpscaleInitInfo info;
+    SmUpscaleInitInfo info;
     memset(&info, 0, sizeof(info));
     info.device             = g_dev;
     info.phys_device        = g_phys;
@@ -862,10 +862,10 @@ static int dlss_init_system(QuantumVis *qv) {
     info.spv_sharpen_size   = sharpen_sz;
     info.allocator          = NULL;
 
-    VkResult vr = ysu_upscale_init(&g_upscale, &info);
+    VkResult vr = sm_upscale_init(&g_upscale, &info);
     free(reproj_spv); free(neural_spv); free(sharpen_spv);
     if (vr != VK_SUCCESS) {
-        fprintf(stderr, "[DLSS] ysu_upscale_init failed: %d\n", (int)vr);
+        fprintf(stderr, "[DLSS] sm_upscale_init failed: %d\n", (int)vr);
         return -11;
     }
 
@@ -899,7 +899,7 @@ static int dlss_init_system(QuantumVis *qv) {
         vkBindBufferMemory(g_dev, g_upscale.weight_buf, g_upscale.weight_mem, 0);
     }
 
-    /* Transition ysu_upscale internal images from UNDEFINED → GENERAL.
+    /* Transition sm_upscale internal images from UNDEFINED → GENERAL.
      * The upscale library creates history/reproj/confidence images but does
      * not transition them, so we must do it here with a one-shot command. */
     {
@@ -1059,9 +1059,9 @@ static void dlss_cmd_record(VkCommandBuffer cb, QuantumVis *qv,
 
     /* ── Step 3: Run DLSS 3-pass upscale ── */
     {
-        YsuJitter jitter = ysu_upscale_jitter(frame_idx);
+        SmJitter jitter = sm_upscale_jitter(frame_idx);
 
-        YsuUpscaleFrameParams fp;
+        SmUpscaleFrameParams fp;
         memset(&fp, 0, sizeof(fp));
         fp.color_lo    = qv->outView;
         fp.depth_lo    = qv->depthView;
@@ -1080,8 +1080,8 @@ static void dlss_cmd_record(VkCommandBuffer cb, QuantumVis *qv,
         fp.clamp_gamma = 1.0f;
         fp.debug_mode  = 0;
 
-        ysu_upscale_update_descriptors(&g_upscale, &fp);
-        ysu_upscale_execute(&g_upscale, cb, &fp);
+        sm_upscale_update_descriptors(&g_upscale, &fp);
+        sm_upscale_execute(&g_upscale, cb, &fp);
     }
 
     /* ── Step 4: Transition images back to GENERAL ── */
@@ -1193,7 +1193,7 @@ static void cmd_blit_to_swapchain_scaled(VkCommandBuffer cb,
 /* Cleanup all DLSS resources */
 static void dlss_cleanup(void) {
     if (g_upscale_inited) {
-        ysu_upscale_destroy(&g_upscale);
+        sm_upscale_destroy(&g_upscale);
         g_upscale_inited = 0;
     }
     if (g_mvPipeline)    vkDestroyPipeline(g_dev, g_mvPipeline, NULL);
@@ -1299,7 +1299,7 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
     double prev_time = 0.0;
     int thermal_paused = 0;
     /* Create GLFW window */
-    g_window = glfwCreateWindow(W, H, "YSU Quantum Wavefunction Visualizer", NULL, NULL);
+    g_window = glfwCreateWindow(W, H, "steinmarder Quantum Wavefunction Visualizer", NULL, NULL);
     if (!g_window) { fprintf(stderr, "[QV] glfwCreateWindow failed\n"); return -1; }
 
     /* Create Vulkan surface */
@@ -1624,7 +1624,7 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
                 float rod_dollars = rt_ptr->operator_rod_rho / RT_BETA_TOTAL;
                 float xe_dollars  = rt_ptr->xe_reactivity / RT_BETA_TOTAL;
                 snprintf(title, sizeof(title),
-                         "YSU RBMK | %.1f%% %.0fMW | rho=%+.1f$ rods=%+.1f$ Xe=%+.1f$ %s",
+                         "steinmarder RBMK | %.1f%% %.0fMW | rho=%+.1f$ rods=%+.1f$ Xe=%+.1f$ %s",
                          rt_ptr->power_fraction * 100.0f,
                          rt_ptr->total_power_w / 1.0e6f,
                          rho_dollars, rod_dollars, xe_dollars,
@@ -1882,10 +1882,10 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
             dirty = 0;
             char title[256];
             if (Z > 0)
-                snprintf(title, sizeof(title), "YSU Quantum — %s (Z=%d) %s",
+                snprintf(title, sizeof(title), "steinmarder Quantum — %s (Z=%d) %s",
                          element_name(Z), Z, electron_config(Z));
             else
-                snprintf(title, sizeof(title), "YSU Quantum — %d%s (m=%d)", n, orbital_letter(l), m);
+                snprintf(title, sizeof(title), "steinmarder Quantum — %d%s (m=%d)", n, orbital_letter(l), m);
             glfwSetWindowTitle(g_window, title);
         }
 
@@ -1919,7 +1919,7 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
             if (++af_title_ctr % 10 == 0) {
                 char title[256];
                 snprintf(title, sizeof(title),
-                         "YSU Atomic | %s | %s%s",
+                         "steinmarder Atomic | %s | %s%s",
                          atomic_fission_scene_name(af_ptr->scene),
                          af_ptr->hud_num_lines > 0 ? af_ptr->hud_lines[0] : "",
                          auto_tour ? " [AUTO-TOUR]" : "");
@@ -1967,7 +1967,7 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
 
         /* ── DLSS: Apply temporal jitter before dispatch ── */
         if (g_dlss_active && g_upscale_inited) {
-            YsuJitter jitter = ysu_upscale_jitter(g_dlssFrame);
+            SmJitter jitter = sm_upscale_jitter(g_dlssFrame);
             qv->params.jitter_x = jitter.x;
             qv->params.jitter_y = jitter.y;
         } else {
@@ -2118,7 +2118,7 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
                 float rod_dollars = rt_ptr->operator_rod_rho / RT_BETA_TOTAL;
                 float xe_dollars  = rt_ptr->xe_reactivity / RT_BETA_TOTAL;
                 snprintf(title, sizeof(title),
-                         "YSU RBMK | %.1f%% %.0fMW | rho=%+.1f$ rods=%+.1f$ Xe=%+.1f$ %s [%d FPS]",
+                         "steinmarder RBMK | %.1f%% %.0fMW | rho=%+.1f$ rods=%+.1f$ Xe=%+.1f$ %s [%d FPS]",
                          rt_ptr->power_fraction * 100.0f,
                          rt_ptr->total_power_w / 1.0e6f,
                          rho_dollars, rod_dollars, xe_dollars,
@@ -2126,16 +2126,16 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
                          fps_count);
             }
             else if (nuclear_mode)
-                snprintf(title, sizeof(title), "YSU Nuclear — %s — %s (t=%.1fs)  [%d FPS]",
+                snprintf(title, sizeof(title), "steinmarder Nuclear — %s — %s (t=%.1fs)  [%d FPS]",
                          nuclear_reaction_type_name(nr_ptr->reactionType),
                          nuclear_reaction_phase_name(nr_ptr->phase),
                          nr_ptr->time, fps_count);
             else if (Z > 0)
-                snprintf(title, sizeof(title), "YSU Quantum — %s (Z=%d) %s  [%d FPS, frame %d]%s",
+                snprintf(title, sizeof(title), "steinmarder Quantum — %s (Z=%d) %s  [%d FPS, frame %d]%s",
                          element_name(Z), Z, electron_config(Z), fps_count, frame,
                          g_dlss_active ? " [DLSS]" : "");
             else
-                snprintf(title, sizeof(title), "YSU Quantum — %d%s (m=%d)  [%d FPS, frame %d]%s",
+                snprintf(title, sizeof(title), "steinmarder Quantum — %d%s (m=%d)  [%d FPS, frame %d]%s",
                          n, orbital_letter(l), m, fps_count, frame,
                          g_dlss_active ? " [DLSS]" : "");
             glfwSetWindowTitle(g_window, title);
@@ -2166,31 +2166,31 @@ static int run_windowed(QuantumVis *qv, NuclearReaction *nr_ptr,
  * ═══════════════════════════════════════════════════════════════════════ */
 int main(void) {
     printf("═══════════════════════════════════════════════════════════\n");
-    printf("  YSU Engine — Quantum Wavefunction Visualization\n");
+    printf("  steinmarder — Quantum Wavefunction Visualization\n");
     printf("  Schrödinger equation → GPU volume rendering\n");
     printf("═══════════════════════════════════════════════════════════\n\n");
 
-    int W    = env_int("YSU_QV_W", 800);
-    int H    = env_int("YSU_QV_H", 600);
-    int grid = env_int("YSU_QV_GRID", 256);
-    int Z    = env_int("YSU_QV_ATOM", 0);
-    int n    = env_int("YSU_QV_N", 3);
-    int l    = env_int("YSU_QV_L", 2);
-    int m    = env_int("YSU_QV_M", 0);
+    int W    = env_int("SM_QV_W", 800);
+    int H    = env_int("SM_QV_H", 600);
+    int grid = env_int("SM_QV_GRID", 256);
+    int Z    = env_int("SM_QV_ATOM", 0);
+    int n    = env_int("SM_QV_N", 3);
+    int l    = env_int("SM_QV_L", 2);
+    int m    = env_int("SM_QV_M", 0);
 
-    float cam_dist  = env_float("YSU_QV_CAM_DIST", 0.0f);
-    float cam_theta = env_float("YSU_QV_CAM_THETA", 30.0f) * (float)M_PI / 180.0f;
-    float cam_phi   = env_float("YSU_QV_CAM_PHI",   45.0f) * (float)M_PI / 180.0f;
+    float cam_dist  = env_float("SM_QV_CAM_DIST", 0.0f);
+    float cam_theta = env_float("SM_QV_CAM_THETA", 30.0f) * (float)M_PI / 180.0f;
+    float cam_phi   = env_float("SM_QV_CAM_PHI",   45.0f) * (float)M_PI / 180.0f;
 
     /* DLSS configuration — compute internal render resolution */
-    g_dlss_enabled = env_bool("YSU_DLSS", 1);
-    g_dlss_quality = env_int("YSU_DLSS_QUALITY", YSU_UPSCALE_QUALITY_BALANCED);
-    if (g_dlss_quality < 0 || g_dlss_quality >= YSU_UPSCALE_QUALITY_COUNT)
-        g_dlss_quality = YSU_UPSCALE_QUALITY_BALANCED;
+    g_dlss_enabled = env_bool("SM_DLSS", 1);
+    g_dlss_quality = env_int("SM_DLSS_QUALITY", SM_UPSCALE_QUALITY_BALANCED);
+    if (g_dlss_quality < 0 || g_dlss_quality >= SM_UPSCALE_QUALITY_COUNT)
+        g_dlss_quality = SM_UPSCALE_QUALITY_BALANCED;
 
     g_W_hi = W;  g_H_hi = H;
     if (g_dlss_enabled) {
-        float scale = ysu_upscale_quality_factor((YsuUpscaleQuality)g_dlss_quality);
+        float scale = sm_upscale_quality_factor((SmUpscaleQuality)g_dlss_quality);
         g_W_lo = (int)(W * scale + 0.5f);
         g_H_lo = (int)(H * scale + 0.5f);
         /* Round up to 16 for workgroup alignment */
@@ -2211,7 +2211,7 @@ int main(void) {
     int renderH = g_H_lo;
 
 #ifdef QV_ENABLE_WINDOW
-    int windowed = env_bool("YSU_QV_WINDOW", 1); /* default ON when compiled with QV_ENABLE_WINDOW */
+    int windowed = env_bool("SM_QV_WINDOW", 1); /* default ON when compiled with QV_ENABLE_WINDOW */
 #else
     int windowed = 0;
 #endif
@@ -2237,11 +2237,11 @@ int main(void) {
     }
 
     /* Override params from env */
-    qv.params.density_mult   = env_float("YSU_QV_DENSITY", qv.params.density_mult);
-    qv.params.gamma          = env_float("YSU_QV_GAMMA",   qv.params.gamma);
-    qv.params.color_mode     = env_int("YSU_QV_COLOR",     qv.params.color_mode);
-    qv.params.output_mode    = env_int("YSU_QV_MODE",      qv.params.output_mode);
-    qv.params.emission_scale = env_float("YSU_QV_EMISSION", qv.params.emission_scale);
+    qv.params.density_mult   = env_float("SM_QV_DENSITY", qv.params.density_mult);
+    qv.params.gamma          = env_float("SM_QV_GAMMA",   qv.params.gamma);
+    qv.params.color_mode     = env_int("SM_QV_COLOR",     qv.params.color_mode);
+    qv.params.output_mode    = env_int("SM_QV_MODE",      qv.params.output_mode);
+    qv.params.emission_scale = env_float("SM_QV_EMISSION", qv.params.emission_scale);
 
     /* Camera setup: spherical coordinates around origin */
     if (cam_dist <= 0.0f) cam_dist = qv.boxHalf * 2.5f;
@@ -2306,7 +2306,7 @@ int main(void) {
     QV_Camera cam;
     build_camera(&cam, cam_dist, cam_theta, cam_phi);
 
-    int num_frames = env_int("YSU_QV_FRAMES", 16);
+    int num_frames = env_int("SM_QV_FRAMES", 16);
     printf("[QV] Rendering %d frames (progressive accumulation)...\n", num_frames);
 
     for (int f = 0; f < num_frames; f++) {

@@ -1,12 +1,12 @@
-# FPS Test Suite for YSU GPU Raytracer
+# FPS Test Suite for steinmarder GPU Raytracer
 # Tests various denoise configurations
 
 Write-Host "================================" -ForegroundColor Cyan
-Write-Host "  YSU GPU Raytracer FPS Tests  " -ForegroundColor Cyan
+Write-Host "  steinmarder GPU Raytracer FPS Tests  " -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
-$testDir = "C:\YSUengine_fixed_renderc_patch_fixed2\YSUengine_fixed_renderc_patch"
+$testDir = "C:\steinmarder"
 Set-Location $testDir
 
 # Configuration
@@ -30,14 +30,14 @@ Write-Host ""
 
 # Define test configurations
 $tests = @(
-    @{ Name = "Baseline (no denoise)"; Env = @{ YSU_GPU_DENOISE = "0" } },
-    @{ Name = "Denoise enabled"; Env = @{ YSU_GPU_DENOISE = "1" } },
-    @{ Name = "Denoise + Skip=2"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_SKIP = "2" } },
-    @{ Name = "Denoise + Skip=4"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_SKIP = "4" } },
-    @{ Name = "Denoise + Skip=8"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_SKIP = "8" } },
-    @{ Name = "Denoise + Adaptive"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_ADAPTIVE = "1" } },
-    @{ Name = "Denoise + History Reset"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_HISTORY_RESET = "1"; YSU_GPU_DENOISE_HISTORY_RESET_FRAME = "60" } },
-    @{ Name = "Full Config (all features)"; Env = @{ YSU_GPU_DENOISE = "1"; YSU_GPU_DENOISE_SKIP = "4"; YSU_GPU_DENOISE_ADAPTIVE = "1"; YSU_GPU_DENOISE_HISTORY_RESET = "1"; YSU_GPU_TEMPORAL_DENOISE = "1" } }
+    @{ Name = "Baseline (no denoise)"; Env = @{ SM_GPU_DENOISE = "0" } },
+    @{ Name = "Denoise enabled"; Env = @{ SM_GPU_DENOISE = "1" } },
+    @{ Name = "Denoise + Skip=2"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_SKIP = "2" } },
+    @{ Name = "Denoise + Skip=4"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_SKIP = "4" } },
+    @{ Name = "Denoise + Skip=8"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_SKIP = "8" } },
+    @{ Name = "Denoise + Adaptive"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_ADAPTIVE = "1" } },
+    @{ Name = "Denoise + History Reset"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_HISTORY_RESET = "1"; SM_GPU_DENOISE_HISTORY_RESET_FRAME = "60" } },
+    @{ Name = "Full Config (all features)"; Env = @{ SM_GPU_DENOISE = "1"; SM_GPU_DENOISE_SKIP = "4"; SM_GPU_DENOISE_ADAPTIVE = "1"; SM_GPU_DENOISE_HISTORY_RESET = "1"; SM_GPU_TEMPORAL_DENOISE = "1" } }
 )
 
 # Run tests
@@ -45,7 +45,7 @@ foreach ($test in $tests) {
     Write-Host ("Test: " + $test.Name) -ForegroundColor Green
     
     # Build environment string
-    $envCmd = "set YSU_GPU_W=$width & set YSU_GPU_H=$height & set YSU_GPU_FRAMES=$frames"
+    $envCmd = "set SM_GPU_W=$width & set SM_GPU_H=$height & set SM_GPU_FRAMES=$frames"
     foreach ($key in $test.Env.Keys) {
         $envCmd += " & set $key=$($test.Env[$key])"
     }

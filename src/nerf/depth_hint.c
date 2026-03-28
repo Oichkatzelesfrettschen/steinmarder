@@ -4,7 +4,7 @@
  * 
  * Research implementation for depth-aware sparse sampling.
  * 
- * Author: YSU Engine Research Team
+ * Author: steinmarder Research Team
  * Date: February 2026
  */
 

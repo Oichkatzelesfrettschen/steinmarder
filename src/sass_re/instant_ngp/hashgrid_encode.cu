@@ -66,7 +66,7 @@ static_assert(NGP_TOTAL_FEATURES == NGP_NUM_LEVELS * NGP_FEATURES_PER,
     "NGP_TOTAL_FEATURES must equal NGP_NUM_LEVELS * NGP_FEATURES_PER — "
     "update both together to avoid out-of-bounds writes into feature buffers");
 
-/* Spatial hash primes (same as engine's ysu_hash_ijk) */
+/* Spatial hash primes (same as engine's sm_hash_ijk) */
 #define PRIME_X 73856093u
 #define PRIME_Y 19349663u
 #define PRIME_Z 83492791u

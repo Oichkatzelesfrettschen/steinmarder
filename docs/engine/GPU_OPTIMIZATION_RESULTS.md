@@ -27,14 +27,14 @@
 | Configuration | Time/Frame | Notes |
 |---|---|---|
 | Full resolution (1920×1080) | 103.95 ms | Baseline |
-| Half resolution (960×540) via YSU_GPU_RENDER_SCALE=0.5 | 100.11 ms | ~4% speedup |
-| Quarter resolution (480×270) via YSU_GPU_RENDER_SCALE=0.25 | 106.68 ms | Slower! |
+| Half resolution (960×540) via SM_GPU_RENDER_SCALE=0.5 | 100.11 ms | ~4% speedup |
+| Quarter resolution (480×270) via SM_GPU_RENDER_SCALE=0.25 | 106.68 ms | Slower! |
 
 **Finding**: Render computation is not the bottleneck. 90ms+ is Vulkan overhead (initialization, command buffer recording, image transitions, readback, tonemap).
 
 ### 3. Fast Mode (Combined Optimizations)
 ```bash
-YSU_GPU_FAST=1 # Enables:
+SM_GPU_FAST=1 # Enables:
  - Auto 50% render resolution scale (960×540)
  - SPP forced to 1 (if not set)
  - Denoiser radius=1, sigma_s=0.8, sigma_r=0.05
@@ -85,24 +85,24 @@ YSU_GPU_FAST=1 # Enables:
 
 For interactive realtime (~30 FPS):
 ```bash
-YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_SPP=1 YSU_GPU_FRAMES=4 \
-YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_RADIUS=2 YSU_NEURAL_DENOISE=0 \
+SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_SPP=1 SM_GPU_FRAMES=4 \
+SM_GPU_DENOISE=1 SM_GPU_DENOISE_RADIUS=2 SM_NEURAL_DENOISE=0 \
 ./gpu_demo.exe
 # Result: ~100ms per 4 frames = 25 FPS sustained
 ```
 
 For progressive refinement (start fast, improve quality):
 ```bash
-YSU_GPU_FAST=1 YSU_GPU_W=1920 YSU_GPU_H=1080 \
-YSU_GPU_DENOISE=1 YSU_NEURAL_DENOISE=0 \
+SM_GPU_FAST=1 SM_GPU_W=1920 SM_GPU_H=1080 \
+SM_GPU_DENOISE=1 SM_NEURAL_DENOISE=0 \
 ./gpu_demo.exe
 # Result: ~100ms per frame at 960×540, upscale to 1080p
 ```
 
 ## Code Changes Made
 
-- Added `YSU_GPU_FAST` flag for aggressive optimization
-- Added `YSU_GPU_RENDER_SCALE` for adaptive resolution (0.1-1.0)
+- Added `SM_GPU_FAST` flag for aggressive optimization
+- Added `SM_GPU_RENDER_SCALE` for adaptive resolution (0.1-1.0)
 - Added smart defaults: denoise params reduce automatically in fast mode
 - Fixed corrupted gpu_vulkan_demo.c compilation issues
 - Denoiser parameter tuning via env vars

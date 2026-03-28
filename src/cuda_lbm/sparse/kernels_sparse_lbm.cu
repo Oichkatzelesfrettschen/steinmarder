@@ -32,8 +32,13 @@ __device__ __forceinline__ bool finite_check(float x) {
 }
 
 // ---------------------------------------------------------------------------
-// Sparse A-A Fused Kernel
+// Sparse A-A Fused Kernel with Shared-Memory Neighbor Cache
 // ---------------------------------------------------------------------------
+// Each block processes one brick (512 cells = 8^3).
+// Threads 0-26 pre-load the 3^3 neighbor stencil of brick pool indices
+// into shared memory, eliminating up to 36 global indirect_table reads
+// per boundary cell per time step.
+//
 // Grid: ceil(N_active_cells / 512)
 // Block: 512 threads (1 block = 1 brick)
 extern "C" __global__ void __launch_bounds__(512)
@@ -52,25 +57,39 @@ lbm_step_sparse_aa(
     int n_active_cells_total,
     int parity
 ) {
+    // --- Shared-memory neighbor cache: 27 ints = 108 bytes ---
+    // Index encoding: (dx+1)*9 + (dy+1)*3 + (dz+1) for dx,dy,dz in {-1,0,+1}
+    __shared__ int neighbor_pool[27];
+
     int local_tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (local_tid >= active_cell_count) return;
     int tid = active_cell_start + local_tid;
 
     int pool_idx = tid / 512;
     int local_idx = tid % 512;
 
-    int global_brick_idx = active_brick_ids[pool_idx];
+    int global_brick_idx = (pool_idx < gridDim.x)
+        ? active_brick_ids[pool_idx] : 0;
     int bx = global_brick_idx % bx_max;
     int by = (global_brick_idx / bx_max) % by_max;
     int bz = global_brick_idx / (bx_max * by_max);
 
+    // Threads 0-26 load the 3x3x3 neighbor stencil
+    if (threadIdx.x < 27) {
+        int dz = (int)(threadIdx.x / 9) - 1;
+        int dy = (int)((threadIdx.x / 3) % 3) - 1;
+        int dx = (int)(threadIdx.x % 3) - 1;
+        int nbx = (bx + dx + bx_max) % bx_max;
+        int nby = (by + dy + by_max) % by_max;
+        int nbz = (bz + dz + bz_max) % bz_max;
+        neighbor_pool[threadIdx.x] = indirect_table[nbx + bx_max * (nby + by_max * nbz)];
+    }
+    __syncthreads();
+
+    if (local_tid >= active_cell_count) return;
+
     int lx = local_idx % 8;
     int ly = (local_idx / 8) % 8;
     int lz = local_idx / 64;
-
-    int x = bx * 8 + lx;
-    int y = by * 8 + ly;
-    int z = bz * 8 + lz;
 
     // 1. Read distributions (with A-A pull logic and bounce-back)
     float rho_local = 0.0f;
@@ -86,17 +105,24 @@ lbm_step_sparse_aa(
             src_tid = tid;
         } else {
             // Odd step: pull from neighbor's opposite slot
-            int xn = (x - CX[i] + nx) % nx;
-            int yn = (y - CY[i] + ny) % ny;
-            int zn = (z - CZ[i] + nz) % nz;
-            
-            int bxn = xn / 8; int lxn = xn % 8;
-            int byn = yn / 8; int lyn = yn % 8;
-            int bzn = zn / 8; int lzn = zn % 8;
-            
-            int n_brick_idx = bxn + bx_max * (byn + by_max * bzn);
-            int n_pool_idx = indirect_table[n_brick_idx];
-            
+            int lxn = lx - CX[i];
+            int lyn = ly - CY[i];
+            int lzn = lz - CZ[i];
+
+            // Determine brick offset: 0 if local coord stays in [0,7], else +/-1
+            int dbx = (lxn < 0) ? -1 : (lxn >= 8) ? 1 : 0;
+            int dby = (lyn < 0) ? -1 : (lyn >= 8) ? 1 : 0;
+            int dbz = (lzn < 0) ? -1 : (lzn >= 8) ? 1 : 0;
+
+            // Wrap local coordinates to [0,7]
+            lxn = (lxn + 8) & 7;
+            lyn = (lyn + 8) & 7;
+            lzn = (lzn + 8) & 7;
+
+            // Lookup neighbor brick from shared memory
+            int stencil_idx = (dbz + 1) * 9 + (dby + 1) * 3 + (dbx + 1);
+            int n_pool_idx = neighbor_pool[stencil_idx];
+
             if (n_pool_idx != -1) {
                 read_dir = OPP[i];
                 src_tid = n_pool_idx * 512 + lxn + 8 * (lyn + 8 * lzn);
@@ -154,34 +180,39 @@ lbm_step_sparse_aa(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
 
-    // 5. Write (with A-A push logic and bounce-back)
+    // 5. Write (with A-A push logic and bounce-back, using SMEM neighbor cache)
     #pragma unroll
     for (int i = 0; i < 19; i++) {
         if (parity == 0) {
             // Even step: push to neighbor's opposite slot
-            int xn = (x + CX[i] + nx) % nx;
-            int yn = (y + CY[i] + ny) % ny;
-            int zn = (z + CZ[i] + nz) % nz;
-            
-            int bxn = xn / 8; int lxn = xn % 8;
-            int byn = yn / 8; int lyn = yn % 8;
-            int bzn = zn / 8; int lzn = zn % 8;
-            
-            int n_brick_idx = bxn + bx_max * (byn + by_max * bzn);
-            int n_pool_idx = indirect_table[n_brick_idx];
-            
+            int lxn_w = lx + CX[i];
+            int lyn_w = ly + CY[i];
+            int lzn_w = lz + CZ[i];
+
+            int dbx_w = (lxn_w < 0) ? -1 : (lxn_w >= 8) ? 1 : 0;
+            int dby_w = (lyn_w < 0) ? -1 : (lyn_w >= 8) ? 1 : 0;
+            int dbz_w = (lzn_w < 0) ? -1 : (lzn_w >= 8) ? 1 : 0;
+
+            lxn_w = (lxn_w + 8) & 7;
+            lyn_w = (lyn_w + 8) & 7;
+            lzn_w = (lzn_w + 8) & 7;
+
+            int stencil_idx_w = (dbz_w + 1) * 9 + (dby_w + 1) * 3 + (dbx_w + 1);
+            int n_pool_idx = neighbor_pool[stencil_idx_w];
+
             if (n_pool_idx != -1) {
-                int dst_tid = n_pool_idx * 512 + lxn + 8 * (lyn + 8 * lzn);
+                int dst_tid = n_pool_idx * 512 + lxn_w + 8 * (lyn_w + 8 * lzn_w);
                 f[OPP[i] * n_active_cells_total + dst_tid] = f_local[i];
             } else {
                 // Bounce-back: neighbor is solid. Write to own OPP[i] slot.

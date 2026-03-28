@@ -3,13 +3,13 @@
 # Optional params:
 #   -TrainRatio 0.35  (default)
 #   -TrainSPP 1       (default)
-#   -Exe .\ysuengine.exe
+#   -Exe .\steinmarder.exe
 #   -DataDir .\DATA
 
 param(
   [double]$TrainRatio = 0.35,
   [int]$TrainSPP = 1,
-  [string]$Exe = ".\ysuengine.exe",
+  [string]$Exe = ".\steinmarder.exe",
   [string]$DataDir = ".\DATA"
 )
 
@@ -21,15 +21,15 @@ function Ensure-Dir($p) {
 
 function Run-Engine($envPolicy, $extraEnv) {
   if ($envPolicy -eq $null -or $envPolicy -eq "") {
-    Remove-Item Env:\YSU_BVH_POLICY -ErrorAction SilentlyContinue
+    Remove-Item Env:\SM_BVH_POLICY -ErrorAction SilentlyContinue
   } else {
-    $env:YSU_BVH_POLICY = $envPolicy
+    $env:SM_BVH_POLICY = $envPolicy
   }
 
   # Optional env overrides (only if your engine reads them)
   foreach ($k in $extraEnv.Keys) { Set-Item -Path "Env:\$k" -Value $extraEnv[$k] }
 
-  Write-Host "== Running: $Exe (YSU_BVH_POLICY=$($env:YSU_BVH_POLICY)) =="
+  Write-Host "== Running: $Exe (SM_BVH_POLICY=$($env:SM_BVH_POLICY)) =="
   & $Exe
   if ($LASTEXITCODE -ne 0) { throw "Engine exited with code $LASTEXITCODE" }
 }
@@ -39,7 +39,7 @@ Ensure-Dir $DataDir
 # --- 1) TRAIN RUN (policy off) ---
 Write-Host "`n=== TRAIN RUN (policy OFF) ==="
 $trainEnv = @{
-  "YSU_SPP" = "$TrainSPP"
+  "SM_SPP" = "$TrainSPP"
 }
 Run-Engine "" $trainEnv
 

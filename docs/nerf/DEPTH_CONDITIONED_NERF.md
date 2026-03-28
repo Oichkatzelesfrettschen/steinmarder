@@ -43,10 +43,10 @@ Projected with fully trained model (30-50% hit rate): **1.3-1.5x speedup**
 
 ```bash
 # Set environment variables
-$env:YSU_GPU_WINDOW=1
-$env:YSU_RENDER_MODE=26
-$env:YSU_NERF_HASHGRID="models/lego_35k.bin"
-$env:YSU_NERF_OCC="models/lego_35k_occ.bin"
+$env:SM_GPU_WINDOW=1
+$env:SM_RENDER_MODE=26
+$env:SM_NERF_HASHGRID="models/lego_35k.bin"
+$env:SM_NERF_OCC="models/lego_35k_occ.bin"
 
 # Run
 ./gpu_demo.exe

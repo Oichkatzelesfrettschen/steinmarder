@@ -46,10 +46,16 @@ static inline int gpu_specs_from_device(GpuSpecs* out, int device_id) {
     out->cuda_cores = out->n_sms * 128; // Ada: 128 FP32 cores/SM
     out->vram_bytes = prop.totalGlobalMem;
     out->l2_bytes = (float)prop.l2CacheSize;
-    out->clock_ghz = prop.clockRate / 1.0e6f;
 
-    // Compute peak BW: memoryClockRate (kHz) * memoryBusWidth (bits) * 2 (DDR) / 8
-    out->peak_bw_gbs = (prop.memoryClockRate / 1.0e6f) * (prop.memoryBusWidth / 8.0f) * 2.0f;
+    // clockRate and memoryClockRate were removed from cudaDeviceProp in CUDA 13.
+    // Use cudaDeviceGetAttribute instead.
+    int clock_khz = 0, mem_clock_khz = 0;
+    cudaDeviceGetAttribute(&clock_khz, cudaDevAttrClockRate, device_id);
+    cudaDeviceGetAttribute(&mem_clock_khz, cudaDevAttrMemoryClockRate, device_id);
+    out->clock_ghz = clock_khz / 1.0e6f;
+
+    // Peak BW: memoryClockRate (kHz) * memoryBusWidth (bits) * 2 (DDR) / 8
+    out->peak_bw_gbs = (mem_clock_khz / 1.0e6f) * (prop.memoryBusWidth / 8.0f) * 2.0f;
     // Peak FP32 TFLOPS: n_sms * 128 * 2 (FMA) * clock_ghz / 1000
     out->peak_fp32_tflops = (float)out->cuda_cores * 2.0f * out->clock_ghz / 1000.0f;
 

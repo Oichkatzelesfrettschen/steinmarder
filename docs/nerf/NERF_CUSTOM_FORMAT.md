@@ -9,8 +9,8 @@ This spec defines a minimal, **inference‑only** binary format for your custom 
 - models/occupancy_grid.bin
 
 **Env Vars**
-- `YSU_NERF_HASHGRID=models/nerf_hashgrid.bin`
-- `YSU_NERF_OCC=models/occupancy_grid.bin`
+- `SM_NERF_HASHGRID=models/nerf_hashgrid.bin`
+- `SM_NERF_OCC=models/occupancy_grid.bin`
 
 ## 2) Hash‑Grid Binary Layout (nerf_hashgrid.bin)
 

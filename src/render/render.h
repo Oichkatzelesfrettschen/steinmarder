@@ -11,7 +11,7 @@ extern "C" {
 #include "camera.h"
 
 /**
- * Debug view modes (env: YSU_DEBUG)
+ * Debug view modes (env: SM_DEBUG)
  *  - "albedo"
  *  - "normal"
  *  - "depth"
@@ -58,7 +58,7 @@ void render_scene(Vec3 *pixels,
                   int max_depth);
 
 /**
- * CPU SIMD NeRF renderer (optional, loads from YSU_NERF_HASHGRID env).
+ * CPU SIMD NeRF renderer (optional, loads from SM_NERF_HASHGRID env).
  */
 void render_nerf_cpu(Vec3 *pixels,
                      int image_width,
@@ -74,13 +74,13 @@ Vec3 ray_color_internal(Ray r, int depth);
  * Portable RNG helper for integrator code.
  * Uses a simple xorshift32 on the given state.
  */
-float ysu_rng_next01(uint32_t *state);
+float sm_rng_next01(uint32_t *state);
 
 /**
  * Russian roulette helper: returns 1 to continue, 0 to terminate.
  * p_survive is clamped to [0,1].
  */
-int   ysu_russian_roulette(uint32_t *state, float p_survive);
+int   sm_russian_roulette(uint32_t *state, float p_survive);
 
 #ifdef __cplusplus
 }

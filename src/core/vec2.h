@@ -1,4 +1,4 @@
-/* vec2.h — 2D vector math for YSU engine
+/* vec2.h — 2D vector math for steinmarder
  *
  * Basic 2D vector type and operations (similar pattern to vec3.h).
  * Used for 2D graphics, texture coordinates, screen space, etc.

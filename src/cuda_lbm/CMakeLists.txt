@@ -6,18 +6,16 @@ set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 # Target architectures
-set(CMAKE_CUDA_ARCHITECTURES "89;80")
+set(CMAKE_CUDA_ARCHITECTURES "80;89")
 
 # Compiler flags
 #   --use_fast_math: ftz, prec-div=false, prec-sqrt=false
 #   -lineinfo: source correlation for Nsight Compute
 #   -Xptxas -v: register/smem reporting (used by check_spills.sh)
-#   -dlto: device link-time optimization
 set(CUDA_COMMON_FLAGS
     --use_fast_math
     -lineinfo
     -Xptxas=-v
-    -dlto
 )
 
 # Release-specific flags
@@ -55,41 +53,23 @@ set(LBM_KERNEL_SOURCES
     kernels_box_counting.cu
     sparse/kernels_sparse_lbm.cu
     sparse/kernels_sparse_map.cu
-)
-
-# ============================================================================
-# Static library: ysu_cuda_lbm
-# ============================================================================
-
-add_library(ysu_cuda_lbm STATIC
-    ${LBM_KERNEL_SOURCES}
     host_wrappers.cu
-)
-
-target_include_directories(ysu_cuda_lbm PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_compile_options(ysu_cuda_lbm PRIVATE
-    $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_COMMON_FLAGS}>
-)
-
-set_target_properties(ysu_cuda_lbm PROPERTIES
-    CUDA_SEPARABLE_COMPILATION ON
-    CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )
 
 # ============================================================================
 # Benchmark executable: lbm_bench
+#
+# All kernel sources are compiled directly into the executable to avoid
+# cross-TU device symbol resolution issues with CUDA separable compilation
+# in static libraries.
 # ============================================================================
 
 add_executable(lbm_bench
+    ${LBM_KERNEL_SOURCES}
     bench/bench_main.cu
     bench/bench_harness.cu
     bench/bench_validate.cu
 )
-
-target_link_libraries(lbm_bench PRIVATE ysu_cuda_lbm)
 
 target_include_directories(lbm_bench PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -98,6 +78,11 @@ target_include_directories(lbm_bench PRIVATE
 
 target_compile_options(lbm_bench PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_COMMON_FLAGS}>
+)
+
+set_target_properties(lbm_bench PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )
 
 # Link NVTX for range annotations
@@ -112,13 +97,14 @@ endif()
 # ============================================================================
 
 add_executable(lbm_test
+    ${LBM_KERNEL_SOURCES}
     test/test_main.cu
     test/test_conservation.cu
     test/test_regression.cu
     test/test_mrt_stability.cu
+    bench/bench_harness.cu
+    bench/bench_validate.cu
 )
-
-target_link_libraries(lbm_test PRIVATE ysu_cuda_lbm)
 
 target_include_directories(lbm_test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -127,4 +113,9 @@ target_include_directories(lbm_test PRIVATE
 
 target_compile_options(lbm_test PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_COMMON_FLAGS}>
+)
+
+set_target_properties(lbm_test PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )

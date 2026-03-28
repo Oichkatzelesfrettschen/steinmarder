@@ -26,7 +26,7 @@ layout(set = 0, binding = 4) uniform sampler2D u_motion_vec;                   /
 layout(set = 0, binding = 5) readonly buffer WeightBuf { float weights[]; };   /* unused in fallback */
 layout(set = 0, binding = 6, rgba16f) uniform writeonly image2D o_output_hi;   /* upscaled output */
 
-/* ─── Push constants (mirrors YsuNeuralPC) ─── */
+/* ─── Push constants (mirrors SmNeuralPC) ─── */
 layout(push_constant) uniform PC {
     uint  w_lo, h_lo;
     uint  w_hi, h_hi;

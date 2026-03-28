@@ -1,7 +1,7 @@
 # cuda_lbm -- D3Q19 Lattice Boltzmann GPU Kernels
 
 Precision-tier CUDA kernels implementing the D3Q19 Lattice Boltzmann Method (LBM)
-for YSU fluid simulation and physics subsystems. All kernels follow the
+for steinmarder fluid simulation and physics subsystems. All kernels follow the
 storage-compute split pattern: distributions are stored in a compressed precision
 format, but arithmetic is promoted to FP32 before any computation.
 
@@ -30,6 +30,7 @@ Two layout families exist:
 | kernels_fp8_soa.cu          | FP8 e4m3             | 1          | SoA pull    | Coalesced gather+scatter; SM 8.9+                  | SM 8.9   |
 | kernels_fp8_e5m2_soa.cu     | FP8 e5m2             | 1          | SoA pull    | e5m2 variant; SM 8.9+                             | SM 8.9   |
 | kernels_int8_soa.cu         | `signed char`        | 1          | SoA pull    | Coalesced gather+scatter; int momentum accum       | SM 6.1   |
+| kernels_int8_soa.cu (C4)    | `signed char`        | 1          | SoA pull    | 4 cells/thread; FMA-reordered Guo; +8.9% vs scalar| SM 6.1   |
 | kernels_int16_soa.cu        | `short`              | 2          | SoA pull    | Integer load path; 3% faster than FP16 SoA        | SM 5.0   |
 | kernels_bf16_soa.cu         | `__nv_bfloat16`      | 2          | SoA pull    | 2x BW vs FP32; SM 8.0+                            | SM 8.0   |
 | kernels_bf16_soa_bf162.cu   | `__nv_bfloat16`+`bf162` | 2       | SoA pull    | 2 cells/thread; HFMA2.BF16_V2 moment accum         | SM 8.0   |
@@ -53,17 +54,18 @@ Results from `cuda-precision-bench` (open_gororoba, 2026-03-15). 30 timing steps
 
 | Rank | Tier            | Layout  | MLUPS  | BW_GBS | BW_PCT | VRAM_MB | Notes                            |
 |------|-----------------|---------|--------|--------|--------|---------|----------------------------------|
-| 1    | INT8 SoA        | SoA     | 5643   | 259.6  | 51.5%  | 76      | Pareto-optimal production tier   |
-| 2    | FP8_e4m3 SoA    | SoA     | 5408   | 248.8  | 49.4%  | 76      | SM 8.9+; best FP8 variant        |
-| 3    | FP8_e5m2 SoA    | SoA     | 5280   | 242.9  | 48.2%  | 76      | SM 8.9+; wider dynamic range     |
-| 4    | FP16 SoA H2     | SoA     | 3802   | 349.7  | 69.4%  | 152     | 2 cells/thread; +9.8% vs FP16SoA |
-| 5    | INT16 SoA       | SoA     | 3569   | 328.3  | 65.1%  | 152     | +3% vs FP16 SoA; integer path    |
-| 6    | FP16 SoA        | SoA     | 3463   | 318.6  | 63.2%  | 152     | Standard FP16 pull-scheme        |
-| 7    | BF16 SoA        | SoA     | 3204   | 294.7  | 58.5%  | 152     | SM 8.0+; 7.5% below FP16 SoA    |
-| 8    | FP32 coarsened  | AoS     | 2107   | 387.8  | 76.9%  | 304     | Best FP32 single-kernel          |
-| 9    | FP32 aa (A-A)   | AoS     | 2062   | 379.3  | 75.3%  | 304     | Halves VRAM vs ping-pong         |
-| 10   | FP32 SoA CS     | SoA     | 2027   | 372.9  | 74.0%  | 304     | __stcs: <3% gain at 128^3        |
-| 11   | FP32 standard   | AoS     | 1984   | 365.0  | 72.4%  | 304     | Baseline reference               |
+| 1    | INT8 SoA C4     | SoA     | 5956   | 416.9  | 82.7%  | 140     | 4 cells/thread + FMA-reordered Guo |
+| 2    | FP8 e4m3 SoA   | SoA     | 5901   | 413.1  | 82.0%  | 140     | SM 8.9+; best FP8 variant        |
+| 3    | FP8 e5m2 SoA   | SoA     | 5582   | 390.7  | 77.5%  | 140     | SM 8.9+; wider dynamic range     |
+| 4    | INT8 SoA        | SoA     | 5469   | 382.8  | 76.0%  | 140     | Scalar baseline INT8             |
+| 5    | FP16 SoA H2     | SoA     | 3773   | 407.4  | 80.8%  | 216     | 2 cells/thread; half2 moments    |
+| 6    | BF16 SoA        | SoA     | 3541   | 382.5  | 75.9%  | 216     | SM 8.0+; bfloat16 storage        |
+| 7    | FP16 SoA        | SoA     | 3539   | 382.2  | 75.8%  | 216     | Standard FP16 pull-scheme        |
+| 8    | INT16 SoA       | SoA     | 2863   | 309.2  | 61.4%  | 216     | Integer path; DIST_SCALE=16384   |
+| 9    | FP32 MRT A-A    | SoA     | 2321   | 427.0  | 84.7%  | 216     | Best FP32; A-A halves VRAM       |
+| 10   | FP32 SoA CS     | SoA     | 2174   | 399.9  | 79.4%  | 368     | Cache-streaming writes           |
+| 11   | FP32 MRT Tiled  | SoA     | 2161   | 397.6  | 78.9%  | 368     | Shared-memory tiled pull         |
+| 12   | FP32 Fused      | SoA     | 2043   | 376.0  | 74.6%  | 368     | Baseline FP32 BGK                |
 | 12   | INT16 AoS       | AoS     | 1904   | 182.8  | 36.3%  | 160     | Equal to FP16 AoS (scatter limit)|
 | 13   | FP16 AoS        | AoS     | 1912   | 183.5  | 36.4%  | 160     | AoS scatter-write limit          |
 | 14   | FP8_e4m3 AoS    | AoS     | 3202   | 153.7  | 30.5%  | 80      | AoS scatter erases 4x BW gain   |
@@ -99,7 +101,7 @@ Results from `cuda-precision-bench` (open_gororoba, 2026-03-15). 30 timing steps
 
 ```
 Production (bandwidth-limited, 128^3+):
-  Highest MLUPS    -> INT8 SoA (5643 MLUPS, 76 MB, 2.85x FP32)
+  Highest MLUPS    -> INT8 SoA C4 (5956 MLUPS, 140 MB, 2.91x FP32)
   Best precision   -> FP16 SoA H2 (3802 MLUPS; 10-bit mantissa, +9.8% vs plain FP16 SoA)
   Moderate Re, INT -> INT16 SoA (3569 MLUPS; DIST_SCALE=16384, LSB=6.1e-5 vs INT8 LSB=0.016)
   VRAM-critical    -> INT8 SoA (76 MB) or INT4 bw-ceiling (38 MB, physics broken)

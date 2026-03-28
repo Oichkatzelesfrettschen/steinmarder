@@ -118,13 +118,14 @@ extern "C" __global__ void lbm_step_soa_fused(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
 
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -355,13 +356,14 @@ extern "C" __global__ void lbm_step_soa_batch_kernel(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
 
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -682,13 +684,14 @@ extern "C" __global__ void lbm_step_soa_mrt_fused(
     if (force_mag_sq >= 1e-40f) {
         float inv_tau = 1.0f / tau_local;
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
 
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -784,12 +787,13 @@ __device__ __forceinline__ void process_cell_bgk(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -876,12 +880,13 @@ __device__ __forceinline__ void process_cell_mrt(
     if (force_mag_sq >= 1e-40f) {
         float inv_tau_f = 1.0f / tau_local;
         float prefactor = 1.0f - 0.5f * inv_tau_f;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -1067,12 +1072,13 @@ lbm_step_soa_tiled(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -1176,12 +1182,13 @@ lbm_step_soa_mrt_tiled(
     if (force_mag_sq >= 1e-40f) {
         float inv_tau_f = 1.0f / tau_local;
         float prefactor = 1.0f - 0.5f * inv_tau_f;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -1291,12 +1298,13 @@ lbm_step_soa_coarsened(
 
         if (force_mag_sq >= 1e-40f) {
             float prefactor = 1.0f - 0.5f * inv_tau;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-                float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
                 f0[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
             }
         }
@@ -1362,12 +1370,13 @@ lbm_step_soa_coarsened(
 
         if (force_mag_sq >= 1e-40f) {
             float prefactor = 1.0f - 0.5f * inv_tau;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-                float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
                 f1[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
             }
         }
@@ -1459,12 +1468,13 @@ lbm_step_soa_mrt_coarsened(
         if (force_mag_sq >= 1e-40f) {
             float inv_tau_f = 1.0f / tau_local;
             float prefactor = 1.0f - 0.5f * inv_tau_f;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-                float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
                 f0[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
             }
         }
@@ -1521,12 +1531,13 @@ lbm_step_soa_mrt_coarsened(
         if (force_mag_sq >= 1e-40f) {
             float inv_tau_f = 1.0f / tau_local;
             float prefactor = 1.0f - 0.5f * inv_tau_f;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-                float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
                 f1[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
             }
         }
@@ -1661,12 +1672,13 @@ extern "C" __global__ void lbm_step_soa_aa(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -1758,12 +1770,13 @@ extern "C" __global__ void lbm_step_soa_mrt_aa(
     if (force_mag_sq >= 1e-40f) {
         float inv_tau_f = 1.0f / tau_local;
         float prefactor = 1.0f - 0.5f * inv_tau_f;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-            float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }
@@ -2010,12 +2023,13 @@ lbm_step_soa_coarsened_float4(
 
         if (force_mag_sq >= 1e-40f) {
             float prefactor = 1.0f - 0.5f * inv_tau;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX[i], eiy = (float)CY[i], eiz = (float)CZ[i];
-                float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
                 f_local[i] += prefactor * W[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
             }
         }

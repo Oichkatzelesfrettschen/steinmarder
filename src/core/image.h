@@ -3,7 +3,7 @@
 
 #include "vec3.h"
 
-// Write PPM image (P6 binary). If env YSU_POSTFX=1 or YSU_BLOOM=1 is set,
+// Write PPM image (P6 binary). If env SM_POSTFX=1 or SM_BLOOM=1 is set,
 // Bloom+Tonemap (ACES) is applied using postprocess.c.
 void image_write_ppm(const char *filename, int width, int height, Vec3 *pixels);
 

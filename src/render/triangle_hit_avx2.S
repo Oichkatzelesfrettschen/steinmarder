@@ -1,8 +1,8 @@
 .intel_syntax noprefix
 .text
-.globl ysu_hit_triangle_avx2
+.globl sm_hit_triangle_avx2
 
-# int ysu_hit_triangle_avx2(
+# int sm_hit_triangle_avx2(
 #   RCX = Triangle* tri
 #   RDX = Ray* r
 #   XMM0 = t_min
@@ -12,7 +12,7 @@
 #   [rsp+40] = float* out_v
 # )
 
-ysu_hit_triangle_avx2:
+sm_hit_triangle_avx2:
     push rbp
     mov rbp, rsp
     sub rsp, 32

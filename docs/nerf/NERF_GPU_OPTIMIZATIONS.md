@@ -98,7 +98,7 @@ Ensure shader compilation includes:
 
 Run the benchmark with:
 ```bash
-YSU_W=1920 YSU_H=1080 ./gpu_demo.exe
+SM_W=1920 SM_H=1080 ./gpu_demo.exe
 # Then measure: 60 frame average FPS using measure_fps.ps1
 ```
 

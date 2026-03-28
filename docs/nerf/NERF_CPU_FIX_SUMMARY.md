@@ -62,16 +62,16 @@ pn.z = fmaxf(0.0f, fminf(1.0f, norm_pos.z * 0.5f + 0.5f));
 
 ```powershell
 # Build
-gcc -std=c11 -O2 -pthread -o ysu.exe ysu_main.c render.c vec3.c ray.c camera.c image.c sphere.c triangle.c bvh.c material.c color.c denoise.c bilateral_denoise.c postprocess.c gbuffer_dump.c nerf_simd.c nerf_simd_integration.c ysu_360_engine_integration.c sceneloader.c triangle_hit_asm.o -lm -lws2_32 -Wno-implicit-function-declaration
+gcc -std=c11 -O2 -pthread -o steinmarder.exe sm_main.c render.c vec3.c ray.c camera.c image.c sphere.c triangle.c bvh.c material.c color.c denoise.c bilateral_denoise.c postprocess.c gbuffer_dump.c nerf_simd.c nerf_simd_integration.c sm_360_engine_integration.c sceneloader.c triangle_hit_asm.o -lm -lws2_32 -Wno-implicit-function-declaration
 
 # Run
-$env:YSU_W="640"; $env:YSU_H="360"
-$env:YSU_NERF_HASHGRID="models/nerf_hashgrid.bin"
-$env:YSU_NERF_OCC="models/nerf_occ.bin"
-$env:YSU_NERF_STEPS="64"
-$env:YSU_NERF_BOUNDS="1.5"
-$env:YSU_NERF_EXPOSURE="2.0"
-.\ysu.exe
+$env:SM_W="640"; $env:SM_H="360"
+$env:SM_NERF_HASHGRID="models/nerf_hashgrid.bin"
+$env:SM_NERF_OCC="models/nerf_occ.bin"
+$env:SM_NERF_STEPS="64"
+$env:SM_NERF_BOUNDS="1.5"
+$env:SM_NERF_EXPOSURE="2.0"
+.\steinmarder.exe
 ```
 
 ## Output Files

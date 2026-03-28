@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-YSU Engine - Real-Time Performance Analysis
+steinmarder - Real-Time Performance Analysis
 Analyzes current performance and projects path to real-time (30-60 FPS)
 """
 import subprocess
@@ -13,11 +13,11 @@ import numpy as np
 def measure_frame_time(width, height, frames=1, denoiser=False):
     """Measure frame rendering time"""
     env = os.environ.copy()
-    env['YSU_GPU_W'] = str(width)
-    env['YSU_GPU_H'] = str(height)
-    env['YSU_GPU_OBJ'] = 'TestSubjects/3M.obj'
-    env['YSU_GPU_FRAMES'] = str(frames)
-    env['YSU_NEURAL_DENOISE'] = '1' if denoiser else '0'
+    env['SM_GPU_W'] = str(width)
+    env['SM_GPU_H'] = str(height)
+    env['SM_GPU_OBJ'] = 'TestSubjects/3M.obj'
+    env['SM_GPU_FRAMES'] = str(frames)
+    env['SM_NEURAL_DENOISE'] = '1' if denoiser else '0'
     
     start = time.time()
     result = subprocess.run(['shaders/gpu_demo.exe'], env=env, 
@@ -27,7 +27,7 @@ def measure_frame_time(width, height, frames=1, denoiser=False):
     return elapsed
 
 print("=" * 80)
-print("YSU GPU ENGINE - REAL-TIME PERFORMANCE ANALYSIS")
+print("STEINMARDER - REAL-TIME PERFORMANCE ANALYSIS")
 print("=" * 80)
 print()
 

@@ -186,7 +186,7 @@ The exact live-occurrence ranking is now:
 Repo hygiene also improved along the way:
 
 - PMD proper on the supported HTML surface is now clean after reducing
-  inline styles in `src/editor/ysu_scene_editor.html`
+  inline styles in `src/editor/sm_scene_editor.html`
 - PMD CPD on the cubin runner/script tranche is clean after factoring shared
   driver boilerplate into `runners/cubin_driver_common.h`
 

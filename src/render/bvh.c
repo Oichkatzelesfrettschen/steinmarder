@@ -275,8 +275,8 @@ static int bvh_count_pruned_rec(const bvh_node* n) {
 // Optional: Physical pruning (default OFF)
 // ============================================================
 
-#ifndef YSU_POLICY_PHYSICAL_PRUNE
-#define YSU_POLICY_PHYSICAL_PRUNE 0
+#ifndef SM_POLICY_PHYSICAL_PRUNE
+#define SM_POLICY_PHYSICAL_PRUNE 0
 #endif
 
 static __attribute__((unused)) void bvh_prune_subtrees_inplace(bvh_node* n) {
@@ -359,7 +359,7 @@ int bvh_load_policy_csv(const char* path, bvh_node* root) {
 
     bvh_apply_policy_rec(root, pairs, n);
 
-#if YSU_POLICY_PHYSICAL_PRUNE
+#if SM_POLICY_PHYSICAL_PRUNE
     // Enable to actually detach subtrees (more aggressive pruning)
     bvh_prune_subtrees_inplace(root);
 #endif

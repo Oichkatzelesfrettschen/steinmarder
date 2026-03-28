@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Instant-NGP style NeRF training for YSU engine.
+Instant-NGP style NeRF training for steinmarder.
 This version uses the EXACT same training loop as nerf_train_and_export.py
 but with instant-NGP style code organization for future enhancements.
 
@@ -222,7 +222,7 @@ def load_nerf_synthetic(data_dir):
 
 
 def export_model(model, out_hashgrid, out_occ, center, scale, device):
-    """Export model to YSU shader format - matches original exactly."""
+    """Export model to steinmarder shader format - matches original exactly."""
     
     # Export hash grid
     header = struct.pack(

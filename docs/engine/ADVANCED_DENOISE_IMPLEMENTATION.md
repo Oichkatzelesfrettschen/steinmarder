@@ -6,7 +6,7 @@
 
 ### 1. History Reset 
 - **Purpose**: Periodically clear denoise history to prevent ghosting on camera cuts
-- **Parameters**: `YSU_GPU_DENOISE_HISTORY_RESET`, `YSU_GPU_DENOISE_HISTORY_RESET_FRAME`
+- **Parameters**: `SM_GPU_DENOISE_HISTORY_RESET`, `SM_GPU_DENOISE_HISTORY_RESET_FRAME`
 - **Code**: Lines 2367-2407 (full Vulkan implementation with image barriers)
 - **Cost**: ~0.1ms per reset (negligible)
 
@@ -18,7 +18,7 @@
 
 ### 3. Adaptive Denoise 
 - **Purpose**: Ramp denoise frequency up/down based on convergence state
-- **Parameters**: `YSU_GPU_DENOISE_ADAPTIVE`, `YSU_GPU_DENOISE_ADAPTIVE_MIN`, `YSU_GPU_DENOISE_ADAPTIVE_MAX`
+- **Parameters**: `SM_GPU_DENOISE_ADAPTIVE`, `SM_GPU_DENOISE_ADAPTIVE_MIN`, `SM_GPU_DENOISE_ADAPTIVE_MAX`
 - **Code**: Lines 2039-2047 (warmup detection + dynamic skip)
 - **Cost**: Automatic ramp (no extra overhead)
 
@@ -30,11 +30,11 @@
 
 **Location 1: Parameter Declarations (Lines 1654-1663)**
 ```c
-int denoise_history_reset = ysu_env_bool("YSU_GPU_DENOISE_HISTORY_RESET", 0);
-int denoise_history_reset_frame = ysu_env_int("YSU_GPU_DENOISE_HISTORY_RESET_FRAME", 60);
-int adaptive_denoise_enabled = ysu_env_bool("YSU_GPU_DENOISE_ADAPTIVE", 0);
-int adaptive_denoise_min = ysu_env_int("YSU_GPU_DENOISE_ADAPTIVE_MIN", 1);
-int adaptive_denoise_max = ysu_env_int("YSU_GPU_DENOISE_ADAPTIVE_MAX", 8);
+int denoise_history_reset = sm_env_bool("SM_GPU_DENOISE_HISTORY_RESET", 0);
+int denoise_history_reset_frame = sm_env_int("SM_GPU_DENOISE_HISTORY_RESET_FRAME", 60);
+int adaptive_denoise_enabled = sm_env_bool("SM_GPU_DENOISE_ADAPTIVE", 0);
+int adaptive_denoise_min = sm_env_int("SM_GPU_DENOISE_ADAPTIVE_MIN", 1);
+int adaptive_denoise_max = sm_env_int("SM_GPU_DENOISE_ADAPTIVE_MAX", 8);
 ```
 
 **Location 2: Enhanced Logging (Lines 1673-1684)**
@@ -97,11 +97,11 @@ if(should_reset_history && denoise_history != VK_NULL_HANDLE) {
 
 ### History Reset
 ```
-YSU_GPU_DENOISE_HISTORY_RESET=0|1
+SM_GPU_DENOISE_HISTORY_RESET=0|1
  Default: 0 (disabled)
  Effect: Enable periodic history buffer clearing
 
-YSU_GPU_DENOISE_HISTORY_RESET_FRAME=<int>
+SM_GPU_DENOISE_HISTORY_RESET_FRAME=<int>
  Default: 60
  Range: 10-300
  Effect: Reset every N frames
@@ -109,15 +109,15 @@ YSU_GPU_DENOISE_HISTORY_RESET_FRAME=<int>
 
 ### Adaptive Denoise
 ```
-YSU_GPU_DENOISE_ADAPTIVE=0|1
+SM_GPU_DENOISE_ADAPTIVE=0|1
  Default: 0 (disabled)
  Effect: Enable dynamic skip adjustment
 
-YSU_GPU_DENOISE_ADAPTIVE_MIN=<int>
+SM_GPU_DENOISE_ADAPTIVE_MIN=<int>
  Default: 1
  Effect: Denoise frequency in warmup phase (lower = more frequent)
 
-YSU_GPU_DENOISE_ADAPTIVE_MAX=<int>
+SM_GPU_DENOISE_ADAPTIVE_MAX=<int>
  Default: 8
  Effect: Denoise frequency in steady state (higher = more sparse)
 ```
@@ -133,11 +133,11 @@ YSU_GPU_DENOISE_ADAPTIVE_MAX=<int>
 
 ### Quick Test: All Features Enabled
 ```bash
-YSU_GPU_DENOISE=1 \
- YSU_GPU_DENOISE_SKIP=4 \
- YSU_GPU_DENOISE_HISTORY_RESET=1 \
- YSU_GPU_DENOISE_ADAPTIVE=1 \
- YSU_GPU_TEMPORAL_DENOISE=1 \
+SM_GPU_DENOISE=1 \
+ SM_GPU_DENOISE_SKIP=4 \
+ SM_GPU_DENOISE_HISTORY_RESET=1 \
+ SM_GPU_DENOISE_ADAPTIVE=1 \
+ SM_GPU_TEMPORAL_DENOISE=1 \
  ./gpu_demo.exe
 ```
 
@@ -154,11 +154,11 @@ YSU_GPU_DENOISE=1 \
 
 ### Preset: Gaming (Balanced)
 ```bash
-YSU_GPU_DENOISE=1 \
- YSU_GPU_DENOISE_SKIP=4 \
- YSU_GPU_DENOISE_ADAPTIVE=1 \
- YSU_GPU_TEMPORAL_DENOISE=1 \
- YSU_GPU_FRAMES=16 \
+SM_GPU_DENOISE=1 \
+ SM_GPU_DENOISE_SKIP=4 \
+ SM_GPU_DENOISE_ADAPTIVE=1 \
+ SM_GPU_TEMPORAL_DENOISE=1 \
+ SM_GPU_FRAMES=16 \
  ./gpu_demo.exe
 ```
 
@@ -168,10 +168,10 @@ YSU_GPU_DENOISE=1 \
 
 ### Preset: Cinematic (Quality Focus)
 ```bash
-YSU_GPU_DENOISE=1 \
- YSU_GPU_DENOISE_SKIP=1 \
- YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
- YSU_GPU_TEMPORAL_DENOISE=1 \
+SM_GPU_DENOISE=1 \
+ SM_GPU_DENOISE_SKIP=1 \
+ SM_GPU_DENOISE_HISTORY_RESET=1 SM_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
+ SM_GPU_TEMPORAL_DENOISE=1 \
  ./gpu_demo.exe
 ```
 
@@ -205,8 +205,8 @@ Frames 31+: Sparse denoising (adaptive steady state) + temporal blend maintains 
 Dynamic adjustment supersedes fixed skip pattern.
 
 ```
-YSU_GPU_DENOISE_SKIP=4 (ignored during warmup)
-With YSU_GPU_DENOISE_ADAPTIVE=1:
+SM_GPU_DENOISE_SKIP=4 (ignored during warmup)
+With SM_GPU_DENOISE_ADAPTIVE=1:
  Frames 0-30: Acts like skip=1 (max denoising)
  Frames 31+: Acts like skip=8 (max speed)
 ```
@@ -238,7 +238,7 @@ Frame 40: RT → Denoise (skip=8, pattern 40 % 8 == 0)
 
 ### Immediate Denoise Timeline
 ```
-YSU_GPU_DENOISE_SKIP=4:
+SM_GPU_DENOISE_SKIP=4:
 Frame 0: ALWAYS denoise ← immediate denoise ensures quality 
 Frame 1: Skip (pattern allows 1 % 4 != 0)
 Frame 2: Skip
@@ -287,22 +287,22 @@ Frame 30: 148 FPS
 
 ### Scenario 1: Pure Speed
 ```bash
-YSU_GPU_DENOISE_SKIP=8
-YSU_GPU_DENOISE_ADAPTIVE=0
+SM_GPU_DENOISE_SKIP=8
+SM_GPU_DENOISE_ADAPTIVE=0
 # Result: 170+ FPS, may have noise
 ```
 
 ### Scenario 2: Smart Speed (Recommended)
 ```bash
-YSU_GPU_DENOISE_SKIP=4
-YSU_GPU_DENOISE_ADAPTIVE=1
+SM_GPU_DENOISE_SKIP=4
+SM_GPU_DENOISE_ADAPTIVE=1
 # Result: 95→210 FPS, excellent quality (ramps)
 ```
 
 ### Scenario 3: Maximum Quality
 ```bash
-YSU_GPU_DENOISE_SKIP=1
-YSU_GPU_DENOISE_HISTORY_RESET=1
+SM_GPU_DENOISE_SKIP=1
+SM_GPU_DENOISE_HISTORY_RESET=1
 # Result: 100 FPS, pristine quality
 ```
 
@@ -376,23 +376,23 @@ Result: 95-210 FPS with excellent quality
 ### For Professional/Cinematic
 Enable full quality with periodic reset:
 ```bash
-YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=1 \
- YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60
+SM_GPU_DENOISE=1 SM_GPU_DENOISE_SKIP=1 \
+ SM_GPU_DENOISE_HISTORY_RESET=1 SM_GPU_DENOISE_HISTORY_RESET_FRAME=60
 ```
 
 ### For Gaming/Interactive (RECOMMENDED)
 Enable adaptive for best user experience:
 ```bash
-YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=4 \
- YSU_GPU_DENOISE_ADAPTIVE=1 YSU_GPU_TEMPORAL_DENOISE=1
+SM_GPU_DENOISE=1 SM_GPU_DENOISE_SKIP=4 \
+ SM_GPU_DENOISE_ADAPTIVE=1 SM_GPU_TEMPORAL_DENOISE=1
 ```
 
 ### For Real-Time/Mobile
 Maximize speed with sparse denoising:
 ```bash
-YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=8 \
- YSU_GPU_DENOISE_ADAPTIVE=1 YSU_GPU_DENOISE_ADAPTIVE_MAX=16 \
- YSU_GPU_RENDER_SCALE=0.5
+SM_GPU_DENOISE=1 SM_GPU_DENOISE_SKIP=8 \
+ SM_GPU_DENOISE_ADAPTIVE=1 SM_GPU_DENOISE_ADAPTIVE_MAX=16 \
+ SM_GPU_RENDER_SCALE=0.5
 ```
 
 ---

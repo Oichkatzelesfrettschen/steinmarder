@@ -101,23 +101,23 @@ gcc -O3 -march=native -std=c11 \
  #include "nerf_simd.h"
  
  // In main rendering loop:
- ysu_render_nerf_frame(camera, width, height, steps, density, bounds);
+ sm_render_nerf_frame(camera, width, height, steps, density, bounds);
  ```
 
 3. **Build with NeRF support**:
  ```bash
  gcc -O3 -march=native \
- ysu_main.c render.c nerf_simd.c vec3.c ... \
- -o ysu -lm -pthread
+ sm_main.c render.c nerf_simd.c vec3.c ... \
+ -o steinmarder -lm -pthread
  ```
 
 4. **Run with NeRF enabled**:
  ```bash
- YSU_NERF_HASHGRID="models/nerf_hashgrid.bin" \
- YSU_NERF_OCC="models/occupancy_grid.bin" \
- YSU_NERF_STEPS=32 \
- YSU_NERF_DENSITY=1.0 \
- ./ysu
+ SM_NERF_HASHGRID="models/nerf_hashgrid.bin" \
+ SM_NERF_OCC="models/occupancy_grid.bin" \
+ SM_NERF_STEPS=32 \
+ SM_NERF_DENSITY=1.0 \
+ ./steinmarder
  ```
 
 ---
@@ -224,14 +224,14 @@ Estimated per-ray costs:
 
 ### nerf_simd.h
 **Public API** - What you call from render.c:
-- `ysu_nerf_data_load()` - Load binary NeRF file
-- `ysu_volume_integrate_batch()` - Main rendering function
+- `sm_nerf_data_load()` - Load binary NeRF file
+- `sm_volume_integrate_batch()` - Main rendering function
 - Data structures: `RayBatch`, `NeRFFramebuffer`, `NeRFConfig`
 
 ### nerf_simd.c
 **Implementation** - How it works internally:
-- Hash function: `ysu_hash_position()`
-- Batched lookup: `ysu_hashgrid_lookup_batch()`
+- Hash function: `sm_hash_position()`
+- Batched lookup: `sm_hashgrid_lookup_batch()`
 - MLP layers: Hidden + Output with activations
 - Volume compositing with adaptive sampling
 
@@ -302,14 +302,14 @@ Before shipping:
 
 **Q: "Very slow, only 0.1 FPS"**
 A: Normal for unoptimized CPU NeRF. Try:
- - Reduce `YSU_NERF_STEPS` to 8 or 16
+ - Reduce `SM_NERF_STEPS` to 8 or 16
  - Use 256×256 resolution instead of 1080p
  - Enable multi-threading (future work)
 
 **Q: "Black output / all zeros"**
 A: Check:
- - `YSU_NERF_DENSITY` (should be 1.0-2.0)
- - `YSU_NERF_BOUNDS` (should match training, ~4.0)
+ - `SM_NERF_DENSITY` (should be 1.0-2.0)
+ - `SM_NERF_BOUNDS` (should match training, ~4.0)
  - MLP outputs in test (should be [0,1] for RGB)
 
 **Q: "Cannot find nerf_hashgrid.bin"**

@@ -181,13 +181,13 @@ After applying all fixes:
 
 **run_lego_gpu.bat settings that work:**
 ```batch
-set YSU_GPU_SPP=4
-set YSU_GPU_WINDOW=1
-set YSU_GPU_TEMPORAL=1
-set YSU_NERF_STEPS=128
-set YSU_NERF_DENSITY=1.0
-set YSU_NERF_SCALE=1.5
-set YSU_NERF_SKIP_OCC=1
+set SM_GPU_SPP=4
+set SM_GPU_WINDOW=1
+set SM_GPU_TEMPORAL=1
+set SM_NERF_STEPS=128
+set SM_NERF_DENSITY=1.0
+set SM_NERF_SCALE=1.5
+set SM_NERF_SKIP_OCC=1
 ```
 
 ---

@@ -45,49 +45,49 @@ Write-Host ""
 
 # Test 1: Maximum speed (skip=8)
 $results += Test-Config "1. NeRF walk (skip=8, 300f)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "300"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "300"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "8"
 } -Frames 300
 
 # Test 2: Balanced (skip=4)
 $results += Test-Config "2. NeRF walk (skip=4, 300f)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "300"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "300"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
 } -Frames 300
 
 # Test 3: High quality (skip=2)
 $results += Test-Config "3. NeRF walk (skip=2, 120f)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "2"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "2"
 } -Frames 120
 
 # Test 4: Maximum quality (skip=1)
 $results += Test-Config "4. NeRF walk (skip=1, 120f)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "1"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "1"
 } -Frames 120
 
 # Test 5: Adaptive quality
 $results += Test-Config "5. NeRF walk (adaptive, 240f)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "240"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MIN" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MAX" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "240"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MIN" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MAX" = "8"
 } -Frames 240
 
 Write-Host ""

@@ -142,8 +142,8 @@ See [LBVH_INTEGRATION_SUMMARY.md](LBVH_INTEGRATION_SUMMARY.md) future section fo
 ### LBVH Status Check
 ```powershell
 # Run with LBVH (default, already happening)
-cd "C:\YSUengine_fixed_renderc_patch_fixed2\YSUengine_fixed_renderc_patch"
-$env:YSU_GPU_W=1920; $env:YSU_GPU_H=1080; $env:YSU_GPU_OBJ="TestSubjects/3M.obj"; .\shaders\gpu_demo.exe
+cd "C:\steinmarder"
+$env:SM_GPU_W=1920; $env:SM_GPU_H=1080; $env:SM_GPU_OBJ="TestSubjects/3M.obj"; .\shaders\gpu_demo.exe
 ```
 
 ### What to Look For

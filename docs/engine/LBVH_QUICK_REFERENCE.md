@@ -82,7 +82,7 @@ Automatically called in two scenarios:
 .\shaders\gpu_demo.exe
 
 # Large mesh tuning
-$env:YSU_GPU_BVH_CHUNK_TRIS = 3000000
+$env:SM_GPU_BVH_CHUNK_TRIS = 3000000
 .\shaders\gpu_demo.exe
 
 # Verify it's working
@@ -95,7 +95,7 @@ $env:YSU_GPU_BVH_CHUNK_TRIS = 3000000
 
 ```powershell
 # Test 1: Verify it builds
-$env:YSU_GPU_W=1920; $env:YSU_GPU_H=1080; .\shaders\gpu_demo.exe
+$env:SM_GPU_W=1920; $env:SM_GPU_H=1080; .\shaders\gpu_demo.exe
 
 # Test 2: Benchmark performance
 python benchmark_1080p_60fps_fixed.py

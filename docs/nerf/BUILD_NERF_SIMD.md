@@ -70,16 +70,16 @@ static NeRFFramebuffer g_nerf_fb = {0};
 
 ### 2.2 Initialize NeRF at Startup
 
-In `ysu_main.c`, in the `main()` function after parsing environment variables, add:
+In `sm_main.c`, in the `main()` function after parsing environment variables, add:
 
 ```c
 // Initialize CPU SIMD NeRF renderer
-const char *nerf_hashgrid = getenv("YSU_NERF_HASHGRID");
-const char *nerf_occ = getenv("YSU_NERF_OCC");
+const char *nerf_hashgrid = getenv("SM_NERF_HASHGRID");
+const char *nerf_occ = getenv("SM_NERF_OCC");
 
 if (nerf_hashgrid && nerf_occ) {
  printf("Loading NeRF data...\n");
- g_nerf_data = ysu_nerf_data_load(nerf_hashgrid, nerf_occ);
+ g_nerf_data = sm_nerf_data_load(nerf_hashgrid, nerf_occ);
  if (g_nerf_data) {
  // Allocate framebuffer
  g_nerf_fb.width = camera.film_width;
@@ -90,7 +90,7 @@ if (nerf_hashgrid && nerf_occ) {
  printf(" NeRF initialized\n");
  }
 } else {
- printf("[Info] No NeRF data (YSU_NERF_HASHGRID/YSU_NERF_OCC not set)\n");
+ printf("[Info] No NeRF data (SM_NERF_HASHGRID/SM_NERF_OCC not set)\n");
 }
 ```
 
@@ -112,13 +112,13 @@ void render_nerf_simd(
  float density = 1.0f;
  float bounds = 4.0f;
  
- const char *env_steps = getenv("YSU_NERF_STEPS");
+ const char *env_steps = getenv("SM_NERF_STEPS");
  if (env_steps) steps = atoi(env_steps);
  
- const char *env_density = getenv("YSU_NERF_DENSITY");
+ const char *env_density = getenv("SM_NERF_DENSITY");
  if (env_density) density = atof(env_density);
  
- const char *env_bounds = getenv("YSU_NERF_BOUNDS");
+ const char *env_bounds = getenv("SM_NERF_BOUNDS");
  if (env_bounds) bounds = atof(env_bounds);
  
  printf("[Render] NeRF SIMD: %ux%u, steps=%u, density=%.2f, bounds=%.2f\n",
@@ -128,7 +128,7 @@ void render_nerf_simd(
  RayBatch batch = {0};
  batch.count = 0;
  
- uint64_t frame_start = ysu_rdtsc();
+ uint64_t frame_start = sm_rdtsc();
  
  for (uint32_t py = 0; py < height; py++) {
  for (uint32_t px = 0; px < width; px++) {
@@ -154,7 +154,7 @@ void render_nerf_simd(
  }
  
  // Render batch
- ysu_volume_integrate_batch(
+ sm_volume_integrate_batch(
  &batch,
  &g_nerf_data->config,
  g_nerf_data,
@@ -174,7 +174,7 @@ void render_nerf_simd(
  }
  }
  
- uint64_t frame_end = ysu_rdtsc();
+ uint64_t frame_end = sm_rdtsc();
  double frame_ms = (frame_end - frame_start) / 2.4e9 * 1000.0; // Assuming 2.4 GHz
  
  printf("[Render] NeRF frame: %.1f ms (%.1f FPS)\n", frame_ms, 1000.0 / frame_ms);
@@ -196,12 +196,12 @@ void render_nerf_simd(
 
 ### 2.4 Cleanup at Shutdown
 
-In `ysu_main.c`, before program exit, add:
+In `sm_main.c`, before program exit, add:
 
 ```c
 // Cleanup NeRF
 if (g_nerf_data) {
- ysu_nerf_data_free(g_nerf_data);
+ sm_nerf_data_free(g_nerf_data);
  g_nerf_data = NULL;
 }
 if (g_nerf_fb.pixels) {
@@ -253,25 +253,25 @@ Write-Host " NeRF SIMD test compiled"
 
 ```bash
 # Run CPU SIMD NeRF
-YSU_NERF_HASHGRID="models/nerf_hashgrid.bin" \
-YSU_NERF_OCC="models/occupancy_grid.bin" \
-YSU_NERF_STEPS=32 \
-YSU_NERF_DENSITY=1.0 \
-YSU_NERF_BOUNDS=4.0 \
-./ysuengine
+SM_NERF_HASHGRID="models/nerf_hashgrid.bin" \
+SM_NERF_OCC="models/occupancy_grid.bin" \
+SM_NERF_STEPS=32 \
+SM_NERF_DENSITY=1.0 \
+SM_NERF_BOUNDS=4.0 \
+./steinmarder
 ```
 
 ### With GPU Mesh (Parallel):
 
 ```bash
 # CPU NeRF + GPU Mesh simultaneously
-YSU_GPU_WINDOW=1 \
-YSU_NERF_HASHGRID="models/nerf_hashgrid.bin" \
-YSU_NERF_OCC="models/occupancy_grid.bin" \
-YSU_RENDER_MODE=3 \
-YSU_NERF_STEPS=32 \
-YSU_NERF_DENSITY=1.5 \
-YSU_NERF_BOUNDS=4.0 \
+SM_GPU_WINDOW=1 \
+SM_NERF_HASHGRID="models/nerf_hashgrid.bin" \
+SM_NERF_OCC="models/occupancy_grid.bin" \
+SM_RENDER_MODE=3 \
+SM_NERF_STEPS=32 \
+SM_NERF_DENSITY=1.5 \
+SM_NERF_BOUNDS=4.0 \
 ./GPU_DEMO.EXE
 ```
 
@@ -279,14 +279,14 @@ YSU_NERF_BOUNDS=4.0 \
 
 ```bash
 # Fast/Low Quality
-YSU_NERF_STEPS=8 # Quick preview
-YSU_NERF_DENSITY=0.5 # Less opaque
-YSU_NERF_BOUNDS=2.0 # Smaller region
+SM_NERF_STEPS=8 # Quick preview
+SM_NERF_DENSITY=0.5 # Less opaque
+SM_NERF_BOUNDS=2.0 # Smaller region
 
 # High Quality
-YSU_NERF_STEPS=64 # More detail
-YSU_NERF_DENSITY=2.0 # More opaque
-YSU_NERF_BOUNDS=8.0 # Larger region
+SM_NERF_STEPS=64 # More detail
+SM_NERF_DENSITY=2.0 # More opaque
+SM_NERF_BOUNDS=8.0 # Larger region
 ```
 
 ---
@@ -336,7 +336,7 @@ YSU_NERF_BOUNDS=8.0 # Larger region
 
 ### Build Errors
 
-**"undefined reference to ysu_nerf_data_load"**
+**"undefined reference to sm_nerf_data_load"**
 - Make sure nerf_simd.c is in compilation command
 - Check include paths
 
@@ -352,13 +352,13 @@ YSU_NERF_BOUNDS=8.0 # Larger region
 - Use absolute paths in environment variables
 
 **Black screen / no output**
-- Check `YSU_NERF_DENSITY` (too low = transparent)
-- Check `YSU_NERF_BOUNDS` (should match training bounds ~4.0)
+- Check `SM_NERF_DENSITY` (too low = transparent)
+- Check `SM_NERF_BOUNDS` (should match training bounds ~4.0)
 - Enable progress output: add `printf()` statements
 
 **Very slow (< 1 FPS @ 64×64)**
 - Normal for CPU! This is baseline performance
-- Try `YSU_NERF_STEPS=8` instead of 32
+- Try `SM_NERF_STEPS=8` instead of 32
 - Use resolution 64×64 for quick tests
 
 ---
@@ -383,7 +383,7 @@ gcc -O3 -march=native -std=c11 \
 
 # Full integration:
 gcc -O3 -march=native -std=c11 \
- ysu_main.c render.c camera.c ray.c vec3.c \
+ sm_main.c render.c camera.c ray.c vec3.c \
  nerf_simd.c nerf_simd_integration.c \
- -o ysuengine -lm -pthread
+ -o steinmarder -lm -pthread
 ```

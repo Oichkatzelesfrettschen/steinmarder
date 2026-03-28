@@ -1,13 +1,13 @@
 # PowerShell script to test NeRF fix
 # Run with: .\test_nerf_fix.ps1
 
-$env:YSU_NERF_HASHGRID = "models/nerf_hashgrid.bin"
-$env:YSU_NERF_OCC = "models/nerf_occ.bin"
-$env:YSU_W = "800"
-$env:YSU_H = "600"
-$env:YSU_SPP = "1"
-$env:YSU_USE_BVH = "1"
-$env:YSU_NERF_STEPS = "64"
+$env:SM_NERF_HASHGRID = "models/nerf_hashgrid.bin"
+$env:SM_NERF_OCC = "models/nerf_occ.bin"
+$env:SM_W = "800"
+$env:SM_H = "600"
+$env:SM_SPP = "1"
+$env:SM_USE_BVH = "1"
+$env:SM_NERF_STEPS = "64"
 
 Write-Host ""
 Write-Host "===================================" -ForegroundColor Cyan
@@ -16,20 +16,20 @@ Write-Host "===================================" -ForegroundColor Cyan
 Write-Host ""
 
 Write-Host "Testing mode 19 (buffer validation)..." -ForegroundColor Yellow
-$env:YSU_RENDER_MODE = "19"
+$env:SM_RENDER_MODE = "19"
 Start-Process -FilePath ".\gpu_demo.exe"
 Start-Sleep -Seconds 3
 
 Write-Host ""
 Write-Host "Testing mode 17 (MLP output)..." -ForegroundColor Yellow
-$env:YSU_RENDER_MODE = "17"
+$env:SM_RENDER_MODE = "17"
 Start-Process -FilePath ".\gpu_demo.exe"
 Start-Sleep -Seconds 3
 
 Write-Host ""
 Write-Host "Testing mode 2 (hybrid mesh+NeRF)..." -ForegroundColor Yellow
-$env:YSU_RENDER_MODE = "2"
-$env:YSU_NERF_BLEND = "0.35"
+$env:SM_RENDER_MODE = "2"
+$env:SM_NERF_BLEND = "0.35"
 Start-Process -FilePath ".\gpu_demo.exe"
 
 Write-Host ""

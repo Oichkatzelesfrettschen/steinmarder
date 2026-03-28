@@ -65,14 +65,14 @@ gcc -O3 -march=native -ffast-math -I./include -I./raylib/include -L./raylib/lib 
 
 ```powershell
 # Mode 3: Baseline NeRF (32 uniform steps)
-$env:YSU_GPU_WINDOW=1
-$env:YSU_RENDER_MODE=3
-$env:YSU_NERF_HASHGRID="models/lego.bin"
-$env:YSU_NERF_OCC="models/lego_occ.bin"
+$env:SM_GPU_WINDOW=1
+$env:SM_RENDER_MODE=3
+$env:SM_NERF_HASHGRID="models/lego.bin"
+$env:SM_NERF_OCC="models/lego_occ.bin"
 .\gpu_vulkan_demo.exe
 
 # Mode 26: Depth-Conditioned NeRF (8-32 adaptive steps)
-$env:YSU_RENDER_MODE=26
+$env:SM_RENDER_MODE=26
 .\gpu_vulkan_demo.exe
 ```
 
@@ -88,16 +88,16 @@ $env:YSU_RENDER_MODE=26
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `YSU_GPU_WINDOW` | 0 | Enable windowed mode (1) or headless (0) |
-| `YSU_GPU_W` | 1920 | Window width |
-| `YSU_GPU_H` | 1080 | Window height |
-| `YSU_GPU_RENDER_SCALE` | 1.0 | Internal render scale (0.5 = half res) |
-| `YSU_RENDER_MODE` | 3 | Render mode (see table above) |
-| `YSU_NERF_HASHGRID` | - | Path to hashgrid .bin file |
-| `YSU_NERF_OCC` | - | Path to occupancy .bin file |
-| `YSU_NERF_STEPS` | 32 | Base step count |
-| `YSU_NERF_CENTER_X/Y/Z` | 0.0 | Scene center offset |
-| `YSU_NERF_SCALE` | 1.5 | Scene scale |
+| `SM_GPU_WINDOW` | 0 | Enable windowed mode (1) or headless (0) |
+| `SM_GPU_W` | 1920 | Window width |
+| `SM_GPU_H` | 1080 | Window height |
+| `SM_GPU_RENDER_SCALE` | 1.0 | Internal render scale (0.5 = half res) |
+| `SM_RENDER_MODE` | 3 | Render mode (see table above) |
+| `SM_NERF_HASHGRID` | - | Path to hashgrid .bin file |
+| `SM_NERF_OCC` | - | Path to occupancy .bin file |
+| `SM_NERF_STEPS` | 32 | Base step count |
+| `SM_NERF_CENTER_X/Y/Z` | 0.0 | Scene center offset |
+| `SM_NERF_SCALE` | 1.5 | Scene scale |
 
 ## File Formats
 
@@ -155,9 +155,9 @@ Tested on RTX 3080, 1024x512 resolution:
 If you use this work, please cite:
 
 ```bibtex
-@misc{ysu_depth_nerf_2026,
+@misc{sm_depth_nerf_2026,
  title={Depth-Conditioned Heterogeneous Sampling for Real-Time NeRF},
- author={YSU Engine Contributors},
+ author={steinmarder Contributors},
  year={2026},
  howpublished={\url{https://github.com/...}}
 }

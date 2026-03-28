@@ -3,7 +3,7 @@
 Instant-NGP style NeRF training with nerfacc acceleration.
 Much faster than vanilla NeRF - trains in minutes instead of hours.
 
-Exports to YSU shader format (hashgrid + MLP weights).
+Exports to steinmarder shader format (hashgrid + MLP weights).
 """
 
 import argparse
@@ -381,7 +381,7 @@ def render_rays(model, rays_o, rays_d, near=0.0, far=6.0, n_samples=64,
 
 
 def export_model(model, out_hashgrid, out_occ, scene_center, scene_scale):
-    """Export model to YSU shader format."""
+    """Export model to steinmarder shader format."""
     print(f"\n[EXPORT] Saving to {out_hashgrid}")
     
     with torch.no_grad():

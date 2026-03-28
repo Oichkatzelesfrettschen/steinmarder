@@ -17,12 +17,12 @@
 Run this in PowerShell:
 
 ```powershell
-$env:YSU_NERF_HASHGRID="models/nerf_hashgrid.bin"
-$env:YSU_NERF_OCC="models/nerf_occ.bin"
-$env:YSU_RENDER_MODE="2"
-$env:YSU_NERF_STEPS="64"
-$env:YSU_W="1280"
-$env:YSU_H="720"
+$env:SM_NERF_HASHGRID="models/nerf_hashgrid.bin"
+$env:SM_NERF_OCC="models/nerf_occ.bin"
+$env:SM_RENDER_MODE="2"
+$env:SM_NERF_STEPS="64"
+$env:SM_W="1280"
+$env:SM_H="720"
 
 .\gpu_demo.exe
 ```
@@ -52,8 +52,8 @@ HashGrid should be ~hundreds of KB, occupancy ~few KB
 
 ### Step 3: Run Debug Mode 19 (Buffer Validation)
 ```cmd
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_RENDER_MODE=19
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_RENDER_MODE=19
 gpu_demo.exe
 ```
 **Expected:** Brownish-gray screen (RGB ≈ 0.3, 0.28, 0.28)
@@ -61,7 +61,7 @@ gpu_demo.exe
 
 ### Step 4: Run Debug Mode 20 (Push Constants)
 ```cmd
-set YSU_RENDER_MODE=20
+set SM_RENDER_MODE=20
 gpu_demo.exe
 ```
 **Expected:** Color varies with center/scale values
@@ -69,7 +69,7 @@ gpu_demo.exe
 
 ### Step 5: Run Debug Mode 17 (MLP Output)
 ```cmd
-set YSU_RENDER_MODE=17
+set SM_RENDER_MODE=17
 gpu_demo.exe
 ```
 **Expected:** Should show colors from your trained NeRF model
@@ -77,7 +77,7 @@ gpu_demo.exe
 
 ### Step 6: Run Debug Mode 18 (Full Integration)
 ```cmd
-set YSU_RENDER_MODE=18
+set SM_RENDER_MODE=18
 gpu_demo.exe
 ```
 **Expected:** Volume-rendered NeRF output
@@ -85,8 +85,8 @@ gpu_demo.exe
 
 ### Step 7: Run Hybrid Mode 2
 ```cmd
-set YSU_RENDER_MODE=2
-set YSU_NERF_BLEND=0.35
+set SM_RENDER_MODE=2
+set SM_NERF_BLEND=0.35
 gpu_demo.exe
 ```
 **Expected:** Mesh with NeRF overlay (65% mesh, 35% NeRF)
@@ -101,8 +101,8 @@ gpu_demo.exe
 
 **Fix:**
 ```cmd
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_NERF_OCC=models/nerf_occ.bin
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_NERF_OCC=models/nerf_occ.bin
 ```
 
 ---
@@ -117,16 +117,16 @@ set YSU_NERF_OCC=models/nerf_occ.bin
 **Fixes:**
 ```cmd
 REM Try skipping occupancy grid
-set YSU_NERF_SKIP_OCC=1
+set SM_NERF_SKIP_OCC=1
 
 REM Increase integration steps
-set YSU_NERF_STEPS=128
+set SM_NERF_STEPS=128
 
 REM Check center/scale (use values from model training)
-set YSU_NERF_CENTER_X=0.0
-set YSU_NERF_CENTER_Y=0.0
-set YSU_NERF_CENTER_Z=0.0
-set YSU_NERF_SCALE=1.0
+set SM_NERF_CENTER_X=0.0
+set SM_NERF_CENTER_Y=0.0
+set SM_NERF_CENTER_Z=0.0
+set SM_NERF_SCALE=1.0
 ```
 
 ---
@@ -137,7 +137,7 @@ set YSU_NERF_SCALE=1.0
 
 **Fix:**
 ```cmd
-set YSU_RENDER_MODE=2
+set SM_RENDER_MODE=2
 ```
 
 ---
@@ -148,9 +148,9 @@ set YSU_RENDER_MODE=2
 
 **Fix:**
 ```cmd
-set YSU_NERF_BLEND=0.5
-set YSU_NERF_STRENGTH=1.5
-set YSU_NERF_DENSITY=2.0
+set SM_NERF_BLEND=0.5
+set SM_NERF_STRENGTH=1.5
+set SM_NERF_DENSITY=2.0
 ```
 
 ---
@@ -161,7 +161,7 @@ set YSU_NERF_DENSITY=2.0
 
 **Fix:**
 ```cmd
-set YSU_NERF_STEPS=128
+set SM_NERF_STEPS=128
 ```
 
 ---
@@ -172,7 +172,7 @@ set YSU_NERF_STEPS=128
 
 **Fix:**
 ```cmd
-set YSU_NERF_BOUNDS=16.0
+set SM_NERF_BOUNDS=16.0
 ```
 
 ---
@@ -180,29 +180,29 @@ set YSU_NERF_BOUNDS=16.0
 ## Environment Variable Reference
 
 ### Required (for NeRF to work)
-- `YSU_NERF_HASHGRID` - Path to hashgrid .bin file
-- `YSU_NERF_OCC` - Path to occupancy .bin file
-- `YSU_RENDER_MODE` - Render mode (2=hybrid, 3=nerf-only)
+- `SM_NERF_HASHGRID` - Path to hashgrid .bin file
+- `SM_NERF_OCC` - Path to occupancy .bin file
+- `SM_RENDER_MODE` - Render mode (2=hybrid, 3=nerf-only)
 
 ### Optional (NeRF parameters)
-- `YSU_NERF_BLEND` - Mesh/NeRF blend (0.0-1.0, default 0.35)
-- `YSU_NERF_STRENGTH` - Color multiplier (default 1.0)
-- `YSU_NERF_DENSITY` - Volume density multiplier (default 1.0)
-- `YSU_NERF_BOUNDS` - Max raymarch distance (default 8.0)
-- `YSU_NERF_STEPS` - Integration steps (default 64, higher=better quality)
-- `YSU_NERF_SKIP_OCC` - Skip occupancy culling (0/1, default 0)
-- `YSU_NERF_CENTER_X/Y/Z` - Volume center (auto from .bin if not set)
-- `YSU_NERF_SCALE` - Volume scale (auto from .bin if not set)
+- `SM_NERF_BLEND` - Mesh/NeRF blend (0.0-1.0, default 0.35)
+- `SM_NERF_STRENGTH` - Color multiplier (default 1.0)
+- `SM_NERF_DENSITY` - Volume density multiplier (default 1.0)
+- `SM_NERF_BOUNDS` - Max raymarch distance (default 8.0)
+- `SM_NERF_STEPS` - Integration steps (default 64, higher=better quality)
+- `SM_NERF_SKIP_OCC` - Skip occupancy culling (0/1, default 0)
+- `SM_NERF_CENTER_X/Y/Z` - Volume center (auto from .bin if not set)
+- `SM_NERF_SCALE` - Volume scale (auto from .bin if not set)
 
 ### Debug modes
-- `YSU_RENDER_MODE=7` - BVH heatmap
-- `YSU_RENDER_MODE=8` - BVH depth
-- `YSU_RENDER_MODE=13` - Occupancy grid
-- `YSU_RENDER_MODE=14` - Hashgrid lookup
-- `YSU_RENDER_MODE=17` - MLP output (best for verifying model works)
-- `YSU_RENDER_MODE=18` - Full NeRF integration
-- `YSU_RENDER_MODE=19` - Buffer validation (magic number)
-- `YSU_RENDER_MODE=20` - Push constant validation
+- `SM_RENDER_MODE=7` - BVH heatmap
+- `SM_RENDER_MODE=8` - BVH depth
+- `SM_RENDER_MODE=13` - Occupancy grid
+- `SM_RENDER_MODE=14` - Hashgrid lookup
+- `SM_RENDER_MODE=17` - MLP output (best for verifying model works)
+- `SM_RENDER_MODE=18` - Full NeRF integration
+- `SM_RENDER_MODE=19` - Buffer validation (magic number)
+- `SM_RENDER_MODE=20` - Push constant validation
 
 ---
 
@@ -249,8 +249,8 @@ The exporter creates binary files with this structure:
 2. **Use mode 17** to verify MLP outputs correct colors
 3. **Use mode 19** to verify buffer is loaded
 4. **Use mode 2** for final hybrid rendering
-5. **Adjust YSU_NERF_STEPS** (higher = better quality, slower)
-6. **Adjust YSU_NERF_BLEND** (how much NeRF vs mesh)
+5. **Adjust SM_NERF_STEPS** (higher = better quality, slower)
+6. **Adjust SM_NERF_BLEND** (how much NeRF vs mesh)
 
 If issues persist, check:
 - Console output for "[NERF] hashgrid loaded: L=... F=... H=..."

@@ -23,6 +23,76 @@
 //
 // Tiled kernels use 3D grid. All others use 1D grid.
 // All kernel functions are declared extern "C" in their .cu files.
+// Forward declarations must be at file scope for correct C linkage.
+
+extern "C" {
+
+// Step kernels -- standard ping-pong signature
+void lbm_step_soa_fused(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_mrt_fused(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_pull(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_mrt_pull(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_tiled(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_mrt_tiled(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_coarsened(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_mrt_coarsened(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_soa_coarsened_float4(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp32_soa_cs_kernel(const float*, float*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_fp16_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp16_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp16_soa_half2_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_bf16_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_bf16_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_bf16_soa_bf162_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_fp8_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp8_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_fp8e5m2_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp8_e5m2_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_int8_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_int8_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_int8_soa_coarsened_kernel(const signed char*, signed char*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_int16_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_int16_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_fp64_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp64_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fused_int4_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_fp4_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
+
+// Step kernels -- A-A signature
+void lbm_step_soa_aa(float*, float*, float*, const float*, const float*, int, int, int, int);
+void lbm_step_soa_mrt_aa(float*, float*, float*, const float*, const float*, int, int, int, int);
+
+// Step kernels -- DD signature
+void lbm_step_fused_dd_kernel(const double*, const double*, double*, double*, float*, float*, const float*, const float*, int, int, int);
+
+// Init kernels -- 10-arg (no tau)
+void initialize_uniform_soa_kernel(float*, float*, float*, float, float, float, float, int, int, int);
+void initialize_uniform_bf16_kernel(void*, float*, float*, float, float, float, float, int, int, int);
+void initialize_uniform_fp64_kernel(void*, float*, float*, float, float, float, float, int, int, int);
+
+// Init kernels -- 12-arg (tau-extended)
+void initialize_uniform_fp32_soa_cs_kernel(float*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp16_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp16_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp16_soa_half2_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_bf16_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp8_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp8_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp8e5m2_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp8_e5m2_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_int8_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_int8_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_int16_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_int16_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp64_soa_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_int4_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void initialize_uniform_fp4_kernel(void*, float*, float*, float*, float, float, float, float, float, int, int, int);
+
+// Init kernels -- special signatures
+void initialize_uniform_dd_kernel(double*, double*, float*, float*, float, float, float, float, int, int, int);
+void initialize_uniform_bf16_soa_bf162_kernel(void*, void*, float*, float*, float*, float*, float, float, float, float, int, int, int);
+
+} // extern "C"
 
 // ============================================================================
 // Launch helpers
@@ -92,9 +162,6 @@ int launch_lbm_step(
         };
         // Note: cudaLaunchKernel requires the function pointer. Since all
         // kernels are extern "C", we must use the symbol directly. For DD:
-        extern void lbm_step_fused_dd_kernel(
-            const double*, const double*, double*, double*,
-            float*, float*, const float*, const float*, int, int, int);
         return cudaLaunchKernel((const void*)lbm_step_fused_dd_kernel,
                                 grd, block, args, 0, stream);
     }
@@ -110,11 +177,9 @@ int launch_lbm_step(
         };
 
         if (variant == LBM_FP32_SOA_AA) {
-            extern void lbm_step_soa_aa(float*, float*, float*, const float*, const float*, int, int, int, int);
             return cudaLaunchKernel((const void*)lbm_step_soa_aa, grd, block, args, 0, stream);
         }
         if (variant == LBM_FP32_SOA_MRT_AA) {
-            extern void lbm_step_soa_mrt_aa(float*, float*, float*, const float*, const float*, int, int, int, int);
             return cudaLaunchKernel((const void*)lbm_step_soa_mrt_aa, grd, block, args, 0, stream);
         }
         return cudaErrorInvalidValue;
@@ -139,12 +204,9 @@ int launch_lbm_step(
     // Macro to reduce boilerplate for standard-signature kernels.
     // Each kernel is declared extern and launched via cudaLaunchKernel.
     #define DISPATCH_STEP(VARIANT, FUNC_NAME, ELEM_T)                         \
-        case VARIANT: {                                                       \
-            extern void FUNC_NAME(const ELEM_T*, ELEM_T*, float*, float*,     \
-                                  const float*, const float*, int, int, int); \
+        case VARIANT:                                                         \
             return cudaLaunchKernel((const void*)FUNC_NAME,                   \
-                                   grd, block, args, 0, stream);             \
-        }
+                                   grd, block, args, 0, stream);
 
     switch (variant) {
     // FP32 SoA
@@ -178,6 +240,7 @@ int launch_lbm_step(
     // INT8
     DISPATCH_STEP(LBM_INT8_AOS,              lbm_step_fused_int8_kernel,       void)
     DISPATCH_STEP(LBM_INT8_SOA,              lbm_step_int8_soa_kernel,         void)
+    DISPATCH_STEP(LBM_INT8_SOA_COARSENED,   lbm_step_int8_soa_coarsened_kernel, signed char)
 
     // INT16
     DISPATCH_STEP(LBM_INT16_AOS,             lbm_step_int16_kernel,            void)
@@ -217,8 +280,6 @@ int launch_lbm_init(
 
     // DD init has unique signature
     if (variant == LBM_DD_SOA) {
-        extern void initialize_uniform_dd_kernel(
-            double*, double*, float*, float*, float, float, float, float, int, int, int);
         void* args[] = {
             (void*)&bufs->f_a, (void*)&bufs->f_b,
             (void*)&bufs->rho, (void*)&bufs->u,
@@ -260,22 +321,14 @@ int launch_lbm_init(
     };
 
     #define DISPATCH_INIT_10(VARIANT, FUNC_NAME, ELEM_T)                     \
-        case VARIANT: {                                                      \
-            extern void FUNC_NAME(ELEM_T*, float*, float*,                   \
-                                  float, float, float, float,                \
-                                  int, int, int);                            \
+        case VARIANT:                                                        \
             return cudaLaunchKernel((const void*)FUNC_NAME,                  \
-                                   grd, block, args_10, 0, stream);         \
-        }
+                                   grd, block, args_10, 0, stream);
 
     #define DISPATCH_INIT_12(VARIANT, FUNC_NAME, ELEM_T)                     \
-        case VARIANT: {                                                      \
-            extern void FUNC_NAME(ELEM_T*, float*, float*, float*,           \
-                                  float, float, float, float, float,         \
-                                  int, int, int);                            \
+        case VARIANT:                                                        \
             return cudaLaunchKernel((const void*)FUNC_NAME,                  \
-                                   grd, block, args_12, 0, stream);         \
-        }
+                                   grd, block, args_12, 0, stream);
 
     switch (variant) {
     // FP32 SoA: 10-arg (no tau in init)
@@ -306,9 +359,6 @@ int launch_lbm_init(
 
     // BF16 SoA BF162: special signature (f_a, f_b, rho, u, tau, force, rho_init, ux, uy, uz, nx, ny, nz)
     case LBM_BF16_SOA_BF162: {
-        extern void initialize_uniform_bf16_soa_bf162_kernel(
-            void*, void*, float*, float*, float*, float*,
-            float, float, float, float, int, int, int);
         void* args_bf162[] = {
             (void*)&bufs->f_a, (void*)&bufs->f_b,
             (void*)&bufs->rho, (void*)&bufs->u,
@@ -329,6 +379,7 @@ int launch_lbm_init(
     // INT8: 12-arg
     DISPATCH_INIT_12(LBM_INT8_AOS,              initialize_uniform_int8_kernel,         void)
     DISPATCH_INIT_12(LBM_INT8_SOA,              initialize_uniform_int8_soa_kernel,     void)
+    DISPATCH_INIT_12(LBM_INT8_SOA_COARSENED,   initialize_uniform_int8_soa_kernel,     void)
 
     // INT16: 12-arg
     DISPATCH_INIT_12(LBM_INT16_AOS,             initialize_uniform_int16_kernel,        void)

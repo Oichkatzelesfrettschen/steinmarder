@@ -179,37 +179,37 @@ With all Session optimizations:
 
 ### For Maximum FPS (Real-time games/demos)
 ```powershell
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_RENDER_SCALE = 0.5 # 2x boost
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 8 # Maximum speed
-$env:YSU_GPU_TEMPORAL = 1 # Temporal accumulation
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_RENDER_SCALE = 0.5 # 2x boost
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_SKIP = 8 # Maximum speed
+$env:SM_GPU_TEMPORAL = 1 # Temporal accumulation
 .\gpu_demo.exe
 # Expected: 150-200+ FPS on complex scenes
 ```
 
 ### For Quality (Interactive tools/editing)
 ```powershell
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE = 1 # Adaptive quality
-$env:YSU_GPU_DENOISE_ADAPTIVE_MIN = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
-$env:YSU_GPU_DENOISE_HISTORY_RESET = 1 # Clean transitions
-$env:YSU_GPU_DENOISE_HISTORY_RESET_FRAME = 60
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_ADAPTIVE = 1 # Adaptive quality
+$env:SM_GPU_DENOISE_ADAPTIVE_MIN = 1
+$env:SM_GPU_DENOISE_ADAPTIVE_MAX = 8
+$env:SM_GPU_DENOISE_HISTORY_RESET = 1 # Clean transitions
+$env:SM_GPU_DENOISE_HISTORY_RESET_FRAME = 60
 .\gpu_demo.exe
 # Expected: 100-150 FPS with high quality
 ```
 
 ### For Balanced (General use)
 ```powershell
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 4 # Good balance
-$env:YSU_GPU_RENDER_SCALE = 0.75 # Moderate internal res
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_SKIP = 4 # Good balance
+$env:SM_GPU_RENDER_SCALE = 0.75 # Moderate internal res
 .\gpu_demo.exe
 # Expected: 120-180 FPS on complex scenes
 ```

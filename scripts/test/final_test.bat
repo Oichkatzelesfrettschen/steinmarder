@@ -2,21 +2,21 @@
 REM Final clean test
 setlocal enabledelayedexpansion
 
-cd /d "c:\YSUengine_fixed_renderc_patch_fixed2\YSUengine_fixed_renderc_patch"
+cd /d "c:\steinmarder"
 
-REM Clear all YSU env vars first
+REM Clear all SM env vars first
 for /f "delims==" %%A in ('set') do (
-    if "%%A:~0,3%%"=="YSU" set "%%A="
+    if "%%A:~0,3%%"=="steinmarder" set "%%A="
 )
 
 REM Test 3M with current shader (has ray dir visualization)
 echo [1] Rendering 3M 1 SPP noisy...
-set YSU_GPU_W=320
-set YSU_GPU_H=180
-set YSU_GPU_SPP=1
-set YSU_GPU_OBJ=TestSubjects/3M.obj
-set YSU_NEURAL_DENOISE=0
-set YSU_GPU_DUMP_ONESHOT=1
+set SM_GPU_W=320
+set SM_GPU_H=180
+set SM_GPU_SPP=1
+set SM_GPU_OBJ=TestSubjects/3M.obj
+set SM_NEURAL_DENOISE=0
+set SM_GPU_DUMP_ONESHOT=1
 
 timeout /t 2 >nul
 gpu_demo.exe >con 2>&1
@@ -28,7 +28,7 @@ if exist output_gpu.ppm (
 )
 
 echo [2] Rendering 3M 1 SPP with denoise...
-set YSU_NEURAL_DENOISE=1
+set SM_NEURAL_DENOISE=1
 timeout /t 2 >nul
 gpu_demo.exe >con 2>&1
 if exist output_gpu.ppm (
@@ -39,8 +39,8 @@ if exist output_gpu.ppm (
 )
 
 echo [3] Rendering 3M 8 SPP clean...
-set YSU_NEURAL_DENOISE=0
-set YSU_GPU_SPP=8
+set SM_NEURAL_DENOISE=0
+set SM_GPU_SPP=8
 timeout /t 2 >nul
 gpu_demo.exe >con 2>&1
 if exist output_gpu.ppm (

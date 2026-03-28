@@ -11,12 +11,12 @@
 
 /* Portable prefetch macro for reducing cache misses on random hashgrid lookups */
 #if defined(__GNUC__) || defined(__clang__)
-#define YSU_PREFETCH(addr) __builtin_prefetch((const void*)(addr), 0, 0)
+#define SM_PREFETCH(addr) __builtin_prefetch((const void*)(addr), 0, 0)
 #elif defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
 #include <intrin.h>
-#define YSU_PREFETCH(addr) _mm_prefetch((const char*)(addr), _MM_HINT_T0)
+#define SM_PREFETCH(addr) _mm_prefetch((const char*)(addr), _MM_HINT_T0)
 #else
-#define YSU_PREFETCH(addr) ((void)0)
+#define SM_PREFETCH(addr) ((void)0)
 #endif
 
 /* Detect AVX2 and AVX-512 at runtime */
@@ -33,7 +33,7 @@ static void cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx,
     #endif
 }
 
-CPUFeatures ysu_detect_cpu_features(void) {
+CPUFeatures sm_detect_cpu_features(void) {
     CPUFeatures features = {0};
     
     uint32_t eax, ebx, ecx, edx;
@@ -61,7 +61,7 @@ CPUFeatures ysu_detect_cpu_features(void) {
 }
 
 /* Half-float utilities (for fp16 exported weights/tables) */
-static float ysu_half_to_float(uint16_t h) {
+static float sm_half_to_float(uint16_t h) {
     uint16_t exp = h & 0x7C00u;
     uint16_t mant = h & 0x03FFu;
     uint32_t sign = ((uint32_t)h & 0x8000u) << 16;
@@ -98,7 +98,7 @@ static float ysu_half_to_float(uint16_t h) {
     return out;
 }
 
-static bool ysu_read_half_block(FILE *f, float *dst, uint32_t count) {
+static bool sm_read_half_block(FILE *f, float *dst, uint32_t count) {
     size_t bytes = (size_t)count * sizeof(uint16_t);
     uint16_t *tmp = (uint16_t*)malloc(bytes);
     if (!tmp) {
@@ -109,7 +109,7 @@ static bool ysu_read_half_block(FILE *f, float *dst, uint32_t count) {
         return false;
     }
     for (uint32_t i = 0; i < count; i++) {
-        dst[i] = ysu_half_to_float(tmp[i]);
+        dst[i] = sm_half_to_float(tmp[i]);
     }
     free(tmp);
     return true;
@@ -121,11 +121,11 @@ static bool ysu_read_half_block(FILE *f, float *dst, uint32_t count) {
 #include <immintrin.h>
 #include <x86intrin.h>
 
-static inline uint64_t ysu_rdtsc(void) {
+static inline uint64_t sm_rdtsc(void) {
     return __builtin_ia32_rdtsc();
 }
 
-static inline __m256 ysu_sigmoid_avx2(__m256 x) {
+static inline __m256 sm_sigmoid_avx2(__m256 x) {
     /* sigmoid(x) = 1 / (1 + exp(-x)) - Fast approximation */
     const __m256 one = _mm256_set1_ps(1.0f);
     
@@ -138,18 +138,18 @@ static inline __m256 ysu_sigmoid_avx2(__m256 x) {
     return sigmoid_approx;
 }
 
-static inline __m256 ysu_relu_avx2(__m256 x) {
+static inline __m256 sm_relu_avx2(__m256 x) {
     return _mm256_max_ps(x, _mm256_set1_ps(0.0f));
 }
 
 #else  /* Scalar fallback for CPUs without AVX2 */
 
-static inline uint64_t ysu_rdtsc(void) {
+static inline uint64_t sm_rdtsc(void) {
     /* Fallback: not available on older CPUs */
     return 0;
 }
 
-static inline float ysu_sigmoid_scalar(float x) {
+static inline float sm_sigmoid_scalar(float x) {
     /* sigmoid(x) ≈ clamp(0.5 + 0.2 * x, 0, 1) */
     float result = 0.5f + 0.2f * x;
     if (result < 0.0f) return 0.0f;
@@ -157,7 +157,7 @@ static inline float ysu_sigmoid_scalar(float x) {
     return result;
 }
 
-static inline float ysu_relu_scalar(float x) {
+static inline float sm_relu_scalar(float x) {
     return x > 0.0f ? x : 0.0f;
 }
 
@@ -165,7 +165,7 @@ static inline float ysu_relu_scalar(float x) {
 
 /* ===== Hash Function ===== */
 
-static inline uint32_t ysu_hash_ijk(
+static inline uint32_t sm_hash_ijk(
     int32_t i, int32_t j, int32_t k,
     uint32_t hash_size
 ) {
@@ -179,7 +179,7 @@ static inline uint32_t ysu_hash_ijk(
     return hash % hash_size;
 }
 
-static inline uint32_t ysu_hash_position(
+static inline uint32_t sm_hash_position(
     const Vec3 *pos,
     float level_scale,
     uint32_t hash_size
@@ -189,12 +189,12 @@ static inline uint32_t ysu_hash_position(
     int32_t y = (int32_t)floorf(pos->y * level_scale);
     int32_t z = (int32_t)floorf(pos->z * level_scale);
     
-    return ysu_hash_ijk(x, y, z, hash_size);
+    return sm_hash_ijk(x, y, z, hash_size);
 }
 
 /* ===== NeRF Data Loading ===== */
 
-NeRFData* ysu_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
+NeRFData* sm_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
     FILE *f_hash = fopen(hashgrid_path, "rb");
     if (!f_hash) {
         fprintf(stderr, "ERROR: Cannot open hashgrid file: %s\n", hashgrid_path);
@@ -278,7 +278,7 @@ NeRFData* ysu_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
     }
     for (uint32_t i = 0; i < grid_elems; i++) {
         if (fp16_format) {
-            data->hashgrid_data[i] = ysu_half_to_float(grid_raw[i]);
+            data->hashgrid_data[i] = sm_half_to_float(grid_raw[i]);
         } else {
             float v = (float)grid_raw[i] / 32767.5f - 1.0f;
             if (v > 1.0f) v = 1.0f;
@@ -295,10 +295,10 @@ NeRFData* ysu_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
      * [hidden_dim][in_dim] = [64][27] (outer index = neuron).
      * These are TRANSPOSED from each other — GPU-trained checkpoints cannot
      * be loaded here without transposing W0 and W1 first.
-     * Set env var YSU_NERF_GPU_WEIGHTS=1 to emit a reminder at load time. */
-    if (getenv("YSU_NERF_GPU_WEIGHTS")) {
+     * Set env var SM_NERF_GPU_WEIGHTS=1 to emit a reminder at load time. */
+    if (getenv("SM_NERF_GPU_WEIGHTS")) {
         fprintf(stderr,
-            "[NeRF] WARNING: YSU_NERF_GPU_WEIGHTS set. GPU checkpoints store W0 as\n"
+            "[NeRF] WARNING: SM_NERF_GPU_WEIGHTS set. GPU checkpoints store W0 as\n"
             "  [hidden][in]=[64][27]. This CPU code expects [in][hidden]=[27][64].\n"
             "  Transpose W0 and W1 before loading, or results will be wrong.\n");
     }
@@ -327,17 +327,17 @@ NeRFData* ysu_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
     if (fp16_format) {
         uint32_t w_off = 0;
         uint32_t b_off = 0;
-        if (!ysu_read_half_block(f_hash, data->mlp_weights + w_off, w0_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_weights + w_off, w0_size)) goto load_fail;
         w_off += w0_size;
-        if (!ysu_read_half_block(f_hash, data->mlp_biases + b_off, b0_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_biases + b_off, b0_size)) goto load_fail;
         b_off += b0_size;
-        if (!ysu_read_half_block(f_hash, data->mlp_weights + w_off, w1_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_weights + w_off, w1_size)) goto load_fail;
         w_off += w1_size;
-        if (!ysu_read_half_block(f_hash, data->mlp_biases + b_off, b1_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_biases + b_off, b1_size)) goto load_fail;
         b_off += b1_size;
-        if (!ysu_read_half_block(f_hash, data->mlp_weights + w_off, w_out_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_weights + w_off, w_out_size)) goto load_fail;
         w_off += w_out_size;
-        if (!ysu_read_half_block(f_hash, data->mlp_biases + b_off, b_out_size)) goto load_fail;
+        if (!sm_read_half_block(f_hash, data->mlp_biases + b_off, b_out_size)) goto load_fail;
     } else {
         size_t weights_bytes = (size_t)total_weight_elems * sizeof(float);
         size_t biases_bytes = (size_t)total_bias_elems * sizeof(float);
@@ -382,11 +382,11 @@ NeRFData* ysu_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
 load_fail:
     fclose(f_hash);
     fclose(f_occ);
-    ysu_nerf_data_free(data);
+    sm_nerf_data_free(data);
     return NULL;
 }
 
-void ysu_nerf_data_free(NeRFData *data) {
+void sm_nerf_data_free(NeRFData *data) {
     if (!data) return;
     free(data->hashgrid_data);
     free(data->mlp_weights);
@@ -397,7 +397,7 @@ void ysu_nerf_data_free(NeRFData *data) {
 
 /* ===== Batched Hashgrid Lookup with Trilinear Interpolation ===== */
 
-void ysu_hashgrid_lookup_batch(
+void sm_hashgrid_lookup_batch(
     const Vec3 positions[SIMD_BATCH_SIZE],
     const NeRFConfig *config,
     const float *hashgrid_data,
@@ -438,24 +438,24 @@ void ysu_hashgrid_lookup_batch(
             /* For each feature, do trilinear interpolation over 8 corners */
             for (uint32_t f = 0; f < config->features_per_entry; f++) {
                 /* Hash all 8 corners */
-                uint32_t h000 = ysu_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
-                uint32_t h001 = ysu_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
-                uint32_t h010 = ysu_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
-                uint32_t h011 = ysu_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
-                uint32_t h100 = ysu_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
-                uint32_t h101 = ysu_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
-                uint32_t h110 = ysu_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
-                uint32_t h111 = ysu_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
+                uint32_t h000 = sm_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
+                uint32_t h001 = sm_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
+                uint32_t h010 = sm_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
+                uint32_t h011 = sm_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
+                uint32_t h100 = sm_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
+                uint32_t h101 = sm_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
+                uint32_t h110 = sm_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
+                uint32_t h111 = sm_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
                 
                 /* Prefetch all 8 hash-indexed cache lines before reading */
-                YSU_PREFETCH(&hashgrid_data[level_offset + h000 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h001 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h010 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h011 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h100 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h101 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h110 * config->features_per_entry + f]);
-                YSU_PREFETCH(&hashgrid_data[level_offset + h111 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h000 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h001 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h010 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h011 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h100 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h101 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h110 * config->features_per_entry + f]);
+                SM_PREFETCH(&hashgrid_data[level_offset + h111 * config->features_per_entry + f]);
 
                 /* Look up feature values at each corner */
                 float v000 = hashgrid_data[level_offset + h000 * config->features_per_entry + f];
@@ -490,7 +490,7 @@ void ysu_hashgrid_lookup_batch(
 }
 /* ===== Batched Occupancy Lookup ===== */
 
-void ysu_occupancy_lookup_batch(
+void sm_occupancy_lookup_batch(
     const Vec3 positions[SIMD_BATCH_SIZE],
     const NeRFConfig *config,
     const uint8_t *occ_grid,
@@ -525,7 +525,7 @@ void ysu_occupancy_lookup_batch(
 
 /* ===== Batched MLP Inference (cache-friendly loop order) ===== */
 
-void ysu_mlp_inference_batch(
+void sm_mlp_inference_batch(
     const float features_in[SIMD_BATCH_SIZE][27],
     const NeRFConfig *config,
     const float *mlp_weights,
@@ -548,7 +548,7 @@ void ysu_mlp_inference_batch(
     
     /* Get weight pointers — layout is [in_dim][hidden_dim] (row-major, CPU convention).
      * NOTE: the GPU kernel (mlp_forward.cu) uses [hidden_dim][in_dim] — TRANSPOSED.
-     * Weights loaded from .ysub files use this CPU [in][hidden] layout. */
+     * Weights loaded from .smb files use this CPU [in][hidden] layout. */
     const float *w0 = mlp_weights;
     const float *b0 = mlp_biases;
     const float *w1 = w0 + hidden_dim * in_dim;
@@ -647,7 +647,7 @@ void ysu_mlp_inference_batch(
 /* Single-ray MLP inference optimized for single-lane execution.
  * Uses weight access patterns that favor the stored layout [in_dim, hidden_dim]
  * and [hidden_dim, hidden_dim] to improve cache locality. */
-void ysu_mlp_inference_single(
+void sm_mlp_inference_single(
     const float features_in[27],
     const NeRFConfig *config,
     const float *mlp_weights,
@@ -807,7 +807,7 @@ void ysu_mlp_inference_single(
 
 /* ===== Adaptive Sampling ===== */
 
-float ysu_adaptive_step_size(
+float sm_adaptive_step_size(
     const Vec3 pos,
     const uint8_t *occ_grid,
     const NeRFConfig *config,
@@ -845,7 +845,7 @@ float ysu_adaptive_step_size(
     return base_step;  /* Fine sampling in occupied regions */
 }
 
-bool ysu_ray_should_terminate(float accumulated_alpha) {
+bool sm_ray_should_terminate(float accumulated_alpha) {
     /* Stop when near-full opacity reached */
     if (accumulated_alpha > 0.99f) return true;
     
@@ -854,7 +854,7 @@ bool ysu_ray_should_terminate(float accumulated_alpha) {
 
 /* ===== Volume Integration (Main Rendering Kernel) ===== */
 
-void ysu_volume_integrate_batch(
+void sm_volume_integrate_batch(
     const RayBatch *batch,
     const NeRFConfig *config,
     const NeRFData *nerf_data,
@@ -906,7 +906,7 @@ void ysu_volume_integrate_batch(
             pos.z = origin.z + direction.z * t;
             
             /* Adaptive step size — used both for alpha computation AND to advance t. */
-            float step_size = ysu_adaptive_step_size(pos, nerf_data->occupancy_grid, config, base_step);
+            float step_size = sm_adaptive_step_size(pos, nerf_data->occupancy_grid, config, base_step);
             
             /* Create feature vector for this ray step */
             float feat[27];
@@ -951,20 +951,20 @@ void ysu_volume_integrate_batch(
                 /* For each feature, do trilinear interpolation over 8 corners */
                 for (uint32_t f = 0; f < config->features_per_entry; f++) {
                     /* Hash all 8 corners */
-                    uint32_t h000 = ysu_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
-                    uint32_t h001 = ysu_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
-                    uint32_t h010 = ysu_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
-                    uint32_t h011 = ysu_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
-                    uint32_t h100 = ysu_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
-                    uint32_t h101 = ysu_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
-                    uint32_t h110 = ysu_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
-                    uint32_t h111 = ysu_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
+                    uint32_t h000 = sm_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
+                    uint32_t h001 = sm_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
+                    uint32_t h010 = sm_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
+                    uint32_t h011 = sm_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
+                    uint32_t h100 = sm_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
+                    uint32_t h101 = sm_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
+                    uint32_t h110 = sm_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
+                    uint32_t h111 = sm_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
                     
                     /* Prefetch hash-indexed lines before the loads */
-                    YSU_PREFETCH(&nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry]);
-                    YSU_PREFETCH(&nerf_data->hashgrid_data[level_offset + h100 * config->features_per_entry]);
-                    YSU_PREFETCH(&nerf_data->hashgrid_data[level_offset + h010 * config->features_per_entry]);
-                    YSU_PREFETCH(&nerf_data->hashgrid_data[level_offset + h110 * config->features_per_entry]);
+                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry]);
+                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h100 * config->features_per_entry]);
+                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h010 * config->features_per_entry]);
+                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h110 * config->features_per_entry]);
 
                     /* Look up feature values at each corner */
                     float v000 = nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry + f];
@@ -1002,7 +1002,7 @@ void ysu_volume_integrate_batch(
             float rgb_step_scalar[3];
             float sigma_step_scalar = 0.0f;
 
-            ysu_mlp_inference_single(
+            sm_mlp_inference_single(
                 feat,
                 config,
                 nerf_data->mlp_weights,
@@ -1027,7 +1027,7 @@ void ysu_volume_integrate_batch(
             t += step_size;
 
             /* Early termination */
-            if (ysu_ray_should_terminate(accumulated_alpha)) {
+            if (sm_ray_should_terminate(accumulated_alpha)) {
                 break;
             }
         }
@@ -1049,17 +1049,17 @@ void ysu_volume_integrate_batch(
 
 /* ===== Profiling Utilities ===== */
 
-void ysu_perf_start(uint64_t *start_cycle) {
-    *start_cycle = ysu_rdtsc();
+void sm_perf_start(uint64_t *start_cycle) {
+    *start_cycle = sm_rdtsc();
 }
 
-void ysu_perf_end(uint64_t start_cycle, PerfCounter *counter) {
-    uint64_t end_cycle = ysu_rdtsc();
+void sm_perf_end(uint64_t start_cycle, PerfCounter *counter) {
+    uint64_t end_cycle = sm_rdtsc();
     counter->total_cycles += (end_cycle - start_cycle);
     counter->sample_count++;
 }
 
-void ysu_perf_report(const char *name, const PerfCounter *counter) {
+void sm_perf_report(const char *name, const PerfCounter *counter) {
     if (counter->sample_count == 0) return;
     
     double avg_cycles = (double)counter->total_cycles / counter->sample_count;

@@ -10,7 +10,7 @@
  *   3. Bind the buffer at binding 10 in your descriptor set
  *   4. Use renderMode=26 for depth-conditioned NeRF rendering
  * 
- * Author: YSU Engine Research Team
+ * Author: steinmarder Research Team
  * Date: February 2026
  */
 

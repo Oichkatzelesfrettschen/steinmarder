@@ -10,13 +10,13 @@ Write-Host ""
 
 # Test 1: 1 SPP WITHOUT denoiser
 Write-Host "[1/3] Rendering 1 SPP WITHOUT denoiser (very noisy)..."
-$env:YSU_GPU_WINDOW = 1
-$env:YSU_GPU_W = 320
-$env:YSU_GPU_H = 180
-$env:YSU_GPU_SPP = 1
-$env:YSU_GPU_DUMP_ONESHOT = 1
-$env:YSU_NEURAL_DENOISE = 0
-$env:YSU_GPU_SEED = 42
+$env:SM_GPU_WINDOW = 1
+$env:SM_GPU_W = 320
+$env:SM_GPU_H = 180
+$env:SM_GPU_SPP = 1
+$env:SM_GPU_DUMP_ONESHOT = 1
+$env:SM_NEURAL_DENOISE = 0
+$env:SM_GPU_SEED = 42
 
 ./gpu_demo.exe *>$null
 if (Test-Path window_dump.ppm) {
@@ -29,7 +29,7 @@ if (Test-Path window_dump.ppm) {
 
 # Test 2: 1 SPP WITH denoiser
 Write-Host "[2/3] Rendering 1 SPP WITH denoiser..."
-$env:YSU_NEURAL_DENOISE = 1
+$env:SM_NEURAL_DENOISE = 1
 
 ./gpu_demo.exe *>$null
 if (Test-Path window_dump.ppm) {
@@ -42,8 +42,8 @@ if (Test-Path window_dump.ppm) {
 
 # Test 3: 16 SPP clean reference
 Write-Host "[3/3] Rendering 16 SPP clean reference..."
-$env:YSU_GPU_SPP = 16
-$env:YSU_NEURAL_DENOISE = 0
+$env:SM_GPU_SPP = 16
+$env:SM_NEURAL_DENOISE = 0
 
 ./gpu_demo.exe *>$null
 if (Test-Path window_dump.ppm) {

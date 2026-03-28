@@ -95,7 +95,7 @@ void denoise_box(Vec3 *pixels, int width, int height, int radius)
 }
 #include "vec3.h"
 
-void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height) {
+void sm_neural_denoise_maybe(Vec3 *pixels, int width, int height) {
     (void)pixels;
     (void)width;
     (void)height;

@@ -9,12 +9,12 @@
 // ==================================================
 // CONFIG
 // ==================================================
-#define YSU_TRI_IMPL_AVX2 1
+#define SM_TRI_IMPL_AVX2 1
 
 // ==================================================
 // ASM INTERFACES
 // ==================================================
-extern int ysu_hit_triangle_asm(
+extern int sm_hit_triangle_asm(
     const Triangle* tri,
     const Ray* r,
     float t_min,
@@ -24,9 +24,9 @@ extern int ysu_hit_triangle_asm(
     float* out_v
 );
 
-// ASM symbol: exported as ysu_hit_triangle_asm in triangle_hit_asm.S.
+// ASM symbol: exported as sm_hit_triangle_asm in triangle_hit_asm.S.
 // We alias the AVX2 hit function to that symbol in this project.
-#define ysu_hit_triangle_avx2 ysu_hit_triangle_asm
+#define sm_hit_triangle_avx2 sm_hit_triangle_asm
 
 // ==================================================
 // INTERNAL
@@ -75,7 +75,7 @@ static inline HitRecord make_hit(const Triangle* tri, const Ray* r, float t, flo
 
 // OPTIMIZED Reference C implementation (Möller–Trumbore)
 // Reduced register pressure and improved instruction-level parallelism
-static int ysu_hit_triangle_c(const Triangle* tri, const Ray* r, float t_min, float t_max,
+static int sm_hit_triangle_c(const Triangle* tri, const Ray* r, float t_min, float t_max,
                              float* out_t, float* out_u, float* out_v)
 {
     // Edge vectors - computed in parallel with ray data loading
@@ -129,12 +129,12 @@ HitRecord triangle_hit(const Triangle* tri, const Ray* r, float t_min, float t_m
     float t = 0.0f, u = 0.0f, v = 0.0f;
     int ok = 0;
 
-#if YSU_TRI_IMPL_AVX2
-    ok = ysu_hit_triangle_avx2(tri, r, t_min, t_max, &t, &u, &v);
+#if SM_TRI_IMPL_AVX2
+    ok = sm_hit_triangle_avx2(tri, r, t_min, t_max, &t, &u, &v);
     // Safety: fall back to C if ASM fails
-    if (!ok) ok = ysu_hit_triangle_c(tri, r, t_min, t_max, &t, &u, &v);
+    if (!ok) ok = sm_hit_triangle_c(tri, r, t_min, t_max, &t, &u, &v);
 #else
-    ok = ysu_hit_triangle_c(tri, r, t_min, t_max, &t, &u, &v);
+    ok = sm_hit_triangle_c(tri, r, t_min, t_max, &t, &u, &v);
 #endif
 
     if (!ok) return no_hit();

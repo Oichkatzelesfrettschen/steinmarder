@@ -1,10 +1,10 @@
-/* kernel.c - The YSU OS Shield Entry */
-void _ysu_main() {
+/* kernel.c - The steinmarder OS Shield Entry */
+void _sm_main() {
     // 0xB8000 is the address for the VGA text buffer in Protected Mode.
     // We cast it to a 'volatile char*' so the compiler doesn't optimize away our writes.
     volatile char* video_memory = (volatile char*) 0xB8000;
     
-    char* msg = "YSU OS v1.7: THE CHISEL IS ALIVE.";
+    char* msg = "steinmarder OS v1.7: THE CHISEL IS ALIVE.";
     
     // Each character on screen takes 2 bytes: [Character][Color/Attribute]
     // Color 0x0B is Light Cyan.

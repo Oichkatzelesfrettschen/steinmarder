@@ -178,13 +178,13 @@ void bilateral_denoise(Vec3 *pixels, int width, int height,
 // Environment-based configuration
 // ============================================================================
 
-static int ysu_env_int(const char *name, int defv) {
+static int sm_env_int(const char *name, int defv) {
     const char *s = getenv(name);
     if (!s || !s[0]) return defv;
     return atoi(s);
 }
 
-static float ysu_env_float(const char *name, float defv) {
+static float sm_env_float(const char *name, float defv) {
     const char *s = getenv(name);
     if (!s || !s[0]) return defv;
     char buf[128];
@@ -200,13 +200,13 @@ void bilateral_denoise_maybe(Vec3 *pixels, int width, int height)
 {
     if (!pixels || width <= 0 || height <= 0) return;
 
-    int enabled = ysu_env_int("YSU_BILATERAL_DENOISE", 0) ? 1 : 0;
+    int enabled = sm_env_int("SM_BILATERAL_DENOISE", 0) ? 1 : 0;
     if (!enabled) return;
 
     // Configuration via environment variables
-    float sigma_s = ysu_env_float("YSU_BILATERAL_SIGMA_S", 1.5f);   // spatial (pixels)
-    float sigma_r = ysu_env_float("YSU_BILATERAL_SIGMA_R", 0.1f);   // range (luminance)
-    int radius = ysu_env_int("YSU_BILATERAL_RADIUS", 3);            // filter radius
+    float sigma_s = sm_env_float("SM_BILATERAL_SIGMA_S", 1.5f);   // spatial (pixels)
+    float sigma_r = sm_env_float("SM_BILATERAL_SIGMA_R", 0.1f);   // range (luminance)
+    int radius = sm_env_int("SM_BILATERAL_RADIUS", 3);            // filter radius
 
     if (sigma_s < 0.1f) sigma_s = 0.1f;
     if (sigma_r < 0.01f) sigma_r = 0.01f;

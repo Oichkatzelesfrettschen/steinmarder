@@ -1,8 +1,8 @@
-# YSU-Engine -- Agent and Developer Reference
+# steinmarder -- Agent and Developer Reference
 
 ## Overview
 
-YSU-Engine is a multi-subsystem rendering and physics engine with:
+steinmarder is a multi-subsystem rendering and physics engine with:
 - CPU raytracer with BVH, denoising, NeRF inference, and upscaling
 - Vulkan GPU rendering pipeline
 - CUDA D3Q19 Lattice Boltzmann Method (LBM) fluid simulation kernels

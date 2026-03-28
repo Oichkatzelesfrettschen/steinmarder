@@ -1,7 +1,7 @@
 // FP16 (half-precision) D3Q19 LBM kernel.
 // Storage: __half (2 bytes/value, f-ping-pong AoS, stride 20 per cell).
 // Compute: FP32 promoted immediately after load.
-// YSU tricks:
+// steinmarder tricks:
 //   - half2 vectorized loads (2 halves = 4 bytes in one 32-bit transaction)
 //   - 10 half2 loads cover indices 0-19 (stride 20); index 19 is unused padding
 //   - 4-byte alignment: stride 20 halves = 40 bytes, divisible by 4 for all idx
@@ -61,7 +61,7 @@ __device__ void compute_equilibrium_fp16(float* f_eq, float rho, const float* u)
 
 // Fused Collision + Streaming kernel using FP16 storage, FP32 compute.
 // Per-cell stride: 20 halves (40 bytes).  Index 19 is unused padding.
-// YSU half2 trick: 10 half2 loads cover all 20 slots in 10 coalesced 32-bit
+// steinmarder half2 trick: 10 half2 loads cover all 20 slots in 10 coalesced 32-bit
 // transactions.  All loads are 4-byte aligned because 40 bytes per cell
 // means f_base is 4-byte aligned for every idx.
 // __launch_bounds__(128, 4): hint to compiler to target 4 blocks/SM (512 threads/SM),

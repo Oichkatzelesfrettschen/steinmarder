@@ -1,6 +1,6 @@
 ﻿param(
   [int]$Runs = 100,
-  [string]$Exe = ".\ysuengine.exe",
+  [string]$Exe = ".\steinmarder.exe",
   [string]$OutDir = ".\DATASET"
 )
 
@@ -10,7 +10,7 @@ New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 for ($i=0; $i -lt $Runs; $i++) {
   python .\gen_scene.py | Out-Host
 
-  Remove-Item Env:\YSU_BVH_POLICY -ErrorAction SilentlyContinue
+  Remove-Item Env:\SM_BVH_POLICY -ErrorAction SilentlyContinue
   & $Exe | Out-Host
 
   if (!(Test-Path ".\baseline_bvh.csv")) { throw "baseline_bvh.csv yok. Engine yazıyor mu?" }

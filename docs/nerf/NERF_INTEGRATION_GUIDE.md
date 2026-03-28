@@ -120,19 +120,19 @@ gcc -std=c11 -O2 -pthread -o gpu_demo.exe gpu_vulkan_demo.c gpu_bvh_lbv.c bilate
 
 ### Run Walkable Scene
 ```powershell
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_FRAMES = 600 # 10 seconds of walking
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 8 # Fast denoising for smooth motion
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_FRAMES = 600 # 10 seconds of walking
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_SKIP = 8 # Fast denoising for smooth motion
 .\gpu_demo.exe
 ```
 
 ### Optional: Enable NeRF Features (When Integrated)
 ```powershell
-$env:YSU_GPU_NERF_ENABLED = 1
-$env:YSU_GPU_NERF_MODEL = "path/to/nerf.json"
-$env:YSU_GPU_NERF_SCALE = 8.0 # Scene radius
+$env:SM_GPU_NERF_ENABLED = 1
+$env:SM_GPU_NERF_MODEL = "path/to/nerf.json"
+$env:SM_GPU_NERF_SCALE = 8.0 # Scene radius
 .\gpu_demo.exe
 ```
 
@@ -164,20 +164,20 @@ $env:YSU_GPU_NERF_SCALE = 8.0 # Scene radius
 
 ```powershell
 # Walking speed
-$env:YSU_NERF_WALK_SPEED = 0.01 # Units per frame (default 0.01)
+$env:SM_NERF_WALK_SPEED = 0.01 # Units per frame (default 0.01)
 
 # Head look speed
-$env:YSU_NERF_HEAD_YAW_SPEED = 1.0 # 360° turns per N frames (default 300)
-$env:YSU_NERF_HEAD_PITCH_SPEED = 0.01 # Up/down tilt speed
+$env:SM_NERF_HEAD_YAW_SPEED = 1.0 # 360° turns per N frames (default 300)
+$env:SM_NERF_HEAD_PITCH_SPEED = 0.01 # Up/down tilt speed
 
 # Camera height
-$env:YSU_NERF_EYE_HEIGHT = 1.6 # Human eye height in units
+$env:SM_NERF_EYE_HEIGHT = 1.6 # Human eye height in units
 
 # Scene scale
-$env:YSU_NERF_SCALE = 8.0 # Radius of NeRF volume
+$env:SM_NERF_SCALE = 8.0 # Radius of NeRF volume
 
 # Walking path type
-$env:YSU_NERF_PATH = "spiral" # Options: spiral, circle, linear, brownian
+$env:SM_NERF_PATH = "spiral" # Options: spiral, circle, linear, brownian
 ```
 
 ### Camera Path Types
@@ -239,7 +239,7 @@ vkUpdateDescriptorSetWithTemplate(..., nerf_weights_image);
 2. Enable NeRF evaluation in shader dispatch:
 ```c
 // Line 2050, modify:
-int nerf_enabled = ysu_env_bool("YSU_GPU_NERF_ENABLED", 0);
+int nerf_enabled = sm_env_bool("SM_GPU_NERF_ENABLED", 0);
 push_i[10] = nerf_enabled; // Pass to shader
 ```
 
@@ -357,11 +357,11 @@ C:\VulkanSDK\1.4.335.0\Bin\glslangValidator.exe -V shaders/tri.comp -o shaders/t
 gcc -std=c11 -O2 -pthread -o gpu_demo.exe gpu_vulkan_demo.c gpu_bvh_lbv.c bilateral_denoise.c neural_denoise.c -lvulkan-1 -lglfw3 -lws2_32 -luser32 -lm
 
 # Run walkable scene
-$env:YSU_GPU_W = 1920
-$env:YSU_GPU_H = 1080
-$env:YSU_GPU_FRAMES = 600
-$env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 8
+$env:SM_GPU_W = 1920
+$env:SM_GPU_H = 1080
+$env:SM_GPU_FRAMES = 600
+$env:SM_GPU_DENOISE = 1
+$env:SM_GPU_DENOISE_SKIP = 8
 .\gpu_demo.exe
 ```
 

@@ -362,9 +362,9 @@ vec3 dir_from_equirect(float u, float v){
 //  - clamp hist to neighborhood to reduce trails
 //  - if pc.alpha > 0: EMA (realtime-friendly)
 //    else: running average using pc.frame
-float ysu_luma(vec3 c){ return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+float sm_luma(vec3 c){ return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 
-vec3 ysu_clamp_history(vec3 hist, vec3 curr, ivec2 p){
+vec3 sm_clamp_history(vec3 hist, vec3 curr, ivec2 p){
     // 3x3 neighborhood clamp using history buffer (cheap & stable)
     vec3 mn = curr;
     vec3 mx = curr;

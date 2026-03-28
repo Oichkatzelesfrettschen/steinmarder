@@ -141,12 +141,13 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int16_kernel(
 
     if (force_mag_sq >= 1e-40f) {
         float prefactor = 1.0f - 0.5f * inv_tau;
+        float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
         for (int i = 0; i < 19; i++) {
             float eix = (float)CX_I16[i], eiy = (float)CY_I16[i], eiz = (float)CZ_I16[i];
-            float em_u_dot_f = (eix - ux) * fx + (eiy - uy) * fy + (eiz - uz) * fz;
-            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
             float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+            float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+            float em_u_dot_f = ei_dot_f - u_dot_f;
             f_local[i] += prefactor * W_I16[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
         }
     }

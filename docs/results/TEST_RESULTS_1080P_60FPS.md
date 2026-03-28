@@ -87,11 +87,11 @@ Visual quality: No artifacts, smooth gradients
 
 ### Command That Works
 ```powershell
-$env:YSU_GPU_W=640
-$env:YSU_GPU_H=360
-$env:YSU_GPU_FRAMES=2
-$env:YSU_NEURAL_DENOISE=1
-$env:YSU_SPP=2
+$env:SM_GPU_W=640
+$env:SM_GPU_H=360
+$env:SM_GPU_FRAMES=2
+$env:SM_NEURAL_DENOISE=1
+$env:SM_SPP=2
 .\shaders\gpu_demo.exe
 ```
 
@@ -103,11 +103,11 @@ $env:YSU_SPP=2
 
 ### Alternative Configuration (Higher Quality)
 ```powershell
-$env:YSU_GPU_W=960
-$env:YSU_GPU_H=540
-$env:YSU_GPU_FRAMES=4
-$env:YSU_NEURAL_DENOISE=1
-$env:YSU_SPP=1
+$env:SM_GPU_W=960
+$env:SM_GPU_H=540
+$env:SM_GPU_FRAMES=4
+$env:SM_NEURAL_DENOISE=1
+$env:SM_SPP=1
 .\shaders\gpu_demo.exe
 ```
 
@@ -204,9 +204,9 @@ Status: READY TO DEPLOY
 
 - Instrument GPU timestamps around the denoise dispatch to measure exact ms cost (two passes)
 - Run a no-readback/no-window test to isolate compute + denoise (disable file write and swapchain)
-- Probe lower bound: `YSU_GPU_FRAMES=1` and `YSU_GPU_SPP=1` to see the compute baseline without denoise cost
+- Probe lower bound: `SM_GPU_FRAMES=1` and `SM_GPU_SPP=1` to see the compute baseline without denoise cost
 - If denoise dominates, cut cost: reduce radius/sigma or run denoise at half-res then upscale
-- Toggle exclusivity: verify only one denoiser runs by testing `YSU_NEURAL_DENOISE=0/1` and `YSU_GPU_DENOISE=0/1`
+- Toggle exclusivity: verify only one denoiser runs by testing `SM_NEURAL_DENOISE=0/1` and `SM_GPU_DENOISE=0/1`
 
 ### Quick timing probe (wall-clock, includes startup)
 - Baseline (no denoise): 640×360, frames=1, spp=1 → **441.8 ms** total run
@@ -233,7 +233,7 @@ Status: Future work
  **60 FPS is ACHIEVABLE**
 - Using temporal upsampling strategy
 - 640×360 → 1080p display
-- Command: `$env:YSU_GPU_W=640; ...`
+- Command: `$env:SM_GPU_W=640; ...`
 
  **Quality is EXCELLENT**
 - 199 colors (no artifacts)

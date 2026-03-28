@@ -90,90 +90,90 @@ function Run-FPS-Test {
 # Test 1: Baseline (no denoise)
 Write-Host "PHASE 1: Baseline (No Denoise)" -ForegroundColor Magenta
 Run-FPS-Test -TestName "1. Baseline (no denoise)" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "0"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "0"
 }
 
 # Test 2: Denoise enabled, no skip
 Write-Host "PHASE 2: Denoise Configurations" -ForegroundColor Magenta
 Run-FPS-Test -TestName "2. Denoise enabled (skip=1, every frame)" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "1"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "1"
 }
 
 # Test 3: Denoise skip=2
 Run-FPS-Test -TestName "3. Denoise with skip=2" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "2"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "2"
 }
 
 # Test 4: Denoise skip=4
 Run-FPS-Test -TestName "4. Denoise with skip=4" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
 }
 
 # Test 5: Denoise skip=8
 Run-FPS-Test -TestName "5. Denoise with skip=8 (aggressive)" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "8"
 }
 
 # Test 6: Temporal blend with denoise
 Write-Host "PHASE 3: Temporal Integration" -ForegroundColor Magenta
 Run-FPS-Test -TestName "6. Denoise + Temporal blend (skip=4)" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
-    "YSU_GPU_TEMPORAL_DENOISE" = "1"
-    "YSU_GPU_TEMPORAL_DENOISE_WEIGHT" = "0.8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_TEMPORAL_DENOISE" = "1"
+    "SM_GPU_TEMPORAL_DENOISE_WEIGHT" = "0.8"
 }
 
 # Test 7: History reset enabled (requires recompile)
 Write-Host "PHASE 4: Advanced Features (Post-Compile)" -ForegroundColor Magenta
 Run-FPS-Test -TestName "7. Denoise + History reset (every 60 frames)" -Frames 300 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "300"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
-    "YSU_GPU_DENOISE_HISTORY_RESET" = "1"
-    "YSU_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "300"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_DENOISE_HISTORY_RESET" = "1"
+    "SM_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
 }
 
 # Test 8: Adaptive denoise (requires recompile)
 Run-FPS-Test -TestName "8. Denoise + Adaptive (warmup 30f, steady-state 8x)" -Frames 120 -EnvVars @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_OBJ" = $testObject
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MIN" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MAX" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_OBJ" = $testObject
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MIN" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MAX" = "8"
 }
 
 # Summary

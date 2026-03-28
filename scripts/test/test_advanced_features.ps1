@@ -39,55 +39,55 @@ Write-Host ""
 
 # Baseline for comparison
 $results += Test-Config "1. Baseline (no denoise)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "0"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "0"
 } -Frames 60
 
 # Denoise with skip=4 (optimal from previous test)
 $results += Test-Config "2. Denoise skip=4" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
 } -Frames 60
 
 # History Reset enabled (longer test)
 $results += Test-Config "3. Denoise skip=4 + History Reset" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "180"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
-    "YSU_GPU_DENOISE_HISTORY_RESET" = "1"
-    "YSU_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "180"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_DENOISE_HISTORY_RESET" = "1"
+    "SM_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
 } -Frames 180
 
 # Adaptive Denoise (120 frames to see warmup + steady state)
 $results += Test-Config "4. Adaptive Denoise (warmup->sparse)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MIN" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MAX" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MIN" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MAX" = "8"
 } -Frames 120
 
 # Full stack: skip=4 + history reset + adaptive
 $results += Test-Config "5. Full Stack (skip=4 + reset + adaptive)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "120"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
-    "YSU_GPU_DENOISE_ADAPTIVE" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MIN" = "1"
-    "YSU_GPU_DENOISE_ADAPTIVE_MAX" = "8"
-    "YSU_GPU_DENOISE_HISTORY_RESET" = "1"
-    "YSU_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "120"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_DENOISE_ADAPTIVE" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MIN" = "1"
+    "SM_GPU_DENOISE_ADAPTIVE_MAX" = "8"
+    "SM_GPU_DENOISE_HISTORY_RESET" = "1"
+    "SM_GPU_DENOISE_HISTORY_RESET_FRAME" = "60"
 } -Frames 120
 
 Write-Host ""

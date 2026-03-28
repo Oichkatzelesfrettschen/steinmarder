@@ -26,7 +26,7 @@ function Test-Config {
         $output = & $exePath 2>&1 | Out-Null
     }).TotalSeconds
     
-    $frames = [int]$EnvVars["YSU_GPU_FRAMES"]
+    $frames = [int]$EnvVars["SM_GPU_FRAMES"]
     $fps = [math]::Round($frames / $time, 2)
     
     Write-Host "  Time: $([math]::Round($time, 2))s | FPS: $fps" -ForegroundColor Green
@@ -44,42 +44,42 @@ Write-Host "Resolution: 1920x1080 | 60 frames per test" -ForegroundColor Gray
 Write-Host ""
 
 $results += Test-Config "1. Baseline (no denoise)" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "0"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "0"
 }
 
 $results += Test-Config "2. Denoise skip=1" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "1"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "1"
 }
 
 $results += Test-Config "3. Denoise skip=2" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "2"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "2"
 }
 
 $results += Test-Config "4. Denoise skip=4" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
 }
 
 $results += Test-Config "5. Denoise skip=8" @{
-    "YSU_GPU_W" = "1920"
-    "YSU_GPU_H" = "1080"
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "8"
+    "SM_GPU_W" = "1920"
+    "SM_GPU_H" = "1080"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "8"
 }
 
 # Display results table

@@ -159,9 +159,9 @@ for (int py = 0; py < height; py++) {
 ### Phase 1: CPU NeRF (Weeks 1-2)
 
  **Create `nerf_simd.c`** with:
-- `ysu_hashgrid_lookup_batch()` — SIMD feature extraction
-- `ysu_mlp_inference_batch()` — Batched matrix multiply
-- `ysu_volume_integrate_batch()` — Ray marching
+- `sm_hashgrid_lookup_batch()` — SIMD feature extraction
+- `sm_mlp_inference_batch()` — Batched matrix multiply
+- `sm_volume_integrate_batch()` — Ray marching
 
  **Modify `render.c`** to:
 - Add ray batching loop (8 rays per batch)
@@ -295,7 +295,7 @@ for (int py = 0; py < height; py++) {
  batch.rays[batch.count++] = camera_ray(cam, px, py);
  
  if (batch.count == 8 || end_of_image) {
- ysu_nerf_render_batch(&batch, nerf, cpu_fb);
+ sm_nerf_render_batch(&batch, nerf, cpu_fb);
  batch.count = 0;
  }
  }
@@ -312,7 +312,7 @@ pthread_barrier_t frame_barrier;
 pthread_barrier_init(&frame_barrier, NULL, 2);
 
 void *nerf_worker(void *ctx) {
- ysu_nerf_render_batch(...);
+ sm_nerf_render_batch(...);
  pthread_barrier_wait(&frame_barrier); // Signal done
 }
 
@@ -389,7 +389,7 @@ NEW:
 
 MODIFY:
  render.c — Ray batching loop, threading
- ysu_main.c — Thread management, parallel setup
+ sm_main.c — Thread management, parallel setup
  gpu_vulkan_demo.c — Framebuffer sync/blend
 
 REFERENCE (read-only):

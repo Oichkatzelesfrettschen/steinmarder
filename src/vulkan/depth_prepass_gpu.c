@@ -2,7 +2,7 @@
  * @file depth_prepass_gpu.c
  * @brief GPU Integration for Depth-Conditioned NeRF Sampling - Implementation
  * 
- * Author: YSU Engine Research Team
+ * Author: steinmarder Research Team
  * Date: February 2026
  */
 

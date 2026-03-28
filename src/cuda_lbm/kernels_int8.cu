@@ -4,7 +4,7 @@
 // Scale factor: DIST_SCALE = 64.0  (f_int8 = clamp(f_float * 64, -128, 127))
 //   -- distributions are typically [0, 1/3]; w_i * rho * max = 1/3 -> int8 = 85.
 //   -- leaving room for collision transients up to f_i = 1.98 before clamping.
-// YSU dp4a trick: __dp4a() computes dot4(a_i8x4, b_i8x4) + acc in one instruction.
+// steinmarder dp4a trick: __dp4a() computes dot4(a_i8x4, b_i8x4) + acc in one instruction.
 //   Applied to the momentum sum (sum_i cx[i]*f[i]) for groups of 4 distributions.
 //   D3Q19 cx has only {-1, 0, 1} -> products fit in int8 exactly -> __dp4a valid.
 // Bandwidth: 4x reduction vs FP32 (1 byte vs 4 bytes per distribution scalar).

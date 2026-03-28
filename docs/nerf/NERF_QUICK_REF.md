@@ -93,10 +93,10 @@ The system is **designed to receive NeRF weights** at runtime:
 
 ### Run Walkable Scene (Recommended)
 ```powershell
-$env:YSU_GPU_W=1920
-$env:YSU_GPU_H=1080
-$env:YSU_GPU_FRAMES=600 # 10 seconds of walking
-$env:YSU_GPU_DENOISE_SKIP=4 # Optimal quality/speed
+$env:SM_GPU_W=1920
+$env:SM_GPU_H=1080
+$env:SM_GPU_FRAMES=600 # 10 seconds of walking
+$env:SM_GPU_DENOISE_SKIP=4 # Optimal quality/speed
 .\gpu_demo.exe
 ```
 

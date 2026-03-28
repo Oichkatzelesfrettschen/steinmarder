@@ -62,7 +62,7 @@ typedef struct NerfOccBlob {
     size_t bytes;
 } NerfOccBlob;
 
-static float ysu_u32_to_f(uint32_t v){
+static float sm_u32_to_f(uint32_t v){
     float f;
     memcpy(&f, &v, sizeof(float));
     return f;
@@ -89,7 +89,7 @@ static void* read_file_blob(const char* path, size_t* out_bytes){
 }
 
 // ---------------- ENV helpers ----------------
-static int ysu_env_bool(const char* key, int defv){
+static int sm_env_bool(const char* key, int defv){
     const char* v = getenv(key);
     if(!v || !v[0]) return defv;
     // trim leading spaces
@@ -99,14 +99,14 @@ static int ysu_env_bool(const char* key, int defv){
     if(!strcmp(v,"0") || !strcmp(v,"false") || !strcmp(v,"FALSE") || !strcmp(v,"off") || !strcmp(v,"OFF")) return 0;
     return defv;
 }
-static int ysu_env_int(const char* key, int defv){
+static int sm_env_int(const char* key, int defv){
     const char* v = getenv(key);
     if(!v || !v[0]) return defv;
     return atoi(v);
 }
 
 
-static float ysu_env_float(const char* key, float defv){
+static float sm_env_float(const char* key, float defv){
     const char* v = getenv(key);
     if(!v || !v[0]) return defv;
     // accept both "1.25" and "1,25"
@@ -416,7 +416,7 @@ _Static_assert(sizeof(PushConstants) <= 128, "PushConstants exceeds Vulkan push 
 
 // =========================
 // BVH OFFLINE CACHE (optional)
-// Set env: YSU_GPU_BVH_CACHE="path/to/file.bvhbin"
+// Set env: SM_GPU_BVH_CACHE="path/to/file.bvhbin"
 // =========================
 #define BVH_CACHE_MAGIC 0x48565359u  // 'YSVH'
 #define BVH_CACHE_VER   1u
@@ -424,9 +424,10 @@ _Static_assert(sizeof(PushConstants) <= 128, "PushConstants exceeds Vulkan push 
 #include <windows.h>
 #endif
 #include <sys/stat.h>
+#include <time.h>
 
 // ---------------- Timing helpers ----------------
-static uint64_t ysu_now_us(void){
+static uint64_t sm_now_us(void){
 #if defined(_WIN32)
     static LARGE_INTEGER freq;
     static int inited = 0;
@@ -441,17 +442,17 @@ static uint64_t ysu_now_us(void){
 
 // ---------------- Triangle cache (binary) ----------------
 // Speeds up huge OBJ loads by caching the vec4 triangle stream to disk.
-// Env: YSU_GPU_TRI_CACHE="path/to/file.tri"
-// If not set, and YSU_GPU_BVH_CACHE is set, we auto-use "<bvh_cache>.tri".
-#define TRI_CACHE_MAGIC "YSUTRI1"
+// Env: SM_GPU_TRI_CACHE="path/to/file.tri"
+// If not set, and SM_GPU_BVH_CACHE is set, we auto-use "<bvh_cache>.tri".
+#define TRI_CACHE_MAGIC "SMTRI1"
 typedef struct TriCacheHeader {
-    char magic[8];        // "YSUTRI1"
+    char magic[8];        // "SMTRI1"
     uint32_t tri_count;
     uint64_t obj_size;
     uint64_t obj_mtime;
 } TriCacheHeader;
 
-static int ysu_stat_file(const char* path, uint64_t* out_size, uint64_t* out_mtime){
+static int sm_stat_file(const char* path, uint64_t* out_size, uint64_t* out_mtime){
 #if defined(_WIN32)
     struct _stat64 st;
     if(_stat64(path, &st) != 0) return 0;
@@ -472,7 +473,7 @@ static int tri_cache_load(const char* tri_cache_path, const char* obj_path,
     if(!tri_cache_path || !tri_cache_path[0] || !obj_path || !obj_path[0]) return 0;
 
     uint64_t obj_size=0, obj_mtime=0;
-    if(!ysu_stat_file(obj_path, &obj_size, &obj_mtime)) return 0;
+    if(!sm_stat_file(obj_path, &obj_size, &obj_mtime)) return 0;
 
     FILE* f = fopen(tri_cache_path, "rb");
     if(!f) return 0;
@@ -503,7 +504,7 @@ static int tri_cache_save(const char* tri_cache_path, const char* obj_path,
     if(!tri_data || tri_count <= 0) return 0;
 
     uint64_t obj_size=0, obj_mtime=0;
-    if(!ysu_stat_file(obj_path, &obj_size, &obj_mtime)) return 0;
+    if(!sm_stat_file(obj_path, &obj_size, &obj_mtime)) return 0;
 
     FILE* f = fopen(tri_cache_path, "wb");
     if(!f) return 0;
@@ -843,59 +844,59 @@ int main(void){
     int seed = 1337;
     int frames = 1;
 
-    int window_enabled = ysu_env_bool("YSU_GPU_WINDOW", 0);
-    int no_io = ysu_env_bool("YSU_GPU_NO_IO", 0);      // skip readback/file writes for timing
-    int minimal = ysu_env_bool("YSU_GPU_MINIMAL", 0);  // force 1 frame, 1 spp, no tonemap/IO
-    int fast_mode = ysu_env_bool("YSU_GPU_FAST", 0);   // aggressive optimization for realtime (lower quality)
-    const char* env_w = getenv("YSU_GPU_W");
-    const char* env_h = getenv("YSU_GPU_H");
-    const char* env_spp = getenv("YSU_GPU_SPP");
-    const char* env_seed = getenv("YSU_GPU_SEED");
-    const char* env_frames = getenv("YSU_GPU_FRAMES");
-    const char* obj_path = getenv("YSU_GPU_OBJ");
-    const char* env_use_bvh = getenv("YSU_GPU_USE_BVH"); // default 1
-    const char* env_cull = getenv("YSU_GPU_CULL"); // default 1 (backface culling)
-    const char* env_render_scale = getenv("YSU_GPU_RENDER_SCALE"); // 0.5 = half-res, 0.25 = quarter-res
-    int ts_enabled = ysu_env_bool("YSU_GPU_TS", 0); // enable GPU timestamps for denoise timing
+    int window_enabled = sm_env_bool("SM_GPU_WINDOW", 0);
+    int no_io = sm_env_bool("SM_GPU_NO_IO", 0);      // skip readback/file writes for timing
+    int minimal = sm_env_bool("SM_GPU_MINIMAL", 0);  // force 1 frame, 1 spp, no tonemap/IO
+    int fast_mode = sm_env_bool("SM_GPU_FAST", 0);   // aggressive optimization for realtime (lower quality)
+    const char* env_w = getenv("SM_GPU_W");
+    const char* env_h = getenv("SM_GPU_H");
+    const char* env_spp = getenv("SM_GPU_SPP");
+    const char* env_seed = getenv("SM_GPU_SEED");
+    const char* env_frames = getenv("SM_GPU_FRAMES");
+    const char* obj_path = getenv("SM_GPU_OBJ");
+    const char* env_use_bvh = getenv("SM_GPU_USE_BVH"); // default 1
+    const char* env_cull = getenv("SM_GPU_CULL"); // default 1 (backface culling)
+    const char* env_render_scale = getenv("SM_GPU_RENDER_SCALE"); // 0.5 = half-res, 0.25 = quarter-res
+    int ts_enabled = sm_env_bool("SM_GPU_TS", 0); // enable GPU timestamps for denoise timing
     double ts_period_ns = 0.0;
 
     // Render mode: 0=mesh, 1=probe (placeholder), 2=hybrid (mesh+nerf proxy), 3=nerf-only, 4-25=debug modes, 26-27=depth-conditioned
-    int render_mode = ysu_env_int("YSU_RENDER_MODE", 0);
+    int render_mode = sm_env_int("SM_RENDER_MODE", 0);
     if(render_mode < 0) render_mode = 0;
     if(render_mode > 27) render_mode = 27;  // Increased for depth-conditioned modes 26-27
 
     // Interactive camera controls
-    float cam_speed = ysu_env_float("YSU_CAM_SPEED", 3.0f);           // units per second for WASD
-    float mouse_sens = ysu_env_float("YSU_CAM_MOUSE_SENS", 0.0025f);  // radians per pixel for mouse look
-    int cam_mouse_lock = ysu_env_bool("YSU_CAM_MOUSE_LOCK", 1);       // lock/hide cursor for FPS look
+    float cam_speed = sm_env_float("SM_CAM_SPEED", 3.0f);           // units per second for WASD
+    float mouse_sens = sm_env_float("SM_CAM_MOUSE_SENS", 0.0025f);  // radians per pixel for mouse look
+    int cam_mouse_lock = sm_env_bool("SM_CAM_MOUSE_LOCK", 1);       // lock/hide cursor for FPS look
     // Deadzone to ignore sub-pixel mouse jitter (helps prevent accumulation resets)
-    float mouse_deadzone = ysu_env_float("YSU_CAM_MOUSE_DEADZONE", 0.5f); // pixels
+    float mouse_deadzone = sm_env_float("SM_CAM_MOUSE_DEADZONE", 0.5f); // pixels
     // Epsilon thresholds for detecting camera movement (position/orientation)
-    float cam_reset_eps_pos = ysu_env_float("YSU_CAM_RESET_EPS_POS", 1e-4f);
-    float cam_reset_eps_ang = ysu_env_float("YSU_CAM_RESET_EPS_ANG", 1e-4f);
+    float cam_reset_eps_pos = sm_env_float("SM_CAM_RESET_EPS_POS", 1e-4f);
+    float cam_reset_eps_ang = sm_env_float("SM_CAM_RESET_EPS_ANG", 1e-4f);
 
     // Hybrid Mesh + NeRF proxy (procedural placeholder for research)
-    int nerf_proxy_enabled = ysu_env_bool("YSU_NERF_PROXY", 0);
-    float nerf_strength = ysu_env_float("YSU_NERF_STRENGTH", 1.0f);
-    float nerf_density = ysu_env_float("YSU_NERF_DENSITY", 1.0f);
-    float nerf_blend = ysu_env_float("YSU_NERF_BLEND", 0.35f); // 0=mesh only, 1=nerf only
-    float nerf_bounds = ysu_env_float("YSU_NERF_BOUNDS", 8.0f); // max distance for proxy volume
-    const char* nerf_center_x_env = getenv("YSU_NERF_CENTER_X");
-    const char* nerf_center_y_env = getenv("YSU_NERF_CENTER_Y");
-    const char* nerf_center_z_env = getenv("YSU_NERF_CENTER_Z");
-    const char* nerf_scale_env = getenv("YSU_NERF_SCALE");
-    float nerf_center_x = (nerf_center_x_env != NULL) ? ysu_env_float("YSU_NERF_CENTER_X", 0.0f) : 0.0f;
-    float nerf_center_y = (nerf_center_y_env != NULL) ? ysu_env_float("YSU_NERF_CENTER_Y", 0.0f) : 0.0f;
-    float nerf_center_z = (nerf_center_z_env != NULL) ? ysu_env_float("YSU_NERF_CENTER_Z", 0.0f) : 0.0f;
-    float nerf_scale = (nerf_scale_env != NULL) ? ysu_env_float("YSU_NERF_SCALE", 1.0f) : 1.0f;
+    int nerf_proxy_enabled = sm_env_bool("SM_NERF_PROXY", 0);
+    float nerf_strength = sm_env_float("SM_NERF_STRENGTH", 1.0f);
+    float nerf_density = sm_env_float("SM_NERF_DENSITY", 1.0f);
+    float nerf_blend = sm_env_float("SM_NERF_BLEND", 0.35f); // 0=mesh only, 1=nerf only
+    float nerf_bounds = sm_env_float("SM_NERF_BOUNDS", 8.0f); // max distance for proxy volume
+    const char* nerf_center_x_env = getenv("SM_NERF_CENTER_X");
+    const char* nerf_center_y_env = getenv("SM_NERF_CENTER_Y");
+    const char* nerf_center_z_env = getenv("SM_NERF_CENTER_Z");
+    const char* nerf_scale_env = getenv("SM_NERF_SCALE");
+    float nerf_center_x = (nerf_center_x_env != NULL) ? sm_env_float("SM_NERF_CENTER_X", 0.0f) : 0.0f;
+    float nerf_center_y = (nerf_center_y_env != NULL) ? sm_env_float("SM_NERF_CENTER_Y", 0.0f) : 0.0f;
+    float nerf_center_z = (nerf_center_z_env != NULL) ? sm_env_float("SM_NERF_CENTER_Z", 0.0f) : 0.0f;
+    float nerf_scale = (nerf_scale_env != NULL) ? sm_env_float("SM_NERF_SCALE", 1.0f) : 1.0f;
     if(nerf_scale <= 0.0f) nerf_scale = 1.0f;
-    int nerf_skip_occ = ysu_env_bool("YSU_NERF_SKIP_OCC", 0);
-    int nerf_steps = ysu_env_int("YSU_NERF_STEPS", 6);
+    int nerf_skip_occ = sm_env_bool("SM_NERF_SKIP_OCC", 0);
+    int nerf_steps = sm_env_int("SM_NERF_STEPS", 6);
     if(nerf_steps < 1) nerf_steps = 1;
     if(nerf_steps > 1024) nerf_steps = 1024;
 
-    const char* nerf_hash_path = getenv("YSU_NERF_HASHGRID");
-    const char* nerf_occ_path = getenv("YSU_NERF_OCC");
+    const char* nerf_hash_path = getenv("SM_NERF_HASHGRID");
+    const char* nerf_occ_path = getenv("SM_NERF_OCC");
     NerfHashGridBlob nerf_hash = {0};
     NerfOccBlob nerf_occ = {0};
 
@@ -910,10 +911,10 @@ int main(void){
                         nerf_hash.hdr.levels, nerf_hash.hdr.features, nerf_hash.hdr.hashmap_size,
                         nerf_hash.hdr.base_resolution, nerf_hash.hdr.mlp_layers, nerf_hash.hdr.mlp_hidden);
                 if(nerf_hash.hdr.version >= 2){
-                    float cx = ysu_u32_to_f(nerf_hash.hdr.reserved[0]);
-                    float cy = ysu_u32_to_f(nerf_hash.hdr.reserved[1]);
-                    float cz = ysu_u32_to_f(nerf_hash.hdr.reserved[2]);
-                    float sc = ysu_u32_to_f(nerf_hash.hdr.flags);
+                    float cx = sm_u32_to_f(nerf_hash.hdr.reserved[0]);
+                    float cy = sm_u32_to_f(nerf_hash.hdr.reserved[1]);
+                    float cz = sm_u32_to_f(nerf_hash.hdr.reserved[2]);
+                    float sc = sm_u32_to_f(nerf_hash.hdr.flags);
                     fprintf(stderr, "[NERF] hashgrid xform: center=(%.3f, %.3f, %.3f) scale=%.3f\n", cx, cy, cz, sc);
                     if(!nerf_center_x_env) nerf_center_x = cx;
                     if(!nerf_center_y_env) nerf_center_y = cy;
@@ -956,12 +957,12 @@ int main(void){
 
     // Scheduler config (AVX2 batch size default 4096)
     NerfScheduleConfig sched_cfg;
-    sched_cfg.batch_size = (uint32_t)ysu_env_int("YSU_NERF_BATCH", 4096);
+    sched_cfg.batch_size = (uint32_t)sm_env_int("SM_NERF_BATCH", 4096);
     if(sched_cfg.batch_size < 8) sched_cfg.batch_size = 8;
-    sched_cfg.cpu_share = ysu_env_float("YSU_NERF_CPU_SHARE", 0.25f);
+    sched_cfg.cpu_share = sm_env_float("SM_NERF_CPU_SHARE", 0.25f);
     if(sched_cfg.cpu_share < 0.0f) sched_cfg.cpu_share = 0.0f;
     if(sched_cfg.cpu_share > 1.0f) sched_cfg.cpu_share = 1.0f;
-    sched_cfg.fovea_radius = ysu_env_float("YSU_NERF_FOVEA", 0.35f);
+    sched_cfg.fovea_radius = sm_env_float("SM_NERF_FOVEA", 0.35f);
 
     NerfScheduleQueues sched_q = {0};
     int sched_ok = nerf_scheduler_init(&sched_q, sched_cfg.batch_size);
@@ -977,13 +978,13 @@ int main(void){
     if(frames < 1) frames = 1;
 
     // In window mode, always use 1 frame per iteration for responsive input
-    // (YSU_GPU_FRAMES is ignored in window mode; use ESC to quit)
+    // (SM_GPU_FRAMES is ignored in window mode; use ESC to quit)
     if(window_enabled) frames = 1;
 
     // Render scale: 0.5 = render at half resolution, 0.25 = quarter res
     // Applied directly to W/H (output resolution matches render resolution)
     float render_scale = 0.5f;  // Default 0.5 = 2x speedup
-    if(env_render_scale) render_scale = ysu_env_float("YSU_GPU_RENDER_SCALE", 0.5f);
+    if(env_render_scale) render_scale = sm_env_float("SM_GPU_RENDER_SCALE", 0.5f);
     if(render_scale < 0.1f) render_scale = 0.1f;  // clamp to reasonable values
     if(render_scale > 1.0f) render_scale = 1.0f;
 
@@ -1024,24 +1025,24 @@ int main(void){
     fprintf(stderr, "[GPU] W=%d H=%d SPP=%d seed=%d renderScale=%.2f\n", W, H, spp, seed, render_scale);
 
     // Benchmark toggles (important for performance tests)
-    int write_enabled    = ysu_env_bool("YSU_GPU_WRITE", 1);
-    int readback_enabled = ysu_env_bool("YSU_GPU_READBACK", write_enabled);
+    int write_enabled    = sm_env_bool("SM_GPU_WRITE", 1);
+    int readback_enabled = sm_env_bool("SM_GPU_READBACK", write_enabled);
     if(minimal){ write_enabled = 0; readback_enabled = 0; }
-    int counters_enabled = ysu_env_bool("YSU_GPU_COUNTERS", 1);
+    int counters_enabled = sm_env_bool("SM_GPU_COUNTERS", 1);
         if(no_io){ write_enabled = 0; readback_enabled = 0; }
         if(!write_enabled) readback_enabled = 0;
         fprintf(stderr, "[GPU] toggles: WRITE=%d READBACK=%d COUNTERS_READ=%d MINIMAL=%d NO_IO=%d\n",
             write_enabled, readback_enabled, counters_enabled, minimal, no_io);
 
     // Output / tonemap
-    const char* outfmt = getenv("YSU_GPU_OUTFMT");
+    const char* outfmt = getenv("SM_GPU_OUTFMT");
     if(!outfmt || !outfmt[0]) outfmt = "ppm";
 
-    int tonemap_enabled = ysu_env_bool("YSU_GPU_TONEMAP", 0);
+    int tonemap_enabled = sm_env_bool("SM_GPU_TONEMAP", 0);
     if(window_enabled) tonemap_enabled = 1; // swapchain wants UNORM output
     if(minimal){ tonemap_enabled = 0; }
-    float tm_exposure = ysu_env_float("YSU_GPU_EXPOSURE", 1.0f);
-    float tm_gamma    = ysu_env_float("YSU_GPU_GAMMA",    2.2f);
+    float tm_exposure = sm_env_float("SM_GPU_EXPOSURE", 1.0f);
+    float tm_gamma    = sm_env_float("SM_GPU_GAMMA",    2.2f);
     if(tonemap_enabled){
         fprintf(stderr, "[GPU] tonemap: ENABLED exposure=%.3f gamma=%.3f outfmt=%s\n", tm_exposure, tm_gamma, outfmt);
     }
@@ -1052,10 +1053,10 @@ int main(void){
     int tri_count = 0;
 
     // Triangle cache: avoids slow OBJ parsing on repeat runs.
-    const char* tri_cache_path = getenv("YSU_GPU_TRI_CACHE");
+    const char* tri_cache_path = getenv("SM_GPU_TRI_CACHE");
     char tri_cache_auto[1024];
     if((!tri_cache_path || !tri_cache_path[0])) {
-        const char* bvh_cache_env = getenv("YSU_GPU_BVH_CACHE");
+        const char* bvh_cache_env = getenv("SM_GPU_BVH_CACHE");
         if(bvh_cache_env && bvh_cache_env[0]) {
             // auto: "<bvh_cache>.tri"
             snprintf(tri_cache_auto, sizeof(tri_cache_auto), "%s.tri", bvh_cache_env);
@@ -1063,7 +1064,7 @@ int main(void){
         }
     }
 
-    uint64_t t_obj0 = ysu_now_us();
+    uint64_t t_obj0 = sm_now_us();
     int tri_cache_hit = 0;
 
     if(obj_path && obj_path[0]){
@@ -1087,7 +1088,7 @@ int main(void){
         }
     }
 
-    uint64_t t_obj1 = ysu_now_us();
+    uint64_t t_obj1 = sm_now_us();
     fprintf(stderr, "[GPU] OBJ/TRI load time: %.3f ms%s\n",
             (double)(t_obj1 - t_obj0)/1000.0,
             tri_cache_hit ? " (cached)" : "");
@@ -1132,9 +1133,9 @@ int32_t* bvh_roots = NULL;
 uint32_t bvh_root_count = 0;
 
 // Optional BVH cache (skips expensive build on repeat runs)
-    uint64_t t_bvh0 = ysu_now_us();
+    uint64_t t_bvh0 = sm_now_us();
 int cache_hit = 0;
-const char* cache_path = getenv("YSU_GPU_BVH_CACHE");
+const char* cache_path = getenv("SM_GPU_BVH_CACHE");
 if(use_bvh != 0 && cache_path && cache_path[0]){
     if(bvh_cache_load(cache_path, (uint32_t)tri_count,
                       &bvh_roots, &bvh_root_count,
@@ -1150,7 +1151,7 @@ if(use_bvh != 0 && cache_path && cache_path[0]){
 
 
 if(use_bvh != 0 && !cache_hit){
-    const char* env_chunk = getenv("YSU_GPU_BVH_CHUNK_TRIS");
+    const char* env_chunk = getenv("SM_GPU_BVH_CHUNK_TRIS");
     int chunk_tris = env_chunk ? atoi(env_chunk) : 3000000;
     if(chunk_tris < 100000) chunk_tris = 100000;
 
@@ -1291,7 +1292,7 @@ fprintf(stderr, "[GPU] BVH roots=%u nodes=%d indices=%u tris=%d useBVH=%d\n",
         }
     }
 
-    uint64_t t_bvh1 = ysu_now_us();
+    uint64_t t_bvh1 = sm_now_us();
     fprintf(stderr, "[GPU] BVH total (cache/load/build) time: %.3f ms%s\n",
             (double)(t_bvh1 - t_bvh0)/1000.0,
             cache_hit ? " (cache hit)" : "");
@@ -1309,7 +1310,7 @@ if(window_enabled){
     }else{
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(W, H, "YSU Vulkan (compute)", NULL, NULL);
+        window = glfwCreateWindow(W, H, "steinmarder Vulkan (compute)", NULL, NULL);
         if(!window){
             fprintf(stderr,"[GLFW] glfwCreateWindow failed -> headless\n");
             glfwTerminate();
@@ -1326,7 +1327,7 @@ if(window_enabled){
 
 // --- Vulkan instance ---
     VkApplicationInfo app = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
-    app.pApplicationName = "YSU GPU Demo";
+    app.pApplicationName = "steinmarder GPU Demo";
     app.apiVersion = VK_API_VERSION_1_2;
 
     VkInstanceCreateInfo ici = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -2195,25 +2196,25 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
     VkImageView denoise_history_view = VK_NULL_HANDLE;
     VkPipeline pipe_denoise = VK_NULL_HANDLE;
     
-    int gpu_denoise_enabled = ysu_env_bool("YSU_GPU_DENOISE", 0);
-    int denoise_radius = ysu_env_int("YSU_GPU_DENOISE_RADIUS", fast_mode ? 1 : 3);
-    float denoise_sigma_s = ysu_env_float("YSU_GPU_DENOISE_SIGMA_S", fast_mode ? 0.8f : 1.5f);
-    float denoise_sigma_r = ysu_env_float("YSU_GPU_DENOISE_SIGMA_R", fast_mode ? 0.05f : 0.1f);
-    int denoise_skip = ysu_env_int("YSU_GPU_DENOISE_SKIP", 1);  // denoise every Nth frame (1=every frame, 2=every 2nd, etc.)
-    int denoise_history_reset = ysu_env_bool("YSU_GPU_DENOISE_HISTORY_RESET", 0);  // reset history buffer periodically
-    int denoise_history_reset_frame = ysu_env_int("YSU_GPU_DENOISE_HISTORY_RESET_FRAME", 60);  // reset history every N frames
-    int adaptive_denoise_enabled = ysu_env_bool("YSU_GPU_DENOISE_ADAPTIVE", 0);  // adjust denoise_skip based on frame variance
-    int adaptive_denoise_min = ysu_env_int("YSU_GPU_DENOISE_ADAPTIVE_MIN", 1);  // minimum denoise_skip in low-noise regions
-    int adaptive_denoise_max = ysu_env_int("YSU_GPU_DENOISE_ADAPTIVE_MAX", 8);  // maximum denoise_skip in high-noise regions
-    int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);  // blend with previous frame denoised output
-    float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);  // 0.7 = 70% history, 30% current
-    int cpu_denoise_enabled = ysu_env_bool("YSU_NEURAL_DENOISE", 0);
+    int gpu_denoise_enabled = sm_env_bool("SM_GPU_DENOISE", 0);
+    int denoise_radius = sm_env_int("SM_GPU_DENOISE_RADIUS", fast_mode ? 1 : 3);
+    float denoise_sigma_s = sm_env_float("SM_GPU_DENOISE_SIGMA_S", fast_mode ? 0.8f : 1.5f);
+    float denoise_sigma_r = sm_env_float("SM_GPU_DENOISE_SIGMA_R", fast_mode ? 0.05f : 0.1f);
+    int denoise_skip = sm_env_int("SM_GPU_DENOISE_SKIP", 1);  // denoise every Nth frame (1=every frame, 2=every 2nd, etc.)
+    int denoise_history_reset = sm_env_bool("SM_GPU_DENOISE_HISTORY_RESET", 0);  // reset history buffer periodically
+    int denoise_history_reset_frame = sm_env_int("SM_GPU_DENOISE_HISTORY_RESET_FRAME", 60);  // reset history every N frames
+    int adaptive_denoise_enabled = sm_env_bool("SM_GPU_DENOISE_ADAPTIVE", 0);  // adjust denoise_skip based on frame variance
+    int adaptive_denoise_min = sm_env_int("SM_GPU_DENOISE_ADAPTIVE_MIN", 1);  // minimum denoise_skip in low-noise regions
+    int adaptive_denoise_max = sm_env_int("SM_GPU_DENOISE_ADAPTIVE_MAX", 8);  // maximum denoise_skip in high-noise regions
+    int temporal_denoise_enabled = sm_env_bool("SM_GPU_TEMPORAL_DENOISE", 1);  // blend with previous frame denoised output
+    float temporal_denoise_weight = sm_env_float("SM_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);  // 0.7 = 70% history, 30% current
+    int cpu_denoise_enabled = sm_env_bool("SM_NEURAL_DENOISE", 0);
     
     // Temporal accumulation: skip readback, blend frames on GPU
-    int temporal_enabled = ysu_env_bool("YSU_GPU_TEMPORAL", 1);  // default ON for ~60% speedup
-    int readback_skip = ysu_env_int("YSU_GPU_READBACK_SKIP", 4); // readback every Nth frame
+    int temporal_enabled = sm_env_bool("SM_GPU_TEMPORAL", 1);  // default ON for ~60% speedup
+    int readback_skip = sm_env_int("SM_GPU_READBACK_SKIP", 4); // readback every Nth frame
     if(temporal_enabled){
-        readback_skip = ysu_env_int("YSU_GPU_READBACK_SKIP", readback_skip);
+        readback_skip = sm_env_int("SM_GPU_READBACK_SKIP", readback_skip);
         fprintf(stderr, "[GPU] Temporal mode: ENABLED (readback every %d frames)\n", readback_skip);
     }
     
@@ -2520,7 +2521,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
     int ts_first = 1;
     int render_count = 0;
     // FPS tracking (window title)
-    uint64_t fps_last_us = ysu_now_us();
+    uint64_t fps_last_us = sm_now_us();
     int fps_frames = 0;
     float fps_value = 0.0f;
 
@@ -2535,12 +2536,12 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
 
         // Update FPS in window title every ~0.5s
         if(window){
-            uint64_t fps_now_us = ysu_now_us();
+            uint64_t fps_now_us = sm_now_us();
             double fps_dt = (double)(fps_now_us - fps_last_us) / 1000000.0;
             if(fps_dt >= 0.5){
                 fps_value = (float)((double)fps_frames / fps_dt);
                 char title[128];
-                snprintf(title, sizeof(title), "YSU GPU Demo - %.1f FPS", fps_value);
+                snprintf(title, sizeof(title), "steinmarder GPU Demo - %.1f FPS", fps_value);
                 glfwSetWindowTitle(window, title);
                 fps_frames = 0;
                 fps_last_us = fps_now_us;
@@ -2787,7 +2788,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
         }
 
         // We render 1 sample per frame in interactive window mode for responsive input
-        // (YSU_GPU_FRAMES is ignored in window mode; use ESC to quit)
+        // (SM_GPU_FRAMES is ignored in window mode; use ESC to quit)
         {
             PushConstants pc_push = {0};
             pc_push.W = W;
@@ -3077,9 +3078,9 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
         }
         if(render_count == 1) { fprintf(stderr, "[GPU] First frame presented successfully\n"); fflush(stderr); }
 
-        // optionally dump a single-frame PPM and exit (use YSU_GPU_DUMP_ONESHOT=1)
+        // optionally dump a single-frame PPM and exit (use SM_GPU_DUMP_ONESHOT=1)
         // NOTE: Disabled in window mode to keep interactive loop running
-        if(!window_enabled && ysu_env_bool("YSU_GPU_DUMP_ONESHOT", 0)){
+        if(!window_enabled && sm_env_bool("SM_GPU_DUMP_ONESHOT", 0)){
             // Record a small command buffer to copy the HDR/LDR image to a host-visible buffer
             vkDeviceWaitIdle(dev);
             vkResetCommandBuffer(cb, 0);
@@ -3180,7 +3181,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
                     }
 
                     // Apply denoiser
-                    ysu_neural_denoise_maybe(pixels_cpu, dump_w, dump_h);
+                    sm_neural_denoise_maybe(pixels_cpu, dump_w, dump_h);
 
                     // Write denoised pixels
                     fprintf(outf, "P6\n%d %d\n255\n", dump_w, dump_h);
@@ -3590,7 +3591,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
         if(temporal_enabled && readback_enabled){
             fprintf(stderr, "[GPU] temporal mode: skipped readback (will readback every %d frames)\n", readback_skip);
         } else {
-            fprintf(stderr, "[GPU] readback disabled (set YSU_GPU_READBACK=1 / YSU_GPU_WRITE=1 to enable)\n");
+            fprintf(stderr, "[GPU] readback disabled (set SM_GPU_READBACK=1 / SM_GPU_WRITE=1 to enable)\n");
         }
     }
 
@@ -3676,7 +3677,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
         }
 
         // Apply denoiser if enabled
-        ysu_neural_denoise_maybe(pixels_cpu, W, H);
+        sm_neural_denoise_maybe(pixels_cpu, W, H);
 
         // Write denoised pixels to PPM
         for(int i=0;i<W*H;i++){

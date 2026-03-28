@@ -48,16 +48,16 @@ $$I_{out}(p) = \frac{1}{W} \sum_q I(q) \cdot w(p,q)$$
 
 ```bash
 # Enable denoising
-YSU_NEURAL_DENOISE=1
+SM_NEURAL_DENOISE=1
 
 # Spatial std dev (pixels). Higher = larger filter radius
-YSU_BILATERAL_SIGMA_S=1.5
+SM_BILATERAL_SIGMA_S=1.5
 
 # Range std dev (luminance 0..1). Higher = preserve more detail
-YSU_BILATERAL_SIGMA_R=0.1
+SM_BILATERAL_SIGMA_R=0.1
 
 # Filter support radius (pixels)
-YSU_BILATERAL_RADIUS=3
+SM_BILATERAL_RADIUS=3
 ```
 
 ## Performance
@@ -77,21 +77,21 @@ YSU_BILATERAL_RADIUS=3
 
 ### For Interactive Preview
 ```bash
-YSU_GPU_SPP=4 YSU_NEURAL_DENOISE=1 ./gpu_demo.exe
+SM_GPU_SPP=4 SM_NEURAL_DENOISE=1 ./gpu_demo.exe
 ```
 
 ### For High-Quality Batch Rendering
 ```bash
-YSU_GPU_SPP=32 YSU_NEURAL_DENOISE=0 ./gpu_demo.exe
+SM_GPU_SPP=32 SM_NEURAL_DENOISE=0 ./gpu_demo.exe
 ```
 
 ### Custom Denoising Strength
 ```bash
 # Aggressive denoising (less detail preservation)
-YSU_BILATERAL_SIGMA_S=2.0 YSU_BILATERAL_SIGMA_R=0.15
+SM_BILATERAL_SIGMA_S=2.0 SM_BILATERAL_SIGMA_R=0.15
 
 # Subtle denoising (preserve more fine detail)
-YSU_BILATERAL_SIGMA_S=1.0 YSU_BILATERAL_SIGMA_R=0.05
+SM_BILATERAL_SIGMA_S=1.0 SM_BILATERAL_SIGMA_R=0.05
 ```
 
 ## Integration Points
@@ -117,7 +117,7 @@ void bilateral_denoise(Vec3 *pixels, int width, int height,
 void bilateral_denoise_maybe(Vec3 *pixels, int width, int height);
 
 // Neural pipeline integration
-void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height);
+void sm_neural_denoise_maybe(Vec3 *pixels, int width, int height);
 ```
 
 ## Technical Details
@@ -152,7 +152,7 @@ gcc -std=c11 -O2 -pthread -o gpu_demo.exe \
 ```
 [GPU] W=320 H=180 SPP=4 seed=1337
 [GPU] BVH roots=1 nodes=23 indices=12 tris=12
-[DENOISE] YSU_NEURAL_DENOISE enabled, using bilateral filter
+[DENOISE] SM_NEURAL_DENOISE enabled, using bilateral filter
 [DENOISE] bilateral complete: sigma_s=1.50 sigma_r=0.1000 radius=3
 [GPU] wrote window_dump.ppm (320x180)
 ```

@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-// Writes interleaved float32 RGB buffer (Vec3 per pixel) to a .ysub file.
+// Writes interleaved float32 RGB buffer (Vec3 per pixel) to a .smb file.
 // Returns 1 on success, 0 on failure.
-int ysu_dump_rgb32(const char *path, const Vec3 *rgb, int width, int height);
+int sm_dump_rgb32(const char *path, const Vec3 *rgb, int width, int height);
 
-// Writes float32 single-channel buffer to a .ysub file.
+// Writes float32 single-channel buffer to a .smb file.
 // Returns 1 on success, 0 on failure.
-int ysu_dump_f32(const char *path, const float *buf, int width, int height);
+int sm_dump_f32(const char *path, const float *buf, int width, int height);
 
 #ifdef __cplusplus
 }

@@ -75,9 +75,9 @@ test_nerf_fix.bat
 
 Or manually:
 ```cmd
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_NERF_OCC=models/nerf_occ.bin
-set YSU_RENDER_MODE=17
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_NERF_OCC=models/nerf_occ.bin
+set SM_RENDER_MODE=17
 gpu_demo.exe
 ```
 
@@ -138,6 +138,6 @@ Our fix ensures the single float16 value is in bits 0-15, with bits 16-31 = 0.
 
 **Before fix:** Blue streaky artifacts 
 **After fix:** Proper NeRF rendering 
-**Test:** Run `test_nerf_fix.bat` or set `YSU_RENDER_MODE=17` 
+**Test:** Run `test_nerf_fix.bat` or set `SM_RENDER_MODE=17` 
 **Files:** `shaders/tri.comp` (recompile required) 
 **Rebuild:** `cd shaders && glslc tri.comp -o tri.comp.spv`

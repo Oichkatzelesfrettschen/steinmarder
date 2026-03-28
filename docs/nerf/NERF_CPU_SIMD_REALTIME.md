@@ -94,7 +94,7 @@ for (uint32_t py = 0; py < height; py++) {
  }
  
  // Vectorized NeRF rendering
- ysu_nerf_render_batch(&batch, nerf, fb);
+ sm_nerf_render_batch(&batch, nerf, fb);
  
  batch.count = 0;
  }
@@ -144,7 +144,7 @@ for (int level = 0; level < 12; level++) {
 
 Use **batched** lookup:
 ```c
-void ysu_hashgrid_lookup_batch(
+void sm_hashgrid_lookup_batch(
  const vec3 positions[8], // 8 rays
  const NeRFConfig *config,
  float features_out[8][24] // 8×24 feature matrix
@@ -240,7 +240,7 @@ void hash_positions_batch(
 // Traditional: 27 * 64 * 8 = 13,824 scalar multiplies
 // Vectorized: ~1,728 scalar multiplies (8x reuse per weight)
 
-void ysu_mlp_hidden_batch(
+void sm_mlp_hidden_batch(
  const float features_in[8][27], // Input: 8×27
  const float weights[64*27], // Layer weights: [64×27]
  const float biases[64],
@@ -303,7 +303,7 @@ W_layer0_transposed = W_layer0.T.copy() # shape [27, 64]
 ### 3.3 Output Layer + Activation
 
 ```c
-void ysu_mlp_output_batch(
+void sm_mlp_output_batch(
  const float hidden[8][64],
  const float weights[4*64],
  const float biases[4],
@@ -332,7 +332,7 @@ void ysu_mlp_output_batch(
  
  if (out < 3) {
  // RGB: sigmoid(x) = 1 / (1 + exp(-x))
- __m256 sigmoid_val = ysu_sigmoid_avx2(val);
+ __m256 sigmoid_val = sm_sigmoid_avx2(val);
  _mm256_storeu_ps(&output_rgb[0][out], sigmoid_val);
  } else {
  // Sigma: ReLU(x)
@@ -343,7 +343,7 @@ void ysu_mlp_output_batch(
 }
 
 // Helper: AVX2-optimized sigmoid
-__m256 ysu_sigmoid_avx2(__m256 x) {
+__m256 sm_sigmoid_avx2(__m256 x) {
  const __m256 one = _mm256_set1_ps(1.0f);
  const __m256 neg_one = _mm256_set1_ps(-1.0f);
  
@@ -365,7 +365,7 @@ __m256 ysu_sigmoid_avx2(__m256 x) {
 Skip empty space using occupancy grid:
 
 ```c
-float ysu_adaptive_step_size(
+float sm_adaptive_step_size(
  const vec3 pos,
  const OccupancyGrid *occ,
  float base_step
@@ -393,7 +393,7 @@ float ysu_adaptive_step_size(
 ### 4.2 Early Ray Termination
 
 ```c
-bool ysu_ray_should_terminate(
+bool sm_ray_should_terminate(
  const float rgb[3],
  float accumulated_alpha
 ) {
@@ -413,7 +413,7 @@ bool ysu_ray_should_terminate(
 ### 4.3 Per-Pixel Sample Adaptive Refinement
 
 ```c
-void ysu_adaptive_spp(
+void sm_adaptive_spp(
  const Framebuffer *fb,
  const FramebufferVariance *variance,
  uint32_t frame_idx,
@@ -482,11 +482,11 @@ PerfCounter perf_hashgrid, perf_mlp, perf_integrate;
 
 // In render loop:
 START_TIMER();
-ysu_hashgrid_lookup_batch(...);
+sm_hashgrid_lookup_batch(...);
 END_TIMER(perf_hashgrid);
 
 START_TIMER();
-ysu_mlp_inference_batch(...);
+sm_mlp_inference_batch(...);
 END_TIMER(perf_mlp);
 
 // Report:
@@ -530,7 +530,7 @@ void render_scene_nerf_simd(
  batch.count++;
  
  if (batch.count == SIMD_BATCH_SIZE) {
- ysu_nerf_render_batch(&batch, nerf_config, nerf_data, output_fb);
+ sm_nerf_render_batch(&batch, nerf_config, nerf_data, output_fb);
  batch.count = 0;
  }
  }
@@ -541,7 +541,7 @@ void render_scene_nerf_simd(
  for (int i = batch.count; i < SIMD_BATCH_SIZE; i++) {
  batch.active[i] = 0;
  }
- ysu_nerf_render_batch(&batch, nerf_config, nerf_data, output_fb);
+ sm_nerf_render_batch(&batch, nerf_config, nerf_data, output_fb);
  }
 }
 ```

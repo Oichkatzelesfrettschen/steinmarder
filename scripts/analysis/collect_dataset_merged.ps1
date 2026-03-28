@@ -1,6 +1,6 @@
 ﻿param(
   [int]$Runs = 5000,
-  [string]$Exe = ".\ysuengine.exe",
+  [string]$Exe = ".\steinmarder.exe",
   [string]$OutDir = ".\DATASET",
   [string]$OutFile = ".\DATASET\baseline_merged.csv"
 )
@@ -14,7 +14,7 @@ for ($i=0; $i -lt $Runs; $i++) {
 
   python .\gen_scene.py | Out-Host
 
-  Remove-Item Env:\YSU_BVH_POLICY -ErrorAction SilentlyContinue
+  Remove-Item Env:\SM_BVH_POLICY -ErrorAction SilentlyContinue
   & $Exe | Out-Host
 
   $src = ".\baseline_bvh.csv"

@@ -1,4 +1,7 @@
-# YSU Engine
+# steinmarder
+
+GPU instruction set explorer and rendering engine with empirical SASS reverse
+engineering for NVIDIA Ada Lovelace (SM 8.9).
 
 A C11 rendering and physics engine with an integrated SASS reverse engineering
 toolkit. The engine provides CPU and GPU rendering pipelines, fluid simulation
@@ -7,48 +10,74 @@ SASS toolkit empirically measures NVIDIA GPU instruction latencies and
 throughput at the machine-code level, feeding directly into hand-optimized
 inline PTX kernels.
 
-### Start here
+---
 
-| If you want to... | Read this |
-|---|---|
-| Understand the SASS measurements | [`src/sass_re/RESULTS.md`](src/sass_re/RESULTS.md) |
-| Learn to read GPU assembly from scratch | [`LEARNING_GUIDE.md`](src/sass_re/instant_ngp/docs/LEARNING_GUIDE.md) |
-| See the optimized kernels + SASS diffs | [`src/sass_re/instant_ngp/`](src/sass_re/instant_ngp/) |
-| Reproduce the 3.16x benchmark | [`src/sass_re/instant_ngp/README.md`](src/sass_re/instant_ngp/README.md) |
-| Browse the full engine | [`src/`](src/) -- start with [`render/render.c`](src/render/render.c) |
+## Quick reference
+
+| If you want to...                       | Read this                                                                                  |
+|-----------------------------------------|--------------------------------------------------------------------------------------------|
+| Understand the SASS measurements        | [`src/sass_re/RESULTS.md`](src/sass_re/RESULTS.md)                                        |
+| Learn to read GPU assembly from scratch | [`LEARNING_GUIDE.md`](src/sass_re/instant_ngp/docs/LEARNING_GUIDE.md)                     |
+| See the optimized kernels + SASS diffs  | [`src/sass_re/instant_ngp/`](src/sass_re/instant_ngp/)                                     |
+| Reproduce the 3.16x benchmark           | [`src/sass_re/instant_ngp/README.md`](src/sass_re/instant_ngp/README.md)                   |
+| Browse the full engine                  | [`src/`](src/) -- start with [`render/render.c`](src/render/render.c)                      |
+| CUDA LBM kernel index                   | [`src/cuda_lbm/README.md`](src/cuda_lbm/README.md)                                        |
 
 ---
 
-## SASS Reverse Engineering Toolkit
+## SASS reverse engineering toolkit
 
-Empirical measurements from an RTX 4070 Ti Super (Ada Lovelace, SM 8.9).
+448 mnemonics reverse-engineered. Empirical measurements from an RTX 4070 Ti
+Super (Ada Lovelace, SM 8.9).
 
-| Instruction | Latency | Throughput (ops/clk/SM) |
-|---|---|---|
-| FFMA (fused multiply-add) | 4.54 cyc | 44.6 |
-| IADD3 (3-input integer add) | 2.51 cyc | 68.2 |
-| MUFU.EX2 (fast exp, SFU) | 17.56 cyc | 9.9 |
-| MUFU.RCP (reciprocal, SFU) | 41.55 cyc | -- |
-| LDG (global memory chase) | 92.29 cyc | -- |
-| LDS (shared memory chase) | 28.03 cyc | -- |
-| SHFL.BFLY (warp shuffle) | 24.96 cyc | -- |
+### Measurement highlights
 
-**Toolkit:** 9 probe kernels (FP32, integer, MUFU, bitwise, memory, conversions, control flow, special regs, tensor cores) + latency/throughput microbenchmarks with 512-deep dependent chains. Multi-architecture pipeline with parameterized scripts -- Pascal (SM 6.1) vs Ada (SM 8.9) comparison ready.
+| Instruction                  | Latency    | Throughput (ops/clk/SM) |
+|------------------------------|------------|-------------------------|
+| FFMA (fused multiply-add)    | 4.54 cyc   | 44.6                    |
+| IADD3 (3-input integer add)  | 2.51 cyc   | 68.2                    |
+| MUFU.EX2 (fast exp, SFU)    | 17.56 cyc  | 9.9                     |
+| MUFU.RCP (reciprocal, SFU)  | 41.55 cyc  | --                      |
+| LDG (global memory chase)   | 92.29 cyc  | --                      |
+| LDS (shared memory chase)   | 28.03 cyc  | --                      |
+| SHFL.BFLY (warp shuffle)    | 24.96 cyc  | --                      |
 
-**Encoding analysis:** The 64-bit SASS instruction word was reverse-engineered by diffing same-opcode instructions with different operands. Mapped register fields for FADD, FFMA, IADD3, LOP3, MOV, LDG, STG. Opcode lives in the low 16 bits (e.g. FADD = 0x7221, IADD3 = 0x7210, LDG = 0x7981).
+**Toolkit:** 9 probe kernels (FP32, integer, MUFU, bitwise, memory,
+conversions, control flow, special regs, tensor cores) + latency/throughput
+microbenchmarks with 512-deep dependent chains. Multi-architecture pipeline
+with parameterized scripts -- Pascal (SM 6.1) vs Ada (SM 8.9) comparison ready.
+
+**Encoding analysis:** The 64-bit SASS instruction word was reverse-engineered
+by diffing same-opcode instructions with different operands. Mapped register
+fields for FADD, FFMA, IADD3, LOP3, MOV, LDG, STG. Opcode lives in the low
+16 bits (e.g. FADD = 0x7221, IADD3 = 0x7210, LDG = 0x7981).
 
 Full results: [`src/sass_re/RESULTS.md`](src/sass_re/RESULTS.md)
 
-## Instant-NGP Inline PTX Kernels
+### Quick start
+
+```sh
+# Dump all probes (requires CUDA 13.x + SM 7.5+ GPU)
+cd src/sass_re
+python runners/run_all_probes.py
+
+# Run latency microbenchmarks
+cd src/sass_re/microbench
+nvcc -arch=sm_89 -o lat lat_bench.cu && ./lat
+```
+
+---
+
+## Instant-NGP inline PTX kernels
 
 Three Instant-NGP kernels rewritten in inline PTX to produce optimal SASS,
 with every instruction hand-chosen and verified by disassembly.
 
-| Kernel | Speedup vs nvcc -O2 | Key technique |
-|---|---|---|
-| MLP Forward (27->64->64->4) | 3.16x | 8-wide ILP FFMA chains, shared mem weight tiling, FMNMX ReLU, MUFU sigmoid |
-| Volume Rendering | 1.53x | MUFU.EX2 fast exp, predicated early exit, warp SHFL neighbor sharing |
-| Hash Grid Encoding | 1.11x | float2 vectorized LDG.E.64, SW pipelining across levels, LOP3 XOR |
+| Kernel                       | Speedup vs nvcc -O2 | Key technique                                                            |
+|------------------------------|----------------------|--------------------------------------------------------------------------|
+| MLP Forward (27->64->64->4)  | 3.16x                | 8-wide ILP FFMA chains, shared mem weight tiling, FMNMX ReLU, MUFU sigmoid |
+| Volume Rendering             | 1.53x                | MUFU.EX2 fast exp, predicated early exit, warp SHFL neighbor sharing     |
+| Hash Grid Encoding           | 1.11x                | float2 vectorized LDG.E.64, SW pipelining across levels, LOP3 XOR       |
 
 The MLP kernel is compute-bound (6,249 FFMA instructions). The compiler
 generates sequential accumulator chains without exploiting the 8 independent
@@ -60,16 +89,19 @@ branch-based ReLU.
 The reference kernels are plain CUDA compiled with `nvcc -arch=sm_89 -O2`.
 Source code, PTX, and SASS diffs are in [`src/sass_re/instant_ngp/`](src/sass_re/instant_ngp/).
 
-### Reproduce
+#### Reproduce
 
-```powershell
+```sh
 cd src/sass_re/instant_ngp
+# Linux
+./build_and_verify.sh
+# Windows
 powershell -ExecutionPolicy Bypass -File build_and_verify.ps1
 ```
 
-Requires CUDA 13.x and an SM 7.5+ GPU. Tested on RTX 4070 Ti Super.
+Requires CUDA 13.x and an SM 7.5+ GPU.
 
-### Documentation
+#### Documentation
 
 - [Explained for Everyone](src/sass_re/instant_ngp/docs/EXPLAINED_FOR_EVERYONE.md) -- no CS background needed
 - [Learning Guide](src/sass_re/instant_ngp/docs/LEARNING_GUIDE.md) -- teaches SASS reading from scratch
@@ -77,9 +109,28 @@ Requires CUDA 13.x and an SM 7.5+ GPU. Tested on RTX 4070 Ti Super.
 
 ---
 
-## Engine Components
+## CUDA LBM fluid simulation
 
-### Path Tracer
+24 production CUDA kernels implementing the D3Q19 Lattice Boltzmann Method
+across 10 precision tiers (FP64 through INT4) in two memory layouts (AoS,
+i-major SoA). Includes MRT collision, adaptive refinement, and sparse brick-map
+support.
+
+Top physics-valid kernels at 128^3 (GDDR6X-bound):
+
+| Tier           | MLUPS | BW%   | VRAM  |
+|----------------|-------|-------|-------|
+| INT8 SoA       | 5643  | 51.5% | 76 MB |
+| FP8 e4m3 SoA   | 5408  | 49.4% | 76 MB |
+| FP16 SoA half2 | 3802  | 69.4% | 152 MB|
+
+Full kernel index and benchmarks: [`src/cuda_lbm/README.md`](src/cuda_lbm/README.md)
+
+---
+
+## Engine components
+
+### Path tracer
 - Tile-based multithreaded renderer -- persistent thread pool, 64-byte-aligned per-thread state, atomic job stealing
 - Adaptive sampling via Welford online variance -- each pixel converges independently, saves 40-70% of samples on smooth regions
 - Deterministic per-pixel RNG (xorshift32 + Fibonacci hash + Murmur finalizer) -- same image regardless of thread count
@@ -95,16 +146,16 @@ Requires CUDA 13.x and an SM 7.5+ GPU. Tested on RTX 4070 Ti Super.
 - 12-level hash grid encoding with software prefetch, 64^3 occupancy grid for empty-space skipping
 - Batched 8-ray variant, fp16 weights on disk with hand-written half-to-float expansion
 
-### Vulkan GPU Compute
+### Vulkan GPU compute
 - Interactive raytracer with WASD + mouse-look camera, progressive accumulation
 - GPU LBVH construction, hybrid mesh + NeRF rendering (28 modes), depth prepass at quarter resolution
 - 6 GLSL compute shaders: raytracer, quantum wavefunction, quantum raymarch, nuclear density, thermal diffusion, tonemap
 
-### Nuclear & Quantum Physics
+### Nuclear and quantum physics
 - **RBMK-1000 reactor sim** -- Chernobyl Unit 4 at 3200 MWt, 1661 fuel channels, 6 materials with IAEA correlations, 3D heat diffusion + 1D coolant flow with boiling transitions, Zircaloy oxidation with positive void coefficient feedback
 - **Quantum orbital raymarcher** -- two-pass Vulkan compute for hydrogen-like atoms up to Z~30, Aufbau electron filling, Slater Z_eff, signed wavefunction phase coloring
 
-### Mesh Editor
+### Mesh editor
 - Single-file immediate-mode 3D editor on raylib -- Grab, Rotate, Scale, Extrude, Inset, Bevel with axis constraints
 - Vertex/Edge/Face selection via Moller-Trumbore ray picking, OBJ import/export
 
@@ -117,46 +168,45 @@ Requires CUDA 13.x and an SM 7.5+ GPU. Tested on RTX 4070 Ti Super.
 ## Build
 
 ```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
-CMake auto-detects Vulkan, raylib, OpenMP, AVX2. Missing deps skip those targets -- the core path tracer needs only pthreads.
+CMake auto-detects Vulkan, raylib, OpenMP, AVX2, and CUDA. Missing dependencies
+skip those targets -- the core path tracer needs only pthreads and a C11
+compiler.
 
 ## Run
 
 ```bash
 # Quick render
-YSU_W=320 YSU_H=180 YSU_SPP=4 ./build/bin/ysu
+SM_W=320 SM_H=180 SM_SPP=4 ./build/bin/steinmarder
 
 # Full quality
-YSU_W=1920 YSU_H=1080 YSU_SPP=128 YSU_ADAPTIVE=1 YSU_NEURAL_DENOISE=1 ./build/bin/ysu
-```
-
-Windows:
-```powershell
-$env:YSU_W=1920; $env:YSU_H=1080; $env:YSU_SPP=128; .\build\bin\ysu.exe
+SM_W=1920 SM_H=1080 SM_SPP=128 SM_ADAPTIVE=1 SM_NEURAL_DENOISE=1 ./build/bin/steinmarder
 ```
 
 ## Configuration
 
 Environment variables only -- no config files, no arg parsing:
 
-| Variable | Default | Description |
-|---|---|---|
-| `YSU_W` / `YSU_H` | 800 / 600 | Image dimensions |
-| `YSU_SPP` | 64 | Samples per pixel |
-| `YSU_DEPTH` | 10 | Max bounce depth |
-| `YSU_THREADS` | auto | Thread count (0 = all cores) |
-| `YSU_TILE` | 32 | Tile size for MT renderer |
-| `YSU_ADAPTIVE` | 0 | Adaptive sampling (Welford variance) |
-| `YSU_SPP_MIN` | 16 | Min SPP before adaptive early-stop |
-| `YSU_REL_ERR` / `YSU_ABS_ERR` | 0.01 / 0.005 | Convergence thresholds |
-| `YSU_NEURAL_DENOISE` | 0 | Enable denoiser |
-| `YSU_FOG` | 0 | Beer-Lambert fog |
+| Variable                        | Default    | Description                            |
+|---------------------------------|------------|----------------------------------------|
+| `SM_W` / `SM_H`                | 800 / 600  | Image dimensions                       |
+| `SM_SPP`                        | 64         | Samples per pixel                      |
+| `SM_DEPTH`                      | 10         | Max bounce depth                       |
+| `SM_THREADS`                    | auto       | Thread count (0 = all cores)           |
+| `SM_TILE`                       | 32         | Tile size for MT renderer              |
+| `SM_ADAPTIVE`                   | 0          | Adaptive sampling (Welford variance)   |
+| `SM_SPP_MIN`                    | 16         | Min SPP before adaptive early-stop     |
+| `SM_REL_ERR` / `SM_ABS_ERR`    | 0.01/0.005 | Convergence thresholds                 |
+| `SM_NEURAL_DENOISE`             | 0          | Enable denoiser                        |
+| `SM_FOG`                        | 0          | Beer-Lambert fog                       |
 
-## Project Structure
+See [`src/render/sm_main.c`](src/render/sm_main.c) and
+[`src/render/render.c`](src/render/render.c) for the full list.
+
+## Project structure
 
 ```
 src/
@@ -169,10 +219,11 @@ src/
   editor/      -- mesh editor, viewport, edit mode (requires raylib)
   sass_re/     -- SASS reverse engineering: probes, microbench, instant-NGP kernels
   cuda_lbm/    -- D3Q19 precision-tier CUDA LBM kernels
+  upscale/     -- neural upscaling pipeline
   tools/       -- CLI utilities
   third_party/ -- stb_image_write.h
 shaders/       -- GLSL compute shaders + compiled .spv
-docs/          -- organized into sass/, nerf/, engine/, results/
+docs/          -- documentation
 scripts/       -- build, test, and analysis scripts
 ```
 
@@ -180,14 +231,14 @@ scripts/       -- build, test, and analysis scripts
 
 - **Required:** C11 compiler, pthreads, CMake 3.16+
 - **Optional:** Vulkan SDK, raylib (editor), OpenMP, ONNX Runtime
-- **SASS toolkit:** CUDA 13.x (SM 7.5+) or CUDA 12.x (Pascal), MSVC or GCC, Python 3
+- **SASS toolkit:** CUDA 13.x (SM 7.5+) or CUDA 12.x (Pascal), Python 3
+- **CUDA LBM:** CUDA 11.8+ (SM 80+)
 
 ## License
 
 MIT
 
-## Contributing
+## Heritage
 
-Contributions are welcome via pull requests and issues.
-
-For project history and original author attribution, see [ORIGINAL_AUTHOR.md](ORIGINAL_AUTHOR.md).
+Originally derived from YSU-Engine. Detached as standalone repository
+March 2026.

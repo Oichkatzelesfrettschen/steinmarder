@@ -11,7 +11,7 @@ typedef struct {
 
 // hdr_rgba: linear HDR, size = w*h*4 floats
 // out_rgb_u8: size = w*h*3 bytes (8-bit, display-ready)
-void ysu_apply_bloom_tonemap_u8(
+void sm_apply_bloom_tonemap_u8(
     const float* hdr_rgba, int w, int h,
     unsigned char* out_rgb_u8,
     const PostFX* fx

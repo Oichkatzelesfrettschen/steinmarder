@@ -57,32 +57,32 @@ function Run-Test {
 Add-Content -Path $outputLog "BASELINE CONFIGURATIONS"
 
 Run-Test "Baseline (no denoise)" @{
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "0"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "0"
 }
 
 Run-Test "Denoise enabled (skip=1)" @{
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "1"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "1"
 }
 
 Run-Test "Denoise (skip=2)" @{
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "2"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "2"
 }
 
 Run-Test "Denoise (skip=4)" @{
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "4"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "4"
 }
 
 Run-Test "Denoise (skip=8)" @{
-    "YSU_GPU_FRAMES" = "60"
-    "YSU_GPU_DENOISE" = "1"
-    "YSU_GPU_DENOISE_SKIP" = "8"
+    "SM_GPU_FRAMES" = "60"
+    "SM_GPU_DENOISE" = "1"
+    "SM_GPU_DENOISE_SKIP" = "8"
 }
 
 Write-Host "====== RESULTS ======" -ForegroundColor Cyan

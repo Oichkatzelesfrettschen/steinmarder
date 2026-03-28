@@ -1,33 +1,33 @@
 @echo off
 REM Test all three modes again after fix
 
-set YSU_NERF_HASHGRID=models/nerf_hashgrid.bin
-set YSU_NERF_OCC=models/nerf_occ.bin
-set YSU_W=800
-set YSU_H=600
-set YSU_SPP=1
-set YSU_USE_BVH=1
-set YSU_NERF_STEPS=64
+set SM_NERF_HASHGRID=models/nerf_hashgrid.bin
+set SM_NERF_OCC=models/nerf_occ.bin
+set SM_W=800
+set SM_H=600
+set SM_SPP=1
+set SM_USE_BVH=1
+set SM_NERF_STEPS=64
 
 echo ===================================
 echo   NeRF Fix Verification
 echo ===================================
 echo.
 echo Testing mode 19 (buffer validation)...
-set YSU_RENDER_MODE=19
+set SM_RENDER_MODE=19
 start "Mode 19" gpu_demo.exe
 timeout /t 3 /nobreak >nul
 
 echo.
 echo Testing mode 17 (MLP output)...
-set YSU_RENDER_MODE=17
+set SM_RENDER_MODE=17
 start "Mode 17" gpu_demo.exe
 timeout /t 3 /nobreak >nul
 
 echo.
 echo Testing mode 2 (hybrid mesh+NeRF)...
-set YSU_RENDER_MODE=2
-set YSU_NERF_BLEND=0.35
+set SM_RENDER_MODE=2
+set SM_NERF_BLEND=0.35
 start "Mode 2" gpu_demo.exe
 
 echo.

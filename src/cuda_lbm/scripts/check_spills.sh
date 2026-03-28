@@ -19,7 +19,7 @@ else
     LOG="$(mktemp)"
     trap 'rm -f "$LOG"' EXIT
     # ptxas writes register info to stderr
-    cmake --build "${PROJECT_ROOT}/build" --target ysu_cuda_lbm 2>&1 | tee "$LOG"
+    cmake --build "${PROJECT_ROOT}/build" --target sm_cuda_lbm 2>&1 | tee "$LOG"
 fi
 
 echo ""

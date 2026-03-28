@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(YSUEngine VERSION 1.0 LANGUAGES C)
+project(steinmarder VERSION 1.0 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -27,7 +27,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Include directories — lets all #include "file.h" resolve
 # without changing any existing source code
 # ════════════════════════════════════════════════════════════════
-set(YSU_INCLUDE_DIRS
+set(SM_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/render
     ${CMAKE_SOURCE_DIR}/src/denoise
@@ -55,11 +55,11 @@ endif()
 # ════════════════════════════════════════════════════════════════
 file(GLOB CORE_SRC src/core/*.c)
 # postprocess.c lives in src/render/ but is called by image.c (core), so
-# include it in ysu_core to resolve the dependency before ysu_render is built.
+# include it in sm_core to resolve the dependency before sm_render is built
 list(APPEND CORE_SRC src/render/postprocess.c)
-add_library(ysu_core STATIC ${CORE_SRC})
-target_include_directories(ysu_core PUBLIC ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu_core PUBLIC ${PLATFORM_LIBS})
+add_library(sm_core STATIC ${CORE_SRC})
+target_include_directories(sm_core PUBLIC ${SM_INCLUDE_DIRS})
+target_link_libraries(sm_core PUBLIC ${PLATFORM_LIBS})
 
 # ════════════════════════════════════════════════════════════════
 # Render library (renderer, BVH, scene, G-buffer)
@@ -70,19 +70,19 @@ set(RENDER_SRC
     src/render/sceneloader.c
     src/render/gbuffer.c
     src/render/gbuffer_dump.c
-    src/render/ysu_mt.c
+    src/render/sm_mt.c
 )
-add_library(ysu_render STATIC ${RENDER_SRC})
-target_include_directories(ysu_render PUBLIC ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu_render PUBLIC ysu_core Threads::Threads)
+add_library(sm_render STATIC ${RENDER_SRC})
+target_include_directories(sm_render PUBLIC ${SM_INCLUDE_DIRS})
+target_link_libraries(sm_render PUBLIC sm_core Threads::Threads)
 
 # ════════════════════════════════════════════════════════════════
 # Denoise library
 # ════════════════════════════════════════════════════════════════
 file(GLOB DENOISE_SRC src/denoise/*.c)
-add_library(ysu_denoise STATIC ${DENOISE_SRC})
-target_include_directories(ysu_denoise PUBLIC ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu_denoise PUBLIC ysu_core)
+add_library(sm_denoise STATIC ${DENOISE_SRC})
+target_include_directories(sm_denoise PUBLIC ${SM_INCLUDE_DIRS})
+target_link_libraries(sm_denoise PUBLIC sm_core)
 
 # ════════════════════════════════════════════════════════════════
 # NeRF library (SIMD inference, scheduling)
@@ -94,47 +94,47 @@ set(NERF_SRC
     src/nerf/nerf_scheduler.c
     src/nerf/depth_hint.c
 )
-add_library(ysu_nerf STATIC ${NERF_SRC})
-target_include_directories(ysu_nerf PUBLIC ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu_nerf PUBLIC ysu_core)
+add_library(sm_nerf STATIC ${NERF_SRC})
+target_include_directories(sm_nerf PUBLIC ${SM_INCLUDE_DIRS})
+target_link_libraries(sm_nerf PUBLIC sm_core)
 
 # AVX2 support (optional, detected at runtime in nerf_simd.c)
 include(CheckCCompilerFlag)
 check_c_compiler_flag(-mavx2 HAS_AVX2)
 if(HAS_AVX2)
-    target_compile_options(ysu_nerf PRIVATE -mavx2 -mfma)
+    target_compile_options(sm_nerf PRIVATE -mavx2 -mfma)
 endif()
 
 # OpenMP (optional, for NeRF batch processing)
 find_package(OpenMP QUIET)
 if(OpenMP_C_FOUND)
-    target_link_libraries(ysu_nerf PUBLIC OpenMP::OpenMP_C)
+    target_link_libraries(sm_nerf PUBLIC OpenMP::OpenMP_C)
 endif()
 
 # ════════════════════════════════════════════════════════════════
 # Upscale library
 # ════════════════════════════════════════════════════════════════
 set(UPSCALE_SRC
-    src/upscale/ysu_upscale.c
+    src/upscale/sm_upscale.c
 )
-add_library(ysu_upscale STATIC ${UPSCALE_SRC})
-target_include_directories(ysu_upscale PUBLIC ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu_upscale PUBLIC ysu_core)
+add_library(sm_upscale STATIC ${UPSCALE_SRC})
+target_include_directories(sm_upscale PUBLIC ${SM_INCLUDE_DIRS})
+target_link_libraries(sm_upscale PUBLIC sm_core)
 
 # ════════════════════════════════════════════════════════════════
 # Main CPU raytracer executable
 # ════════════════════════════════════════════════════════════════
-add_executable(ysu
-    src/render/ysu_main.c
-    src/editor/ysu_360_engine_integration.c
+add_executable(steinmarder
+    src/render/sm_main.c
+    src/editor/sm_360_engine_integration.c
 )
-target_include_directories(ysu PRIVATE ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysu PRIVATE
-    ysu_render
-    ysu_denoise
-    ysu_nerf
-    ysu_upscale
-    ysu_core
+target_include_directories(steinmarder PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(steinmarder PRIVATE
+    sm_render
+    sm_denoise
+    sm_nerf
+    sm_upscale
+    sm_core
     Threads::Threads
     ${PLATFORM_LIBS}
 )
@@ -143,8 +143,8 @@ target_link_libraries(ysu PRIVATE
 # NeRF SIMD standalone test
 # ════════════════════════════════════════════════════════════════
 add_executable(nerf_simd_test src/nerf/nerf_simd_test.c)
-target_include_directories(nerf_simd_test PRIVATE ${YSU_INCLUDE_DIRS})
-target_link_libraries(nerf_simd_test PRIVATE ysu_nerf ysu_core ${PLATFORM_LIBS})
+target_include_directories(nerf_simd_test PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(nerf_simd_test PRIVATE sm_nerf sm_core ${PLATFORM_LIBS})
 
 # ════════════════════════════════════════════════════════════════
 # Vulkan targets (only if Vulkan SDK is found)
@@ -165,12 +165,12 @@ if(Vulkan_FOUND)
     )
 
     add_executable(gpu_demo ${VULKAN_SRC})
-    target_include_directories(gpu_demo PRIVATE ${YSU_INCLUDE_DIRS})
+    target_include_directories(gpu_demo PRIVATE ${SM_INCLUDE_DIRS})
     target_link_libraries(gpu_demo PRIVATE
-        ysu_denoise
-        ysu_nerf
-        ysu_render
-        ysu_core
+        sm_denoise
+        sm_nerf
+        sm_render
+        sm_core
         Vulkan::Vulkan
         Threads::Threads
         ${PLATFORM_LIBS}
@@ -194,9 +194,9 @@ if(Vulkan_FOUND)
         src/physics/quantum_demo_main.c
         ${PHYSICS_COMMON_SRC}
     )
-    target_include_directories(quantum_demo PRIVATE ${YSU_INCLUDE_DIRS})
+    target_include_directories(quantum_demo PRIVATE ${SM_INCLUDE_DIRS})
     target_link_libraries(quantum_demo PRIVATE
-        ysu_core
+        sm_core
         Vulkan::Vulkan
         Threads::Threads
         ${PLATFORM_LIBS}
@@ -207,8 +207,8 @@ if(Vulkan_FOUND)
 
     # Reactor thermal test
     add_executable(test_reactor_thermal src/physics/test_reactor_thermal.c ${PHYSICS_COMMON_SRC})
-    target_include_directories(test_reactor_thermal PRIVATE ${YSU_INCLUDE_DIRS})
-    target_link_libraries(test_reactor_thermal PRIVATE ysu_core Vulkan::Vulkan ${PLATFORM_LIBS})
+    target_include_directories(test_reactor_thermal PRIVATE ${SM_INCLUDE_DIRS})
+    target_link_libraries(test_reactor_thermal PRIVATE sm_core Vulkan::Vulkan ${PLATFORM_LIBS})
 
 else()
     message(STATUS "Vulkan NOT found — skipping GPU targets")
@@ -226,17 +226,17 @@ if(RAYLIB_LIB)
         list(APPEND EDITOR_LIBS gdi32 winmm opengl32)
     endif()
 
-    add_executable(ysu_mesh_edit src/editor/ysu_mesh_edit.c)
-    target_include_directories(ysu_mesh_edit PRIVATE ${YSU_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
-    target_link_libraries(ysu_mesh_edit PRIVATE ysu_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
+    add_executable(sm_mesh_edit src/editor/sm_mesh_edit.c)
+    target_include_directories(sm_mesh_edit PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
+    target_link_libraries(sm_mesh_edit PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
 
-    add_executable(ysu_viewport src/editor/ysu_viewport.c)
-    target_include_directories(ysu_viewport PRIVATE ${YSU_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
-    target_link_libraries(ysu_viewport PRIVATE ysu_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
+    add_executable(sm_viewport src/editor/sm_viewport.c)
+    target_include_directories(sm_viewport PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
+    target_link_libraries(sm_viewport PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
 
-    add_executable(ysu_edit_mode src/editor/ysu_edit_mode.c)
-    target_include_directories(ysu_edit_mode PRIVATE ${YSU_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
-    target_link_libraries(ysu_edit_mode PRIVATE ysu_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
+    add_executable(sm_edit_mode src/editor/sm_edit_mode.c)
+    target_include_directories(sm_edit_mode PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
+    target_link_libraries(sm_edit_mode PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
 else()
     message(STATUS "raylib NOT found — skipping editor targets")
 endif()
@@ -257,22 +257,22 @@ endif()
 # Standalone tools
 # ════════════════════════════════════════════════════════════════
 add_executable(inspect_ppm src/tools/inspect_ppm.c)
-target_include_directories(inspect_ppm PRIVATE ${YSU_INCLUDE_DIRS})
+target_include_directories(inspect_ppm PRIVATE ${SM_INCLUDE_DIRS})
 target_link_libraries(inspect_ppm PRIVATE ${PLATFORM_LIBS})
 
-add_executable(ysub_info src/tools/ysub_info.c)
-target_include_directories(ysub_info PRIVATE ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysub_info PRIVATE ${PLATFORM_LIBS})
+add_executable(smb_info src/tools/smb_info.c)
+target_include_directories(smb_info PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(smb_info PRIVATE ${PLATFORM_LIBS})
 
-add_executable(ysub_to_ppm src/tools/ysub_to_ppm.c)
-target_include_directories(ysub_to_ppm PRIVATE ${YSU_INCLUDE_DIRS})
-target_link_libraries(ysub_to_ppm PRIVATE ${PLATFORM_LIBS})
+add_executable(smb_to_ppm src/tools/smb_to_ppm.c)
+target_include_directories(smb_to_ppm PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(smb_to_ppm PRIVATE ${PLATFORM_LIBS})
 
 # ════════════════════════════════════════════════════════════════
 # Summary
 # ════════════════════════════════════════════════════════════════
 message(STATUS "")
-message(STATUS "=== YSU Engine Build Summary ===")
+message(STATUS "=== steinmarder Build Summary ===")
 message(STATUS "  Build type:   ${CMAKE_BUILD_TYPE}")
 message(STATUS "  C compiler:   ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
 message(STATUS "  AVX2:         ${HAS_AVX2}")

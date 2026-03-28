@@ -29,7 +29,7 @@ gcc -O3 -march=native -std=c11 \
 
 ### Load NeRF Data
 ```c
-NeRFData *nerf = ysu_nerf_data_load(
+NeRFData *nerf = sm_nerf_data_load(
  "models/nerf_hashgrid.bin",
  "models/occupancy_grid.bin"
 );
@@ -42,7 +42,7 @@ batch.count = 8; // 8 rays
 batch.origin[i], batch.direction[i] = ray data
 batch.pixel_id[i] = output pixel coordinate
 
-ysu_volume_integrate_batch(
+sm_volume_integrate_batch(
  &batch,
  &nerf->config,
  nerf,
@@ -55,18 +55,18 @@ ysu_volume_integrate_batch(
 
 ### Cleanup
 ```c
-ysu_nerf_data_free(nerf);
+sm_nerf_data_free(nerf);
 free(framebuffer.pixels);
 ```
 
 ## Environment Variables
 
 ```bash
-YSU_NERF_HASHGRID="models/nerf_hashgrid.bin" # Required
-YSU_NERF_OCC="models/occupancy_grid.bin" # Required
-YSU_NERF_STEPS=32 # Ray march steps
-YSU_NERF_DENSITY=1.0 # Opacity scale
-YSU_NERF_BOUNDS=4.0 # Volume size
+SM_NERF_HASHGRID="models/nerf_hashgrid.bin" # Required
+SM_NERF_OCC="models/occupancy_grid.bin" # Required
+SM_NERF_STEPS=32 # Ray march steps
+SM_NERF_DENSITY=1.0 # Opacity scale
+SM_NERF_BOUNDS=4.0 # Volume size
 ```
 
 ## Performance
@@ -93,9 +93,9 @@ YSU_NERF_BOUNDS=4.0 # Volume size
 - [ ] Copy `nerf_simd.h`, `nerf_simd.c` to project
 - [ ] Add `#include "nerf_simd.h"` to render.c
 - [ ] Add ray batching loop (see `nerf_simd_integration.c`)
-- [ ] Initialize with `ysu_nerf_data_load()` at startup
-- [ ] Render with `ysu_volume_integrate_batch()` each frame
-- [ ] Cleanup with `ysu_nerf_data_free()` at exit
+- [ ] Initialize with `sm_nerf_data_load()` at startup
+- [ ] Render with `sm_volume_integrate_batch()` each frame
+- [ ] Cleanup with `sm_nerf_data_free()` at exit
 - [ ] Compile with `-O3 -march=native`
 - [ ] Test with environment variables set
 
@@ -103,17 +103,17 @@ YSU_NERF_BOUNDS=4.0 # Volume size
 
 **Fast/Preview**:
 ```bash
-YSU_NERF_STEPS=8 YSU_NERF_DENSITY=0.5 YSU_NERF_BOUNDS=2.0
+SM_NERF_STEPS=8 SM_NERF_DENSITY=0.5 SM_NERF_BOUNDS=2.0
 ```
 
 **Balanced**:
 ```bash
-YSU_NERF_STEPS=32 YSU_NERF_DENSITY=1.0 YSU_NERF_BOUNDS=4.0
+SM_NERF_STEPS=32 SM_NERF_DENSITY=1.0 SM_NERF_BOUNDS=4.0
 ```
 
 **High Quality**:
 ```bash
-YSU_NERF_STEPS=64 YSU_NERF_DENSITY=2.0 YSU_NERF_BOUNDS=8.0
+SM_NERF_STEPS=64 SM_NERF_DENSITY=2.0 SM_NERF_BOUNDS=8.0
 ```
 
 ## Debugging
@@ -128,7 +128,7 @@ assert(!isnan(nerf_pix.rgb.x)); // No NaN
 
 **Enable per-ray logging**:
 ```c
-// In nerf_simd.c, add printf() in ysu_volume_integrate_batch()
+// In nerf_simd.c, add printf() in sm_volume_integrate_batch()
 printf("Ray %u: pos=(%.2f,%.2f,%.2f) rgb=(%.3f,%.3f,%.3f) alpha=%.3f\n",
  ray_idx, pos.x, pos.y, pos.z, rgb[0], rgb[1], rgb[2], alpha);
 ```
@@ -144,10 +144,10 @@ printf("Ray %u: pos=(%.2f,%.2f,%.2f) rgb=(%.3f,%.3f,%.3f) alpha=%.3f\n",
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| Black output | Density too low | Increase `YSU_NERF_DENSITY` |
-| Washed out | Bounds too small | Increase `YSU_NERF_BOUNDS` |
-| Very slow | Too many steps | Reduce `YSU_NERF_STEPS` |
-| NaN output | MLP overflow | Reduce `YSU_NERF_DENSITY` |
+| Black output | Density too low | Increase `SM_NERF_DENSITY` |
+| Washed out | Bounds too small | Increase `SM_NERF_BOUNDS` |
+| Very slow | Too many steps | Reduce `SM_NERF_STEPS` |
+| NaN output | MLP overflow | Reduce `SM_NERF_DENSITY` |
 | File not found | Wrong path | Use absolute path |
 | Compile error | Missing `-march=native` | Add to CFLAGS |
 
@@ -206,11 +206,11 @@ gcc -DBENCH_ONLY -O3 -march=native -std=c11 \
 ## Architecture
 
 ```
-ysu_nerf_data_load() ────┐
- ├──→ ysu_volume_integrate_batch()
-ysu_mlp_inference_batch()┤ ├─ ysu_hashgrid_lookup_batch()
- ├──→ ├─ ysu_occupancy_lookup_batch()
-ysu_adaptive_step_size() ┴──→ └─ Volume compositing loop
+sm_nerf_data_load() ────┐
+ ├──→ sm_volume_integrate_batch()
+sm_mlp_inference_batch()┤ ├─ sm_hashgrid_lookup_batch()
+ ├──→ ├─ sm_occupancy_lookup_batch()
+sm_adaptive_step_size() ┴──→ └─ Volume compositing loop
 ```
 
 ## Memory Usage

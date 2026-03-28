@@ -65,20 +65,20 @@ PROJECT_COMPLETION.md - This project summary
 ### Enable the Denoiser
 ```bash
 # In bash/terminal before running
-export YSU_NEURAL_DENOISE=1
+export SM_NEURAL_DENOISE=1
 ./gpu_demo.exe
 
 # Or in cmd.exe
-set YSU_NEURAL_DENOISE=1
+set SM_NEURAL_DENOISE=1
 gpu_demo.exe
 ```
 
 ### Configure Parameters
 ```bash
 # Fine-tune filtering strength
-export YSU_BILATERAL_SIGMA_S=1.5 # Spatial extent [pixels]
-export YSU_BILATERAL_SIGMA_R=0.1 # Range kernel [0..1]
-export YSU_BILATERAL_RADIUS=3 # Filter radius [pixels]
+export SM_BILATERAL_SIGMA_S=1.5 # Spatial extent [pixels]
+export SM_BILATERAL_SIGMA_R=0.1 # Range kernel [0..1]
+export SM_BILATERAL_RADIUS=3 # Filter radius [pixels]
 ```
 
 ---
@@ -146,7 +146,7 @@ range_kernel = exp(-(dL² / (2 × σ_r²)))
 ```
 
 ### Code Quality
-- Clean API (`ysu_bilateral_denoise()`)
+- Clean API (`sm_bilateral_denoise()`)
 - Environment-driven configuration
 - Zero external dependencies
 - Memory-safe (C11 compatible)
@@ -218,7 +218,7 @@ The bilateral denoiser has been successfully implemented, integrated, tested, an
 ### For the User
 The denoiser is ready to use. Simply:
 ```bash
-export YSU_NEURAL_DENOISE=1
+export SM_NEURAL_DENOISE=1
 ./gpu_demo.exe
 ```
 

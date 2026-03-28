@@ -1,16 +1,16 @@
-/* test_upscale_unit.c — Unit tests for YSU Neural Upscale system
+/* test_upscale_unit.c — Unit tests for steinmarder Neural Upscale system
  *
  * Tests the non-Vulkan parts (math, constants, API contracts).
  * A full integration test would require a Vulkan device context.
  *
  * Compile:
- *   gcc -std=c11 -O2 -o test_upscale_unit test_upscale_unit.c ysu_upscale.c -lm
+ *   gcc -std=c11 -O2 -o test_upscale_unit test_upscale_unit.c sm_upscale.c -lm
  *
  * Run:
  *   ./test_upscale_unit
  */
 
-#include "ysu_upscale.h"
+#include "sm_upscale.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,19 +45,19 @@ int test_halton_sequence(void) {
      * Halton(n, 3): 1/3, 2/3, 1/9, 4/9, 7/9, ...
      */
 
-    float h2_1 = ysu_halton(1, 2);
+    float h2_1 = sm_halton(1, 2);
     ASSERT_APPROX(h2_1, 0.5f, 1e-6, "Halton(1,2) = 0.5");
 
-    float h2_2 = ysu_halton(2, 2);
+    float h2_2 = sm_halton(2, 2);
     ASSERT_APPROX(h2_2, 0.25f, 1e-6, "Halton(2,2) = 0.25");
 
-    float h2_3 = ysu_halton(3, 2);
+    float h2_3 = sm_halton(3, 2);
     ASSERT_APPROX(h2_3, 0.75f, 1e-6, "Halton(3,2) = 0.75");
 
-    float h3_1 = ysu_halton(1, 3);
+    float h3_1 = sm_halton(1, 3);
     ASSERT_APPROX(h3_1, 1.0f/3.0f, 1e-6, "Halton(1,3) = 1/3");
 
-    float h3_2 = ysu_halton(2, 3);
+    float h3_2 = sm_halton(2, 3);
     ASSERT_APPROX(h3_2, 2.0f/3.0f, 1e-6, "Halton(2,3) = 2/3");
 
     printf("  ✓ Halton sequence correct\n");
@@ -72,18 +72,18 @@ int test_jitter_generation(void) {
     printf("[TEST 2] Jitter generation (frame-indexed)...\n");
 
     /* Frame 0 */
-    YsuJitter j0 = ysu_upscale_jitter(0);
+    SmJitter j0 = sm_upscale_jitter(0);
     ASSERT(j0.x >= -0.5f && j0.x <= 0.5f, "Jitter X in [-0.5, 0.5]");
     ASSERT(j0.y >= -0.5f && j0.y <= 0.5f, "Jitter Y in [-0.5, 0.5]");
 
     /* Frame 1 — should differ */
-    YsuJitter j1 = ysu_upscale_jitter(1);
+    SmJitter j1 = sm_upscale_jitter(1);
     float dist = sqrtf(j1.x * j1.x + j1.y * j1.y);
     ASSERT(dist > 0.01f, "Frame 1 jitter differs from frame 0");
 
     /* Frame 16 — cycles back (16-phase Halton) */
-    YsuJitter j16 = ysu_upscale_jitter(16);
-    YsuJitter j0_repeat = ysu_upscale_jitter(0 + 16);
+    SmJitter j16 = sm_upscale_jitter(16);
+    SmJitter j0_repeat = sm_upscale_jitter(0 + 16);
     ASSERT_APPROX(j16.x, j0_repeat.x, 1e-6, "Jitter cycles at phase 16");
     ASSERT_APPROX(j16.y, j0_repeat.y, 1e-6, "Jitter cycles at phase 16");
 
@@ -98,11 +98,11 @@ int test_jitter_generation(void) {
 int test_quality_factors(void) {
     printf("[TEST 3] Quality preset factors...\n");
 
-    float f_ultra_perf = ysu_upscale_quality_factor(YSU_UPSCALE_QUALITY_ULTRA_PERF);
-    float f_perf       = ysu_upscale_quality_factor(YSU_UPSCALE_QUALITY_PERFORMANCE);
-    float f_balanced   = ysu_upscale_quality_factor(YSU_UPSCALE_QUALITY_BALANCED);
-    float f_quality    = ysu_upscale_quality_factor(YSU_UPSCALE_QUALITY_QUALITY);
-    float f_ultra      = ysu_upscale_quality_factor(YSU_UPSCALE_QUALITY_ULTRA);
+    float f_ultra_perf = sm_upscale_quality_factor(SM_UPSCALE_QUALITY_ULTRA_PERF);
+    float f_perf       = sm_upscale_quality_factor(SM_UPSCALE_QUALITY_PERFORMANCE);
+    float f_balanced   = sm_upscale_quality_factor(SM_UPSCALE_QUALITY_BALANCED);
+    float f_quality    = sm_upscale_quality_factor(SM_UPSCALE_QUALITY_QUALITY);
+    float f_ultra      = sm_upscale_quality_factor(SM_UPSCALE_QUALITY_ULTRA);
 
     /* Each should be in (0, 1] and ordered correctly */
     ASSERT(f_ultra_perf > 0.0f && f_ultra_perf < 0.5f, "ULTRA_PERF ≈ 1/3");
@@ -131,8 +131,8 @@ int test_resolution_scaling(void) {
 
     uint32_t display_w = 3840, display_h = 2160;
 
-    for (int preset = 0; preset < YSU_UPSCALE_QUALITY_COUNT; preset++) {
-        float scale = ysu_upscale_quality_factor((YsuUpscaleQuality)preset);
+    for (int preset = 0; preset < SM_UPSCALE_QUALITY_COUNT; preset++) {
+        float scale = sm_upscale_quality_factor((SmUpscaleQuality)preset);
         uint32_t w_lo = (uint32_t)(display_w * scale);
         uint32_t h_lo = (uint32_t)(display_h * scale);
 
@@ -155,13 +155,13 @@ int test_struct_sizes(void) {
     printf("[TEST 5] Struct size contracts...\n");
 
     /* These are critical for push constant compatibility with GLSL shaders */
-    ASSERT(sizeof(YsuReprojPC) >= 48, "YsuReprojPC >= 48 bytes");
-    ASSERT(sizeof(YsuNeuralPC) >= 48, "YsuNeuralPC >= 48 bytes");
-    ASSERT(sizeof(YsuSharpenPC) >= 16, "YsuSharpenPC >= 16 bytes");
+    ASSERT(sizeof(SmReprojPC) >= 48, "SmReprojPC >= 48 bytes");
+    ASSERT(sizeof(SmNeuralPC) >= 48, "SmNeuralPC >= 48 bytes");
+    ASSERT(sizeof(SmSharpenPC) >= 16, "SmSharpenPC >= 16 bytes");
 
-    printf("  YsuReprojPC:   %zu bytes\n", sizeof(YsuReprojPC));
-    printf("  YsuNeuralPC:   %zu bytes\n", sizeof(YsuNeuralPC));
-    printf("  YsuSharpenPC:  %zu bytes\n", sizeof(YsuSharpenPC));
+    printf("  SmReprojPC:   %zu bytes\n", sizeof(SmReprojPC));
+    printf("  SmNeuralPC:   %zu bytes\n", sizeof(SmNeuralPC));
+    printf("  SmSharpenPC:  %zu bytes\n", sizeof(SmSharpenPC));
     printf("  ✓ All push constants properly sized\n");
     return 1;
 }
@@ -180,7 +180,7 @@ int test_jitter_distribution(void) {
     float var_x = 0.0f, var_y = 0.0f;
 
     for (uint32_t i = 0; i < 64; i++) {
-        YsuJitter j = ysu_upscale_jitter(i);
+        SmJitter j = sm_upscale_jitter(i);
         sum_x += j.x;
         sum_y += j.y;
     }
@@ -189,7 +189,7 @@ int test_jitter_distribution(void) {
     float mean_y = sum_y / 64.0f;
 
     for (uint32_t i = 0; i < 64; i++) {
-        YsuJitter j = ysu_upscale_jitter(i);
+        SmJitter j = sm_upscale_jitter(i);
         float dx = j.x - mean_x;
         float dy = j.y - mean_y;
         var_x += dx * dx;
@@ -218,7 +218,7 @@ int test_jitter_distribution(void) {
 
 int main(void) {
     printf("\n╔════════════════════════════════════════════════════════════╗\n");
-    printf("║      YSU Neural Upscale — Unit Test Suite                 ║\n");
+    printf("║      steinmarder Neural Upscale — Unit Test Suite                 ║\n");
     printf("╚════════════════════════════════════════════════════════════╝\n\n");
 
     int tests_passed = 0, tests_total = 6;
@@ -238,8 +238,8 @@ int main(void) {
         printf("✓ ALL TESTS PASSED\n");
         printf("\nNext steps:\n");
         printf("  1. Compile shaders: glslc -O shaders/upscale_*.comp -o shaders/upscale_*.spv\n");
-        printf("  2. Integrate with your Vulkan renderer (see ysu_upscale_integration_example.c)\n");
-        printf("  3. Train neural weights (see YSU_NEURAL_UPSCALE_ARCHITECTURE.md § 4)\n");
+        printf("  2. Integrate with your Vulkan renderer (see sm_upscale_integration_example.c)\n");
+        printf("  3. Train neural weights (see SM_NEURAL_UPSCALE_ARCHITECTURE.md § 4)\n");
         return 0;
     } else {
         printf("✗ %d/%d TESTS FAILED\n", tests_total - tests_passed, tests_total);

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Feature validation for YSU GPU Engine - Tests all 10 newly-implemented features
+Feature validation for steinmarder GPU Engine - Tests all 10 newly-implemented features
 """
 import subprocess
 import os
@@ -9,16 +9,16 @@ import numpy as np
 
 def test_features():
     print("=" * 70)
-    print("YSU ENGINE - FEATURE VALIDATION TEST")
+    print("STEINMARDER - FEATURE VALIDATION TEST")
     print("=" * 70)
     
     # Run with all features enabled
     env = os.environ.copy()
-    env['YSU_GPU_W'] = '320'
-    env['YSU_GPU_H'] = '180'
-    env['YSU_GPU_OBJ'] = 'TestSubjects/3M.obj'
-    env['YSU_GPU_FRAMES'] = '16'  # More frames to see temporal filtering
-    env['YSU_NEURAL_DENOISE'] = '1'
+    env['SM_GPU_W'] = '320'
+    env['SM_GPU_H'] = '180'
+    env['SM_GPU_OBJ'] = 'TestSubjects/3M.obj'
+    env['SM_GPU_FRAMES'] = '16'  # More frames to see temporal filtering
+    env['SM_NEURAL_DENOISE'] = '1'
     
     print("\n[TEST 1] Running GPU renderer with 16 frames...")
     result = subprocess.run(['shaders/gpu_demo.exe'], env=env, capture_output=True, text=True)

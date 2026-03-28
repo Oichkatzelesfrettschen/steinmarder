@@ -139,7 +139,7 @@ For meshes larger than configurable threshold (default 3M triangles):
 ### Chunked BVH Tuning
 ```powershell
 # Adjust chunk size (default 3M triangles)
-$env:YSU_GPU_BVH_CHUNK_TRIS = 3000000
+$env:SM_GPU_BVH_CHUNK_TRIS = 3000000
 ```
 
 ### Force SAH Builder (if needed, not recommended)

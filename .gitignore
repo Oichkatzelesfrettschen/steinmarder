@@ -14,7 +14,7 @@ nerf-synthetic/
 DATASET/
 
 # Binary scene data (23 MB each)
-DATA/*.ysub
+DATA/*.smb
 
 # Pretrained model binaries (optional — ~10 MB total, under GitHub limit)
 # Uncomment the next line if you do NOT want models in the repo:

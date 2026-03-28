@@ -99,22 +99,22 @@ Measured (Session 12): 25.3 ms/frame = 39.5 FPS
 
 #### For 60 FPS Display (Good Quality)
 ```bash
-YSU_GPU_RENDER_SCALE=0.75 YSU_GPU_W=1920 YSU_GPU_H=1080 \
-YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
+SM_GPU_RENDER_SCALE=0.75 SM_GPU_W=1920 SM_GPU_H=1080 \
+SM_GPU_FRAMES=16 SM_GPU_TEMPORAL=1 ./gpu_demo.exe
 Expected: 55-70 FPS
 ```
 
 #### For 100 FPS (Balanced)
 ```bash
-YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_W=1920 YSU_GPU_H=1080 \
-YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
+SM_GPU_RENDER_SCALE=0.5 SM_GPU_W=1920 SM_GPU_H=1080 \
+SM_GPU_FRAMES=16 SM_GPU_TEMPORAL=1 ./gpu_demo.exe
 Expected: 80-120 FPS
 ```
 
 #### For Maximum Performance
 ```bash
-YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_W=1920 YSU_GPU_H=1080 \
-YSU_GPU_FRAMES=16 YSU_GPU_TEMPORAL=1 YSU_GPU_NO_IO=1 ./gpu_demo.exe
+SM_GPU_RENDER_SCALE=0.5 SM_GPU_W=1920 SM_GPU_H=1080 \
+SM_GPU_FRAMES=16 SM_GPU_TEMPORAL=1 SM_GPU_NO_IO=1 ./gpu_demo.exe
 Expected: 100-150 FPS
 ```
 
@@ -158,13 +158,13 @@ When running tests in Vulkan environment:
 
 ```bash
 # Test 1: Measure single frame
-time ./gpu_demo.exe YSU_GPU_FRAMES=1 YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5
+time ./gpu_demo.exe SM_GPU_FRAMES=1 SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5
 
 # Test 2: Measure batch (amortize overhead)
-time ./gpu_demo.exe YSU_GPU_FRAMES=16 YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5
+time ./gpu_demo.exe SM_GPU_FRAMES=16 SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5
 
 # Test 3: Measure with temporal
-time ./gpu_demo.exe YSU_GPU_FRAMES=16 YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_TEMPORAL=1
+time ./gpu_demo.exe SM_GPU_FRAMES=16 SM_GPU_W=1920 SM_GPU_H=1080 SM_GPU_RENDER_SCALE=0.5 SM_GPU_TEMPORAL=1
 
 # Calculate FPS
 fps = (16 * 1000) / total_ms
@@ -191,7 +191,7 @@ fps = (16 * 1000) / total_ms
 2. **Run FPS test**:
  ```bash
  # 16-frame batch, default scale=0.5
- YSU_GPU_FRAMES=16 YSU_GPU_RENDER_SCALE=0.5 ./gpu_demo.exe
+ SM_GPU_FRAMES=16 SM_GPU_RENDER_SCALE=0.5 ./gpu_demo.exe
  
  # Measure time, calculate: fps = 16000 / time_ms
  ```
@@ -199,10 +199,10 @@ fps = (16 * 1000) / total_ms
 3. **Verify scale effect**:
  ```bash
  # With scale=0.5 (should be ~4x faster)
- time YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_FRAMES=16 ./gpu_demo.exe
+ time SM_GPU_RENDER_SCALE=0.5 SM_GPU_FRAMES=16 ./gpu_demo.exe
  
  # With scale=1.0 (should be baseline)
- time YSU_GPU_RENDER_SCALE=1.0 YSU_GPU_FRAMES=16 ./gpu_demo.exe
+ time SM_GPU_RENDER_SCALE=1.0 SM_GPU_FRAMES=16 ./gpu_demo.exe
  ```
 
 ---

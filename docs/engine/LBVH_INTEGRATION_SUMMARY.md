@@ -180,10 +180,10 @@ LBVH can be controlled via environment variables:
 
 ```powershell
 # Chunk size for large meshes (default 3M triangles)
-$env:YSU_GPU_BVH_CHUNK_TRIS = 3000000
+$env:SM_GPU_BVH_CHUNK_TRIS = 3000000
 
 # Enable/disable BVH (1=use BVH, 0=no BVH)
-$env:YSU_GPU_USE_BVH = 1
+$env:SM_GPU_USE_BVH = 1
 
 # Enable cache for faster reloads
 # (cache is automatically managed)
@@ -195,12 +195,12 @@ $env:YSU_GPU_USE_BVH = 1
 
 ### Test 1: Verify It's Being Used
 ```powershell
-cd "C:\YSUengine_fixed_renderc_patch_fixed2\YSUengine_fixed_renderc_patch"
-$env:YSU_GPU_W=1920
-$env:YSU_GPU_H=1080
-$env:YSU_GPU_OBJ="TestSubjects/3M.obj"
-$env:YSU_NEURAL_DENOISE=0
-$env:YSU_SPP=1
+cd "C:\steinmarder"
+$env:SM_GPU_W=1920
+$env:SM_GPU_H=1080
+$env:SM_GPU_OBJ="TestSubjects/3M.obj"
+$env:SM_NEURAL_DENOISE=0
+$env:SM_SPP=1
 .\shaders\gpu_demo.exe
 ```
 
@@ -252,7 +252,7 @@ However, LBVH provides:
 
 ## Summary
 
-**LBVH is fully integrated and active in the YSU engine.**
+**LBVH is fully integrated and active in the steinmarder.**
 
 - Already implemented in gpu_bvh_lbv.c
 - Already called in gpu_vulkan_demo.c
