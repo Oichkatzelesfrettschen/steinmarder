@@ -53,6 +53,7 @@ set(LBM_KERNEL_SOURCES
     kernels_box_counting.cu
     sparse/kernels_sparse_lbm.cu
     sparse/kernels_sparse_map.cu
+    kernels_int8_soa_lloydmax.cu
     host_wrappers.cu
 )
 
@@ -69,6 +70,7 @@ add_executable(lbm_bench
     bench/bench_main.cu
     bench/bench_harness.cu
     bench/bench_validate.cu
+    bench/lloydmax_codebook.cu
 )
 
 target_include_directories(lbm_bench PRIVATE

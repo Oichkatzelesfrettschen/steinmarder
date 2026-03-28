@@ -24,6 +24,9 @@ extern void bench_print_result_csv(const BenchResult* r);
 // Forward declarations from bench_validate.cu
 extern int validate_all(void);
 
+// Lloyd-Max codebook generator
+#include "lloydmax_codebook.h"
+
 // Parse comma-separated grid sizes (e.g., "64,128,256").
 static int parse_grid_sizes(const char* str, int* sizes, int max_sizes) {
     int count = 0;
@@ -73,6 +76,7 @@ static void print_usage(void) {
     printf("  --validate           Run physics conservation checks\n");
     printf("  --regression         Compare against baselines, exit nonzero on regression\n");
     printf("  --occupancy          Print occupancy table and exit\n");
+    printf("  --codebook           Generate Lloyd-Max codebook from FP32 simulation\n");
     printf("  --list               List all kernel variants\n");
     printf("  --help               Show this help\n");
 }
@@ -83,6 +87,7 @@ int main(int argc, char** argv) {
     int do_validate = 0;
     int do_regression = 0;
     int do_occupancy = 0;
+    int do_codebook = 0;
     int do_list = 0;
     int warmup = 5;
     int timing_steps = 30;
@@ -116,6 +121,8 @@ int main(int argc, char** argv) {
             do_regression = 1;
         } else if (strcmp(argv[i], "--occupancy") == 0) {
             do_occupancy = 1;
+        } else if (strcmp(argv[i], "--codebook") == 0) {
+            do_codebook = 1;
         } else if (strcmp(argv[i], "--list") == 0) {
             do_list = 1;
         } else if (strcmp(argv[i], "--help") == 0) {
@@ -158,6 +165,13 @@ int main(int argc, char** argv) {
     // --occupancy
     if (do_occupancy) {
         report_all_occupancy(device);
+        return 0;
+    }
+
+    // --codebook
+    if (do_codebook) {
+        LloydMaxCodebook cb = lloydmax_generate(64, 100);
+        lloydmax_print_codebook_c(&cb);
         return 0;
     }
 

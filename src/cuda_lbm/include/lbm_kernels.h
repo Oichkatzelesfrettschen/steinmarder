@@ -47,6 +47,7 @@ typedef enum {
     LBM_INT8_AOS,              // kernels_int8.cu
     LBM_INT8_SOA,              // kernels_int8_soa.cu
     LBM_INT8_SOA_COARSENED,    // kernels_int8_soa.cu (4-cell coarsened + FMA-reordered Guo)
+    LBM_INT8_SOA_LLOYDMAX,     // kernels_int8_soa_lloydmax.cu (adaptive-range quantization)
 
     // INT16 variants
     LBM_INT16_AOS,             // kernels_int16.cu
@@ -122,6 +123,7 @@ static const LbmKernelInfo LBM_KERNEL_INFO[LBM_VARIANT_COUNT] = {
     [LBM_INT8_AOS]           = {"INT8 AoS",            "lbm_step_fused_int8_kernel",     "initialize_uniform_int8_kernel", 1,   61, 1,   0,   128, 1,   0,  0},
     [LBM_INT8_SOA]           = {"INT8 SoA",            "lbm_step_int8_soa_kernel",       "initialize_uniform_int8_soa_kernel", 1, 61, 1, 1, 128, 1, 0, 0},
     [LBM_INT8_SOA_COARSENED] = {"INT8 SoA C4",         "lbm_step_int8_soa_coarsened_kernel", "initialize_uniform_int8_soa_kernel", 1, 61, 1, 1, 128, 4, 0, 0},
+    [LBM_INT8_SOA_LLOYDMAX] = {"INT8 SoA LM",         "lbm_step_int8_soa_lloydmax_kernel", "initialize_uniform_int8_soa_lloydmax_kernel", 1, 61, 1, 1, 128, 1, 0, 0},
 
     // INT16 variants
     [LBM_INT16_AOS]          = {"INT16 AoS",           "lbm_step_int16_kernel",          "initialize_uniform_int16_kernel", 2,  50, 1,   0,   128, 1,   0,  0},
