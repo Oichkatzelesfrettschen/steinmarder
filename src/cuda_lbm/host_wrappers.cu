@@ -406,47 +406,78 @@ int launch_lbm_init(
 // ============================================================================
 
 // Query occupancy for a single variant on the current device.
+// Map variant -> kernel function pointer for occupancy queries.
+// Returns NULL for variants without a step kernel (should not happen).
+static const void* get_step_kernel_ptr(LbmKernelVariant variant) {
+    switch (variant) {
+    case LBM_FP32_SOA_FUSED:         return (const void*)lbm_step_soa_fused;
+    case LBM_FP32_SOA_MRT_FUSED:     return (const void*)lbm_step_soa_mrt_fused;
+    case LBM_FP32_SOA_PULL:          return (const void*)lbm_step_soa_pull;
+    case LBM_FP32_SOA_MRT_PULL:      return (const void*)lbm_step_soa_mrt_pull;
+    case LBM_FP32_SOA_TILED:         return (const void*)lbm_step_soa_tiled;
+    case LBM_FP32_SOA_MRT_TILED:     return (const void*)lbm_step_soa_mrt_tiled;
+    case LBM_FP32_SOA_COARSENED:     return (const void*)lbm_step_soa_coarsened;
+    case LBM_FP32_SOA_MRT_COARSENED: return (const void*)lbm_step_soa_mrt_coarsened;
+    case LBM_FP32_SOA_COARSENED_F4:  return (const void*)lbm_step_soa_coarsened_float4;
+    case LBM_FP32_SOA_CS:            return (const void*)lbm_step_fp32_soa_cs_kernel;
+    case LBM_FP32_SOA_AA:            return (const void*)lbm_step_soa_aa;
+    case LBM_FP32_SOA_MRT_AA:        return (const void*)lbm_step_soa_mrt_aa;
+    case LBM_FP16_AOS:               return (const void*)lbm_step_fused_fp16_kernel;
+    case LBM_FP16_SOA:               return (const void*)lbm_step_fp16_soa_kernel;
+    case LBM_FP16_SOA_HALF2:         return (const void*)lbm_step_fp16_soa_half2_kernel;
+    case LBM_BF16_AOS:               return (const void*)lbm_step_fused_bf16_kernel;
+    case LBM_BF16_SOA:               return (const void*)lbm_step_bf16_soa_kernel;
+    case LBM_BF16_SOA_BF162:         return (const void*)lbm_step_bf16_soa_bf162_kernel;
+    case LBM_FP8_E4M3_AOS:           return (const void*)lbm_step_fused_fp8_kernel;
+    case LBM_FP8_E4M3_SOA:           return (const void*)lbm_step_fp8_soa_kernel;
+    case LBM_FP8_E5M2_AOS:           return (const void*)lbm_step_fused_fp8e5m2_kernel;
+    case LBM_FP8_E5M2_SOA:           return (const void*)lbm_step_fp8_e5m2_soa_kernel;
+    case LBM_INT8_AOS:               return (const void*)lbm_step_fused_int8_kernel;
+    case LBM_INT8_SOA:               return (const void*)lbm_step_int8_soa_kernel;
+    case LBM_INT8_SOA_COARSENED:     return (const void*)lbm_step_int8_soa_coarsened_kernel;
+    case LBM_INT16_AOS:              return (const void*)lbm_step_int16_kernel;
+    case LBM_INT16_SOA:              return (const void*)lbm_step_int16_soa_kernel;
+    case LBM_FP64_AOS:               return (const void*)lbm_step_fused_fp64_kernel;
+    case LBM_FP64_SOA:               return (const void*)lbm_step_fp64_soa_kernel;
+    case LBM_DD_SOA:                 return (const void*)lbm_step_fused_dd_kernel;
+    case LBM_INT4_SOA:               return (const void*)lbm_step_fused_int4_kernel;
+    case LBM_FP4_SOA:                return (const void*)lbm_step_fp4_kernel;
+    default:                         return NULL;
+    }
+}
+
 int query_occupancy(LbmKernelVariant variant, int device_id, OccupancyInfo* out) {
-    (void)device_id;
     const LbmKernelInfo* info = &LBM_KERNEL_INFO[variant];
     out->variant = variant;
     out->max_active_blocks = 0;
     out->max_warps = 0;
     out->occupancy_pct = 0.0f;
 
-    // cudaOccupancyMaxActiveBlocksPerMultiprocessor requires the function
-    // pointer. For a generic approach, we use the same switch dispatch.
-    // This is verbose but necessary since we cannot store device function
-    // pointers in a table at compile time.
+    const void* kernel_ptr = get_step_kernel_ptr(variant);
+    if (!kernel_ptr) return -1;
 
     int block_size = info->threads_per_block;
     int num_blocks = 0;
 
-    // Use a simplified approach: query via cudaOccupancyMaxActiveBlocksPerMultiprocessor
-    // for the most common kernels.
-    // For now, return a reasonable estimate based on register count heuristics.
-    // The exact values require linking against the specific kernel symbols.
+    cudaError_t err = cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+        &num_blocks, kernel_ptr, block_size, 0);
+    if (err != cudaSuccess) {
+        // Fallback: estimate from register heuristic
+        int warps_per_block = (block_size + 31) / 32;
+        num_blocks = 48 / warps_per_block;  // max 48 warps/SM on Ada
+        if (num_blocks < 1) num_blocks = 1;
+    }
 
-    // Estimate: 48 max warps per SM on Ada
+    // Query max warps per SM from device properties
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, device_id);
+    int max_warps_per_sm = prop.maxThreadsPerMultiProcessor / 32;
+
     int warps_per_block = (block_size + 31) / 32;
-
-    // Conservative estimate assuming 64 regs/thread for standard kernels,
-    // 128 for MRT, 192 for DD
-    int est_regs;
-    if (variant == LBM_DD_SOA) est_regs = 192;
-    else if (info->is_mrt) est_regs = 128;
-    else est_regs = 64;
-
-    int max_warps_by_regs = 65536 / (est_regs * 32);
-    int max_blocks_by_regs = max_warps_by_regs / warps_per_block;
-    int max_blocks_by_slots = 24; // Ada: 24 blocks/SM limit
-    num_blocks = max_blocks_by_regs < max_blocks_by_slots ? max_blocks_by_regs : max_blocks_by_slots;
-    if (num_blocks < 1) num_blocks = 1;
-
     out->max_active_blocks = num_blocks;
     out->max_warps = num_blocks * warps_per_block;
-    if (out->max_warps > 48) out->max_warps = 48;
-    out->occupancy_pct = (float)out->max_warps / 48.0f * 100.0f;
+    if (out->max_warps > max_warps_per_sm) out->max_warps = max_warps_per_sm;
+    out->occupancy_pct = (float)out->max_warps / (float)max_warps_per_sm * 100.0f;
 
     return 0;
 }
