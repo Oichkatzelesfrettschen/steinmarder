@@ -117,15 +117,15 @@ INT4) in two memory layouts (AoS, i-major SoA). Includes MRT collision,
 adaptive refinement, sparse brick-map, and novel SASS-RE-informed fixed-point
 kernels (Q16.16, Q32.32) that exploit integer ALU pipelines.
 
-All kernels achieve **mass_drift = 0** via precomputed inv_tau (eliminates
-50.6-cycle MUFU.RCP SFU stall measured by our SASS reverse engineering).
+Precomputed inv_tau eliminates the 50.6-cycle MUFU.RCP SFU stall
+(measured by our SASS reverse engineering) from every kernel's collision phase.
 
 Top physics-valid kernels at 128^3 (GDDR6X-bound):
 
 | Tier           | MLUPS | BW%   | VRAM   | mass_drift |
 |----------------|-------|-------|--------|------------|
-| INT8 SoA       | ~5460 | ~76%  | 140 MB | 0          |
-| FP8 e4m3 SoA   | ~5170 | ~72%  | 140 MB | 0          |
+| INT8 SoA       | ~5460 | ~76%  | 140 MB | 3.12e-01   |
+| INT8 SoA LM    | ~4830 | ~67%  | 140 MB | 1.47e-02 (21x better) |
 | Q32.32 SoA     | ~920  | ~61%  | 672 MB | 0 (1.59x FP64) |
 
 Full kernel index and benchmarks: [`src/cuda_lbm/README.md`](src/cuda_lbm/README.md)

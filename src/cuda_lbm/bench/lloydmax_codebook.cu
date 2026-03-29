@@ -54,7 +54,7 @@ static void collect_f_histogram(
     }
     cudaMemset(force_d, 0, n_cells * 3 * sizeof(float));
 
-    LBMBuffers bufs = {f_a, f_b, NULL, NULL, rho, u, tau_d, force_d};
+    LBMBuffers bufs = {f_a, f_b, NULL, NULL, rho, u, tau_d, NULL, force_d};
     // Initialize with nonzero velocity to spread the f_i distribution.
     // Ma = 0.1 is typical for LBM; this creates a realistic spread around equilibrium.
     launch_lbm_init(LBM_FP32_SOA_FUSED, &grid, &bufs, 1.0f, 0.1f, 0.05f, 0.0f, 0);

@@ -27,7 +27,7 @@ precision tiers with two memory layouts (AoS, i-major SoA).
 
 - All scalar LBM kernels (FP32 and below) are **bandwidth-bound** on Ada
 - INT8 SoA is Pareto-optimal: ~5460 MLUPS, 140 MB VRAM, ~2.8x FP32
-- **All kernels: mass_drift = 0** via precomputed inv_tau (eliminates MUFU.RCP)
+- Precomputed inv_tau eliminates 50.6-cycle MUFU.RCP from collision phase
 - SoA layout beats AoS by 1.81x-2.22x at 128^3 (scatter penalty elimination)
 - Q32.32 fixed-point: 1.59x faster than FP64 (INT64 ALU bypasses 64:1 throttle)
 - FP64/DD kernels are compute-bound (64:1 FP64 ratio on Ada gaming SKUs)

@@ -105,8 +105,18 @@ ValidationResult validate_kernel(LbmKernelVariant variant) {
     }
     cudaMemset(force_d, 0, n_cells * 3 * sizeof(float));
 
+    // Precompute inv_tau (eliminates MUFU.RCP in kernels)
+    float* inv_tau_d = NULL;
+    {
+        cudaMalloc(&inv_tau_d, n_cells * sizeof(float));
+        float* h_inv = (float*)malloc(n_cells * sizeof(float));
+        for (size_t i = 0; i < n_cells; i++) h_inv[i] = 1.0f / 0.6f; // tau = 0.6
+        cudaMemcpy(inv_tau_d, h_inv, n_cells * sizeof(float), cudaMemcpyHostToDevice);
+        free(h_inv);
+    }
+
     LBMGrid grid = {nx, ny, nz, (int)n_cells};
-    LBMBuffers bufs = {f_a, f_b, f_c, f_d, rho, u, tau_d, force_d};
+    LBMBuffers bufs = {f_a, f_b, f_c, f_d, rho, u, tau_d, inv_tau_d, force_d};
 
     // Initialize to equilibrium (rho=1, u=0)
     launch_lbm_init(variant, &grid, &bufs,
@@ -175,6 +185,7 @@ ValidationResult validate_kernel(LbmKernelVariant variant) {
     cudaFree(rho);
     cudaFree(u);
     cudaFree(tau_d);
+    if (inv_tau_d) cudaFree(inv_tau_d);
     cudaFree(force_d);
 
     return vr;

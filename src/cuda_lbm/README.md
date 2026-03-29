@@ -60,21 +60,21 @@ across ALL precision tiers.
 
 | Rank | Tier            | Layout  | MLUPS  | BW%    | mass_drift  | VRAM_MB | Notes                            |
 |------|-----------------|---------|--------|--------|-------------|---------|----------------------------------|
-| 1    | INT8 SoA        | SoA     | ~5460  | ~76%   | 0.00e+00    | 140     | Fastest; uniform DIST_SCALE=64   |
-| 2    | FP8 e4m3 SoA   | SoA     | ~5170  | ~72%   | 0.00e+00    | 140     | SM 8.9+                          |
-| 3    | INT8 SoA C4    | SoA     | ~4960  | ~69%   | 0.00e+00    | 140     | 4 cells/thread coarsened         |
-| 4    | INT8 SoA LM    | SoA     | ~4830  | ~67%   | 0.00e+00    | 140     | Lloyd-Max adaptive quantization  |
-| 5    | BF16 SoA       | SoA     | ~3210  | ~69%   | 0.00e+00    | 216     | SM 8.0+; bfloat16 storage        |
-| 6    | FP16 SoA H2    | SoA     | ~3050  | ~65%   | 0.00e+00    | 216     | 2 cells/thread; half2 moments    |
-| 7    | FP32 MRT A-A   | SoA     | ~2130  | ~78%   | 0.00e+00    | 216     | Best FP32; A-A halves VRAM       |
-| 8    | Q16.16 SoA     | SoA     | ~1940  | ~71%   | 0.00e+00    | 368     | IADD3 pipeline; FP32-class MLUPS |
-| 9    | FP32 Fused     | SoA     | ~1940  | ~71%   | 0.00e+00    | 368     | Baseline FP32 BGK                |
+| 1    | INT8 SoA        | SoA     | ~5460  | ~76%   | 3.12e-01    | 140     | Fastest; uniform DIST_SCALE=64   |
+| 2    | FP8 e4m3 SoA   | SoA     | ~5170  | ~72%   | 3.12e-02    | 140     | SM 8.9+                          |
+| 3    | INT8 SoA C4    | SoA     | ~4960  | ~69%   | 3.12e-01    | 140     | 4 cells/thread coarsened         |
+| 4    | INT8 SoA LM    | SoA     | ~4830  | ~67%   | 1.47e-02    | 140     | Lloyd-Max: 21x better than INT8  |
+| 5    | BF16 SoA       | SoA     | ~3210  | ~69%   | 1.95e-03    | 216     | SM 8.0+; bfloat16 storage        |
+| 6    | FP16 SoA H2    | SoA     | ~3050  | ~65%   | 2.44e-04    | 216     | 2 cells/thread; half2 moments    |
+| 7    | FP32 MRT A-A   | SoA     | ~2130  | ~78%   | 1.19e-07    | 216     | Best FP32; A-A halves VRAM       |
+| 8    | Q16.16 SoA     | SoA     | ~1940  | ~71%   | ~1.5e-05    | 368     | IADD3 pipeline; FP32-class MLUPS |
+| 9    | FP32 Fused     | SoA     | ~1940  | ~71%   | 4.77e-07    | 368     | Baseline FP32 BGK                |
 | 10   | Q32.32 SoA     | SoA     | ~920   | ~61%   | 0.00e+00    | 672     | **1.59x faster than FP64**       |
 | 11   | FP64 SoA       | SoA     | ~575   | ~38%   | 0.00e+00    | 672     | Compute-bound (64:1 FP64 ratio)  |
 
-**All tiers: mass_drift = 0.00e+00.** The GPU SFU reciprocal approximation
-was the sole source of mass drift at every precision level. Precomputing
-inv_tau on the CPU (exact arithmetic) eliminated it completely.
+**Precomputed inv_tau** eliminates the 50.6-cycle MUFU.RCP SFU stall per
+cell per step. Mass drift values reflect the inherent quantization error
+of each precision tier (FP32: ~5e-7, INT8: ~0.31, FP8: ~0.03).
 
 ### Novel SASS-RE-informed kernels and optimizations
 
