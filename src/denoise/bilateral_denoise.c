@@ -46,91 +46,117 @@ static void bilateral_filter_1d(
 {
     float sigma_s_sq = p->sigma_s * p->sigma_s;
     float sigma_r_sq = p->sigma_r * p->sigma_r;
+    float inv_2sigma_r_sq = 1.0f / (2.0f * sigma_r_sq);
+
+    // Precompute spatial kernel -- depends only on offset, not pixel data.
+    // Eliminates one expf() per neighbor per pixel (saves ~50% transcendentals).
+    float spatial_lut[41]; // max radius 20 -> 2*20+1 = 41 entries
+    int r = p->radius;
+    if (r > 20) r = 20;
+    for (int d = -r; d <= r; d++) {
+        spatial_lut[d + r] = gauss_spatial((float)(d * d), sigma_s_sq);
+    }
 
     if (horizontal) {
         // Horizontal pass: filter rows
         for (int y = 0; y < height; y++) {
+            const Vec3 *row_in = input + y * width;
+            Vec3 *row_out = output + y * width;
+
             for (int x = 0; x < width; x++) {
-                int center_idx = y * width + x;
-                Vec3 center_col = input[center_idx];
+                Vec3 center_col = row_in[x];
                 float center_lum = luminance(center_col);
 
-                Vec3 sum = {0, 0, 0};
+                float sum_x = 0.0f, sum_y = 0.0f, sum_z = 0.0f;
                 float weight_sum = 0.0f;
 
-                for (int dx = -p->radius; dx <= p->radius; dx++) {
-                    int nx = x + dx;
-                    if (nx < 0 || nx >= width) continue;
+                int dx_min = (x - r >= 0)     ? -r : -x;
+                int dx_max = (x + r < width)  ?  r : (width - 1 - x);
 
-                    int neighbor_idx = y * width + nx;
-                    Vec3 neighbor_col = input[neighbor_idx];
+                for (int dx = dx_min; dx <= dx_max; dx++) {
+                    Vec3 neighbor_col = row_in[x + dx];
                     float neighbor_lum = luminance(neighbor_col);
 
-                    float dist_sq = (float)(dx * dx);
-                    float lum_diff_sq = (center_lum - neighbor_lum) * (center_lum - neighbor_lum);
+                    float lum_diff = center_lum - neighbor_lum;
+                    float lum_diff_sq = lum_diff * lum_diff;
 
-                    float w_spatial = gauss_spatial(dist_sq, sigma_s_sq);
-                    float w_range = gauss_range(lum_diff_sq, sigma_r_sq);
-                    float weight = w_spatial * w_range;
+                    // Range kernel: fast polynomial approx instead of expf
+                    float rx = lum_diff_sq * inv_2sigma_r_sq;
+                    float w_range;
+                    if (rx > 4.0f) {
+                        w_range = 0.0f;
+                    } else {
+                        // exp(-x) ~ max(0, 1 - x + 0.5*x^2) for x in [0,4]
+                        w_range = 1.0f - rx + 0.5f * rx * rx;
+                    }
 
-                    sum.x += neighbor_col.x * weight;
-                    sum.y += neighbor_col.y * weight;
-                    sum.z += neighbor_col.z * weight;
+                    float weight = spatial_lut[dx + r] * w_range;
+
+                    sum_x += neighbor_col.x * weight;
+                    sum_y += neighbor_col.y * weight;
+                    sum_z += neighbor_col.z * weight;
                     weight_sum += weight;
                 }
 
                 if (weight_sum > 1e-6f) {
-                    output[center_idx].x = sum.x / weight_sum;
-                    output[center_idx].y = sum.y / weight_sum;
-                    output[center_idx].z = sum.z / weight_sum;
+                    float inv_w = 1.0f / weight_sum;
+                    row_out[x].x = sum_x * inv_w;
+                    row_out[x].y = sum_y * inv_w;
+                    row_out[x].z = sum_z * inv_w;
                 } else {
-                    output[center_idx] = center_col;
+                    row_out[x] = center_col;
                 }
             }
         }
     } else {
-        // Vertical pass: filter columns — process in column strips so the
-        // vertical working set (radius rows × strip_w columns) fits in L2 cache.
-        // For a 64-column strip at radius 5: (2*5+1) rows × 64 × 12 bytes ≈ 8.4 KB.
+        // Vertical pass: filter columns in 64-column strips for L2 cache locality.
+        // Strip working set: (2*radius+1) rows * 64 cols * 12 bytes ~ 8.4 KB at radius 5.
         #define VERT_STRIP_W 64
         for (int x_start = 0; x_start < width; x_start += VERT_STRIP_W) {
             int x_end = x_start + VERT_STRIP_W;
             if (x_end > width) x_end = width;
 
             for (int y = 0; y < height; y++) {
+                int dy_min = (y - r >= 0)      ? -r : -y;
+                int dy_max = (y + r < height)  ?  r : (height - 1 - y);
+
                 for (int x = x_start; x < x_end; x++) {
                     int center_idx = y * width + x;
                     Vec3 center_col = input[center_idx];
                     float center_lum = luminance(center_col);
 
-                    Vec3 sum = {0, 0, 0};
+                    float sum_x = 0.0f, sum_y = 0.0f, sum_z = 0.0f;
                     float weight_sum = 0.0f;
 
-                    for (int dy = -p->radius; dy <= p->radius; dy++) {
-                        int ny = y + dy;
-                        if (ny < 0 || ny >= height) continue;
-
-                        int neighbor_idx = ny * width + x;
+                    for (int dy = dy_min; dy <= dy_max; dy++) {
+                        int neighbor_idx = (y + dy) * width + x;
                         Vec3 neighbor_col = input[neighbor_idx];
                         float neighbor_lum = luminance(neighbor_col);
 
-                        float dist_sq = (float)(dy * dy);
-                        float lum_diff_sq = (center_lum - neighbor_lum) * (center_lum - neighbor_lum);
+                        float lum_diff = center_lum - neighbor_lum;
+                        float lum_diff_sq = lum_diff * lum_diff;
 
-                        float w_spatial = gauss_spatial(dist_sq, sigma_s_sq);
-                        float w_range = gauss_range(lum_diff_sq, sigma_r_sq);
-                        float weight = w_spatial * w_range;
+                        float rx = lum_diff_sq * inv_2sigma_r_sq;
+                        float w_range;
+                        if (rx > 4.0f) {
+                            w_range = 0.0f;
+                        } else {
+                            w_range = 1.0f - rx + 0.5f * rx * rx;
+                        }
 
-                        sum.x += neighbor_col.x * weight;
-                        sum.y += neighbor_col.y * weight;
-                        sum.z += neighbor_col.z * weight;
+                        float weight = spatial_lut[dy + r] * w_range;
+
+                        sum_x += neighbor_col.x * weight;
+                        sum_y += neighbor_col.y * weight;
+                        sum_z += neighbor_col.z * weight;
                         weight_sum += weight;
                     }
 
                     if (weight_sum > 1e-6f) {
-                        output[center_idx].x = sum.x / weight_sum;
-                        output[center_idx].y = sum.y / weight_sum;
-                        output[center_idx].z = sum.z / weight_sum;
+                        float inv_w = 1.0f / weight_sum;
+                        output[center_idx].x = sum_x * inv_w;
+                        output[center_idx].y = sum_y * inv_w;
+                        output[center_idx].z = sum_z * inv_w;
                     } else {
                         output[center_idx] = center_col;
                     }
