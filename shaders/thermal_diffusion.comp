@@ -14,7 +14,9 @@
 //   B₄C: k ≈ 30 - 0.005·(T-300)
 
 #version 450
-layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+// 128 threads/workgroup for better occupancy (was 64 at 4x4x4).
+// 8x4x4 keeps Z-dimension small for better L2 locality on 3D stencil.
+layout(local_size_x = 8, local_size_y = 4, local_size_z = 4) in;
 
 // Binding 0: temperature input (read)
 layout(std430, set=0, binding=0) readonly buffer TempIn {

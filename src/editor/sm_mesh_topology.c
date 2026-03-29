@@ -1,4 +1,5 @@
 #include "sm_mesh_topology.h"
+#include <string.h>
 
 // Small helper: sort (a,b) unordered pair into canonical order
 static void SortPair(int *a, int *b)
@@ -10,13 +11,50 @@ static void SortPair(int *a, int *b)
     }
 }
 
+// ---- Open-addressing hash table for O(1) edge lookup ----
+// Replaces the O(E) linear scan that made Topology_Build O(E^2).
+// Uses Fibonacci hashing on the (a,b) vertex pair.
+#define EDGE_HASH_SIZE 4096  // Power of 2, must be >= 2 * SM_MAX_EDGES
+#define EDGE_HASH_MASK (EDGE_HASH_SIZE - 1)
+#define EDGE_HASH_EMPTY (-1)
+
+static int edge_hash_table[EDGE_HASH_SIZE]; // Maps hash slot -> edge index
+
+static unsigned int edge_hash_key(int a, int b) {
+    unsigned int h = (unsigned int)a * 2654435761u ^ (unsigned int)b * 2246822519u;
+    return h & EDGE_HASH_MASK;
+}
+
+static int edge_hash_find(const MeshEdge *edges, int a, int b) {
+    unsigned int slot = edge_hash_key(a, b);
+    for (int probe = 0; probe < 64; probe++) {
+        int idx = edge_hash_table[(slot + (unsigned)probe) & EDGE_HASH_MASK];
+        if (idx == EDGE_HASH_EMPTY) return -1;
+        if (edges[idx].v0 == a && edges[idx].v1 == b) return idx;
+    }
+    return -1; // Fallback: not found after 64 probes
+}
+
+static void edge_hash_insert(int edge_idx, int a, int b) {
+    unsigned int slot = edge_hash_key(a, b);
+    for (int probe = 0; probe < 64; probe++) {
+        unsigned int s = (slot + (unsigned)probe) & EDGE_HASH_MASK;
+        if (edge_hash_table[s] == EDGE_HASH_EMPTY) {
+            edge_hash_table[s] = edge_idx;
+            return;
+        }
+    }
+    // Table full -- should not happen with proper sizing
+}
+
 void Topology_Build(MeshTopology *topo,
                     EditTri *tris, int triCount,
                     int vertCount)
 {
-    (void)vertCount; // Not used for now
+    (void)vertCount;
 
     topo->edgeCount = 0;
+    memset(edge_hash_table, 0xFF, sizeof(edge_hash_table)); // Fill with EDGE_HASH_EMPTY (-1)
 
     for (int ti = 0; ti < triCount; ++ti) {
         EditTri *t = &tris[ti];
@@ -29,14 +67,7 @@ void Topology_Build(MeshTopology *topo,
 
             SortPair(&a, &b);
 
-            int found = -1;
-            for (int ei = 0; ei < topo->edgeCount; ++ei) {
-                MeshEdge *edge = &topo->edges[ei];
-                if (edge->v0 == a && edge->v1 == b) {
-                    found = ei;
-                    break;
-                }
-            }
+            int found = edge_hash_find(topo->edges, a, b);
 
             if (found >= 0) {
                 MeshEdge *edge = &topo->edges[found];
@@ -44,11 +75,13 @@ void Topology_Build(MeshTopology *topo,
                 else if (edge->tri1 == -1) edge->tri1 = ti;
             } else {
                 if (topo->edgeCount >= SM_MAX_EDGES) continue;
-                MeshEdge *edge = &topo->edges[topo->edgeCount++];
+                int idx = topo->edgeCount++;
+                MeshEdge *edge = &topo->edges[idx];
                 edge->v0   = a;
                 edge->v1   = b;
                 edge->tri0 = ti;
                 edge->tri1 = -1;
+                edge_hash_insert(idx, a, b);
             }
         }
     }

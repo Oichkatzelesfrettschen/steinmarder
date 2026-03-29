@@ -229,7 +229,12 @@ vec3 transfer_physical(float density, float signed_psi, float r, vec3 p) {
 
     // Reinhard tone-map with contrast power
     float x = raw * pc.densityMult;
-    float d = pow(x / (x + 1.0), 0.4);
+    // pow(y, 0.4) ~ sqrt(sqrt(y)) * sqrt(sqrt(sqrt(y))) but that is y^0.375.
+    // Better: y^0.4 = y^(2/5) = sqrt(y * sqrt(y)) / y^0.1 -- too complex.
+    // Use: pow(y, 0.4) ~ y^0.5 * y^(-0.1) ~ sqrt(y) * (1 - 0.1*ln(y)) -- also complex.
+    // Simplest fast approx: sqrt(sqrt(y)) = y^0.25 is close enough for tonemapping.
+    float y = x / (x + 1.0);
+    float d = sqrt(sqrt(y));
 
     vec3 color;
     if (pc.useSignedGrid != 0 && pc.colorMode == 2) {
@@ -377,7 +382,7 @@ vec3 transfer_physical(float density, float signed_psi, float r, vec3 p) {
             fuel_c *= (0.45 + 0.55 * orbital);
 
             // Fission event micro-flashes (random bright spots = individual fission events)
-            float fiss_noise = fract(sin(dot(p_norm.xy, vec2(127.1, 311.7)) + time_f * 0.02) * 43758.5453);
+            float fiss_noise = fract(float(((floatBitsToUint(p_norm.x) * 1103515245u + floatBitsToUint(p_norm.y) * 12345u) ^ floatBitsToUint(time_f * 0.02)) * 2654435761u) / 4294967296.0);
             float fission_flash = (fiss_noise > 0.97) ? 2.0 : 0.0;  // 3% chance per voxel/frame
 
             // Cherenkov radiation glow: blue halo that extends beyond fuel into coolant
@@ -702,7 +707,7 @@ vec3 transfer_physical(float density, float signed_psi, float r, vec3 p) {
             vec3 ba_color = vec3(0.15, 0.85, 0.30);   // Ba green emission (553 nm)
             vec3 kr_color = vec3(0.70, 0.20, 0.95);   // Kr noble gas violet
 
-            float which = fract(sin(dot(p_norm.xy, vec2(127.1, 311.7))) * 43758.5);
+            float which = fract(float((floatBitsToUint(p_norm.x) * 1103515245u + floatBitsToUint(p_norm.y) * 12345u) * 2654435761u) / 4294967296.0);
             vec3 frag_base = which > 0.5 ? ba_color : kr_color;
 
             color = mix(frag_base, hot_core, fragment_glow);
