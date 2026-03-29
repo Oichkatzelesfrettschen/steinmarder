@@ -11,11 +11,20 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_C_FLAGS_RELEASE "-O2")
+set(CMAKE_C_FLAGS_RELEASE "-O2 -march=native")
 set(CMAKE_C_FLAGS_DEBUG   "-g -O0 -fsanitize=address,undefined")
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)
+endif()
+
+# Link-time optimization for Release builds: enables cross-TU inlining,
+# dead code elimination, and interprocedural constant propagation.
+# Typical 5-10% speedup across all CPU targets.
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported)
+if(ipo_supported AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
 # ════════════════════════════════════════════════════════════════
