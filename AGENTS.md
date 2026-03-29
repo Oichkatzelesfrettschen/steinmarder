@@ -26,8 +26,10 @@ precision tiers with two memory layouts (AoS, i-major SoA).
 ### Key Performance Facts
 
 - All scalar LBM kernels (FP32 and below) are **bandwidth-bound** on Ada
-- INT8 SoA is Pareto-optimal: 5643 MLUPS, 76 MB VRAM, 2.85x FP32
+- INT8 SoA is Pareto-optimal: ~5460 MLUPS, 140 MB VRAM, ~2.8x FP32
+- **All kernels: mass_drift = 0** via precomputed inv_tau (eliminates MUFU.RCP)
 - SoA layout beats AoS by 1.81x-2.22x at 128^3 (scatter penalty elimination)
+- Q32.32 fixed-point: 1.59x faster than FP64 (INT64 ALU bypasses 64:1 throttle)
 - FP64/DD kernels are compute-bound (64:1 FP64 ratio on Ada gaming SKUs)
 - Canonical benchmark grid: 128^3 (GDDR6X-bound regime)
 
@@ -127,14 +129,14 @@ production kernel has LMEM > 0 bytes.
 All baselines measured on RTX 4070 Ti Super (AD103, 66 SMs, 504 GB/s peak).
 See `src/cuda_lbm/README.md` for full tables.
 
-Top 5 physics-valid at 128^3 (GDDR6X-bound):
+Top kernels at 128^3 (GDDR6X-bound, all mass_drift=0):
 
 | Rank | Tier | MLUPS | BW% | VRAM |
 |------|------|-------|-----|------|
-| 1 | INT8 SoA | 5643 | 51.5% | 76 MB |
-| 2 | FP8 e4m3 SoA | 5408 | 49.4% | 76 MB |
-| 3 | FP8 e5m2 SoA | 5280 | 48.2% | 76 MB |
-| 4 | FP16 SoA H2 | 3802 | 69.4% | 152 MB |
+| 1 | INT8 SoA | ~5460 | ~76% | 140 MB |
+| 2 | FP8 e4m3 SoA | ~5170 | ~72% | 140 MB |
+| 3 | INT8 SoA C4 | ~4960 | ~69% | 140 MB |
+| 4 | BF16 SoA | ~3210 | ~69% | 216 MB |
 | 5 | INT16 SoA | 3569 | 65.1% | 152 MB |
 
 ## SM89 Optimization Checklist

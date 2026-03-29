@@ -111,18 +111,22 @@ Requires CUDA 13.x and an SM 7.5+ GPU.
 
 ## CUDA LBM fluid simulation
 
-24 production CUDA kernels implementing the D3Q19 Lattice Boltzmann Method
-across 10 precision tiers (FP64 through INT4) in two memory layouts (AoS,
-i-major SoA). Includes MRT collision, adaptive refinement, and sparse brick-map
-support.
+39 CUDA kernels implementing the D3Q19 Lattice Boltzmann Method across 12
+precision tiers (FP64, Q32.32, FP32, Q16.16, FP16, BF16, FP8, INT8, INT16,
+INT4) in two memory layouts (AoS, i-major SoA). Includes MRT collision,
+adaptive refinement, sparse brick-map, and novel SASS-RE-informed fixed-point
+kernels (Q16.16, Q32.32) that exploit integer ALU pipelines.
+
+All kernels achieve **mass_drift = 0** via precomputed inv_tau (eliminates
+50.6-cycle MUFU.RCP SFU stall measured by our SASS reverse engineering).
 
 Top physics-valid kernels at 128^3 (GDDR6X-bound):
 
-| Tier           | MLUPS | BW%   | VRAM  |
-|----------------|-------|-------|-------|
-| INT8 SoA       | 5643  | 51.5% | 76 MB |
-| FP8 e4m3 SoA   | 5408  | 49.4% | 76 MB |
-| FP16 SoA half2 | 3802  | 69.4% | 152 MB|
+| Tier           | MLUPS | BW%   | VRAM   | mass_drift |
+|----------------|-------|-------|--------|------------|
+| INT8 SoA       | ~5460 | ~76%  | 140 MB | 0          |
+| FP8 e4m3 SoA   | ~5170 | ~72%  | 140 MB | 0          |
+| Q32.32 SoA     | ~920  | ~61%  | 672 MB | 0 (1.59x FP64) |
 
 Full kernel index and benchmarks: [`src/cuda_lbm/README.md`](src/cuda_lbm/README.md)
 
