@@ -50,6 +50,7 @@ typedef enum {
     LBM_INT8_SOA_LLOYDMAX,     // kernels_int8_soa_lloydmax.cu (adaptive-range quantization)
     LBM_INT8_SOA_LLOYDMAX_C4,  // kernels_int8_soa_lloydmax.cu (adaptive-range + 4-cell coarsened)
     LBM_INT8_SOA_LLOYDMAX_PIPE, // kernels_int8_soa_lloydmax_pipe.cu (SW-pipelined load/compute)
+    LBM_INT8_SOA_LLOYDMAX_HIOCC, // kernels_int8_soa_lloydmax.cu (register-limited, 5 blocks/SM)
 
     // INT16 variants
     LBM_INT16_AOS,             // kernels_int16.cu
@@ -128,6 +129,7 @@ static const LbmKernelInfo LBM_KERNEL_INFO[LBM_VARIANT_COUNT] = {
     [LBM_INT8_SOA_LLOYDMAX] = {"INT8 SoA LM",         "lbm_step_int8_soa_lloydmax_kernel", "initialize_uniform_int8_soa_lloydmax_kernel", 1, 61, 1, 1, 128, 1, 0, 0},
     [LBM_INT8_SOA_LLOYDMAX_C4] = {"INT8 SoA LM C4",    "lbm_step_int8_soa_lloydmax_c4_kernel", "initialize_uniform_int8_soa_lloydmax_kernel", 1, 61, 1, 1, 128, 4, 0, 0},
     [LBM_INT8_SOA_LLOYDMAX_PIPE] = {"INT8 SoA LM Pipe", "lbm_step_int8_soa_lloydmax_pipe_kernel", "initialize_uniform_int8_soa_lloydmax_kernel", 1, 61, 1, 1, 128, 2, 0, 0},
+    [LBM_INT8_SOA_LLOYDMAX_HIOCC] = {"INT8 SoA LM HiOcc", "lbm_step_int8_soa_lloydmax_hiocc_kernel", "initialize_uniform_int8_soa_lloydmax_kernel", 1, 61, 1, 1, 128, 1, 0, 0},
 
     // INT16 variants
     [LBM_INT16_AOS]          = {"INT16 AoS",           "lbm_step_int16_kernel",          "initialize_uniform_int16_kernel", 2,  50, 1,   0,   128, 1,   0,  0},
