@@ -160,7 +160,7 @@ lbm_step_sparse_aa(
 
     // 3. BGK collision
     float tau_local = __ldg(&tau[tid]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
     float u_sq = ux * ux + uy * uy + uz * uz;
     float base = fmaf(-1.5f, u_sq, 1.0f);
 

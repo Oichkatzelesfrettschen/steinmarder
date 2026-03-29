@@ -18,7 +18,7 @@
 // Usage:
 //   1. Call compute_inv_tau_kernel once when tau field changes
 //   2. Pass inv_tau array to BGK kernels instead of tau
-//   3. Kernel replaces `float inv_tau = 1.0f / tau_local;` with
+//   3. Kernel replaces `float inv_tau = tau_local;  // tau slot = precomputed inv_tau` with
 //      `float inv_tau = __ldg(&inv_tau_arr[idx]);`
 //      LDG at ~33 cy (L1 hit) vs MUFU.RCP at 41.53 cy = 20% faster
 //      And LDG can be overlapped with other warps (MUFU.RCP cannot).

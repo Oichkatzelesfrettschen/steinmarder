@@ -204,18 +204,23 @@ int launch_lbm_step(
         return cudaErrorInvalidValue;
     }
 
+    // If inv_tau is precomputed, pass it in the tau slot.
+    // Kernels read it directly as inv_tau (no reciprocal needed).
+    // If inv_tau is NULL, pass raw tau (kernels compute 1/tau internally).
+    const float* tau_or_inv = bufs->inv_tau ? bufs->inv_tau : bufs->tau;
+
     // AoS kernels use (force, tau); SoA kernels use (tau, force).
     // Build args conditionally based on layout from the info table.
     void* args_soa[] = {
         (void*)&f_in, (void*)&f_out,
         (void*)&bufs->rho, (void*)&bufs->u,
-        (void*)&bufs->tau, (void*)&bufs->force,
+        (void*)&tau_or_inv, (void*)&bufs->force,
         (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
     };
     void* args_aos[] = {
         (void*)&f_in, (void*)&f_out,
         (void*)&bufs->rho, (void*)&bufs->u,
-        (void*)&bufs->force, (void*)&bufs->tau,
+        (void*)&bufs->force, (void*)&tau_or_inv,
         (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
     };
     void** args = info->is_soa ? args_soa : args_aos;

@@ -115,8 +115,7 @@ extern "C" __launch_bounds__(128, 5) __global__ void lbm_step_q16_soa_lm_kernel(
         f_local[i] = QLM_DECODE(q_local[i]);
     }
 
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau   = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq      = ux * ux + uy * uy + uz * uz;
     float base      = fmaf(-1.5f, u_sq, 1.0f);
 

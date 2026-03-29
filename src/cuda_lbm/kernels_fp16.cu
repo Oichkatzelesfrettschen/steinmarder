@@ -139,7 +139,7 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_fused_fp16_kernel(
     compute_equilibrium_fp16(f_eq, rho_local, u_vec);
 
     float tau_local = tau[idx];
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
     float prefactor = 1.0f - 0.5f * inv_tau;
     float fx = force[idx * 3 + 0];
     float fy = force[idx * 3 + 1];

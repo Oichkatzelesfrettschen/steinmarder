@@ -97,8 +97,7 @@ extern "C" __global__ void lbm_step_soa_fused(
     u_out[2 * N + idx] = uz;
 
     // 2. BGK collision with Horner FMA equilibrium
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq = ux * ux + uy * uy + uz * uz;
     float base = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -336,7 +335,7 @@ extern "C" __global__ void lbm_step_soa_batch_kernel(
 
     // 2. BGK collision
     float tau_local = __ldg(&tau[offset + local_idx]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
     float u_sq = ux * ux + uy * uy + uz * uz;
     float base_val = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -439,7 +438,7 @@ __device__ __forceinline__ void mrt_collision_d3q19(
     float f[19], float rho, float ux, float uy, float uz, float tau_local
 ) {
     // Relaxation rates (diagonal S matrix)
-    float s_nu    = 1.0f / tau_local;
+    float s_nu = tau_local;  // tau slot contains precomputed inv_tau
     float s_e     = 1.19f;
     float s_eps   = 1.4f;
     float s_q     = 1.2f;
@@ -682,7 +681,7 @@ extern "C" __global__ void lbm_step_soa_mrt_fused(
     float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
     if (force_mag_sq >= 1e-40f) {
-        float inv_tau = 1.0f / tau_local;
+        float inv_tau = tau_local;  // tau slot = precomputed inv_tau
         float prefactor = 1.0f - 0.5f * inv_tau;
         float u_dot_f = ux * fx + uy * fy + uz * fz;
 
@@ -767,8 +766,7 @@ __device__ __forceinline__ void process_cell_bgk(
     u_out[N + idx]     = uy;
     u_out[2 * N + idx] = uz;
 
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq = ux * ux + uy * uy + uz * uz;
     float base = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -878,7 +876,7 @@ __device__ __forceinline__ void process_cell_mrt(
     float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
     if (force_mag_sq >= 1e-40f) {
-        float inv_tau_f = 1.0f / tau_local;
+        float inv_tau_f = tau_local;  // tau slot = precomputed inv_tau
         float prefactor = 1.0f - 0.5f * inv_tau_f;
         float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
@@ -1051,8 +1049,7 @@ lbm_step_soa_tiled(
     u_out[2 * N + idx] = uz;
 
     // Phase 4: BGK collision
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau   = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq      = ux * ux + uy * uy + uz * uz;
     float base      = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -1180,7 +1177,7 @@ lbm_step_soa_mrt_tiled(
     float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
     if (force_mag_sq >= 1e-40f) {
-        float inv_tau_f = 1.0f / tau_local;
+        float inv_tau_f = tau_local;  // tau slot = precomputed inv_tau
         float prefactor = 1.0f - 0.5f * inv_tau_f;
         float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
@@ -1278,8 +1275,7 @@ lbm_step_soa_coarsened(
         u_out[N + idx]     = uy;
         u_out[2 * N + idx] = uz;
 
-        float tau_local = __ldg(&tau[idx]);
-        float inv_tau = 1.0f / tau_local;
+        float inv_tau = __ldg(&tau[idx]);  // precomputed by host
         float u_sq = ux * ux + uy * uy + uz * uz;
         float base_eq = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -1350,8 +1346,7 @@ lbm_step_soa_coarsened(
         u_out[N + idx]     = uy;
         u_out[2 * N + idx] = uz;
 
-        float tau_local = __ldg(&tau[idx]);
-        float inv_tau = 1.0f / tau_local;
+        float inv_tau = __ldg(&tau[idx]);  // precomputed by host
         float u_sq = ux * ux + uy * uy + uz * uz;
         float base_eq = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -1466,7 +1461,7 @@ lbm_step_soa_mrt_coarsened(
         float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
         if (force_mag_sq >= 1e-40f) {
-            float inv_tau_f = 1.0f / tau_local;
+            float inv_tau_f = tau_local;  // tau slot = precomputed inv_tau
             float prefactor = 1.0f - 0.5f * inv_tau_f;
             float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
@@ -1529,7 +1524,7 @@ lbm_step_soa_mrt_coarsened(
         float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
         if (force_mag_sq >= 1e-40f) {
-            float inv_tau_f = 1.0f / tau_local;
+            float inv_tau_f = tau_local;  // tau slot = precomputed inv_tau
             float prefactor = 1.0f - 0.5f * inv_tau_f;
             float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
@@ -1651,8 +1646,7 @@ extern "C" __global__ void lbm_step_soa_aa(
     u_out[2 * N + idx] = uz;
 
     // 3. BGK collision
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq = ux * ux + uy * uy + uz * uz;
     float base = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -1768,7 +1762,7 @@ extern "C" __global__ void lbm_step_soa_mrt_aa(
     float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
     if (force_mag_sq >= 1e-40f) {
-        float inv_tau_f = 1.0f / tau_local;
+        float inv_tau_f = tau_local;  // tau slot = precomputed inv_tau
         float prefactor = 1.0f - 0.5f * inv_tau_f;
         float u_dot_f = ux * fx + uy * fy + uz * fz;
         #pragma unroll
@@ -2003,8 +1997,7 @@ lbm_step_soa_coarsened_float4(
         u_out[N + idx]     = uy;
         u_out[2 * N + idx] = uz;
 
-        float tau_local = __ldg(&tau[idx]);
-        float inv_tau = 1.0f / tau_local;
+        float inv_tau = __ldg(&tau[idx]);  // precomputed by host
         float u_sq = ux * ux + uy * uy + uz * uz;
         float base_eq = fmaf(-1.5f, u_sq, 1.0f);
 

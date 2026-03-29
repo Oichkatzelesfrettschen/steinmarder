@@ -114,8 +114,7 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_kernel(
     u_out[n_cells + idx]     = uy;
     u_out[2 * n_cells + idx] = uz;
 
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau   = 1.0f / tau_local;
+    float inv_tau = __ldg(&tau[idx]);  // precomputed by host
     float u_sq      = ux * ux + uy * uy + uz * uz;
     float base      = fmaf(-1.5f, u_sq, 1.0f);
 
@@ -221,8 +220,7 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_coarsened
         u_out[n_cells + idx]     = uy;
         u_out[2 * n_cells + idx] = uz;
 
-        float tau_local = __ldg(&tau[idx]);
-        float inv_tau   = 1.0f / tau_local;
+        float inv_tau = __ldg(&tau[idx]);  // precomputed by host
         float u_sq      = ux * ux + uy * uy + uz * uz;
         float base_val  = fmaf(-1.5f, u_sq, 1.0f);
 

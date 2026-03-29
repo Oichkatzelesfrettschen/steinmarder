@@ -54,7 +54,7 @@ __device__ __forceinline__ signed char float_to_i8ma(float v) {
 __device__ __forceinline__ void mrt_collision_int8(
     float f[19], float rho, float ux, float uy, float uz, float tau_local
 ) {
-    float s_nu = 1.0f / tau_local;
+    float s_nu = tau_local;  // tau slot contains precomputed inv_tau
     float s_e = 1.19f, s_eps = 1.4f, s_q = 1.2f, s_ghost = 1.0f;
 
     float usq = ux*ux + uy*uy + uz*uz;
@@ -228,7 +228,7 @@ extern "C" __launch_bounds__(128, 2) __global__ void lbm_step_int8_soa_mrt_aa_ke
     float fy = force ? force[N + idx] : 0.0f;
     float fz = force ? force[2*N + idx] : 0.0f;
     if (fx*fx + fy*fy + fz*fz >= 1e-40f) {
-        float inv_tau = 1.0f / tau_local;
+        float inv_tau = tau_local;  // tau slot = precomputed inv_tau
         float pref = 1.0f - 0.5f * inv_tau;
         #pragma unroll
         for (int i = 0; i < 19; i++) {

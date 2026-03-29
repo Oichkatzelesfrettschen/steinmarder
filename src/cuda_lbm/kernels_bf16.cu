@@ -106,7 +106,7 @@ extern "C" __global__ void lbm_step_fused_bf16_kernel(
     compute_equilibrium_bf16(f_eq, rho_local, u_vec);
 
     float tau_local = __bfloat162float(tau[idx]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
     float prefactor = 1.0f - 0.5f * inv_tau;
 
     float fx = __bfloat162float(force[idx * 3 + 0]);
@@ -200,7 +200,7 @@ extern "C" __global__ void lbm_step_fused_bf16_4d_batch_kernel(
     compute_equilibrium_bf16(f_eq, rho_local, u_vec);
 
     float tau_local = __bfloat162float(tau[idx_4d]);
-    float inv_tau = 1.0f / tau_local;
+    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
     float prefactor = 1.0f - 0.5f * inv_tau;
 
     float fx = __bfloat162float(force[idx_4d * 3 + 0]);
