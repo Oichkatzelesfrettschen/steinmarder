@@ -47,25 +47,41 @@ Two layout families exist:
 
 ## Measured Performance (RTX 4070 Ti, Ada SM 8.9, 504 GB/s peak, 128^3 grid)
 
-Results from `cuda-precision-bench` (open_gororoba, 2026-03-15). 30 timing steps,
+Results from `lbm_bench` (steinmarder, 2026-03-28). 30 timing steps,
 5 warmup steps. Bandwidth model: (19_read + 19_write + 8_aux) * N^3 * elem_bytes.
 
 ### Physics-valid tiers -- MLUPS ranking at 128^3
 
-| Rank | Tier            | Layout  | MLUPS  | BW_GBS | BW_PCT | VRAM_MB | Notes                            |
-|------|-----------------|---------|--------|--------|--------|---------|----------------------------------|
-| 1    | INT8 SoA C4     | SoA     | 5956   | 416.9  | 82.7%  | 140     | 4 cells/thread + FMA-reordered Guo |
-| 2    | FP8 e4m3 SoA   | SoA     | 5901   | 413.1  | 82.0%  | 140     | SM 8.9+; best FP8 variant        |
-| 3    | FP8 e5m2 SoA   | SoA     | 5582   | 390.7  | 77.5%  | 140     | SM 8.9+; wider dynamic range     |
-| 4    | INT8 SoA        | SoA     | 5469   | 382.8  | 76.0%  | 140     | Scalar baseline INT8             |
-| 5    | FP16 SoA H2     | SoA     | 3773   | 407.4  | 80.8%  | 216     | 2 cells/thread; half2 moments    |
-| 6    | BF16 SoA        | SoA     | 3541   | 382.5  | 75.9%  | 216     | SM 8.0+; bfloat16 storage        |
-| 7    | FP16 SoA        | SoA     | 3539   | 382.2  | 75.8%  | 216     | Standard FP16 pull-scheme        |
-| 8    | INT16 SoA       | SoA     | 2863   | 309.2  | 61.4%  | 216     | Integer path; DIST_SCALE=16384   |
-| 9    | FP32 MRT A-A    | SoA     | 2321   | 427.0  | 84.7%  | 216     | Best FP32; A-A halves VRAM       |
-| 10   | FP32 SoA CS     | SoA     | 2174   | 399.9  | 79.4%  | 368     | Cache-streaming writes           |
-| 11   | FP32 MRT Tiled  | SoA     | 2161   | 397.6  | 78.9%  | 368     | Shared-memory tiled pull         |
-| 12   | FP32 Fused      | SoA     | 2043   | 376.0  | 74.6%  | 368     | Baseline FP32 BGK                |
+| Rank | Tier            | Layout  | MLUPS  | BW%    | mass_drift  | VRAM_MB | Notes                            |
+|------|-----------------|---------|--------|--------|-------------|---------|----------------------------------|
+| 1    | FP8 e4m3 SoA   | SoA     | ~5400  | ~76%   | 3.12e-02    | 140     | SM 8.9+; best raw throughput     |
+| 2    | INT8 SoA LM    | SoA     | ~5000  | ~68%   | 1.47e-02    | 140     | Lloyd-Max adaptive quantization  |
+| 3    | INT8 SoA C4    | SoA     | ~5400  | ~75%   | 3.12e-01    | 140     | 4 cells/thread coarsened         |
+| 4    | FP16 SoA H2    | SoA     | ~3600  | ~77%   | 2.44e-04    | 216     | 2 cells/thread; half2 moments    |
+| 5    | BF16 SoA       | SoA     | ~3500  | ~76%   | 1.95e-03    | 216     | SM 8.0+; bfloat16 storage        |
+| 6    | FP32 MRT A-A   | SoA     | ~2300  | ~85%   | 1.19e-07    | 216     | Best FP32; A-A halves VRAM       |
+| 7    | FP32 Fused     | SoA     | ~2000  | ~72%   | 4.77e-07    | 368     | Baseline FP32 BGK                |
+| 8    | Q16.16 SoA     | SoA     | ~1950  | ~70%   | ~1.5e-05    | 368     | IADD3 pipeline; near-FP32 MLUPS  |
+| 9    | Q16.16 SoA LM  | SoA     | ~1900  | ~69%   | ~5.7e-05    | 368     | Adaptive-range Q16.16            |
+| 10   | Q32.32 SoA     | SoA     | ~1050  | ~70%   | 0.00e+00    | 672     | **1.88x faster than FP64**       |
+| 11   | FP64 SoA       | SoA     | ~570   | ~38%   | 0.00e+00    | 672     | Compute-bound (64:1 FP64 ratio)  |
+
+### Novel SASS-RE-informed kernels (this session)
+
+Three kernel families exploit hardware pipeline measurements from the
+steinmarder SASS RE toolkit:
+
+1. **Lloyd-Max INT8 SoA** (TurboQuant crossover): adaptive-range quantization
+   concentrating 256 levels in the D3Q19 occupied range. 21x better mass
+   conservation than uniform INT8 at same MLUPS.
+
+2. **Q16.16 fixed-point SoA**: exploits IADD3 pipeline at 0.53 cycles/op
+   (8.5x faster than FFMA). Perfect integer rho accumulation. Same VRAM as FP32.
+
+3. **Q32.32 fixed-point SoA**: exploits INT64 ALU at ~2.57 cycles/op to bypass
+   the 64:1 FP64 throttling on gaming GPUs. 1.88x faster than FP64 at same VRAM
+   with zero mass drift. ncu confirmed: Q32.32 is bandwidth-bound (82.5% DRAM)
+   while FP64 is compute-bound (86.3% SM, only 44.4% DRAM).
 | 12   | INT16 AoS       | AoS     | 1904   | 182.8  | 36.3%  | 160     | Equal to FP16 AoS (scatter limit)|
 | 13   | FP16 AoS        | AoS     | 1912   | 183.5  | 36.4%  | 160     | AoS scatter-write limit          |
 | 14   | FP8_e4m3 AoS    | AoS     | 3202   | 153.7  | 30.5%  | 80      | AoS scatter erases 4x BW gain   |
