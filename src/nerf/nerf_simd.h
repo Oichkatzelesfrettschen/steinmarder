@@ -59,7 +59,9 @@ typedef struct {
 } NeRFConfig;
 
 typedef struct {
-    float *hashgrid_data;        // Hashgrid features as float32
+    float *hashgrid_data;        // Hashgrid features as float32 (NULL if compact)
+    uint16_t *hashgrid_fp16;     // Hashgrid features as FP16 bits (NULL if float32)
+    int hashgrid_compact;        // 1 = FP16 storage (halves memory), 0 = FP32
     float *mlp_weights;          // All MLP weights concatenated
     float *mlp_biases;           // All MLP biases concatenated
     uint8_t *occupancy_grid;     // 64^3 occupancy grid

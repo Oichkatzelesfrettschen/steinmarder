@@ -268,23 +268,43 @@ NeRFData* sm_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
         free(data);
         return NULL;
     }
-    data->hashgrid_data = (float*)malloc((size_t)grid_elems * sizeof(float));
-    if (!data->hashgrid_data) {
-        free(grid_raw);
-        fclose(f_hash);
-        fclose(f_occ);
-        free(data);
-        return NULL;
-    }
-    for (uint32_t i = 0; i < grid_elems; i++) {
-        if (fp16_format) {
-            data->hashgrid_data[i] = sm_half_to_float(grid_raw[i]);
-        } else {
-            float v = (float)grid_raw[i] / 32767.5f - 1.0f;
-            if (v > 1.0f) v = 1.0f;
-            if (v < -1.0f) v = -1.0f;
-            data->hashgrid_data[i] = v;
+    // Check if compact FP16 storage is requested (halves hashgrid memory).
+    // SM_NERF_HASHGRID_FP16=1 keeps data as 16-bit, converts on lookup.
+    const char *compact_env = getenv("SM_NERF_HASHGRID_FP16");
+    int use_compact = (compact_env && compact_env[0] == '1' && fp16_format);
+
+    if (use_compact) {
+        // Compact mode: keep raw FP16 bits, convert on-the-fly during lookup.
+        // Memory: 2 bytes/entry instead of 4 bytes/entry (50% reduction).
+        data->hashgrid_fp16 = (uint16_t*)malloc((size_t)grid_elems * sizeof(uint16_t));
+        if (!data->hashgrid_fp16) {
+            free(grid_raw); fclose(f_hash); fclose(f_occ); free(data);
+            return NULL;
         }
+        memcpy(data->hashgrid_fp16, grid_raw, grid_elems * sizeof(uint16_t));
+        data->hashgrid_data = NULL;
+        data->hashgrid_compact = 1;
+        fprintf(stderr, "[NeRF] hashgrid: compact FP16 mode (%u entries, %.1f MB saved)\n",
+                grid_elems, (float)grid_elems * 2.0f / (1024.0f * 1024.0f));
+    } else {
+        // Standard mode: expand to FP32 for maximum lookup speed.
+        data->hashgrid_data = (float*)malloc((size_t)grid_elems * sizeof(float));
+        if (!data->hashgrid_data) {
+            free(grid_raw); fclose(f_hash); fclose(f_occ); free(data);
+            return NULL;
+        }
+        for (uint32_t i = 0; i < grid_elems; i++) {
+            if (fp16_format) {
+                data->hashgrid_data[i] = sm_half_to_float(grid_raw[i]);
+            } else {
+                float v = (float)grid_raw[i] / 32767.5f - 1.0f;
+                if (v > 1.0f) v = 1.0f;
+                if (v < -1.0f) v = -1.0f;
+                data->hashgrid_data[i] = v;
+            }
+        }
+        data->hashgrid_fp16 = NULL;
+        data->hashgrid_compact = 0;
     }
     free(grid_raw);
 
@@ -389,10 +409,25 @@ load_fail:
 void sm_nerf_data_free(NeRFData *data) {
     if (!data) return;
     free(data->hashgrid_data);
+    free(data->hashgrid_fp16);
     free(data->mlp_weights);
     free(data->mlp_biases);
     free(data->occupancy_grid);
     free(data);
+}
+
+/* ===== FP16 hashgrid read helper ===== */
+
+/* Read a hashgrid feature value, converting from FP16 if in compact mode.
+ * In compact mode, hashgrid_data is NULL and hashgrid_fp16 is non-NULL.
+ * The caller passes both pointers; exactly one should be non-NULL. */
+static inline float hashgrid_read(
+    const float *hashgrid_f32,
+    const uint16_t *hashgrid_fp16,
+    uint32_t index
+) {
+    if (hashgrid_f32) return hashgrid_f32[index];
+    return sm_half_to_float(hashgrid_fp16[index]);
 }
 
 /* ===== Batched Hashgrid Lookup with Trilinear Interpolation ===== */
