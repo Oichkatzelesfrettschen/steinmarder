@@ -72,6 +72,8 @@ void lbm_step_q16_soa_kernel(const int*, int*, float*, float*, const float*, con
 
 // Init kernels -- Q16.16
 void initialize_uniform_q16_soa_kernel(int*, float*, float*, float*, float, float, float, float, float, int, int, int);
+void lbm_step_q16_soa_lm_kernel(const int*, int*, float*, float*, const float*, const float*, int, int, int);
+void initialize_uniform_q16_soa_lm_kernel(int*, float*, float*, float*, float, float, float, float, float, int, int, int);
 
 // Step kernels -- DD signature
 void lbm_step_fused_dd_kernel(const double*, const double*, double*, double*, float*, float*, const float*, const float*, int, int, int);
@@ -269,6 +271,7 @@ int launch_lbm_step(
 
     // Q16.16 fixed-point
     DISPATCH_STEP(LBM_Q16_SOA,               lbm_step_q16_soa_kernel,          int)
+    DISPATCH_STEP(LBM_Q16_SOA_LM,           lbm_step_q16_soa_lm_kernel,       int)
 
     // BW ceiling
     DISPATCH_STEP(LBM_INT4_SOA,              lbm_step_fused_int4_kernel,       void)
@@ -414,6 +417,7 @@ int launch_lbm_init(
     // FP64 SoA: 12-arg
     DISPATCH_INIT_12(LBM_FP64_SOA,              initialize_uniform_fp64_soa_kernel,     void)
     DISPATCH_INIT_12(LBM_Q16_SOA,               initialize_uniform_q16_soa_kernel,      int)
+    DISPATCH_INIT_12(LBM_Q16_SOA_LM,           initialize_uniform_q16_soa_lm_kernel,   int)
 
     // BW ceiling: 12-arg
     DISPATCH_INIT_12(LBM_INT4_SOA,              initialize_uniform_int4_kernel,         void)
@@ -470,6 +474,7 @@ static const void* get_step_kernel_ptr(LbmKernelVariant variant) {
     case LBM_FP64_SOA:               return (const void*)lbm_step_fp64_soa_kernel;
     case LBM_DD_SOA:                 return (const void*)lbm_step_fused_dd_kernel;
     case LBM_Q16_SOA:                return (const void*)lbm_step_q16_soa_kernel;
+    case LBM_Q16_SOA_LM:            return (const void*)lbm_step_q16_soa_lm_kernel;
     case LBM_INT4_SOA:               return (const void*)lbm_step_fused_int4_kernel;
     case LBM_FP4_SOA:                return (const void*)lbm_step_fp4_kernel;
     default:                         return NULL;
