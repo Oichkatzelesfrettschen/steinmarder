@@ -53,6 +53,7 @@ void lbm_step_int8_soa_kernel(const void*, void*, float*, float*, const float*, 
 void lbm_step_int8_soa_coarsened_kernel(const signed char*, signed char*, float*, float*, const float*, const float*, int, int, int);
 void lbm_step_int8_soa_lloydmax_kernel(const unsigned char*, unsigned char*, float*, float*, const float*, const float*, int, int, int);
 void lbm_step_int8_soa_lloydmax_c4_kernel(const unsigned char*, unsigned char*, float*, float*, const float*, const float*, int, int, int);
+void lbm_step_int8_soa_lloydmax_pipe_kernel(const unsigned char*, unsigned char*, float*, float*, const float*, const float*, int, int, int);
 void initialize_uniform_int8_soa_lloydmax_kernel(unsigned char*, float*, float*, float*, float, float, float, float, float, int, int, int);
 void lbm_step_int16_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
 void lbm_step_int16_soa_kernel(const void*, void*, float*, float*, const float*, const float*, int, int, int);
@@ -248,6 +249,7 @@ int launch_lbm_step(
     DISPATCH_STEP(LBM_INT8_SOA_COARSENED,   lbm_step_int8_soa_coarsened_kernel, signed char)
     DISPATCH_STEP(LBM_INT8_SOA_LLOYDMAX,   lbm_step_int8_soa_lloydmax_kernel, unsigned char)
     DISPATCH_STEP(LBM_INT8_SOA_LLOYDMAX_C4, lbm_step_int8_soa_lloydmax_c4_kernel, unsigned char)
+    DISPATCH_STEP(LBM_INT8_SOA_LLOYDMAX_PIPE, lbm_step_int8_soa_lloydmax_pipe_kernel, unsigned char)
 
     // INT16
     DISPATCH_STEP(LBM_INT16_AOS,             lbm_step_int16_kernel,            void)
@@ -389,6 +391,7 @@ int launch_lbm_init(
     DISPATCH_INIT_12(LBM_INT8_SOA_COARSENED,   initialize_uniform_int8_soa_kernel,     void)
     DISPATCH_INIT_12(LBM_INT8_SOA_LLOYDMAX,   initialize_uniform_int8_soa_lloydmax_kernel, unsigned char)
     DISPATCH_INIT_12(LBM_INT8_SOA_LLOYDMAX_C4, initialize_uniform_int8_soa_lloydmax_kernel, unsigned char)
+    DISPATCH_INIT_12(LBM_INT8_SOA_LLOYDMAX_PIPE, initialize_uniform_int8_soa_lloydmax_kernel, unsigned char)
 
     // INT16: 12-arg
     DISPATCH_INIT_12(LBM_INT16_AOS,             initialize_uniform_int16_kernel,        void)
@@ -446,6 +449,7 @@ static const void* get_step_kernel_ptr(LbmKernelVariant variant) {
     case LBM_INT8_SOA_COARSENED:     return (const void*)lbm_step_int8_soa_coarsened_kernel;
     case LBM_INT8_SOA_LLOYDMAX:      return (const void*)lbm_step_int8_soa_lloydmax_kernel;
     case LBM_INT8_SOA_LLOYDMAX_C4:   return (const void*)lbm_step_int8_soa_lloydmax_c4_kernel;
+    case LBM_INT8_SOA_LLOYDMAX_PIPE: return (const void*)lbm_step_int8_soa_lloydmax_pipe_kernel;
     case LBM_INT16_AOS:              return (const void*)lbm_step_int16_kernel;
     case LBM_INT16_SOA:              return (const void*)lbm_step_int16_soa_kernel;
     case LBM_FP64_AOS:               return (const void*)lbm_step_fused_fp64_kernel;

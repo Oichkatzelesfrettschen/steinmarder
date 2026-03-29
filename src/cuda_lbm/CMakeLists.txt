@@ -54,6 +54,7 @@ set(LBM_KERNEL_SOURCES
     sparse/kernels_sparse_lbm.cu
     sparse/kernels_sparse_map.cu
     kernels_int8_soa_lloydmax.cu
+    kernels_int8_soa_lloydmax_pipe.cu
     host_wrappers.cu
 )
 
