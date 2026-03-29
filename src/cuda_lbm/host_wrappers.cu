@@ -157,6 +157,9 @@ int launch_lbm_step(
     dim3 block(tpb);
     dim3 grd;
 
+    // If inv_tau is precomputed, pass it in place of tau to all kernels.
+    const float* tau_or_inv = bufs->inv_tau ? bufs->inv_tau : bufs->tau;
+
     // Compute grid dimensions
     int is_tiled = (variant == LBM_FP32_SOA_TILED || variant == LBM_FP32_SOA_MRT_TILED);
     if (is_tiled) {
@@ -176,7 +179,7 @@ int launch_lbm_step(
             (void*)&bufs->f_a, (void*)&bufs->f_b,
             (void*)&bufs->f_c, (void*)&bufs->f_d,
             (void*)&bufs->rho, (void*)&bufs->u,
-            (void*)&bufs->force, (void*)&bufs->tau,
+            (void*)&bufs->force, (void*)&tau_or_inv,
             (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
         };
         // Note: cudaLaunchKernel requires the function pointer. Since all
@@ -190,7 +193,7 @@ int launch_lbm_step(
         void* args[] = {
             (void*)&bufs->f_a,
             (void*)&bufs->rho, (void*)&bufs->u,
-            (void*)&bufs->tau, (void*)&bufs->force,
+            (void*)&tau_or_inv, (void*)&bufs->force,
             (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz,
             (void*)&parity
         };
@@ -203,11 +206,6 @@ int launch_lbm_step(
         }
         return cudaErrorInvalidValue;
     }
-
-    // If inv_tau is precomputed, pass it in the tau slot.
-    // Kernels read it directly as inv_tau (no reciprocal needed).
-    // If inv_tau is NULL, pass raw tau (kernels compute 1/tau internally).
-    const float* tau_or_inv = bufs->inv_tau ? bufs->inv_tau : bufs->tau;
 
     // AoS kernels use (force, tau); SoA kernels use (tau, force).
     // Build args conditionally based on layout from the info table.
@@ -346,6 +344,7 @@ int launch_lbm_init(
     };
 
     // 12-arg: (f, rho, u, tau, rho_init, ux, uy, uz, tau_val, nx, ny, nz)
+    // Init kernels WRITE to tau buffer, so pass raw tau (not inv_tau).
     void* args_12[] = {
         (void*)&bufs->f_a,
         (void*)&bufs->rho, (void*)&bufs->u,
