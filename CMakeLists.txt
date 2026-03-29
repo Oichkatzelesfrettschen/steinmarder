@@ -282,6 +282,26 @@ target_include_directories(smb_to_ppm PRIVATE ${SM_INCLUDE_DIRS})
 target_link_libraries(smb_to_ppm PRIVATE ${PLATFORM_LIBS})
 
 # ════════════════════════════════════════════════════════════════
+# CTest integration
+# ════════════════════════════════════════════════════════════════
+enable_testing()
+
+# Reactor thermal unit test (always available)
+add_test(NAME test_reactor_thermal COMMAND test_reactor_thermal)
+
+# CUDA LBM tests (only if CUDA available)
+if(CUDAToolkit_FOUND)
+    add_test(NAME lbm_conservation COMMAND lbm_test)
+    add_test(NAME lbm_benchmark_quick COMMAND lbm_bench --kernel "FP32 SoA Fused" --grid 64 --steps 5)
+endif()
+
+# Quick CPU render smoke test
+add_test(NAME render_smoke COMMAND steinmarder)
+set_tests_properties(render_smoke PROPERTIES
+    ENVIRONMENT "SM_W=32;SM_H=32;SM_SPP=1;SM_THREADS=1"
+    TIMEOUT 30)
+
+# ════════════════════════════════════════════════════════════════
 # Summary
 # ════════════════════════════════════════════════════════════════
 message(STATUS "")
