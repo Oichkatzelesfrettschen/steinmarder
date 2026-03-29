@@ -129,11 +129,14 @@ float radial_wavefunction(int n, int l, float Z, float r) {
     // Normalization: N = sqrt( (2Z/n)^3 · (n-l-1)! / (2n · (n+l)!) )
     float fact_nml1 = factorial(n - l - 1);
     float fact_npl  = factorial(n + l);
-    float norm = sqrt(pow(2.0 * Z / float(n), 3.0) * fact_nml1
+    float ratio_cubed = 2.0 * Z / float(n);
+    ratio_cubed = ratio_cubed * ratio_cubed * ratio_cubed;  // avoid pow(x, 3.0)
+    float norm = sqrt(ratio_cubed * fact_nml1
                      / (2.0 * float(n) * fact_npl));
 
-    // ρ^l term
-    float rho_l = pow(rho, float(l));
+    // rho^l via integer exponentiation (l is always a non-negative integer)
+    float rho_l = 1.0;
+    for (int li = 0; li < l; li++) rho_l *= rho;
 
     // Exponential decay
     float exponential = exp(-rho * 0.5);

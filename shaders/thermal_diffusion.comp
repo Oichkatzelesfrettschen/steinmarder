@@ -50,80 +50,6 @@ layout(push_constant) uniform ThermalPush {
 //   0 = VOID, 1 = FUEL_UO2, 2 = CLAD_ZR4, 3 = COOLANT_H2O,
 //   4 = MODERATOR_C, 5 = CONTROL_B4C
 
-// Temperature-dependent thermal diffusivity α = k/(ρ·c_p)
-float get_diffusivity(int mat, float T) {
-    float k, rho, cp;
-
-    if (mat == 1) { // UO₂ fuel
-        float t = T / 1000.0;
-        if (t < 0.3) t = 0.3;
-        k = 100.0 / (7.5408 + 17.692 * t + 3.6142 * t * t)
-            + (6400.0 / pow(t, 2.5)) * exp(-16.35 / t);
-        rho = 10970.0 * (1.0 - 3.0 * 10.0e-6 * (T - 300.0));
-        cp  = 302.27 + 0.0285 * T;
-    }
-    else if (mat == 2) { // Zircaloy-4
-        k   = 12.767 + 0.00574 * T;
-        rho = 6550.0 * (1.0 - 3.0 * 5.7e-6 * (T - 300.0));
-        cp  = (T < 1100.0) ? (281.0 + 0.0306 * T) : 360.0;
-    }
-    else if (mat == 3) { // Water (simplified: liquid properties)
-        k   = 0.686 - 0.0004 * (T - 373.15);
-        rho = 760.0 - 0.5 * (T - 543.15);
-        cp  = 4200.0 + 3.0 * (T - 543.15);
-        // Clamp for stability
-        if (rho < 36.0) rho = 36.0;
-        if (k < 0.025) k = 0.025;
-    }
-    else if (mat == 4) { // Graphite moderator
-        k   = 50.0 * exp(-0.0003 * (T - 300.0)) + 10.0;
-        rho = 1700.0;
-        cp  = 710.0 + 0.40 * (T - 300.0);
-    }
-    else if (mat == 5) { // B₄C control rod
-        k   = 30.0 - 0.005 * (T - 300.0);
-        rho = 2520.0;
-        cp  = 960.0 + 0.25 * (T - 300.0);
-    }
-    else { // VOID — minimal thermal properties
-        return 1.0e-7;
-    }
-
-    float denom = rho * cp;
-    if (denom < 1.0) denom = 1.0;
-    return k / denom;
-}
-
-// Get ρ·c_p for source term scaling
-float get_rho_cp(int mat, float T) {
-    float rho, cp;
-
-    if (mat == 1) { // UO₂
-        rho = 10970.0 * (1.0 - 3.0 * 10.0e-6 * (T - 300.0));
-        cp  = 302.27 + 0.0285 * T;
-    }
-    else if (mat == 2) { // Zircaloy
-        rho = 6550.0 * (1.0 - 3.0 * 5.7e-6 * (T - 300.0));
-        cp  = (T < 1100.0) ? (281.0 + 0.0306 * T) : 360.0;
-    }
-    else if (mat == 3) { // Water
-        rho = max(760.0 - 0.5 * (T - 543.15), 36.0);
-        cp  = 4200.0 + 3.0 * (T - 543.15);
-    }
-    else if (mat == 4) { // Graphite
-        rho = 1700.0;
-        cp  = 710.0 + 0.40 * (T - 300.0);
-    }
-    else if (mat == 5) { // B₄C
-        rho = 2520.0;
-        cp  = 960.0 + 0.25 * (T - 300.0);
-    }
-    else {
-        return 1.0;
-    }
-    return max(rho * cp, 1.0);
-}
-
 // ═══════════ Main compute ═══════════
 void main() {
     ivec3 gid = ivec3(gl_GlobalInvocationID.xyz);
@@ -155,11 +81,44 @@ void main() {
     float laplacian = (T_xp + T_xm + T_yp + T_ym + T_zp + T_zm - 6.0 * T_c)
                       / (dx * dx);
 
-    // ─── Material-dependent diffusivity ───
-    float alpha = get_diffusivity(mat, T_c);
-
-    // ─── Heat source term: q̇ / (ρ·c_p) ───
-    float rho_cp = get_rho_cp(mat, T_c);
+    // ─── Material properties: compute k, rho, cp once, derive both alpha and rho_cp ───
+    float alpha;
+    float rho_cp;
+    {
+        float k, rho, cp;
+        if (mat == 1) { // UO2 fuel
+            float t = T_c / 1000.0;
+            if (t < 0.3) t = 0.3;
+            float t_sq = t * t;
+            k = 100.0 / (7.5408 + 17.692 * t + 3.6142 * t_sq)
+                + (6400.0 / (t_sq * sqrt(t))) * exp(-16.35 / t); // t^2.5 = t^2 * t^0.5
+            rho = 10970.0 * (1.0 - 3.0 * 10.0e-6 * (T_c - 300.0));
+            cp  = 302.27 + 0.0285 * T_c;
+        } else if (mat == 2) { // Zircaloy-4
+            k   = 12.767 + 0.00574 * T_c;
+            rho = 6550.0 * (1.0 - 3.0 * 5.7e-6 * (T_c - 300.0));
+            cp  = (T_c < 1100.0) ? (281.0 + 0.0306 * T_c) : 360.0;
+        } else if (mat == 3) { // Water
+            k   = max(0.686 - 0.0004 * (T_c - 373.15), 0.025);
+            rho = max(760.0 - 0.5 * (T_c - 543.15), 36.0);
+            cp  = 4200.0 + 3.0 * (T_c - 543.15);
+        } else if (mat == 4) { // Graphite
+            k   = 50.0 * exp(-0.0003 * (T_c - 300.0)) + 10.0;
+            rho = 1700.0;
+            cp  = 710.0 + 0.40 * (T_c - 300.0);
+        } else if (mat == 5) { // B4C
+            k   = 30.0 - 0.005 * (T_c - 300.0);
+            rho = 2520.0;
+            cp  = 960.0 + 0.25 * (T_c - 300.0);
+        } else {
+            alpha = 1.0e-7;
+            rho_cp = 1.0;
+            k = 0.0; rho = 1.0; cp = 1.0;
+        }
+        float denom = max(rho * cp, 1.0);
+        alpha = k / denom;
+        rho_cp = denom;
+    }
     float source = heat_src[idx] / rho_cp;
 
     // ─── Explicit Euler time integration ───
