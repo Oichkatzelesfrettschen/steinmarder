@@ -157,8 +157,12 @@ int launch_lbm_step(
     dim3 block(tpb);
     dim3 grd;
 
-    // If inv_tau is precomputed, pass it in place of tau to all kernels.
-    const float* tau_or_inv = bufs->inv_tau ? bufs->inv_tau : bufs->tau;
+    // If inv_tau is precomputed, pass it to SoA kernels (which use float* tau).
+    // AoS kernels use type-specific tau pointers (BF16*, FP16*, FP64*) and
+    // cannot accept a float* inv_tau -- they would reinterpret-cast and read
+    // garbage. AoS kernels always get raw bufs->tau.
+    const float* tau_soa = bufs->inv_tau ? bufs->inv_tau : bufs->tau;
+    const float* tau_aos = bufs->tau;  // Always raw tau for AoS
 
     // Compute grid dimensions
     int is_tiled = (variant == LBM_FP32_SOA_TILED || variant == LBM_FP32_SOA_MRT_TILED);
@@ -179,7 +183,7 @@ int launch_lbm_step(
             (void*)&bufs->f_a, (void*)&bufs->f_b,
             (void*)&bufs->f_c, (void*)&bufs->f_d,
             (void*)&bufs->rho, (void*)&bufs->u,
-            (void*)&bufs->force, (void*)&tau_or_inv,
+            (void*)&bufs->force, (void*)&tau_soa,
             (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
         };
         // Note: cudaLaunchKernel requires the function pointer. Since all
@@ -193,7 +197,7 @@ int launch_lbm_step(
         void* args[] = {
             (void*)&bufs->f_a,
             (void*)&bufs->rho, (void*)&bufs->u,
-            (void*)&tau_or_inv, (void*)&bufs->force,
+            (void*)&tau_soa, (void*)&bufs->force,
             (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz,
             (void*)&parity
         };
@@ -212,13 +216,13 @@ int launch_lbm_step(
     void* args_soa[] = {
         (void*)&f_in, (void*)&f_out,
         (void*)&bufs->rho, (void*)&bufs->u,
-        (void*)&tau_or_inv, (void*)&bufs->force,
+        (void*)&tau_soa, (void*)&bufs->force,
         (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
     };
     void* args_aos[] = {
         (void*)&f_in, (void*)&f_out,
         (void*)&bufs->rho, (void*)&bufs->u,
-        (void*)&bufs->force, (void*)&tau_or_inv,
+        (void*)&bufs->force, (void*)&tau_aos,
         (void*)&grid->nx, (void*)&grid->ny, (void*)&grid->nz
     };
     void** args = info->is_soa ? args_soa : args_aos;

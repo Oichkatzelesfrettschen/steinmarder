@@ -53,10 +53,10 @@ __device__ void compute_equilibrium_bf16(
 extern "C" __global__ void lbm_step_fused_bf16_kernel(
     const __nv_bfloat16* f_in,      // Input distributions
     __nv_bfloat16* f_out,           // Output distributions
-    __nv_bfloat16* rho_out,         // Density output
-    __nv_bfloat16* u_out,           // Velocity output
-    const __nv_bfloat16* force,     // Force field
-    const __nv_bfloat16* tau,       // Relaxation time
+    float* rho_out,                 // FP32 output (matches host buffer type)
+    float* u_out,                   // FP32 output
+    const float* force,             // FP32 from host
+    const float* tau,               // FP32 from host
     int nx, int ny, int nz
 ) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -95,23 +95,24 @@ extern "C" __global__ void lbm_step_fused_bf16_kernel(
         rho_local = 1.0f;
     }
 
-    rho_out[idx] = __float2bfloat16(rho_local);
-    u_out[idx * 3 + 0] = __float2bfloat16(ux);
-    u_out[idx * 3 + 1] = __float2bfloat16(uy);
-    u_out[idx * 3 + 2] = __float2bfloat16(uz);
+    rho_out[idx] = rho_local;
+    int n_cells = nx * ny * nz;
+    u_out[idx]               = ux;
+    u_out[n_cells + idx]     = uy;
+    u_out[2 * n_cells + idx] = uz;
 
     // 2. Collision (math in FP32)
     float f_eq[19];
     float u_vec[3] = {ux, uy, uz};
     compute_equilibrium_bf16(f_eq, rho_local, u_vec);
 
-    float tau_local = __bfloat162float(tau[idx]);
-    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
+    float tau_local = __ldg(&tau[idx]);
+    float inv_tau = 1.0f / tau_local;
     float prefactor = 1.0f - 0.5f * inv_tau;
 
-    float fx = __bfloat162float(force[idx * 3 + 0]);
-    float fy = __bfloat162float(force[idx * 3 + 1]);
-    float fz = __bfloat162float(force[idx * 3 + 2]);
+    float fx = __ldg(&force[idx]);
+    float fy = __ldg(&force[n_cells + idx]);
+    float fz = __ldg(&force[2 * n_cells + idx]);
 
     for (int i = 0; i < 19; i++) {
         // BGK + Forcing
@@ -139,10 +140,10 @@ extern "C" __global__ void lbm_step_fused_bf16_kernel(
 extern "C" __global__ void lbm_step_fused_bf16_4d_batch_kernel(
     const __nv_bfloat16* f_in,      // Input distributions
     __nv_bfloat16* f_out,           // Output distributions
-    __nv_bfloat16* rho_out,         // Density output
-    __nv_bfloat16* u_out,           // Velocity output
-    const __nv_bfloat16* force,     // Force field
-    const __nv_bfloat16* tau,       // Relaxation time
+    float* rho_out,                 // FP32 output (matches host buffer type)
+    float* u_out,                   // FP32 output
+    const float* force,             // FP32 from host
+    const float* tau,               // FP32 from host
     int nx, int ny, int nz, int nw
 ) {
     // 4D grid mapping strategy:
@@ -200,7 +201,7 @@ extern "C" __global__ void lbm_step_fused_bf16_4d_batch_kernel(
     compute_equilibrium_bf16(f_eq, rho_local, u_vec);
 
     float tau_local = __bfloat162float(tau[idx_4d]);
-    float inv_tau = tau_local;  // tau slot = precomputed inv_tau
+    float inv_tau = 1.0f / tau_local;
     float prefactor = 1.0f - 0.5f * inv_tau;
 
     float fx = __bfloat162float(force[idx_4d * 3 + 0]);

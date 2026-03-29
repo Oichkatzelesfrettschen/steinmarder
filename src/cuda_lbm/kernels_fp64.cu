@@ -58,10 +58,10 @@ __device__ void compute_equilibrium_d(
 extern "C" __global__ void lbm_step_fused_fp64_kernel(
     const double* f_in,
     double* f_out,
-    double* rho_out,
-    double* u_out,
-    const double* force,
-    const double* tau,
+    float* rho_out,    // FP32 output (matches buffer type from host)
+    float* u_out,      // FP32 output
+    const float* force,       // FP32 from host (matches buffer type)
+    const float* tau,         // FP32 from host
     int nx, int ny, int nz
 ) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -101,22 +101,23 @@ extern "C" __global__ void lbm_step_fused_fp64_kernel(
         rho_local = 1.0;
     }
 
-    rho_out[idx] = rho_local;
-    u_out[idx * 3 + 0] = ux;
-    u_out[idx * 3 + 1] = uy;
-    u_out[idx * 3 + 2] = uz;
+    int n_cells = nx * ny * nz;
+    rho_out[idx] = (float)rho_local;
+    u_out[idx]               = (float)ux;
+    u_out[n_cells + idx]     = (float)uy;
+    u_out[2 * n_cells + idx] = (float)uz;
 
     // 2. Collision + Forcing
     double f_eq[19];
     double u_vec[3] = {ux, uy, uz};
     compute_equilibrium_d(f_eq, rho_local, u_vec);
 
-    double tau_local = __ldg(&tau[idx]);
+    double tau_local = (double)__ldg(&tau[idx]);
     double inv_tau = 1.0 / tau_local;
 
-    double fx = __ldg(&force[idx * 3 + 0]);
-    double fy = __ldg(&force[idx * 3 + 1]);
-    double fz = __ldg(&force[idx * 3 + 2]);
+    double fx = (double)__ldg(&force[idx]);
+    double fy = (double)__ldg(&force[n_cells + idx]);
+    double fz = (double)__ldg(&force[2 * n_cells + idx]);
 
     // Occupancy culling: check if Guo forcing is needed.
     double force_mag_sq = fx * fx + fy * fy + fz * fz;
