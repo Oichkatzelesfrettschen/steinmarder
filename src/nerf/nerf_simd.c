@@ -889,12 +889,15 @@ void sm_volume_integrate_batch(
     if (num_steps == 0) return;
 
     /* Process each ray independently within batch */
-    /* Precompute level scales to avoid repeated pow() calls.
-     * Use 20 slots — enough for any foreseeable instant-NGP config (default=16). */
+    /* Precompute level scales via iterative multiply (avoids powf per level). */
     float level_scales[20];
     uint32_t num_levels_clamped = config->num_levels < 20 ? config->num_levels : 20;
-    for (uint32_t l = 0; l < num_levels_clamped; l++) {
-        level_scales[l] = config->base_res * powf(config->per_level_scale, (float)l);
+    {
+        float scale = (float)config->base_res;
+        for (uint32_t l = 0; l < num_levels_clamped; l++) {
+            level_scales[l] = scale;
+            scale *= config->per_level_scale;
+        }
     }
     
     /* Parallelize ray loop with OpenMP if available */

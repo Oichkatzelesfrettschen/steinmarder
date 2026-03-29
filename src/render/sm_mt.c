@@ -1,9 +1,11 @@
-// sm_mt.c
+// sm_mt.c -- thread count detection for multi-threaded renderer
 #include "sm_mt.h"
 #include <stdlib.h>
 
 #if defined(_WIN32)
 #include <windows.h>
+#elif defined(__linux__) || defined(__APPLE__) || defined(__unix__)
+#include <unistd.h>
 #endif
 
 int sm_mt_suggest_threads(void) {
@@ -14,15 +16,16 @@ int sm_mt_suggest_threads(void) {
         if (v > 0) return v;
     }
 
-    // 2) Platform default
+    // 2) Platform detection
 #if defined(_WIN32)
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     int n = (int)sysinfo.dwNumberOfProcessors;
     return (n > 0) ? n : 4;
+#elif defined(_SC_NPROCESSORS_ONLN)
+    long n = sysconf(_SC_NPROCESSORS_ONLN);
+    return (n > 0) ? (int)n : 4;
 #else
-    // GCC/Clang: fallback
-    // (Could use POSIX sysconf here if needed)
-    return 8;
+    return 4;
 #endif
 }
