@@ -64,12 +64,13 @@ extern "C" __global__ void lbm_step_fused_fp64_kernel(
     const float* tau,         // FP32 from host
     int nx, int ny, int nz
 ) {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-    int z = blockIdx.z * blockDim.z + threadIdx.z;
-    if (x >= nx || y >= ny || z >= nz) return;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int n_cells_local = nx * ny * nz;
+    if (idx >= n_cells_local) return;
 
-    int idx = x + nx * (y + ny * z);
+    int x = idx % nx;
+    int y = (idx / nx) % ny;
+    int z = idx / (nx * ny);
 
     // 1. Gather macroscopic (use __ldg for read-only f_in)
     double rho_local = 0.0;
@@ -153,12 +154,12 @@ extern "C" __global__ void lbm_step_fused_fp64_kernel(
 // Initialize uniform density and velocity (FP64)
 extern "C" __global__ void initialize_uniform_fp64_kernel(
     double* f,
-    double* rho,
-    double* u,
-    double rho_init,
-    double ux_init,
-    double uy_init,
-    double uz_init,
+    float* rho,
+    float* u,
+    float rho_init,
+    float ux_init,
+    float uy_init,
+    float uz_init,
     int nx, int ny, int nz
 ) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -166,9 +167,9 @@ extern "C" __global__ void initialize_uniform_fp64_kernel(
     if (idx >= n_cells) return;
 
     rho[idx] = rho_init;
-    u[idx * 3 + 0] = ux_init;
-    u[idx * 3 + 1] = uy_init;
-    u[idx * 3 + 2] = uz_init;
+    u[idx]               = ux_init;
+    u[n_cells + idx]     = uy_init;
+    u[2 * n_cells + idx] = uz_init;
 
     double u_local[3] = {ux_init, uy_init, uz_init};
     double f_eq[19];
@@ -229,12 +230,13 @@ extern "C" __global__ void compute_enstrophy_cell_fp64_kernel(
     double* enstrophy_field,
     int nx, int ny, int nz
 ) {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-    int z = blockIdx.z * blockDim.z + threadIdx.z;
-    if (x >= nx || y >= ny || z >= nz) return;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int n_cells_local = nx * ny * nz;
+    if (idx >= n_cells_local) return;
 
-    int idx = x + nx * (y + ny * z);
+    int x = idx % nx;
+    int y = (idx / nx) % ny;
+    int z = idx / (nx * ny);
 
     int xp = (x + 1) % nx; int xm = (x + nx - 1) % nx;
     int yp = (y + 1) % ny; int ym = (y + ny - 1) % ny;

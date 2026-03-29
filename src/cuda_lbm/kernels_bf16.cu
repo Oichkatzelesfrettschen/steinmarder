@@ -59,12 +59,13 @@ extern "C" __global__ void lbm_step_fused_bf16_kernel(
     const float* tau,               // FP32 from host
     int nx, int ny, int nz
 ) {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-    int z = blockIdx.z * blockDim.z + threadIdx.z;
-    if (x >= nx || y >= ny || z >= nz) return;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int n_cells_bf16 = nx * ny * nz;
+    if (idx >= n_cells_bf16) return;
 
-    int idx = x + nx * (y + ny * z);
+    int x = idx % nx;
+    int y = (idx / nx) % ny;
+    int z = idx / (nx * ny);
 
     // 1. Load macroscopic (convert BF16 -> FP32)
     float rho_local = 0.0f;
@@ -228,8 +229,8 @@ extern "C" __global__ void lbm_step_fused_bf16_4d_batch_kernel(
 
 extern "C" __global__ void initialize_uniform_bf16_kernel(
     __nv_bfloat16* f,
-    __nv_bfloat16* rho,
-    __nv_bfloat16* u,
+    float* rho,             // FP32 from host
+    float* u,               // FP32 from host (SoA layout)
     float rho_init,
     float ux_init,
     float uy_init,
@@ -242,10 +243,10 @@ extern "C" __global__ void initialize_uniform_bf16_kernel(
     int n_cells = nx * ny * nz;
     if (idx >= n_cells) return;
 
-    rho[idx] = __float2bfloat16(rho_init);
-    u[idx * 3 + 0] = __float2bfloat16(ux_init);
-    u[idx * 3 + 1] = __float2bfloat16(uy_init);
-    u[idx * 3 + 2] = __float2bfloat16(uz_init);
+    rho[idx] = rho_init;
+    u[idx]               = ux_init;
+    u[n_cells + idx]     = uy_init;
+    u[2 * n_cells + idx] = uz_init;
 
     float u_local[3] = {ux_init, uy_init, uz_init};
     float f_eq[19];
