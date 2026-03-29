@@ -281,6 +281,11 @@ add_executable(smb_to_ppm src/tools/smb_to_ppm.c)
 target_include_directories(smb_to_ppm PRIVATE ${SM_INCLUDE_DIRS})
 target_link_libraries(smb_to_ppm PRIVATE ${PLATFORM_LIBS})
 
+add_executable(test_render_smoke src/tools/test_render_smoke.c)
+target_include_directories(test_render_smoke PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(test_render_smoke PRIVATE
+    sm_render sm_denoise sm_nerf sm_upscale sm_core Threads::Threads ${PLATFORM_LIBS})
+
 # ════════════════════════════════════════════════════════════════
 # CTest integration
 # ════════════════════════════════════════════════════════════════
@@ -295,11 +300,9 @@ if(CUDAToolkit_FOUND)
     add_test(NAME lbm_benchmark_quick COMMAND lbm_bench --kernel "FP32 SoA Fused" --grid 64 --steps 5)
 endif()
 
-# Quick CPU render smoke test
-add_test(NAME render_smoke COMMAND steinmarder)
-set_tests_properties(render_smoke PROPERTIES
-    ENVIRONMENT "SM_W=32;SM_H=32;SM_SPP=1;SM_THREADS=1"
-    TIMEOUT 30)
+# CPU render smoke test (dedicated binary, checks for NaN/Inf/zero)
+add_test(NAME render_smoke COMMAND test_render_smoke)
+set_tests_properties(render_smoke PROPERTIES TIMEOUT 30)
 
 # ════════════════════════════════════════════════════════════════
 # Summary
