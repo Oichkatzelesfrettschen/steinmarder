@@ -148,6 +148,99 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_lloydmax_
     }
 }
 
+// Lloyd-Max + 4-cell coarsened hybrid: best quantization + best ILP.
+extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_lloydmax_c4_kernel(
+    const unsigned char* __restrict__ f_in,
+    unsigned char* __restrict__ f_out,
+    float* __restrict__ rho_out,
+    float* __restrict__ u_out,
+    const float* __restrict__ tau,
+    const float* __restrict__ force,
+    int nx, int ny, int nz
+) {
+    int n_cells = nx * ny * nz;
+    int base_idx = (blockIdx.x * blockDim.x + threadIdx.x) * 4;
+
+    for (int c = 0; c < 4; c++) {
+        int idx = base_idx + c;
+        if (idx >= n_cells) return;
+
+        int x = idx % nx;
+        int y = (idx / nx) % ny;
+        int z = idx / (nx * ny);
+
+        float f_local[19];
+        float rho_local = 0.0f;
+        float mx = 0.0f, my = 0.0f, mz = 0.0f;
+
+        #pragma unroll
+        for (int i = 0; i < 19; i++) {
+            int xb = (x - CX_LM[i] + nx) % nx;
+            int yb = (y - CY_LM[i] + ny) % ny;
+            int zb = (z - CZ_LM[i] + nz) % nz;
+            int idx_back = xb + nx * (yb + ny * zb);
+            unsigned char v = __ldg(&f_in[(long long)i * n_cells + idx_back]);
+            float fv = lm_decode(v);
+            f_local[i] = fv;
+            rho_local += fv;
+            mx += (float)CX_LM[i] * fv;
+            my += (float)CY_LM[i] * fv;
+            mz += (float)CZ_LM[i] * fv;
+        }
+
+        float ux = 0.0f, uy = 0.0f, uz = 0.0f;
+        if (finite_lm(rho_local) && rho_local > 1.0e-20f) {
+            float inv_rho = 1.0f / rho_local;
+            ux = mx * inv_rho;
+            uy = my * inv_rho;
+            uz = mz * inv_rho;
+        } else {
+            rho_local = 1.0f;
+        }
+
+        rho_out[idx] = rho_local;
+        u_out[idx]               = ux;
+        u_out[n_cells + idx]     = uy;
+        u_out[2 * n_cells + idx] = uz;
+
+        float tau_local = __ldg(&tau[idx]);
+        float inv_tau   = 1.0f / tau_local;
+        float u_sq      = ux * ux + uy * uy + uz * uz;
+        float base      = fmaf(-1.5f, u_sq, 1.0f);
+
+        #pragma unroll
+        for (int i = 0; i < 19; i++) {
+            float eu    = fmaf((float)CX_LM[i], ux, fmaf((float)CY_LM[i], uy, (float)CZ_LM[i] * uz));
+            float w_rho = W_LM[i] * rho_local;
+            float f_eq  = w_rho * fmaf(fmaf(eu, 4.5f, 3.0f), eu, base);
+            f_local[i] -= (f_local[i] - f_eq) * inv_tau;
+        }
+
+        float fx = __ldg(&force[idx]);
+        float fy = __ldg(&force[n_cells + idx]);
+        float fz = __ldg(&force[2 * n_cells + idx]);
+        float force_mag_sq = fx * fx + fy * fy + fz * fz;
+
+        if (force_mag_sq >= 1e-40f) {
+            float prefactor = 1.0f - 0.5f * inv_tau;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
+            #pragma unroll
+            for (int i = 0; i < 19; i++) {
+                float eix = (float)CX_LM[i], eiy = (float)CY_LM[i], eiz = (float)CZ_LM[i];
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
+                f_local[i] += prefactor * W_LM[i] * fmaf(ei_dot_u * ei_dot_f, 9.0f, em_u_dot_f * 3.0f);
+            }
+        }
+
+        #pragma unroll
+        for (int i = 0; i < 19; i++) {
+            f_out[(long long)i * n_cells + idx] = lm_encode(f_local[i]);
+        }
+    }
+}
+
 extern "C" __global__ void initialize_uniform_int8_soa_lloydmax_kernel(
     unsigned char* f,
     float* rho_out,
