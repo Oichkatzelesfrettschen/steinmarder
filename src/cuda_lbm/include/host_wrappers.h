@@ -21,6 +21,7 @@ typedef struct {
     float* rho;
     float* u;
     float* tau;
+    float* inv_tau;   // Precomputed 1.0f/tau -- eliminates 50.6-cycle MUFU.RCP per cell
     float* force;
 } LBMBuffers;
 
