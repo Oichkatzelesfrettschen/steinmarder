@@ -226,9 +226,10 @@ endif()
 # ════════════════════════════════════════════════════════════════
 # Editor targets (require raylib)
 # ════════════════════════════════════════════════════════════════
-find_library(RAYLIB_LIB raylib PATHS ${CMAKE_SOURCE_DIR}/raylib/lib)
-if(RAYLIB_LIB)
-    message(STATUS "raylib found — building editor targets")
+find_library(RAYLIB_LIB raylib PATHS ${CMAKE_SOURCE_DIR}/raylib/lib /usr/lib /usr/local/lib)
+find_path(RAYLIB_INCLUDE raylib.h PATHS ${CMAKE_SOURCE_DIR}/raylib/include /usr/include /usr/local/include)
+if(RAYLIB_LIB AND RAYLIB_INCLUDE)
+    message(STATUS "raylib found at ${RAYLIB_LIB} — building editor targets")
 
     set(EDITOR_LIBS ${RAYLIB_LIB})
     if(WIN32)
@@ -236,18 +237,21 @@ if(RAYLIB_LIB)
     endif()
 
     add_executable(sm_mesh_edit src/editor/sm_mesh_edit.c)
-    target_include_directories(sm_mesh_edit PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
+    target_include_directories(sm_mesh_edit PRIVATE ${SM_INCLUDE_DIRS} ${RAYLIB_INCLUDE})
     target_link_libraries(sm_mesh_edit PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
 
+    # sm_viewport requires GPU integration stubs (Vulkan pipeline not linked to raylib targets)
     add_executable(sm_viewport src/editor/sm_viewport.c)
-    target_include_directories(sm_viewport PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
-    target_link_libraries(sm_viewport PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
+    target_include_directories(sm_viewport PRIVATE ${SM_INCLUDE_DIRS} ${RAYLIB_INCLUDE})
+    target_link_libraries(sm_viewport PRIVATE sm_core sm_render ${EDITOR_LIBS} ${PLATFORM_LIBS})
 
     add_executable(sm_edit_mode src/editor/sm_edit_mode.c)
-    target_include_directories(sm_edit_mode PRIVATE ${SM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/raylib/include)
-    target_link_libraries(sm_edit_mode PRIVATE sm_core ${EDITOR_LIBS} ${PLATFORM_LIBS})
+    target_include_directories(sm_edit_mode PRIVATE ${SM_INCLUDE_DIRS} ${RAYLIB_INCLUDE})
+    target_link_libraries(sm_edit_mode PRIVATE sm_core sm_render ${EDITOR_LIBS} ${PLATFORM_LIBS})
 else()
     message(STATUS "raylib NOT found — skipping editor targets")
+    message(STATUS "  Install: pacman -S raylib (Arch), apt install libraylib-dev (Debian/Ubuntu),")
+    message(STATUS "           dnf install raylib-devel (Fedora), brew install raylib (macOS)")
 endif()
 
 # ════════════════════════════════════════════════════════════════

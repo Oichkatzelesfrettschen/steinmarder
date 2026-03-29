@@ -3,12 +3,19 @@
 #include <math.h>
 #include <stdio.h>
 
-// GPU rendering context (forward declarations)
-// In production, these would link to gpu_vulkan_demo.c
-extern int sm_gpu_init(int width, int height);
-extern int sm_gpu_render_frame(const float *cam_pos, const float *cam_dir, const float *cam_up, float fov);
-extern void sm_gpu_shutdown(void);
-extern unsigned char* sm_gpu_get_framebuffer(void);  // Returns RGBA8 data
+// GPU rendering context.
+// When linked with the Vulkan pipeline (gpu_vulkan_demo.c), these resolve
+// to the real GPU renderer. Otherwise, weak stubs provide graceful fallback.
+#pragma weak sm_gpu_init
+#pragma weak sm_gpu_render_frame
+#pragma weak sm_gpu_shutdown
+#pragma weak sm_gpu_get_framebuffer
+int sm_gpu_init(int width, int height) { (void)width; (void)height; return 0; }
+int sm_gpu_render_frame(const float *cam_pos, const float *cam_dir, const float *cam_up, float fov) {
+    (void)cam_pos; (void)cam_dir; (void)cam_up; (void)fov; return -1;
+}
+void sm_gpu_shutdown(void) {}
+unsigned char* sm_gpu_get_framebuffer(void) { return NULL; }
 
 int main(void)
 {

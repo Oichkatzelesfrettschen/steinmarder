@@ -234,6 +234,19 @@ scripts/       -- build, test, and analysis scripts
 - **SASS toolkit:** CUDA 13.x (SM 7.5+) or CUDA 12.x (Pascal), Python 3
 - **CUDA LBM:** CUDA 11.8+ (SM 80+)
 
+### Installing optional dependencies
+
+| Dependency | Arch/CachyOS | Debian/Ubuntu | Fedora | macOS (brew) |
+|------------|-------------|---------------|--------|--------------|
+| Vulkan SDK | `pacman -S vulkan-devel` | `apt install libvulkan-dev vulkan-tools` | `dnf install vulkan-devel` | `brew install vulkan-sdk` |
+| raylib | `pacman -S raylib` | `apt install libraylib-dev` | `dnf install raylib-devel` | `brew install raylib` |
+| OpenMP | Included with GCC | `apt install libomp-dev` | Included with GCC | `brew install libomp` |
+| ONNX Runtime | AUR: `yay -S onnxruntime` | `apt install libonnxruntime-dev` | `dnf install onnxruntime-devel` | `brew install onnxruntime` |
+| GLFW (Vulkan windowing) | `pacman -S glfw` | `apt install libglfw3-dev` | `dnf install glfw-devel` | `brew install glfw` |
+
+Windows (MSVC): install Vulkan SDK from LunarG, raylib via vcpkg (`vcpkg install raylib`),
+or download pre-built binaries from the respective project pages.
+
 ## License
 
 MIT
