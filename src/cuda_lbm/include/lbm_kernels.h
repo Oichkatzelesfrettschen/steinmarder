@@ -63,6 +63,9 @@ typedef enum {
     // Double-double FP128
     LBM_DD_SOA,                // kernels_dd.cu
 
+    // Q16.16 fixed-point (exploits IADD3 pipeline, 8.5x faster than FFMA)
+    LBM_Q16_SOA,               // kernels_q16_soa.cu
+
     // Bandwidth ceiling (non-physics)
     LBM_INT4_SOA,              // kernels_int4.cu
     LBM_FP4_SOA,               // kernels_fp4.cu
@@ -141,6 +144,9 @@ static const LbmKernelInfo LBM_KERNEL_INFO[LBM_VARIANT_COUNT] = {
 
     // Double-double
     [LBM_DD_SOA]             = {"DD FP128 SoA",        "lbm_step_fused_dd_kernel",       "initialize_uniform_dd_kernel",   16,  60, 1,   1,   128, 1,   0,  0},
+
+    // Q16.16 fixed-point
+    [LBM_Q16_SOA]            = {"Q16.16 SoA",          "lbm_step_q16_soa_kernel",            "initialize_uniform_q16_soa_kernel",  4, 50, 1, 1, 128, 1, 0, 0},
 
     // BW ceiling (non-physics)
     [LBM_INT4_SOA]           = {"INT4 Nibble SoA",     "lbm_step_fused_int4_kernel",     "initialize_uniform_int4_kernel", 1,   61, 0,   1,   128, 2,   0,  0},
