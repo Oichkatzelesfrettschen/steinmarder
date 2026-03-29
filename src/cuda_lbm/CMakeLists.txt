@@ -57,6 +57,7 @@ set(LBM_KERNEL_SOURCES
     kernels_int8_soa_lloydmax_pipe.cu
     kernels_q16_soa.cu
     kernels_q16_soa_lm.cu
+    kernels_q32_soa.cu
     host_wrappers.cu
 )
 

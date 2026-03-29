@@ -75,6 +75,10 @@ void initialize_uniform_q16_soa_kernel(int*, float*, float*, float*, float, floa
 void lbm_step_q16_soa_lm_kernel(const int*, int*, float*, float*, const float*, const float*, int, int, int);
 void initialize_uniform_q16_soa_lm_kernel(int*, float*, float*, float*, float, float, float, float, float, int, int, int);
 
+// Step kernels -- Q32.32 (64-bit fixed-point)
+void lbm_step_q32_soa_kernel(const long long*, long long*, float*, float*, const float*, const float*, int, int, int);
+void initialize_uniform_q32_soa_kernel(long long*, float*, float*, float*, float, float, float, float, float, int, int, int);
+
 // Step kernels -- DD signature
 void lbm_step_fused_dd_kernel(const double*, const double*, double*, double*, float*, float*, const float*, const float*, int, int, int);
 
@@ -273,6 +277,9 @@ int launch_lbm_step(
     DISPATCH_STEP(LBM_Q16_SOA,               lbm_step_q16_soa_kernel,          int)
     DISPATCH_STEP(LBM_Q16_SOA_LM,           lbm_step_q16_soa_lm_kernel,       int)
 
+    // Q32.32 uses long long (8 bytes), same buffer layout as FP64
+    DISPATCH_STEP(LBM_Q32_SOA,              lbm_step_q32_soa_kernel,          long long)
+
     // BW ceiling
     DISPATCH_STEP(LBM_INT4_SOA,              lbm_step_fused_int4_kernel,       void)
     DISPATCH_STEP(LBM_FP4_SOA,               lbm_step_fp4_kernel,              void)
@@ -418,6 +425,7 @@ int launch_lbm_init(
     DISPATCH_INIT_12(LBM_FP64_SOA,              initialize_uniform_fp64_soa_kernel,     void)
     DISPATCH_INIT_12(LBM_Q16_SOA,               initialize_uniform_q16_soa_kernel,      int)
     DISPATCH_INIT_12(LBM_Q16_SOA_LM,           initialize_uniform_q16_soa_lm_kernel,   int)
+    DISPATCH_INIT_12(LBM_Q32_SOA,              initialize_uniform_q32_soa_kernel,      long long)
 
     // BW ceiling: 12-arg
     DISPATCH_INIT_12(LBM_INT4_SOA,              initialize_uniform_int4_kernel,         void)
@@ -475,6 +483,7 @@ static const void* get_step_kernel_ptr(LbmKernelVariant variant) {
     case LBM_DD_SOA:                 return (const void*)lbm_step_fused_dd_kernel;
     case LBM_Q16_SOA:                return (const void*)lbm_step_q16_soa_kernel;
     case LBM_Q16_SOA_LM:            return (const void*)lbm_step_q16_soa_lm_kernel;
+    case LBM_Q32_SOA:               return (const void*)lbm_step_q32_soa_kernel;
     case LBM_INT4_SOA:               return (const void*)lbm_step_fused_int4_kernel;
     case LBM_FP4_SOA:                return (const void*)lbm_step_fp4_kernel;
     default:                         return NULL;
