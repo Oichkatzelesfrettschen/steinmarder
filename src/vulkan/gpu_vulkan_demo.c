@@ -3466,8 +3466,8 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
         vkCmdDispatch(cb, tgx, tgy, 1);
     }
 
-    // --- GPU Denoiser (separable bilateral filter) ---
-    if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE){
+    // --- GPU Denoiser (standalone, only when tonemap did NOT already run it) ---
+    if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && !tonemap_enabled){
         // Transition out_img for denoising
         VkImageMemoryBarrier denoise_bar_pre = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
         denoise_bar_pre.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

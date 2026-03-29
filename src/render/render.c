@@ -476,8 +476,18 @@ typedef struct {
 
     int tiles_x;
     int tiles_y;
+
+    // Atomic job counter on its own cache line to prevent false sharing.
+    // Without alignment, atomic_fetch_add invalidates the line for all threads,
+    // dragging tiles_y and seed_base along (3-5 extra L3 misses per steal).
+#if __STDC_VERSION__ >= 201112L
+    _Alignas(64)
+#endif
     atomic_int next_job;
 
+#if __STDC_VERSION__ >= 201112L
+    _Alignas(64)
+#endif
     uint32_t seed_base;
 
     // sync
