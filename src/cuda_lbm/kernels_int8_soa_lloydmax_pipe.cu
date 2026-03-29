@@ -15,8 +15,8 @@
 // overlap for the 92-cycle LDG latency. This should eliminate the 44.1%
 // stall entirely.
 
-#define LM_RANGE_MIN_P  0.0f
-#define LM_RANGE_MAX_P  0.40f
+#define LM_RANGE_MIN_P  (-0.05f)
+#define LM_RANGE_MAX_P  0.45f
 #define LM_SCALE_VAL_P  (255.0f / (LM_RANGE_MAX_P - LM_RANGE_MIN_P))
 #define LM_INV_SCALE_P  ((LM_RANGE_MAX_P - LM_RANGE_MIN_P) / 255.0f)
 #define LM_OFFSET_P     LM_RANGE_MIN_P
@@ -56,15 +56,34 @@ __device__ __forceinline__ float lm_decode_p(unsigned char idx) {
     return (float)idx * LM_INV_SCALE_P + LM_OFFSET_P;
 }
 
-// Process one cell: given pre-loaded raw bytes, do decode + accumulate + collision + forcing + encode + write.
+// Prefetched auxiliary data for a cell (tau + force).
+// Loaded during the prefetch phase to overlap with prior cell's compute.
+typedef struct {
+    float tau_val;
+    float fx, fy, fz;
+} CellAux;
+
+// Prefetch tau and force for a cell (fire-and-forget, data arrives later).
+__device__ __forceinline__ void prefetch_aux(
+    int idx, int n_cells,
+    const float* __restrict__ tau,
+    const float* __restrict__ force,
+    CellAux* out
+) {
+    out->tau_val = __ldg(&tau[idx]);
+    out->fx      = __ldg(&force[idx]);
+    out->fy      = __ldg(&force[n_cells + idx]);
+    out->fz      = __ldg(&force[2 * n_cells + idx]);
+}
+
+// Process one cell: given pre-loaded raw bytes AND pre-loaded aux data.
 __device__ __forceinline__ void process_cell(
     int idx, int n_cells,
     const unsigned char raw[19],
+    const CellAux* aux,
     unsigned char* __restrict__ f_out,
     float* __restrict__ rho_out,
-    float* __restrict__ u_out,
-    const float* __restrict__ tau,
-    const float* __restrict__ force
+    float* __restrict__ u_out
 ) {
     float f_local[19];
     float rho_local = 0.0f;
@@ -95,10 +114,9 @@ __device__ __forceinline__ void process_cell(
     u_out[n_cells + idx]     = uy;
     u_out[2 * n_cells + idx] = uz;
 
-    float tau_local = __ldg(&tau[idx]);
-    float inv_tau   = 1.0f / tau_local;
-    float u_sq      = ux * ux + uy * uy + uz * uz;
-    float base      = fmaf(-1.5f, u_sq, 1.0f);
+    float inv_tau = 1.0f / aux->tau_val;
+    float u_sq    = ux * ux + uy * uy + uz * uz;
+    float base    = fmaf(-1.5f, u_sq, 1.0f);
 
     #pragma unroll
     for (int i = 0; i < 19; i++) {
@@ -108,9 +126,7 @@ __device__ __forceinline__ void process_cell(
         f_local[i] -= (f_local[i] - f_eq) * inv_tau;
     }
 
-    float fx = __ldg(&force[idx]);
-    float fy = __ldg(&force[n_cells + idx]);
-    float fz = __ldg(&force[2 * n_cells + idx]);
+    float fx = aux->fx, fy = aux->fy, fz = aux->fz;
     float force_mag_sq = fx * fx + fy * fy + fz * fz;
 
     if (force_mag_sq >= 1e-40f) {
@@ -170,22 +186,26 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_lloydmax_
 
     if (idx_a >= n_cells) return;
 
-    // Stage 1: Issue loads for cell A (fire-and-forget into L1 cache)
+    // Stage 1: Prefetch f_in + tau + force for cell A
     unsigned char raw_a[19];
+    CellAux aux_a;
     prefetch_cell(idx_a, n_cells, nx, ny, nz, f_in, raw_a);
+    prefetch_aux(idx_a, n_cells, tau, force, &aux_a);
 
-    // Stage 2: Issue loads for cell B (while cell A loads are in flight)
+    // Stage 2: Prefetch f_in + tau + force for cell B (cell A loads in flight)
     unsigned char raw_b[19];
+    CellAux aux_b;
     int has_b = (idx_b < n_cells);
     if (has_b) {
         prefetch_cell(idx_b, n_cells, nx, ny, nz, f_in, raw_b);
+        prefetch_aux(idx_b, n_cells, tau, force, &aux_b);
     }
 
-    // Stage 3: Process cell A (loads have had time to complete during stage 2)
-    process_cell(idx_a, n_cells, raw_a, f_out, rho_out, u_out, tau, force);
+    // Stage 3: Process cell A (all loads arrived during stage 2)
+    process_cell(idx_a, n_cells, raw_a, &aux_a, f_out, rho_out, u_out);
 
-    // Stage 4: Process cell B (loads completed during stage 3's 700+ FMA instructions)
+    // Stage 4: Process cell B (all loads arrived during stage 3's 700+ FMA instructions)
     if (has_b) {
-        process_cell(idx_b, n_cells, raw_b, f_out, rho_out, u_out, tau, force);
+        process_cell(idx_b, n_cells, raw_b, &aux_b, f_out, rho_out, u_out);
     }
 }

@@ -17,9 +17,11 @@
 //   Decode: f = (index / LM_SCALE) + LM_OFFSET
 
 // Range calibrated from D3Q19 at Ma <= 0.3 with Guo forcing.
-// Covers f_i in [0.0, 0.40] with margin.
-#define LM_RANGE_MIN  0.0f
-#define LM_RANGE_MAX  0.40f
+// Lower bound -0.05 covers transient negative f_i from BGK collision near
+// instability. Upper bound 0.45 covers f_0 = w_0*rho for rho up to ~1.35.
+// Total range 0.50 -> resolution = 0.50/255 = 0.00196 per level.
+#define LM_RANGE_MIN  (-0.05f)
+#define LM_RANGE_MAX  0.45f
 #define LM_SCALE_VAL  (255.0f / (LM_RANGE_MAX - LM_RANGE_MIN))
 #define LM_INV_SCALE  ((LM_RANGE_MAX - LM_RANGE_MIN) / 255.0f)
 #define LM_OFFSET     LM_RANGE_MIN

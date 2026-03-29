@@ -241,15 +241,14 @@ extern "C" __launch_bounds__(128, 4) __global__ void lbm_step_int8_soa_coarsened
 
         if (force_mag_sq >= 1e-40f) {
             float prefactor = 1.0f - 0.5f * inv_tau;
+            float u_dot_f = ux * fx + uy * fy + uz * fz;
             #pragma unroll
             for (int i = 0; i < 19; i++) {
                 float eix = (float)CX_I8S[i], eiy = (float)CY_I8S[i], eiz = (float)CZ_I8S[i];
-                // Compute ei_dot_f and ei_dot_u independently (no dependency),
-                // then combine for em_u_dot_f which depends on both -- exposes ILP.
-                float ei_dot_f = eix * fx + eiy * fy + eiz * fz;
-                float ei_dot_u = eix * ux + eiy * uy + eiz * uz;
-                float em_u_dot_f = ei_dot_f - (ux * fx + uy * fy + uz * fz);
-                f_local[i] += prefactor * W_I8S[i] * (em_u_dot_f * 3.0f + ei_dot_u * ei_dot_f * 9.0f);
+                float ei_dot_f   = eix * fx + eiy * fy + eiz * fz;
+                float ei_dot_u   = eix * ux + eiy * uy + eiz * uz;
+                float em_u_dot_f = ei_dot_f - u_dot_f;
+                f_local[i] += prefactor * W_I8S[i] * fmaf(ei_dot_u * ei_dot_f, 9.0f, em_u_dot_f * 3.0f);
             }
         }
 
