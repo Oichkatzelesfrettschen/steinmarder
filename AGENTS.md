@@ -2,156 +2,204 @@
 
 ## Overview
 
-steinmarder is a multi-subsystem rendering and physics engine with:
-- CPU raytracer with BVH, denoising, NeRF inference, and upscaling
-- Vulkan GPU rendering pipeline
-- CUDA D3Q19 Lattice Boltzmann Method (LBM) fluid simulation kernels
-- SASS reverse engineering toolkit for Ada Lovelace
-- GPU box-counting fractal dimension analysis
-- Sparse brick-map LBM for high-sparsity domains
+steinmarder is a C11 rendering and physics engine with several optional GPU and
+research subsystems:
 
-## CUDA LBM Reference Architecture
+- CPU path tracer with BVH, adaptive sampling, denoising, and postprocess
+- CPU NeRF inference with SIMD paths and batching
+- Vulkan compute rendering and physics demos
+- CUDA D3Q19 Lattice Boltzmann Method (LBM) kernels
+- SASS reverse engineering and inline PTX optimization tooling
+- Physics modules for reactor thermal, fission, and quantum volume demos
+- raylib-based mesh editing tools
 
-The primary GPU physics subsystem. 24 production CUDA kernels spanning 10
-precision tiers with two memory layouts (AoS, i-major SoA).
+The repo is intentionally modular. A plain C11 + pthreads build covers the core
+renderer. Vulkan, CUDA, raylib, OpenMP, and ONNX-dependent targets are added
+only when the local toolchain supports them.
 
-| Document | Purpose |
-|----------|---------|
-| `src/cuda_lbm/README.md` | Kernel index, measured performance tables, layout details |
-| `docs/sass/SM89_ARCHITECTURE_REFERENCE.md` | Hardware specs, roofline model, L2 regime analysis |
-| `docs/sass/NVIDIA_SASS_ADA_LOVELACE_REFERENCE.md` | Full SASS ISA reference for SM 8.9 |
-| `src/cuda_lbm/include/lbm_kernels.h` | Kernel variant enum and registry |
-| `src/cuda_lbm/include/lbm_metrics.h` | Benchmark result structs and GPU specs |
+## High-Value Entry Points
 
-### Key Performance Facts
+| Path | Why it matters |
+|------|----------------|
+| `README.md` | Current project-wide feature summary, build notes, and run commands |
+| `CMakeLists.txt` | Source of truth for optional targets, tests, and dependency gating |
+| `src/render/render.c` | Main CPU rendering pipeline |
+| `src/render/sm_main.c` | Environment-variable configuration and executable entry point |
+| `src/cuda_lbm/README.md` | LBM kernel index, performance tables, and benchmark conventions |
+| `src/cuda_lbm/CMakeLists.txt` | CUDA LBM targets and compiled kernel source list |
+| `src/sass_re/RESULTS.md` | Measured Ada Lovelace SASS latency and throughput data |
+| `docs/sass/SM89_ARCHITECTURE_REFERENCE.md` | Roofline and hardware-specific optimization context |
 
-- All scalar LBM kernels (FP32 and below) are **bandwidth-bound** on Ada
-- INT8 SoA is Pareto-optimal: ~5460 MLUPS, 140 MB VRAM, ~2.8x FP32
-- Precomputed inv_tau eliminates 50.6-cycle MUFU.RCP from collision phase
-- SoA layout beats AoS by 1.81x-2.22x at 128^3 (scatter penalty elimination)
-- Q32.32 fixed-point: 1.59x faster than FP64 (INT64 ALU bypasses 64:1 throttle)
-- FP64/DD kernels are compute-bound (64:1 FP64 ratio on Ada gaming SKUs)
-- Canonical benchmark grid: 128^3 (GDDR6X-bound regime)
+## Build Matrix
 
-## SASS RE Toolkit
+### Always-on core targets
 
-First-party SASS reverse engineering for Ada Lovelace.
+Built with a C11 compiler, pthreads, and CMake:
 
-| Document | Purpose |
-|----------|---------|
-| `src/sass_re/RESULTS.md` | Measured instruction latencies and throughput |
-| `src/sass_re/microbench/` | Latency and throughput probe kernels |
-| `src/sass_re/probes/` | 9 SASS probe kernel files (3107 instructions analyzed) |
+- `steinmarder`
+- `nerf_simd_test`
+- `inspect_ppm`
+- `smb_info`
+- `smb_to_ppm`
+- `test_render_smoke`
 
-Key measurements: FFMA 4.54 cyc, IADD3 2.51 cyc, MUFU.RCP 41.55 cyc,
-LDG 92.29 cyc, LDS 28.03 cyc.
+### Optional targets
 
-## Build and Benchmark
+- Vulkan found:
+  `gpu_demo`, `quantum_demo`, `test_reactor_thermal`
+- raylib found:
+  `sm_mesh_edit`, `sm_viewport`, `sm_edit_mode`
+- CUDA Toolkit found:
+  `src/cuda_lbm/` is added and builds `lbm_bench` and `lbm_test`
+- OpenMP found:
+  enabled for NeRF batch processing
 
-### Building CUDA Targets
+### Canonical build
 
 ```sh
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-CUDA is auto-detected via `find_package(CUDAToolkit)`. If found, the
-`src/cuda_lbm/` subdirectory is included. Target architectures: SM 89 (Ada)
-and SM 80 (Ampere fallback).
+Notes:
 
-### Running Benchmarks
+- Release defaults to `-O2 -march=native` and enables IPO/LTO when supported.
+- Debug defaults to `-g -O0 -fsanitize=address,undefined`.
+- The runtime output directory is `build/bin/`.
+
+## Testing and Verification
+
+CTest is enabled at the top level:
 
 ```sh
-# Full benchmark suite
-build/bin/lbm_bench --all --grid 128 --output table
-
-# Single kernel
-build/bin/lbm_bench --kernel int8_soa --grid 64,128,256
-
-# Physics validation only
-build/bin/lbm_bench --validate
-
-# Performance regression check
-build/bin/lbm_bench --regression
-
-# Occupancy report
-build/bin/lbm_bench --occupancy
+cd build
+ctest --output-on-failure
 ```
 
-### Running Tests
+Important tests:
+
+- `render_smoke` always exists and checks for NaN/Inf/zero-output regressions
+- `test_reactor_thermal` exists when Vulkan is available
+- `lbm_conservation` and `lbm_benchmark_quick` exist when CUDA is available
+
+Direct binaries:
 
 ```sh
+build/bin/test_render_smoke
+build/bin/test_reactor_thermal
 build/bin/lbm_test
 ```
 
-Runs conservation tests, performance regression tests, and MRT stability
-validation for all physics-valid kernels.
+## CUDA LBM Reference Architecture
 
-## Profiling Workflow
+The main GPU physics subsystem currently builds from 33 CUDA source files and
+ships 39 kernel variants across 12 precision tiers plus sparse, tensor-core,
+and analysis utilities.
 
-### Nsight Compute (single kernel)
+Primary references:
 
-```sh
-src/cuda_lbm/scripts/profile_ncu.sh <kernel_name> <grid_size> [output_dir]
-```
+| Document | Purpose |
+|----------|---------|
+| `src/cuda_lbm/README.md` | Kernel inventory, measured performance tables, layout guidance |
+| `src/cuda_lbm/CMakeLists.txt` | Exact compiled CUDA sources for `lbm_bench` and `lbm_test` |
+| `src/cuda_lbm/include/lbm_kernels.h` | Kernel variant registry |
+| `src/cuda_lbm/include/lbm_metrics.h` | Benchmark result structs and GPU specs |
+| `docs/sass/SM89_ARCHITECTURE_REFERENCE.md` | Ada-specific performance model |
+| `docs/sass/NVIDIA_SASS_ADA_LOVELACE_REFERENCE.md` | ISA reference |
 
-Collects full .ncu-rep with `--launch-skip 5 --launch-count 3` (warmed up).
-Secondary pass extracts key metrics to CSV: DRAM/L2/L1 throughput, occupancy,
-stall reasons, cache hit rates, register count.
+Current measured highlights from the checked-in docs:
 
-### Nsight Compute (batch)
+- All scalar FP32-and-below LBM production kernels are bandwidth-bound on Ada
+- INT8 SoA remains the top MLUPS tier at about 5460 MLUPS on 128^3
+- FP8 e4m3 SoA follows at about 5170 MLUPS
+- Q32.32 fixed-point is faster than FP64 while preserving zero mass drift
+- SoA pull-scheme is the preferred production layout; AoS mainly remains as a
+  comparison baseline
+- Precomputed `inv_tau` removes the reciprocal stall and improves stability
 
-```sh
-src/cuda_lbm/scripts/profile_ncu_all.sh
-```
-
-Profiles all physics-valid SoA kernels at 128^3.
-
-### Nsight Systems (timeline)
-
-```sh
-src/cuda_lbm/scripts/profile_nsys.sh
-```
-
-Full timeline with CUDA + NVTX + OS runtime traces.
-
-### Register Spill Check
+Canonical commands:
 
 ```sh
-src/cuda_lbm/scripts/check_spills.sh
+build/bin/lbm_bench --all --grid 128 --output table
+build/bin/lbm_bench --kernel int8_soa --grid 64,128,256
+build/bin/lbm_bench --validate
+build/bin/lbm_bench --regression
+build/bin/lbm_bench --occupancy
+build/bin/lbm_test
 ```
 
-Parses ptxas output for register spills and LMEM usage. Exits nonzero if any
-production kernel has LMEM > 0 bytes.
+## SASS Reverse Engineering Toolkit
 
-## Performance Baselines
+The SASS RE subsystem is a first-party measurement and optimization workflow
+for NVIDIA Ada Lovelace, with probe kernels, microbenchmarks, cubin/SASS
+analysis, and inline-PTX case studies under `src/sass_re/`.
 
-All baselines measured on RTX 4070 Ti Super (AD103, 66 SMs, 504 GB/s peak).
-See `src/cuda_lbm/README.md` for full tables.
+Key references:
 
-Top kernels at 128^3 (GDDR6X-bound, all mass_drift=0):
+| Path | Purpose |
+|------|---------|
+| `src/sass_re/RESULTS.md` | Latency and throughput measurements |
+| `src/sass_re/microbench/` | Microbench sources |
+| `src/sass_re/probes/` | Probe kernels |
+| `src/sass_re/instant_ngp/` | Inline PTX rewrites and reproduction scripts |
 
-| Rank | Tier | MLUPS | BW% | VRAM |
-|------|------|-------|-----|------|
-| 1 | INT8 SoA | ~5460 | ~76% | 140 MB |
-| 2 | FP8 e4m3 SoA | ~5170 | ~72% | 140 MB |
-| 3 | INT8 SoA C4 | ~4960 | ~69% | 140 MB |
-| 4 | BF16 SoA | ~3210 | ~69% | 216 MB |
-| 5 | INT16 SoA | 3569 | 65.1% | 152 MB |
+Representative measured values called out in repo docs:
 
-## SM89 Optimization Checklist
+- `FFMA`: 4.54 cycles
+- `IADD3`: 2.51 cycles
+- `MUFU.RCP`: 41.55 cycles
+- `LDG`: 92.29 cycles
+- `LDS`: 28.03 cycles
 
-When modifying or adding CUDA LBM kernels:
+## CPU Renderer and NeRF Notes
 
-1. [ ] Use i-major SoA layout with pull-scheme (not AoS push-scheme)
-2. [ ] Verify coalesced memory access for all 19 directions
-3. [ ] Check register count with `-Xptxas -v`; target <= 128 regs/thread
-4. [ ] Run `check_spills.sh` -- zero LMEM for production kernels
-5. [ ] Use `__launch_bounds__(128, 4)` for standard kernels
-6. [ ] Use `__ldg()` for read-only input arrays
-7. [ ] Promote to FP32 before compute (storage-compute split pattern)
-8. [ ] Benchmark at 128^3 for GDDR6X-bound baselines
-9. [ ] Tag benchmark results with bandwidth regime (L2-bound vs GDDR6X-bound)
-10. [ ] Verify physics: mass conservation, momentum conservation, density stability
-11. [ ] FP8 kernels: guard with `#if __CUDA_ARCH__ >= 890`
-12. [ ] MRT kernels: verify ghost moment damping (s_ghost=1.0)
+Useful realities when editing the non-CUDA engine:
+
+- The core renderer lives in `src/render/` and links through `sm_render`
+- `src/render/postprocess.c` is compiled into `sm_core` on purpose because
+  `image.c` depends on it before `sm_render` is linked
+- NeRF sources are in `src/nerf/`; AVX2/FMA are enabled only when the compiler
+  supports them, and runtime dispatch still handles feature detection
+- Denoise code is in `src/denoise/`; upscale code is in `src/upscale/`
+
+Common run commands:
+
+```sh
+SM_W=320 SM_H=180 SM_SPP=4 ./build/bin/steinmarder
+SM_W=1920 SM_H=1080 SM_SPP=128 SM_ADAPTIVE=1 SM_NEURAL_DENOISE=1 ./build/bin/steinmarder
+```
+
+The renderer is configured through environment variables rather than CLI flags.
+Start with `src/render/sm_main.c` when adding or changing runtime controls.
+
+## Project Structure
+
+```text
+src/
+  core/        math, rays, camera, primitives, image, material, color
+  render/      CPU renderer, BVH, scene loading, g-buffer, postprocess
+  denoise/     bilateral and neural denoising
+  nerf/        NeRF SIMD inference and scheduling
+  vulkan/      Vulkan compute demos and GPU acceleration pieces
+  physics/     reactor, fission, quantum volume, thermal simulation
+  editor/      raylib-based mesh editing tools
+  cuda_lbm/    CUDA LBM kernels, benchmarks, tests, sparse variants
+  sass_re/     SASS probes, microbenchmarks, runners, paper assets
+  upscale/     image upscaling pipeline
+  tools/       small standalone utilities and smoke tests
+  third_party/ stb_image_write
+docs/          engine, nerf, sass, and result documentation
+scripts/       helper scripts
+```
+
+## Working Guidance
+
+When making changes:
+
+1. Check `CMakeLists.txt` first so you update the right target and dependency
+   assumptions.
+2. Preserve optional-build behavior. Do not make Vulkan, CUDA, raylib, ONNX, or
+   OpenMP mandatory unless the user explicitly wants that.
+3. For CUDA LBM work, benchmark or validate with the checked-in commands above.
+4. For renderer changes, prefer `test_render_smoke` or `ctest` before finishing.
+5. If documentation and code disagree, trust the code and refresh the docs.
