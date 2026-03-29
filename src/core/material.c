@@ -11,16 +11,25 @@ static float rand01(void) {
     return (float)rand() / (float)RAND_MAX;
 }
 
-static Vec3 random_in_unit_sphere(void) {
-    while (1) {
-        Vec3 p = vec3_random(-1.0f, 1.0f);
-        if (vec3_length_squared(p) >= 1.0f) continue;
-        return p;
-    }
+// Direct unit-sphere surface sampling via cylindrical method.
+// Uniform on the sphere surface. No rejection loop.
+//   z = 2*rand - 1 (uniform in [-1, 1])
+//   r = sqrt(1 - z*z)
+//   theta = 2*pi*rand
+//   return (r*cos(theta), r*sin(theta), z)
+static Vec3 random_unit_vector(void) {
+    float z = 2.0f * rand01() - 1.0f;
+    float r = sqrtf(fmaxf(0.0f, 1.0f - z * z));
+    float theta = 6.2831853f * rand01();  // 2*pi
+    return vec3(r * cosf(theta), r * sinf(theta), z);
 }
 
-static Vec3 random_unit_vector(void) {
-    return vec3_unit(random_in_unit_sphere());
+// Uniform sampling inside unit sphere: unit vector scaled by cbrt(rand).
+// cbrtf gives uniform volume distribution (r^3 is uniform -> r = cbrt(U)).
+static Vec3 random_in_unit_sphere(void) {
+    Vec3 dir = random_unit_vector();
+    float scale = cbrtf(rand01());
+    return vec3_scale(dir, scale);
 }
 
 static Vec3 reflect(Vec3 v, Vec3 n) {
@@ -42,7 +51,9 @@ static Vec3 refract(Vec3 uv, Vec3 n, float etai_over_etat) {
 static float schlick(float cosine, float ref_idx) {
     float r0 = (1.0f - ref_idx) / (1.0f + ref_idx);
     r0 = r0 * r0;
-    return r0 + (1.0f - r0) * powf(1.0f - cosine, 5.0f);
+    float x = 1.0f - cosine;
+    float x2 = x * x;
+    return r0 + (1.0f - r0) * (x2 * x2 * x);  // x^5 via 3 muls instead of powf
 }
 
 bool material_scatter(const Material *mat,

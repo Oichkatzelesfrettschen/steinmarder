@@ -96,20 +96,46 @@ static void rt_submit_and_wait(VkDevice dev, VkQueue queue, VkCommandBuffer cmd)
  *  Temperature-dependent, based on published nuclear engineering data
  * ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Thermal Conductivity k (W/(m·K)) ─── */
-float rt_thermal_conductivity(RT_Material mat, float T) {
-    switch (mat) {
-    case RT_MAT_FUEL_UO2: {
-        /* IAEA correlation for UO₂:
-         * k = 100 / (7.5408 + 17.692t + 3.6142t²) + 6400/(t^2.5) × exp(-16.35/t)
-         * where t = T/1000.  Simplified for computational stability.
-         * [Fink, J. Nucl. Mater. 279 (2000) 1-18; IAEA-TECDOC-1496 §3.2.1] */
+/* ─── UO₂ Thermal Conductivity LUT ─── */
+/* Precomputed from IAEA correlation to eliminate powf + expf per call.
+ * Range: [300K, 3200K], 1K resolution, 2901 entries.
+ * Initialized on first call (thread-safe via static init). */
+#define UO2_K_LUT_TMIN  300.0f
+#define UO2_K_LUT_TMAX  3200.0f
+#define UO2_K_LUT_N     2901
+static float g_uo2_k_lut[UO2_K_LUT_N];
+static int   g_uo2_k_lut_ready = 0;
+
+static void uo2_k_lut_init(void) {
+    for (int i = 0; i < UO2_K_LUT_N; i++) {
+        float T = UO2_K_LUT_TMIN + (float)i;
         float t = T / 1000.0f;
         if (t < 0.3f) t = 0.3f;
         float k_phonon = 100.0f / (7.5408f + 17.692f * t + 3.6142f * t * t);
         float k_rad    = (6400.0f / powf(t, 2.5f)) * expf(-16.35f / t);
-        return k_phonon + k_rad;
+        g_uo2_k_lut[i] = k_phonon + k_rad;
     }
+    g_uo2_k_lut_ready = 1;
+}
+
+static inline float uo2_k_lut_lookup(float T) {
+    if (!g_uo2_k_lut_ready) uo2_k_lut_init();
+    if (T < UO2_K_LUT_TMIN) T = UO2_K_LUT_TMIN;
+    if (T > UO2_K_LUT_TMAX) T = UO2_K_LUT_TMAX;
+    float idx_f = T - UO2_K_LUT_TMIN;
+    int idx = (int)idx_f;
+    if (idx >= UO2_K_LUT_N - 1) return g_uo2_k_lut[UO2_K_LUT_N - 1];
+    float frac = idx_f - (float)idx;
+    return g_uo2_k_lut[idx] * (1.0f - frac) + g_uo2_k_lut[idx + 1] * frac;
+}
+
+/* ─── Thermal Conductivity k (W/(m·K)) ─── */
+float rt_thermal_conductivity(RT_Material mat, float T) {
+    switch (mat) {
+    case RT_MAT_FUEL_UO2:
+        /* IAEA correlation for UO₂ via precomputed LUT (eliminates powf + expf).
+         * [Fink, J. Nucl. Mater. 279 (2000) 1-18; IAEA-TECDOC-1496 §3.2.1] */
+        return uo2_k_lut_lookup(T);
     case RT_MAT_CLAD_ZR4:
         /* Zircaloy-4: k ≈ 12.767 + 0.00574×T (W/(m·K)), valid 300-1800K
          * [Mills et al., J. Nucl. Mater. 246 (1997); IAEA-TECDOC-1496 §4.2.1] */
