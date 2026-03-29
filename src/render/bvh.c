@@ -58,19 +58,34 @@ aabb aabb_surrounding(aabb b0, aabb b1) {
     return box;
 }
 
-// Slab test (with counting) — float precision (halves bandwidth vs double)
-bool aabb_hit(const aabb* box, const Ray* r, float t_min, float t_max) {
+// Precomputed inverse ray direction for BVH traversal.
+// Computed once per ray, eliminates 3 divisions per AABB test.
+typedef struct {
+    float inv_dir[3];   // 1.0f / ray.direction[i]
+    float origin[3];    // ray.origin[i]
+} RayInvDir;
+
+static inline RayInvDir ray_inv_dir(const Ray* r) {
+    RayInvDir rid;
+    rid.origin[0]  = r->origin.x;
+    rid.origin[1]  = r->origin.y;
+    rid.origin[2]  = r->origin.z;
+    rid.inv_dir[0] = 1.0f / r->direction.x;
+    rid.inv_dir[1] = 1.0f / r->direction.y;
+    rid.inv_dir[2] = 1.0f / r->direction.z;
+    return rid;
+}
+
+// Slab test (with counting) — uses precomputed invD, no divisions
+static inline bool aabb_hit_fast(const aabb* box, const RayInvDir* rid, float t_min, float t_max) {
     g_bvh_aabb_tests++;
 
-    const float o[3]  = { r->origin.x,    r->origin.y,    r->origin.z };
-    const float d[3]  = { r->direction.x, r->direction.y, r->direction.z };
     const float mn[3] = { box->minimum.x, box->minimum.y, box->minimum.z };
     const float mx[3] = { box->maximum.x, box->maximum.y, box->maximum.z };
 
     for (int i = 0; i < 3; ++i) {
-        float invD = 1.0f / d[i];   // ±inf for d[i]==0, still correct
-        float t0 = (mn[i] - o[i]) * invD;
-        float t1 = (mx[i] - o[i]) * invD;
+        float t0 = (mn[i] - rid->origin[i]) * rid->inv_dir[i];
+        float t1 = (mx[i] - rid->origin[i]) * rid->inv_dir[i];
         if (t0 > t1) { float tmp = t0; t0 = t1; t1 = tmp; }
 
         if (t0 > t_min) t_min = t0;
@@ -78,6 +93,12 @@ bool aabb_hit(const aabb* box, const Ray* r, float t_min, float t_max) {
         if (t_max <= t_min) return false;
     }
     return true;
+}
+
+// Legacy API: computes invD each time (for external callers)
+bool aabb_hit(const aabb* box, const Ray* r, float t_min, float t_max) {
+    RayInvDir rid = ray_inv_dir(r);
+    return aabb_hit_fast(box, &rid, t_min, t_max);
 }
 
 // Child ordering helper (does NOT increment counters) — float precision
@@ -379,25 +400,24 @@ int bvh_load_policy_csv(const char* path, bvh_node* root) {
 // BVH intersection used by render.c: returns HitRecord.
 extern HitRecord sphere_intersect(const Sphere *s, Ray r, float t_min, float t_max);
 
-bool bvh_hit(
+// Internal traversal with precomputed inverse ray direction.
+static bool bvh_hit_internal(
     const bvh_node* node,
     const Sphere* spheres,
     const Ray* r,
+    const RayInvDir* rid,
     float t_min,
     float t_max,
     HitRecord* rec
 ) {
     if (!node) return false;
-
-    // ✅ PASS-2: prune ise subtree 0 maliyet (ne visit, ne AABB)
     if (node->prune) return false;
 
-    // visit
     g_bvh_node_visits++;
     ((bvh_node*)node)->visit_count++;
 
-    // AABB
-    if (!aabb_hit(&node->box, r, t_min, t_max)) return false;
+    // Use precomputed invD -- no divisions
+    if (!aabb_hit_fast(&node->box, rid, t_min, t_max)) return false;
 
     // Leaf
     if (node->count > 0) {
@@ -435,15 +455,14 @@ bool bvh_hit(
     float closest = t_max;
     HitRecord tmp;
 
-    if (first && !first->prune && bvh_hit(first, spheres, r, t_min, closest, &tmp)) {
+    if (first && !first->prune && bvh_hit_internal(first, spheres, r, rid, t_min, closest, &tmp)) {
         hit_any = true;
         closest = tmp.t;
         *rec = tmp;
     }
 
-    // ✅ second prune ise AABB testini bile yapma
-    if (second && !second->prune && aabb_hit(&second->box, r, t_min, closest)) {
-        if (bvh_hit(second, spheres, r, t_min, closest, &tmp)) {
+    if (second && !second->prune && aabb_hit_fast(&second->box, rid, t_min, closest)) {
+        if (bvh_hit_internal(second, spheres, r, rid, t_min, closest, &tmp)) {
             hit_any = true;
             *rec = tmp;
         }
@@ -451,6 +470,19 @@ bool bvh_hit(
 
     if (hit_any) ((bvh_node*)node)->useful_count++;
     return hit_any;
+}
+
+// Public API: precomputes inverse direction once per ray
+bool bvh_hit(
+    const bvh_node* node,
+    const Sphere* spheres,
+    const Ray* r,
+    float t_min,
+    float t_max,
+    HitRecord* rec
+) {
+    RayInvDir rid = ray_inv_dir(r);
+    return bvh_hit_internal(node, spheres, r, &rid, t_min, t_max, rec);
 }
 
 // ============================================================

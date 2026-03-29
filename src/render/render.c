@@ -426,10 +426,12 @@ void render_scene_st(Vec3 *pixels,
 
                     if (spp_used >= spp_min && (spp_used % g_adapt_spp_batch) == 0) {
                         float var = (spp_used > 1) ? (m2 / (float)(spp_used - 1)) : 0.0f;
-                        float se  = sqrtf(fmaxf(var, 0.0f) / (float)spp_used);
-
-                        float tol = fmaxf(g_adapt_abs_err, g_adapt_rel_err * fabsf(mean));
-                        if (se <= tol) { early_stop = 1; break; }
+                        // Compare squared SE vs squared tolerance to avoid sqrtf
+                        float se_sq = fmaxf(var, 0.0f) / (float)spp_used;
+                        float tol_abs = g_adapt_abs_err;
+                        float tol_rel = g_adapt_rel_err * fabsf(mean);
+                        float tol = fmaxf(tol_abs, tol_rel);
+                        if (se_sq <= tol * tol) { early_stop = 1; break; }
                     }
                 }
             }
@@ -561,10 +563,12 @@ static void render_tile_chunk(RenderPool *p, WorkerLocal *wl, int job) {
 
                     if (spp_used >= spp_min && (spp_used % g_adapt_spp_batch) == 0) {
                         float var = (spp_used > 1) ? (m2 / (float)(spp_used - 1)) : 0.0f;
-                        float se  = sqrtf(fmaxf(var, 0.0f) / (float)spp_used);
-
-                        float tol = fmaxf(g_adapt_abs_err, g_adapt_rel_err * fabsf(mean));
-                        if (se <= tol) { early_stop = 1; break; }
+                        // Compare squared SE vs squared tolerance to avoid sqrtf
+                        float se_sq = fmaxf(var, 0.0f) / (float)spp_used;
+                        float tol_abs = g_adapt_abs_err;
+                        float tol_rel = g_adapt_rel_err * fabsf(mean);
+                        float tol = fmaxf(tol_abs, tol_rel);
+                        if (se_sq <= tol * tol) { early_stop = 1; break; }
                     }
                 }
             }
