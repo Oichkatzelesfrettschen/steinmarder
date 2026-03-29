@@ -247,39 +247,46 @@ void main() {
 
     uint wo = 0; /* weight offset tracker */
 
-    /* Depthwise: each of 12 input channels gets its own 3×3 filter */
+    /* Depthwise: each of 12 input channels gets its own 3×3 filter.
+     * Channels 9-11 (jitter, confidence) are spatially constant within 3×3,
+     * so we precompute their kernel-weighted sums without texture fetches. */
     float dw_out[INPUT_CH];
-    for (uint c = 0; c < INPUT_CH; c++) {
+
+    /* Fast path: spatially constant channels (no texture fetch needed) */
+    for (uint c = 9; c < INPUT_CH; c++) {
+        float kernel_sum = 0.0;
+        for (int ki = 0; ki < int(KERNEL_N); ki++) {
+            kernel_sum += weights[wo + c * KERNEL_N + ki];
+        }
+        dw_out[c] = input_feat[c] * kernel_sum;
+    }
+
+    /* Texture-dependent channels: 3×3 neighborhood sampling */
+    /* Precompute offset UVs to avoid redundant division per channel */
+    vec2 inv_lo = vec2(1.0 / float(pc.w_lo), 1.0 / float(pc.h_lo));
+    int ratio_i = int(round(ratio));
+
+    for (uint c = 0; c < 9; c++) {
         float nbr_sum = 0.0;
         for (int ky = -1; ky <= 1; ky++) {
             for (int kx = -1; kx <= 1; kx++) {
-                vec2 offset_uv = vec2(float(kx), float(ky)) /
-                                 vec2(float(pc.w_lo), float(pc.h_lo));
-                vec2 sample_uv = uv_lo + offset_uv;
+                vec2 sample_uv = uv_lo + vec2(float(kx), float(ky)) * inv_lo;
 
-                /* Re-assemble just channel c at the offset position.
-                 * In production, cache the full neighborhood in shared memory. */
                 float val = 0.0;
                 if (c < 3) {
                     vec3 s = textureLod(u_color_lo, sample_uv, 0.0).rgb;
                     val = (c == 0) ? s.r : (c == 1) ? s.g : s.b;
                 } else if (c < 6) {
-                    /* History at offset — use high-res mapping */
-                    ivec2 hi_offset = pix_hi + ivec2(kx * int(round(ratio)),
-                                                      ky * int(round(ratio)));
+                    ivec2 hi_offset = pix_hi + ivec2(kx * ratio_i, ky * ratio_i);
                     hi_offset = clamp(hi_offset, ivec2(0), ivec2(pc.w_hi-1, pc.h_hi-1));
                     vec4 h = imageLoad(u_reproj_hi, hi_offset);
                     val = (c == 3) ? h.r : (c == 4) ? h.g : h.b;
                 } else if (c == 6 || c == 7) {
                     vec2 mv = textureLod(u_motion_vec, sample_uv, 0.0).rg;
-                    val = (c == 6) ? mv.x / max(float(pc.w_lo), 1.0)
-                                  : mv.y / max(float(pc.h_lo), 1.0);
+                    val = (c == 6) ? mv.x * inv_lo.x : mv.y * inv_lo.y;
                 } else if (c == 8) {
                     float d = textureLod(u_depth_lo, sample_uv, 0.0).r;
                     val = log2(max(d, 1e-6)) / 20.0;
-                } else {
-                    /* jitter and confidence don't vary spatially within 3×3 */
-                    val = input_feat[c];
                 }
 
                 int ki = (ky + 1) * 3 + (kx + 1);
