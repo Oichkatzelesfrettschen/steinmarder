@@ -435,37 +435,48 @@ void sm_hashgrid_lookup_batch(
             float wy = gy - fy;
             float wz = gz - fz;
             
-            /* For each feature, do trilinear interpolation over 8 corners */
-            for (uint32_t f = 0; f < config->features_per_entry; f++) {
-                /* Hash all 8 corners */
-                uint32_t h000 = sm_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
-                uint32_t h001 = sm_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
-                uint32_t h010 = sm_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
-                uint32_t h011 = sm_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
-                uint32_t h100 = sm_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
-                uint32_t h101 = sm_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
-                uint32_t h110 = sm_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
-                uint32_t h111 = sm_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
-                
-                /* Prefetch all 8 hash-indexed cache lines before reading */
-                SM_PREFETCH(&hashgrid_data[level_offset + h000 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h001 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h010 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h011 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h100 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h101 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h110 * config->features_per_entry + f]);
-                SM_PREFETCH(&hashgrid_data[level_offset + h111 * config->features_per_entry + f]);
+            /* Hash all 8 corners once (independent of feature index) */
+            uint32_t h000 = sm_hash_ijk(i0,   j0,   k0,   config->hashmap_size);
+            uint32_t h001 = sm_hash_ijk(i0,   j0,   k0+1, config->hashmap_size);
+            uint32_t h010 = sm_hash_ijk(i0,   j0+1, k0,   config->hashmap_size);
+            uint32_t h011 = sm_hash_ijk(i0,   j0+1, k0+1, config->hashmap_size);
+            uint32_t h100 = sm_hash_ijk(i0+1, j0,   k0,   config->hashmap_size);
+            uint32_t h101 = sm_hash_ijk(i0+1, j0,   k0+1, config->hashmap_size);
+            uint32_t h110 = sm_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
+            uint32_t h111 = sm_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
 
+            /* Precompute base addresses for each corner (stride by features_per_entry) */
+            uint32_t fpe = config->features_per_entry;
+            uint32_t base000 = level_offset + h000 * fpe;
+            uint32_t base001 = level_offset + h001 * fpe;
+            uint32_t base010 = level_offset + h010 * fpe;
+            uint32_t base011 = level_offset + h011 * fpe;
+            uint32_t base100 = level_offset + h100 * fpe;
+            uint32_t base101 = level_offset + h101 * fpe;
+            uint32_t base110 = level_offset + h110 * fpe;
+            uint32_t base111 = level_offset + h111 * fpe;
+
+            /* Prefetch all 8 corners (covers all features since fpe is typically 2) */
+            SM_PREFETCH(&hashgrid_data[base000]);
+            SM_PREFETCH(&hashgrid_data[base001]);
+            SM_PREFETCH(&hashgrid_data[base010]);
+            SM_PREFETCH(&hashgrid_data[base011]);
+            SM_PREFETCH(&hashgrid_data[base100]);
+            SM_PREFETCH(&hashgrid_data[base101]);
+            SM_PREFETCH(&hashgrid_data[base110]);
+            SM_PREFETCH(&hashgrid_data[base111]);
+
+            /* For each feature, do trilinear interpolation over 8 corners */
+            for (uint32_t f = 0; f < fpe; f++) {
                 /* Look up feature values at each corner */
-                float v000 = hashgrid_data[level_offset + h000 * config->features_per_entry + f];
-                float v001 = hashgrid_data[level_offset + h001 * config->features_per_entry + f];
-                float v010 = hashgrid_data[level_offset + h010 * config->features_per_entry + f];
-                float v011 = hashgrid_data[level_offset + h011 * config->features_per_entry + f];
-                float v100 = hashgrid_data[level_offset + h100 * config->features_per_entry + f];
-                float v101 = hashgrid_data[level_offset + h101 * config->features_per_entry + f];
-                float v110 = hashgrid_data[level_offset + h110 * config->features_per_entry + f];
-                float v111 = hashgrid_data[level_offset + h111 * config->features_per_entry + f];
+                float v000 = hashgrid_data[base000 + f];
+                float v001 = hashgrid_data[base001 + f];
+                float v010 = hashgrid_data[base010 + f];
+                float v011 = hashgrid_data[base011 + f];
+                float v100 = hashgrid_data[base100 + f];
+                float v101 = hashgrid_data[base101 + f];
+                float v110 = hashgrid_data[base110 + f];
+                float v111 = hashgrid_data[base111 + f];
                 
                 /* Trilinear interpolation */
                 /* First lerp in Z */
