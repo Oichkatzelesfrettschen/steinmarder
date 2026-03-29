@@ -565,17 +565,22 @@ void sm_mlp_inference_batch(
         }
     }
     for (uint32_t i = 0; i < in_dim; i++) {
-        const float *w0_row = &w0[i * hidden_dim]; /* contiguous row */
+        const float *w0_row = &w0[i * hidden_dim];
         for (uint32_t ray = 0; ray < SIMD_BATCH_SIZE; ray++) {
-            float fi = features_in[ray][i];
-            for (uint32_t h = 0; h < hidden_dim; h++) {
-                hidden[ray][h] += w0_row[h] * fi;
+            __m256 vfi = _mm256_set1_ps(features_in[ray][i]);
+            for (uint32_t h = 0; h < hidden_dim; h += 8) {
+                __m256 vh = _mm256_loadu_ps(&hidden[ray][h]);
+                __m256 vw = _mm256_loadu_ps(&w0_row[h]);
+                vh = _mm256_fmadd_ps(vw, vfi, vh);
+                _mm256_storeu_ps(&hidden[ray][h], vh);
             }
         }
     }
     for (uint32_t ray = 0; ray < SIMD_BATCH_SIZE; ray++) {
-        for (uint32_t h = 0; h < hidden_dim; h++) {
-            hidden[ray][h] = fmaxf(0.0f, hidden[ray][h]);
+        __m256 vzero = _mm256_setzero_ps();
+        for (uint32_t h = 0; h < hidden_dim; h += 8) {
+            __m256 vh = _mm256_loadu_ps(&hidden[ray][h]);
+            _mm256_storeu_ps(&hidden[ray][h], _mm256_max_ps(vh, vzero));
         }
     }
     
@@ -587,17 +592,22 @@ void sm_mlp_inference_batch(
         }
     }
     for (uint32_t h_prev = 0; h_prev < hidden_dim; h_prev++) {
-        const float *w1_row = &w1[h_prev * hidden_dim]; /* contiguous row */
+        const float *w1_row = &w1[h_prev * hidden_dim];
         for (uint32_t ray = 0; ray < SIMD_BATCH_SIZE; ray++) {
-            float val = hidden[ray][h_prev];
-            for (uint32_t h = 0; h < hidden_dim; h++) {
-                hidden2[ray][h] += w1_row[h] * val;
+            __m256 vval = _mm256_set1_ps(hidden[ray][h_prev]);
+            for (uint32_t h = 0; h < hidden_dim; h += 8) {
+                __m256 vh = _mm256_loadu_ps(&hidden2[ray][h]);
+                __m256 vw = _mm256_loadu_ps(&w1_row[h]);
+                vh = _mm256_fmadd_ps(vw, vval, vh);
+                _mm256_storeu_ps(&hidden2[ray][h], vh);
             }
         }
     }
     for (uint32_t ray = 0; ray < SIMD_BATCH_SIZE; ray++) {
-        for (uint32_t h = 0; h < hidden_dim; h++) {
-            hidden2[ray][h] = fmaxf(0.0f, hidden2[ray][h]);
+        __m256 vzero = _mm256_setzero_ps();
+        for (uint32_t h = 0; h < hidden_dim; h += 8) {
+            __m256 vh = _mm256_loadu_ps(&hidden2[ray][h]);
+            _mm256_storeu_ps(&hidden2[ray][h], _mm256_max_ps(vh, vzero));
         }
     }
     
