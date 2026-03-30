@@ -60,7 +60,9 @@ that exist on Apple silicon:
   - exercises `torch`, `mlx`, `jax-metal`, and `coremltools` in one pass
 - `scripts/analyze_tranche_mnemonics.py`
   - parses tranche disassembly outputs into opcode/mnemonic counts and a
-    short interpretation report
+  short interpretation report
+- `scripts/analyze_xctrace_row_deltas.py`
+  - computes schema row-count deltas between baseline and variant GPU traces
 - `scripts/run_apple_tranche1.sh`
   - orchestrates the first 42-step deep-dive tranche across CPU, Metal, and
   neural lanes with manifest outputs
@@ -70,6 +72,10 @@ that exist on Apple silicon:
   - pinned package entrypoint for the repo-local neural lane
 - `shaders/probe_simdgroup_reduce.metal`
   - starter SIMD-group probe kernel for the Metal lane
+- `shaders/probe_threadgroup_heavy.metal`
+  - threadgroup-memory-heavy variant for counter/timing deltas
+- `shaders/probe_occupancy_heavy.metal`
+  - arithmetic/occupancy-heavy variant for counter/timing deltas
 
 ## Local bootstrap
 
@@ -153,6 +159,8 @@ Notes:
 - Step 27 emits structured trace artifacts:
   `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
   `xctrace_metric_row_counts.csv`, and per-schema XML exports.
+- Step 30 now also emits variant-vs-baseline delta artifacts:
+  `xctrace_row_deltas.csv` and `xctrace_row_delta_summary.md`.
 - Post-run mnemonic analysis:
   `python3 src/apple_re/scripts/analyze_tranche_mnemonics.py <run_dir>`
   writes `cpu_mnemonic_counts.csv`, `metal_air_opcode_counts.csv`, and

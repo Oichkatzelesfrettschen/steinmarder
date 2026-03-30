@@ -175,8 +175,9 @@ def main() -> int:
 
     write_cpu_csv(out_cpu_csv, sorted(cpu_rows, key=lambda r: (r[0], r[1], r[2])))
 
-    air_path = dis_dir / "probe_simdgroup_reduce.metallib.dis.txt"
-    air_counts = parse_air_ops(air_path)
+    air_counts: Counter[str] = Counter()
+    for air_path in sorted(dis_dir.glob("*.metallib.dis.txt")):
+        air_counts.update(parse_air_ops(air_path))
     write_air_csv(out_air_csv, air_counts)
 
     render_markdown(out_md, run_dir, cpu_totals, air_counts, dis_dir)

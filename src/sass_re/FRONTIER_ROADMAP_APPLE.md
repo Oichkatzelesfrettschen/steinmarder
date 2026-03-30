@@ -204,6 +204,7 @@ Latest blessed snapshot:
 - `C` CPU runtime timing + profiler + diagnostics
 - `D` Metal host harness + compile + correctness + timing sweep
 - `E` GPU trace + host-overhead capture + power sampling + synthesis note
+  (baseline + `threadgroup_heavy` + `occupancy_heavy` traces with row deltas)
 - `F` neural lane bootstrap + placement probes (`torch`, `coreml`, `mlx`, `jax`)
 - `G` manifest + quality gates + failed-step snapshot + linkage notes
 
@@ -238,7 +239,7 @@ Latest blessed snapshot:
 - [ ] 27 `E::extract_xctrace_metrics`
 - [ ] 28 `E::host_overhead_capture`
 - [ ] 29 `E::powermetrics_gpu`
-- [ ] 30 `E::counter_latency_report`
+- [ ] 30 `E::counter_latency_report` (includes `xctrace_row_deltas.csv`)
 - [ ] 31 `F::venv_rebuild`
 - [ ] 32 `F::neural_probe_all`
 - [ ] 33 `F::model_family_define`
