@@ -1,0 +1,2 @@
+command,mean,stddev,median,user,system,min,max
+src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/cpu_bins/sm_apple_cpu_latency_O3 --iters 500000 --csv,0.06180010902000001,0.001755985873021277,0.06105777542,0.059574,0.00088882,0.060821401420000004,0.06492023442

@@ -1,0 +1,345 @@
+{
+  "run_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4",
+  "total_steps": 42,
+  "ok": 42,
+  "fail": 0,
+  "skipped_phase": 0,
+  "steps": [
+    {
+      "timestamp_utc": "2026-03-30T21:37:11Z",
+      "step": "1",
+      "status": "ok",
+      "phase": "A",
+      "name": "sudo_prime",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/01_sudo_prime"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:11Z",
+      "step": "2",
+      "status": "ok",
+      "phase": "A",
+      "name": "sudo_keepalive_start",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/02_sudo_keepalive_start"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:11Z",
+      "step": "3",
+      "status": "ok",
+      "phase": "A",
+      "name": "machine_stamp",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/03_machine_stamp"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:11Z",
+      "step": "4",
+      "status": "ok",
+      "phase": "A",
+      "name": "tool_matrix",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/04_tool_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:12Z",
+      "step": "5",
+      "status": "ok",
+      "phase": "A",
+      "name": "package_inventory",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/05_package_inventory"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:13Z",
+      "step": "6",
+      "status": "ok",
+      "phase": "A",
+      "name": "capabilities_json",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/06_capabilities_json"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:13Z",
+      "step": "7",
+      "status": "ok",
+      "phase": "B",
+      "name": "cpu_family_matrix",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/07_cpu_family_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:13Z",
+      "step": "8",
+      "status": "ok",
+      "phase": "B",
+      "name": "cpu_probe_inventory",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/08_cpu_probe_inventory"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:13Z",
+      "step": "9",
+      "status": "ok",
+      "phase": "B",
+      "name": "compile_matrix_define",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/09_compile_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:14Z",
+      "step": "10",
+      "status": "ok",
+      "phase": "B",
+      "name": "Ofast",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/10_build_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:14Z",
+      "step": "11",
+      "status": "ok",
+      "phase": "B",
+      "name": "disassemble_cpu_matrix",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/11_disassemble_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:15Z",
+      "step": "12",
+      "status": "ok",
+      "phase": "B",
+      "name": "O3",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/12_llvm_mca_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:16Z",
+      "step": "13",
+      "status": "ok",
+      "phase": "C",
+      "name": "cpu_baseline_timing",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/13_cpu_baseline_timing"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:17Z",
+      "step": "14",
+      "status": "ok",
+      "phase": "C",
+      "name": "hyperfine_cpu_timing",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/14_hyperfine_cpu_timing"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:24Z",
+      "step": "15",
+      "status": "ok",
+      "phase": "C",
+      "name": "xctrace_cpu_profile",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/15_xctrace_cpu_profile"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:25Z",
+      "step": "16",
+      "status": "ok",
+      "phase": "C",
+      "name": "dtrace_dtruss_cpu",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/16_dtrace_dtruss_cpu"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:30Z",
+      "step": "17",
+      "status": "ok",
+      "phase": "C",
+      "name": "powermetrics_cpu",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/17_powermetrics_cpu"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:53Z",
+      "step": "18",
+      "status": "ok",
+      "phase": "C",
+      "name": "cpu_diagnostics",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/18_cpu_diagnostics"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:54Z",
+      "step": "19",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_host_harness_build",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/19_metal_host_harness_build"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:54Z",
+      "step": "20",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_variant_matrix_define",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/20_metal_variant_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:55Z",
+      "step": "21",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_compile_variants",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/21_metal_compile_variants"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:55Z",
+      "step": "22",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_correctness",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/22_metal_correctness"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:55Z",
+      "step": "23",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_timing_sweep",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/23_metal_timing_sweep"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:37:55Z",
+      "step": "24",
+      "status": "ok",
+      "phase": "D",
+      "name": "publish_metal_matrix",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/24_publish_metal_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:38:04Z",
+      "step": "25",
+      "status": "ok",
+      "phase": "E",
+      "name": "xctrace_gpu_baseline",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/25_xctrace_gpu_baseline"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:38:14Z",
+      "step": "26",
+      "status": "ok",
+      "phase": "E",
+      "name": "xctrace_gpu_compare",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/26_xctrace_gpu_compare"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:40:01Z",
+      "step": "27",
+      "status": "ok",
+      "phase": "E",
+      "name": "extract_xctrace_metrics",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/27_extract_xctrace_metrics"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:40:26Z",
+      "step": "28",
+      "status": "ok",
+      "phase": "E",
+      "name": "host_overhead_capture",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/28_host_overhead_capture"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:40:31Z",
+      "step": "29",
+      "status": "ok",
+      "phase": "E",
+      "name": "powermetrics_gpu",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/29_powermetrics_gpu"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:40:31Z",
+      "step": "30",
+      "status": "ok",
+      "phase": "E",
+      "name": "counter_latency_report",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/30_counter_latency_report"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:41:29Z",
+      "step": "31",
+      "status": "ok",
+      "phase": "F",
+      "name": "venv_rebuild",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/31_venv_rebuild"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:12Z",
+      "step": "32",
+      "status": "ok",
+      "phase": "F",
+      "name": "neural_probe_all",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/32_neural_probe_all"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:12Z",
+      "step": "33",
+      "status": "ok",
+      "phase": "F",
+      "name": "model_family_define",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/33_model_family_define"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:17Z",
+      "step": "34",
+      "status": "ok",
+      "phase": "F",
+      "name": "coreml_placement_sweep",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/34_coreml_placement_sweep"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:19Z",
+      "step": "35",
+      "status": "ok",
+      "phase": "F",
+      "name": "torch_cpu_vs_mps",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/35_torch_cpu_vs_mps"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "36",
+      "status": "ok",
+      "phase": "F",
+      "name": "mlx_jax_checks",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/36_mlx_jax_checks"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "37",
+      "status": "ok",
+      "phase": "G",
+      "name": "consolidate_manifest",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/37_consolidate_manifest"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "38",
+      "status": "ok",
+      "phase": "G",
+      "name": "quality_gates",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/38_quality_gates"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "39",
+      "status": "ok",
+      "phase": "G",
+      "name": "rerun_failed_snapshot",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/39_rerun_failed_snapshot"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "40",
+      "status": "ok",
+      "phase": "G",
+      "name": "synthesis_report",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/40_synthesis_report"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "41",
+      "status": "ok",
+      "phase": "G",
+      "name": "linkage_notes",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/41_linkage_notes"
+    },
+    {
+      "timestamp_utc": "2026-03-30T21:42:20Z",
+      "step": "42",
+      "status": "ok",
+      "phase": "G",
+      "name": "sudo_teardown",
+      "artifact_dir": "src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/steps/42_sudo_teardown"
+    }
+  ]
+}

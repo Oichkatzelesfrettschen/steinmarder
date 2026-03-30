@@ -12,6 +12,27 @@ pretending Apple exposes the same machine-code surfaces as CUDA.
   - GPU lane: Metal compute probes plus Xcode counter capture
   - Neural lane: Core ML placement and dtype studies across CPU, GPU, and ANE
 
+## CUDA-Method Translation (M1-specific)
+
+This lane keeps the same research posture as `sass_re`, but translated to tools
+that exist on Apple silicon:
+
+- `ncu`-style per-kernel evidence:
+  - Apple equivalent: `xctrace` table exports + host CSV timing from
+    `run_metal_probe_host.sh`
+- `nsys`-style timeline/context evidence:
+  - Apple equivalent: `xctrace` TOC + per-schema XML exports + `sample`,
+    PID-targeted `spindump`, and PID-targeted `fs_usage`
+- `compute-sanitizer`/valgrind-style memory safety lane:
+  - Apple equivalent: ASan/UBSan build plus `leaks <pid>` and `vmmap <pid>`
+    against a live target process
+- SASS mnemonic frontier lane:
+  - Apple equivalent: CPU assembly/disassembly deltas (`clang -S`, `otool`,
+    `llvm-objdump`, `llvm-mca`) plus Metal shader artifact inspection
+- cross-lane synthesis:
+  - keep one tranche output dir with manifest, schema inventory, row-count
+    metrics, timing CSVs, and neural placement probes
+
 ## Current contents
 
 - `probes/apple_cpu_latency.c`
@@ -37,9 +58,12 @@ pretending Apple exposes the same machine-code surfaces as CUDA.
   - creates the repo-local `.venv` with the neural-lane Python stack
 - `scripts/neural_lane_probe.py`
   - exercises `torch`, `mlx`, `jax-metal`, and `coremltools` in one pass
+- `scripts/analyze_tranche_mnemonics.py`
+  - parses tranche disassembly outputs into opcode/mnemonic counts and a
+    short interpretation report
 - `scripts/run_apple_tranche1.sh`
   - orchestrates the first 42-step deep-dive tranche across CPU, Metal, and
-    neural lanes with manifest outputs
+  neural lanes with manifest outputs
 - `host/metal_probe_host.m`
   - minimal Metal host harness used for end-to-end GPU lane timing
 - `requirements-neural.txt`
@@ -71,6 +95,12 @@ Then audit the full stack:
 
 ```sh
 src/apple_re/scripts/audit_macos_re_env.sh
+```
+
+Prime sudo cache once (supports Touch ID if enabled on your host):
+
+```sh
+src/apple_re/scripts/prime_sudo_cache.sh
 ```
 
 If the neural-lane packages are missing, bootstrap the repo-local environment:
@@ -111,11 +141,23 @@ Notes:
 
 - `--sudo keepalive` starts a background `sudo -A` refresh loop and tears it
   down automatically at the end.
+- `--sudo cache` uses one interactive `sudo -v` prime (Touch ID/password),
+  then keeps the run non-interactive via cached `sudo -n` refresh.
+- `--sudo none` skips sudo priming and allows non-root evidence capture only.
 - All steps write artifacts into
   `src/apple_re/results/tranche1_<timestamp>/steps/`.
 - Run subsets with `--phase A,B,C` (or any comma-separated phase list).
 - Latest promoted snapshot:
-  `src/apple_re/results/blessed/2026-03-30_tranche1_r2/`.
+  `src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`.
+- Step 27 emits structured trace artifacts:
+  `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
+  `xctrace_metric_row_counts.csv`, and per-schema XML exports.
+- Post-run mnemonic analysis:
+  `python3 src/apple_re/scripts/analyze_tranche_mnemonics.py <run_dir>`
+  writes `cpu_mnemonic_counts.csv`, `metal_air_opcode_counts.csv`, and
+  `mnemonic_interpretation.md` into that run directory.
+- If GUI askpass is unavailable in terminal automation, use `--sudo none` to
+  complete non-root evidence capture without hanging.
 
 ## Recommended workflow
 

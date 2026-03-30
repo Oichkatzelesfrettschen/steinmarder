@@ -12,10 +12,11 @@ ITERS="${ITERS:-500000}"
 KEEPALIVE_PID=""
 STEP_NO=0
 TOTAL_STEPS=42
+SUDO_INVOKE="sudo -A"
 
 usage() {
     cat <<EOF
-usage: $0 [--phase A|B|C|D|E|F|G|all|A,B,...] [--out DIR] [--sudo keepalive|none] [--iters N]
+usage: $0 [--phase A|B|C|D|E|F|G|all|A,B,...] [--out DIR] [--sudo keepalive|cache|none] [--iters N]
 EOF
 }
 
@@ -49,6 +50,14 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+if [ "$SUDO_MODE" = "keepalive" ]; then
+    SUDO_INVOKE="sudo -A"
+elif [ "$SUDO_MODE" = "cache" ]; then
+    SUDO_INVOKE="sudo -n"
+else
+    SUDO_INVOKE="sudo -n"
+fi
+
 mkdir -p "$OUT_DIR/steps"
 
 COMMANDS_LOG="$OUT_DIR/commands.log"
@@ -76,6 +85,24 @@ phase_enabled() {
     done
     IFS="$old_ifs"
     return 1
+}
+
+choose_sudo_prime_cmd() {
+    if [ -n "${SUDO_ASKPASS:-}" ] && [ -x "${SUDO_ASKPASS}" ]; then
+        echo "sudo -A -v"
+        return 0
+    fi
+    echo "sudo -v"
+}
+
+sudo_prime_once() {
+    if [ "$SUDO_MODE" = "none" ]; then
+        echo "sudo_disabled"
+        return 0
+    fi
+    prime_cmd="$(choose_sudo_prime_cmd)"
+    echo "sudo_prime_cmd=$prime_cmd"
+    eval "$prime_cmd"
 }
 
 mark_step() {
@@ -108,7 +135,7 @@ run_step() {
         echo "$cmd"
     } >> "$COMMANDS_LOG"
 
-    if sh -c "$cmd" > "$step_dir/stdout.log" 2> "$step_dir/stderr.log"; then
+    if eval "$cmd" > "$step_dir/stdout.log" 2> "$step_dir/stderr.log"; then
         mark_step "$STEP_NO" "ok" "$phase" "$name" "$step_dir"
     else
         mark_step "$STEP_NO" "fail" "$phase" "$name" "$step_dir"
@@ -116,17 +143,13 @@ run_step() {
 }
 
 start_sudo_keepalive() {
-    if [ "$SUDO_MODE" != "keepalive" ]; then
+    if [ "$SUDO_MODE" = "none" ]; then
         return 0
     fi
-    if [ -z "${SUDO_ASKPASS:-}" ]; then
-        echo "SUDO_ASKPASS is not set; cannot run keepalive mode." >&2
-        exit 1
-    fi
-    sudo -A -v
+    sudo_prime_once
     (
         while true; do
-            sudo -A -n true >/dev/null 2>&1 || exit 0
+            sudo -n true >/dev/null 2>&1 || exit 0
             sleep 50
         done
     ) &
@@ -139,8 +162,8 @@ stop_sudo_keepalive() {
         kill "$KEEPALIVE_PID" >/dev/null 2>&1 || true
         KEEPALIVE_PID=""
     fi
-    if [ "$SUDO_MODE" = "keepalive" ]; then
-        sudo -A -K >/dev/null 2>&1 || true
+    if [ "$SUDO_MODE" != "none" ]; then
+        sudo -K >/dev/null 2>&1 || true
     fi
 }
 
@@ -149,9 +172,9 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-run_step "A" "sudo_prime" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then sudo -A -v; else echo sudo_disabled; fi"
-run_step "A" "sudo_keepalive_start" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then echo keepalive_requested; else echo keepalive_disabled; fi"
-if phase_enabled "A" && [ "$SUDO_MODE" = "keepalive" ]; then
+run_step "A" "sudo_prime" "sudo_prime_once"
+run_step "A" "sudo_keepalive_start" "if [ \"$SUDO_MODE\" = \"keepalive\" ] || [ \"$SUDO_MODE\" = \"cache\" ]; then echo keepalive_requested; else echo keepalive_disabled; fi"
+if phase_enabled "A" && { [ "$SUDO_MODE" = "keepalive" ] || [ "$SUDO_MODE" = "cache" ]; }; then
     start_sudo_keepalive
 fi
 
@@ -191,9 +214,9 @@ run_step "B" "llvm_mca_cpu_matrix" "mkdir -p \"$OUT_DIR/llvm_mca\" && for row in
 run_step "C" "cpu_baseline_timing" "mkdir -p \"$OUT_DIR/cpu_runs\" && for bin in \"$OUT_DIR\"/cpu_bins/sm_apple_cpu_latency_*; do \"\$bin\" --iters \"$ITERS\" --csv > \"$OUT_DIR/cpu_runs/\$(basename \"\$bin\").csv\" 2>&1 || true; done"
 run_step "C" "hyperfine_cpu_timing" "if command -v hyperfine >/dev/null 2>&1; then hyperfine --runs 5 \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3 --iters $ITERS --csv\" --export-csv \"$OUT_DIR/cpu_runs/hyperfine.csv\"; else echo hyperfine_missing; fi"
 run_step "C" "xctrace_cpu_profile" "if command -v xctrace >/dev/null 2>&1; then xctrace record --template 'Time Profiler' --output \"$OUT_DIR/cpu_time_profiler.trace\" --launch -- \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" --iters \"$ITERS\" >/dev/null 2>&1 || true; else echo xctrace_missing; fi"
-run_step "C" "dtrace_dtruss_cpu" "if command -v dtruss >/dev/null 2>&1; then sudo -A dtruss -f \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" --iters 10000 > \"$OUT_DIR/cpu_runs/dtruss.log\" 2>&1 || true; else echo dtruss_missing; fi"
-run_step "C" "powermetrics_cpu" "if command -v powermetrics >/dev/null 2>&1; then sudo -A powermetrics --samplers cpu_power -n 1 > \"$OUT_DIR/cpu_runs/powermetrics_cpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
-run_step "C" "cpu_diagnostics" "mkdir -p \"$OUT_DIR/diagnostics\" && clang -O1 -g -fsanitize=address,undefined -std=gnu11 -I\"$ROOT_DIR/include\" \"$ROOT_DIR/probes/apple_cpu_latency.c\" -o \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" && \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" --iters 5000 --csv > \"$OUT_DIR/diagnostics/asan_run.csv\" 2>&1 || true; leaks \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" > \"$OUT_DIR/diagnostics/leaks.txt\" 2>&1 || true; vmmap \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" > \"$OUT_DIR/diagnostics/vmmap.txt\" 2>&1 || true"
+run_step "C" "dtrace_dtruss_cpu" "if command -v dtruss >/dev/null 2>&1; then $SUDO_INVOKE dtruss -f \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" --iters 10000 > \"$OUT_DIR/cpu_runs/dtruss.log\" 2>&1 || true; else echo dtruss_missing; fi"
+run_step "C" "powermetrics_cpu" "if command -v powermetrics >/dev/null 2>&1; then $SUDO_INVOKE powermetrics --samplers cpu_power -n 1 > \"$OUT_DIR/cpu_runs/powermetrics_cpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
+run_step "C" "cpu_diagnostics" "mkdir -p \"$OUT_DIR/diagnostics\" && clang -O1 -g -fsanitize=address,undefined -std=gnu11 -I\"$ROOT_DIR/include\" \"$ROOT_DIR/probes/apple_cpu_latency.c\" -o \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" && \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" --iters 5000 --csv > \"$OUT_DIR/diagnostics/asan_run.csv\" 2>&1 || true; if [ -x \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" ]; then \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" --iters 200000000 --csv > \"$OUT_DIR/diagnostics/live_cpu_probe.csv\" 2>&1 & diag_pid=\$!; echo \"\$diag_pid\" > \"$OUT_DIR/diagnostics/live_cpu_probe.pid\"; sleep 0.2; if command -v leaks >/dev/null 2>&1; then leaks \"\$diag_pid\" > \"$OUT_DIR/diagnostics/leaks.txt\" 2>&1 || true; fi; if command -v vmmap >/dev/null 2>&1; then vmmap \"\$diag_pid\" > \"$OUT_DIR/diagnostics/vmmap.txt\" 2>&1 || true; fi; wait \"\$diag_pid\" >/dev/null 2>&1 || true; else echo missing_cpu_probe_binary > \"$OUT_DIR/diagnostics/leaks.txt\"; echo missing_cpu_probe_binary > \"$OUT_DIR/diagnostics/vmmap.txt\"; fi"
 
 run_step "D" "metal_host_harness_build" "\"$SCRIPT_DIR/build_metal_probe_host.sh\" \"$ROOT_DIR/host/metal_probe_host.m\" \"$OUT_DIR/metal_host\""
 run_step "D" "metal_variant_matrix_define" "cat > \"$OUT_DIR/metal_variant_matrix.csv\" <<'EOF'
@@ -205,11 +228,11 @@ run_step "D" "metal_correctness" "WIDTH=1024 ITERS=1 \"$SCRIPT_DIR/run_metal_pro
 run_step "D" "metal_timing_sweep" "WIDTH=1024 ITERS=200 \"$SCRIPT_DIR/run_metal_probe_host.sh\" \"$OUT_DIR/metal_host\" \"$OUT_DIR/metal_probe\" > \"$OUT_DIR/metal_timing.csv\" 2>&1 || true"
 run_step "D" "publish_metal_matrix" "cat \"$OUT_DIR/metal_variant_matrix.csv\" > \"$OUT_DIR/metal_variant_matrix_published.csv\""
 
-run_step "E" "xctrace_gpu_baseline" "if command -v xctrace >/dev/null 2>&1; then xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_baseline.trace\" --launch -- \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" --iters 50 --width 1024 >/dev/null 2>&1 || true; else echo xctrace_missing; fi"
-run_step "E" "xctrace_gpu_compare" "if command -v xctrace >/dev/null 2>&1; then xctrace record --template 'Time Profiler' --output \"$OUT_DIR/gpu_compare.trace\" --launch -- \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" --iters 200 --width 1024 >/dev/null 2>&1 || true; else echo xctrace_missing; fi"
-run_step "E" "extract_xctrace_metrics" "ls -1 \"$OUT_DIR\"/*.trace > \"$OUT_DIR/xctrace_artifacts.txt\" 2>/dev/null || true"
-run_step "E" "host_overhead_capture" "if command -v sample >/dev/null 2>&1; then \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" --iters 200 --width 1024 >/dev/null 2>&1 & pid=\$!; sleep 1; sample \$pid 1 1 -file \"$OUT_DIR/sample_gpu_host.txt\" >/dev/null 2>&1 || true; wait \$pid || true; fi; if command -v spindump >/dev/null 2>&1; then sudo -A spindump 1 1 -file \"$OUT_DIR/spindump_gpu_host.txt\" >/dev/null 2>&1 || true; fi; if command -v fs_usage >/dev/null 2>&1; then sudo -A fs_usage -w -f filesystem -t 1 > \"$OUT_DIR/fs_usage_gpu_host.txt\" 2>&1 || true; fi"
-run_step "E" "powermetrics_gpu" "if command -v powermetrics >/dev/null 2>&1; then sudo -A powermetrics --samplers gpu_power -n 1 > \"$OUT_DIR/powermetrics_gpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
+run_step "E" "xctrace_gpu_baseline" "if command -v xctrace >/dev/null 2>&1; then stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_baseline.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" \"\$stage_dir/\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_baseline_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_baseline.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/probe_simdgroup_reduce.metallib\" --iters 1000 --width 1024 >/dev/null 2>&1 || true; else echo xctrace_missing; fi"
+run_step "E" "xctrace_gpu_compare" "if command -v xctrace >/dev/null 2>&1; then stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_compare.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" \"\$stage_dir/\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_compare_stage_dir.txt\"; xctrace record --template 'Time Profiler' --output \"$OUT_DIR/gpu_compare.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/probe_simdgroup_reduce.metallib\" --iters 20000 --width 1024 >/dev/null 2>&1 || true; else echo xctrace_missing; fi"
+run_step "E" "extract_xctrace_metrics" "if command -v xctrace >/dev/null 2>&1; then python3 \"$SCRIPT_DIR/extract_xctrace_metrics.py\" \"$OUT_DIR\" > \"$OUT_DIR/xctrace_extract_summary.txt\" 2>&1 || true; else ls -1 \"$OUT_DIR\"/*.trace > \"$OUT_DIR/xctrace_artifacts.txt\" 2>/dev/null || true; fi"
+run_step "E" "host_overhead_capture" "if [ -x \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" ] && [ -f \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" ]; then \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"$OUT_DIR/metal_probe/probe_simdgroup_reduce.metallib\" --iters 50000 --width 1024 >/dev/null 2>&1 & pid=\$!; echo \"\$pid\" > \"$OUT_DIR/host_capture_pid.txt\"; sleep 0.2; if command -v fs_usage >/dev/null 2>&1; then $SUDO_INVOKE fs_usage -w -f filesys -t 1 \"\$pid\" > \"$OUT_DIR/fs_usage_gpu_host.txt\" 2>&1 || true; fi; if command -v sample >/dev/null 2>&1; then sample \"\$pid\" 1 1 -file \"$OUT_DIR/sample_gpu_host.txt\" >/dev/null 2>&1 || true; fi; if command -v spindump >/dev/null 2>&1; then $SUDO_INVOKE spindump \"\$pid\" 1 1 -o \"$OUT_DIR/spindump_gpu_host.txt\" >/dev/null 2>&1 || true; fi; wait \"\$pid\" >/dev/null 2>&1 || true; else echo host_or_metallib_missing > \"$OUT_DIR/sample_gpu_host.txt\"; fi"
+run_step "E" "powermetrics_gpu" "if command -v powermetrics >/dev/null 2>&1; then $SUDO_INVOKE powermetrics --samplers gpu_power -n 1 > \"$OUT_DIR/powermetrics_gpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
 run_step "E" "counter_latency_report" "cat > \"$OUT_DIR/counter_latency_report.md\" <<'EOF'
 # Counter vs Latency Report
 
@@ -217,6 +240,9 @@ run_step "E" "counter_latency_report" "cat > \"$OUT_DIR/counter_latency_report.m
 - comparison trace: gpu_compare.trace
 - timing csv: metal_timing.csv
 - power sample: powermetrics_gpu.txt
+- trace health: xctrace_trace_health.csv
+- schema inventory: xctrace_schema_inventory.csv
+- metric row counts: xctrace_metric_row_counts.csv
 EOF"
 
 run_step "F" "venv_rebuild" "\"$SCRIPT_DIR/bootstrap_neural_lane.sh\""
@@ -286,8 +312,9 @@ run_step "G" "synthesis_report" "cat > \"$SUMMARY_MD\" <<'EOF'
 - run_dir: $OUT_DIR
 - status_csv: step_status.csv
 - manifest: run_manifest.json
+- manifest_final: run_manifest_final.json
 - capabilities: capabilities.json
-- key reports: counter_latency_report.md, quality_gates.txt
+- key reports: counter_latency_report.md, quality_gates.txt, xctrace_trace_health.csv
 EOF"
 run_step "G" "linkage_notes" "cat > \"$OUT_DIR/linkage_notes.txt\" <<'EOF'
 Update references in:
@@ -296,6 +323,26 @@ Update references in:
 - docs/README.md
 with this run directory once results are promoted.
 EOF"
-run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -A -K >/dev/null 2>&1 || true; else echo sudo_disabled; fi"
+run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" != \"none\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -K >/dev/null 2>&1 || true; else echo sudo_disabled; fi"
+
+python3 - <<PY > "$OUT_DIR/run_manifest_final.json"
+import csv
+import json
+import pathlib
+
+status_path = pathlib.Path("$STATUS_CSV")
+rows = list(csv.DictReader(status_path.open()))
+summary = {
+    "run_dir": "$OUT_DIR",
+    "total_steps": len(rows),
+    "ok": sum(1 for r in rows if r["status"] == "ok"),
+    "fail": sum(1 for r in rows if r["status"] == "fail"),
+    "skipped_phase": sum(1 for r in rows if r["status"] == "skipped_phase"),
+    "steps": rows,
+}
+print(json.dumps(summary, indent=2))
+PY
+
+cp "$OUT_DIR/run_manifest_final.json" "$MANIFEST_JSON"
 
 printf 'Completed tranche runner. Artifacts: %s\n' "$OUT_DIR"
