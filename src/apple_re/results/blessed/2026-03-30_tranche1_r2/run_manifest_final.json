@@ -1,0 +1,16 @@
+{
+  "run_id": "tranche1_manual_20260330_r2",
+  "blessed_id": "2026-03-30_tranche1_r2",
+  "status": {
+    "total_steps": 42,
+    "ok": 42,
+    "fail": 0,
+    "skipped_phase": 0
+  },
+  "source_run_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_manual_20260330_r2",
+  "step_status_file": "step_status.csv",
+  "notes": [
+    "This final manifest is computed from the full step_status.csv after completion.",
+    "Raw .trace bundles remain in the source_run_dir and are intentionally not duplicated into the blessed snapshot."
+  ]
+}

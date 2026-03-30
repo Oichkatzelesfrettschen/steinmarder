@@ -1,0 +1,15 @@
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_manual_20260330_r2/llvm_mca/apple_cpu_latency_O2.s:2:2: warning: .build_version macos used while targeting darwin25.3.0
+        .build_version macos, 26, 0     sdk_version 26, 0
+        ^
+PLEASE submit a bug report to https://github.com/Homebrew/homebrew-core/issues and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /opt/homebrew/opt/llvm/bin/llvm-mca /Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_manual_20260330_r2/llvm_mca/apple_cpu_latency_O2.s
+#0 0x000000011083f5e4 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/opt/homebrew/Cellar/llvm/22.1.2/lib/libLLVM.dylib+0x40e75e4)
+#1 0x000000011083fe14 SignalHandler(int, __siginfo*, void*) (/opt/homebrew/Cellar/llvm/22.1.2/lib/libLLVM.dylib+0x40e7e14)
+#2 0x000000019580d764 (/usr/lib/system/libsystem_platform.dylib+0x1804e5764)
+#3 0x000000010e313394 bool llvm::MCAsmParserExtension::HandleDirective<(anonymous namespace)::DarwinAsmParser, &(anonymous namespace)::DarwinAsmParser::parseDirectiveSubsectionsViaSymbols(llvm::StringRef, llvm::SMLoc)>(llvm::MCAsmParserExtension*, llvm::StringRef, llvm::SMLoc) (/opt/homebrew/Cellar/llvm/22.1.2/lib/libLLVM.dylib+0x1bbb394)
+#4 0x000000010e30340c (anonymous namespace)::AsmParser::parseStatement((anonymous namespace)::ParseStatementInfo&, llvm::MCAsmParserSemaCallback*) (/opt/homebrew/Cellar/llvm/22.1.2/lib/libLLVM.dylib+0x1bab40c)
+#5 0x000000010e2fe4d0 (anonymous namespace)::AsmParser::Run(bool, bool) (/opt/homebrew/Cellar/llvm/22.1.2/lib/libLLVM.dylib+0x1ba64d0)
+#6 0x000000010273742c llvm::mca::AsmCodeRegionGenerator::parseCodeRegions(std::__1::unique_ptr<llvm::MCInstPrinter, std::__1::default_delete<llvm::MCInstPrinter>> const&, bool) (/opt/homebrew/Cellar/llvm/22.1.2/bin/llvm-mca+0x10000b42c)
+#7 0x000000010272de38 main (/opt/homebrew/Cellar/llvm/22.1.2/bin/llvm-mca+0x100001e38)
+#8 0x0000000195439d54

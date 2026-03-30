@@ -1,0 +1,2 @@
+variant,shader,notes
+baseline,probe_simdgroup_reduce.metal,starter variant

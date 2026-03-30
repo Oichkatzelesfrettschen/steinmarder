@@ -1,0 +1,6 @@
+coremltools
+mlx
+jax-metal
+jax==0.4.38
+jaxlib==0.4.38
+torch==2.7.0

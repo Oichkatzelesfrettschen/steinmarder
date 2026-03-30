@@ -1,0 +1,5 @@
+uname=Darwin Eirikrs-MacBook-Air.local 25.3.0 Darwin Kernel Version 25.3.0: Wed Jan 28 20:53:31 PST 2026; root:xnu-12377.91.3~2/RELEASE_ARM64_T8103 arm64
+xcode_select=/Applications/Xcode-beta.app/Contents/Developer
+xcodebuild=Xcode 26.0;Build version 17A5295f;
+metal=/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.1.5295.6.HUCfh8/Metal.xctoolchain/usr/bin/metal
+metallib=/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.1.5295.6.HUCfh8/Metal.xctoolchain/usr/bin/metallib

@@ -1,0 +1,26 @@
+WARNING:2026-03-30 11:58:25,493:jax._src.xla_bridge:1000: Platform 'METAL' is experimental and not all JAX functionality may be correctly supported!
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1774897105.493801 1405910 mps_client.cc:510] WARNING: JAX Apple GPU support is experimental and not all JAX functionality is correctly supported!
+Metal device set to: Apple M1
+I0000 00:00:1774897105.494029 1405910 service.cc:145] XLA service 0x7c0fa8900 initialized for platform METAL (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1774897105.494039 1405910 service.cc:153]   StreamExecutor device (0): Metal, <undefined>
+I0000 00:00:1774897105.495592 1405910 mps_client.cc:406] Using Simple allocator.
+I0000 00:00:1774897105.495602 1405910 mps_client.cc:384] XLA backend will use up to 12711673856 bytes on device 0 for SimpleAllocator.
+{
+  "mlx": {
+    "ok": true,
+    "default_device": "Device(gpu, 0)"
+  },
+  "jax": {
+    "ok": true,
+    "version": "0.4.38",
+    "devices": [
+      "METAL:0"
+    ]
+  }
+}
+I0000 00:00:1774897105.506659 1405910 mps_client.h:209] MetalClient destroyed.
+
+systemMemory: 16.00 GB
+maxCacheSize: 5.92 GB
+
