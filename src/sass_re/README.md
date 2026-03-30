@@ -4,6 +4,32 @@ Hands-on tools for reverse-engineering NVIDIA SASS on Ada Lovelace and Pascal.
 The Ada workflow is now manifest-driven and recursive: it walks the full
 `src/sass_re/probes/**/*.cu` tree instead of the old top-level-only probe list.
 
+For the Apple silicon translation of the same research style, see
+[APPLE_SILICON_RE_BRIDGE.md](APPLE_SILICON_RE_BRIDGE.md) in this subtree, the
+sibling [`../apple_re/`](../apple_re/) scaffold, and the longer companion guide
+in [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md).
+
+## Apple silicon track
+
+If you want the Apple-side translation of this research style, start here:
+
+- [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md) -- concrete checklist
+  and work order
+- [APPLE_SILICON_RE_BRIDGE.md](APPLE_SILICON_RE_BRIDGE.md) -- method
+  translation and lane mapping
+- [`../apple_re/`](../apple_re/) -- sibling scaffold and scripts
+- [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
+  -- first 42-step deep-dive runner (CPU + Metal + neural lanes)
+- [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md)
+  -- longer Apple-specific guide
+
+## Ryzen 5600X3D companion track
+
+- [FRONTIER_ROADMAP_RYZEN_5600X3D.md](FRONTIER_ROADMAP_RYZEN_5600X3D.md)
+  -- concrete Ryzen 5600X3D CPU/cache frontier checklist
+- [`../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md`](../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md)
+  -- methodology translation guide for Zen 3 + 3D V-Cache
+
 See [RESULTS.md](RESULTS.md) for measurements and confirmed findings, and see
 [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md) for the
 current SM89 mnemonic inventory. The integrated current-state interpretation is

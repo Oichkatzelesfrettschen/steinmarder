@@ -15,11 +15,20 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | [SASS_KERNEL_OPTIMIZATION_GUIDE](sass/SASS_KERNEL_OPTIMIZATION_GUIDE.md) | Kernel optimization patterns and techniques |
 | [OPTIX_INTEGRATION_PATTERNS](sass/OPTIX_INTEGRATION_PATTERNS.md) | OptiX integration patterns |
 | [NEXT_PHASES](sass/NEXT_PHASES.md) | Planned next phases for SASS RE |
+| [APPLE_SILICON_RE_GUIDE](sass/APPLE_SILICON_RE_GUIDE.md) | Apple silicon CPU, Metal, and Core ML research plan |
+| [FRONTIER_ROADMAP_APPLE](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) | Apple silicon CPU, Metal, and Core ML frontier checklist |
+| [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5600X3D CPU and cache-lane research translation guide |
+| [FRONTIER_ROADMAP_RYZEN_5600X3D](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) | Ryzen 5600X3D frontier checklist and tool-stack mapping |
 
 **See also:** [`src/sass_re/`](../src/sass_re/) for the full toolkit:
 - [`src/sass_re/RESULTS.md`](../src/sass_re/RESULTS.md) -- Measured latencies and encoding analysis
 - [`src/sass_re/instant_ngp/`](../src/sass_re/instant_ngp/) -- Inline PTX kernels with SASS diffs
 - [`src/sass_re/instant_ngp/docs/`](../src/sass_re/instant_ngp/docs/) -- Three-tier documentation
+- [`src/apple_re/`](../src/apple_re/) -- Apple silicon CPU, Metal, and Core ML scaffolding
+- [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
+- [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
+- [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 42-step Apple deep-dive tranche runner
+- [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) -- Ryzen 5600X3D frontier checklist
 
 ---
 
