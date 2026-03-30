@@ -173,11 +173,21 @@ src/apple_re/scripts/run_apple_tranche1.sh \
   --iters 500000
 ```
 
+Touch ID / cached-sudo flow:
+
+```sh
+src/apple_re/scripts/prime_sudo_cache.sh
+src/apple_re/scripts/run_apple_tranche1.sh --phase all --sudo cache --iters 500000
+```
+
 Default output: `src/apple_re/results/tranche1_<timestamp>/`
 
 Latest blessed snapshot:
 
-- `src/apple_re/results/blessed/2026-03-30_tranche1_r2/`
+- `src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`
+  (includes `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
+  `xctrace_metric_row_counts.csv`, `RUN_SUMMARY.md`,
+  `cpu_mnemonic_counts.csv`, and `mnemonic_interpretation.md`)
 
 ### Tool-stack mapping (non-overlapping, complementary)
 

@@ -28,6 +28,8 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
 - [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 42-step Apple deep-dive tranche runner
+- [`src/apple_re/scripts/prime_sudo_cache.sh`](../src/apple_re/scripts/prime_sudo_cache.sh) -- Touch ID/password sudo cache prime for `--sudo cache` runs
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Latest M1 tranche evidence bundle (trace health, schema inventory, row counts, mnemonic interpretation)
 - [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) -- Ryzen 5600X3D frontier checklist
 
 ---
