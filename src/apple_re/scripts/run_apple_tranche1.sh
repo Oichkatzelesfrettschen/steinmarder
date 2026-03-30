@@ -162,7 +162,7 @@ stop_sudo_keepalive() {
         kill "$KEEPALIVE_PID" >/dev/null 2>&1 || true
         KEEPALIVE_PID=""
     fi
-    if [ "$SUDO_MODE" != "none" ]; then
+    if [ "$SUDO_MODE" = "keepalive" ]; then
         sudo -K >/dev/null 2>&1 || true
     fi
 }
@@ -323,7 +323,7 @@ Update references in:
 - docs/README.md
 with this run directory once results are promoted.
 EOF"
-run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" != \"none\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -K >/dev/null 2>&1 || true; else echo sudo_disabled; fi"
+run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -K >/dev/null 2>&1 || true; elif [ \"$SUDO_MODE\" = \"cache\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; echo sudo_cache_preserved; else echo sudo_disabled; fi"
 
 python3 - <<PY > "$OUT_DIR/run_manifest_final.json"
 import csv

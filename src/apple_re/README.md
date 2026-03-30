@@ -143,6 +143,7 @@ Notes:
   down automatically at the end.
 - `--sudo cache` uses one interactive `sudo -v` prime (Touch ID/password),
   then keeps the run non-interactive via cached `sudo -n` refresh.
+  Cache mode now preserves sudo ticket state at teardown.
 - `--sudo none` skips sudo priming and allows non-root evidence capture only.
 - All steps write artifacts into
   `src/apple_re/results/tranche1_<timestamp>/steps/`.
