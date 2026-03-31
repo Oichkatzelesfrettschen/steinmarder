@@ -22,11 +22,13 @@ fp64_soa
 
 echo "=== Batch NCU Profiling: All Physics-Valid SoA Kernels at 128^3 ==="
 
+FAIL=0
 for k in $KERNELS; do
     echo ""
     echo "--- $k ---"
-    "$SCRIPT_DIR/profile_ncu.sh" "$k" 128 "$OUTDIR" || true
+    sh "$SCRIPT_DIR/profile_ncu.sh" "$k" 128 "$OUTDIR" || FAIL=1
 done
 
 echo ""
 echo "=== Batch profiling complete. Results in: $OUTDIR ==="
+exit "$FAIL"

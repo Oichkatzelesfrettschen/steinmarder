@@ -12,6 +12,8 @@ handwritten path is still worth keeping versus when a template or
 compiler-generated variant is already sufficient.
 The checklist also spells out the exact run commands and the expected
 `src/cuda_lbm/results/<run-id>/` layout per measurement pass.
+The canonical launcher is
+`src/cuda_lbm/scripts/run_cuda_decision_tranche.sh`.
 
 Two layout families exist:
 
