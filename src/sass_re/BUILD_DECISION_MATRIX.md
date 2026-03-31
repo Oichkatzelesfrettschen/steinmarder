@@ -3,6 +3,8 @@
 This document narrows the wider `steinmarder` reverse-engineering program to
 the evidence that actually changes build choices.
 
+For the side-by-side living architecture map, see [`STACK_MAP.md`](STACK_MAP.md).
+
 The repo already has plenty of raw captures:
 
 - SASS mnemonic frontiers and timing tables

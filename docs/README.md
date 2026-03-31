@@ -21,6 +21,7 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | Document | Description |
 |----------|-------------|
 | [APPLE_SILICON_RE_GUIDE](sass/APPLE_SILICON_RE_GUIDE.md) | Apple silicon CPU, Metal, and Core ML research plan that mirrors the SASS discipline |
+| [STACK_MAP](../src/sass_re/STACK_MAP.md) | Living side-by-side architecture map for Apple, Ryzen, CUDA, SASS, and future track slots |
 | [BUILD_DECISION_MATRIX](../src/sass_re/BUILD_DECISION_MATRIX.md) | Repo-wide compiler-vs-manual build decision matrix |
 | [CUDA_LBM_README](../src/cuda_lbm/README.md) | CUDA LBM kernel inventory, performance tables, and baseline build decisions |
 | [FRONTIER_ROADMAP_APPLE](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) | Apple silicon frontier checklist, tranche status, and checklists |
@@ -40,6 +41,7 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 - [`src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/) -- Latest promoted Apple keepalive bundle (real fs_usage, PID-scoped leaks/vmmap, normalized density)
 - [`src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/) -- Latest promoted M1 variant frontier bundle (3 Metal variants, row deltas, mnemonic frontier, ranked next steps)
 - [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Full-stack promoted Apple tranche baseline (42/42, trace health + schema exports + diagnostics)
+- [`src/sass_re/STACK_MAP.md`](../src/sass_re/STACK_MAP.md) -- living architecture stack map for Apple, Ryzen, CUDA, SASS, and future slots
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
 - [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 64-step Apple deep-dive tranche runner

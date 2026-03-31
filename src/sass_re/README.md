@@ -9,6 +9,14 @@ For the Apple silicon translation of the same research style, see
 sibling [`../apple_re/`](../apple_re/) scaffold, and the longer companion guide
 in [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md).
 
+## Cross-architecture stack map
+
+If you want the one-page living map that keeps Apple, Ryzen, CUDA, SASS, and
+future architecture slots aligned, start here:
+
+- [STACK_MAP.md](STACK_MAP.md) -- side-by-side living architecture map and
+  placeholder slots for the next track families
+
 ## Apple silicon track
 
 If you want the Apple-side translation of this research style, start here:
