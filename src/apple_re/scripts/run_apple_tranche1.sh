@@ -192,24 +192,12 @@ run_step "A" "package_inventory" "{
 }"
 run_step "A" "capabilities_json" "python3 \"$SCRIPT_DIR/apple_capability_report.py\" > \"$OUT_DIR/capabilities.json\""
 
-run_step "B" "cpu_family_matrix" "cat > \"$OUT_DIR/cpu_probe_families.txt\" <<'EOF'
-integer_add_sub
-floating_add_mul_fma
-load_store_chain
-shuffle_lane_cross
-atomics
-transcendentals
-EOF"
-run_step "B" "cpu_probe_inventory" "find \"$ROOT_DIR/probes\" -type f -name '*.c' | sort > \"$OUT_DIR/cpu_probe_inventory.txt\""
-run_step "B" "compile_matrix_define" "cat > \"$OUT_DIR/compile_matrix.txt\" <<'EOF'
-O0:-O0
-O2:-O2
-O3:-O3
-Ofast:-Ofast
-EOF"
-run_step "B" "build_cpu_matrix" "mkdir -p \"$OUT_DIR/cpu_bins\" && for row in O0:-O0 O2:-O2 O3:-O3 Ofast:-Ofast; do name=\"\${row%%:*}\"; flag=\"\${row##*:}\"; clang \"\$flag\" -std=gnu11 -I\"$ROOT_DIR/include\" \"$ROOT_DIR/probes/apple_cpu_latency.c\" -lm -o \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_\${name}\"; done"
-run_step "B" "disassemble_cpu_matrix" "mkdir -p \"$OUT_DIR/disassembly\" && for bin in \"$OUT_DIR\"/cpu_bins/sm_apple_cpu_latency_*; do base=\$(basename \"\$bin\"); otool -tvV \"\$bin\" > \"$OUT_DIR/disassembly/\${base}.otool.txt\" 2>/dev/null || true; if command -v llvm-objdump >/dev/null 2>&1; then llvm-objdump -d --macho \"\$bin\" > \"$OUT_DIR/disassembly/\${base}.objdump.txt\" 2>/dev/null || true; elif [ -x /opt/homebrew/opt/llvm/bin/llvm-objdump ]; then /opt/homebrew/opt/llvm/bin/llvm-objdump -d --macho \"\$bin\" > \"$OUT_DIR/disassembly/\${base}.objdump.txt\" 2>/dev/null || true; fi; done"
-run_step "B" "llvm_mca_cpu_matrix" "mkdir -p \"$OUT_DIR/llvm_mca\" && for row in O0:-O0 O2:-O2 O3:-O3; do name=\"\${row%%:*}\"; flag=\"\${row##*:}\"; clang \"\$flag\" -std=gnu11 -S -I\"$ROOT_DIR/include\" \"$ROOT_DIR/probes/apple_cpu_latency.c\" -o \"$OUT_DIR/llvm_mca/apple_cpu_latency_\${name}.s\" 2>/dev/null || true; if command -v llvm-mca >/dev/null 2>&1; then llvm-mca \"$OUT_DIR/llvm_mca/apple_cpu_latency_\${name}.s\" > \"$OUT_DIR/llvm_mca/apple_cpu_latency_\${name}.mca.txt\" 2>&1 || true; elif [ -x /opt/homebrew/opt/llvm/bin/llvm-mca ]; then /opt/homebrew/opt/llvm/bin/llvm-mca \"$OUT_DIR/llvm_mca/apple_cpu_latency_\${name}.s\" > \"$OUT_DIR/llvm_mca/apple_cpu_latency_\${name}.mca.txt\" 2>&1 || true; fi; done"
+run_step "B" "cpu_family_matrix" "\"$SCRIPT_DIR/run_next42_cpu_probes.sh\" \"$OUT_DIR\""
+run_step "B" "cpu_probe_inventory" "test -s \"$OUT_DIR/cpu_probe_inventory.txt\" && echo cpu_probe_inventory_ready"
+run_step "B" "compile_matrix_define" "test -s \"$OUT_DIR/compile_matrix.txt\" && echo compile_matrix_ready"
+run_step "B" "build_cpu_matrix" "test -d \"$OUT_DIR/cpu_bins\" && find \"$OUT_DIR/cpu_bins\" -maxdepth 1 -type f | wc -l"
+run_step "B" "disassemble_cpu_matrix" "test -d \"$OUT_DIR/disassembly\" && find \"$OUT_DIR/disassembly\" -maxdepth 1 -type f | wc -l"
+run_step "B" "llvm_mca_cpu_matrix" "test -d \"$OUT_DIR/llvm_mca\" && find \"$OUT_DIR/llvm_mca\" -maxdepth 1 -type f | wc -l"
 
 run_step "C" "cpu_baseline_timing" "mkdir -p \"$OUT_DIR/cpu_runs\" && for bin in \"$OUT_DIR\"/cpu_bins/sm_apple_cpu_latency_*; do \"\$bin\" --iters \"$ITERS\" --csv > \"$OUT_DIR/cpu_runs/\$(basename \"\$bin\").csv\" 2>&1 || true; done"
 run_step "C" "hyperfine_cpu_timing" "if command -v hyperfine >/dev/null 2>&1; then hyperfine --runs 5 \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3 --iters $ITERS --csv\" --export-csv \"$OUT_DIR/cpu_runs/hyperfine.csv\"; else echo hyperfine_missing; fi"
@@ -218,19 +206,12 @@ run_step "C" "dtrace_dtruss_cpu" "if command -v dtruss >/dev/null 2>&1; then $SU
 run_step "C" "powermetrics_cpu" "if command -v powermetrics >/dev/null 2>&1; then $SUDO_INVOKE powermetrics --samplers cpu_power -n 1 > \"$OUT_DIR/cpu_runs/powermetrics_cpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
 run_step "C" "cpu_diagnostics" "mkdir -p \"$OUT_DIR/diagnostics\" && clang -O1 -g -fsanitize=address,undefined -std=gnu11 -I\"$ROOT_DIR/include\" \"$ROOT_DIR/probes/apple_cpu_latency.c\" -lm -o \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" && \"$OUT_DIR/diagnostics/sm_apple_cpu_latency_asan\" --iters 5000 --csv > \"$OUT_DIR/diagnostics/asan_run.csv\" 2>&1 || true; if [ -x \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" ]; then \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3\" --probe add_dep_u64 --iters 200000000 --csv > \"$OUT_DIR/diagnostics/live_cpu_probe.csv\" 2>&1 & diag_pid=\$!; echo \"\$diag_pid\" > \"$OUT_DIR/diagnostics/live_cpu_probe.pid\"; sleep 0.2; if command -v leaks >/dev/null 2>&1; then leaks \"\$diag_pid\" > \"$OUT_DIR/diagnostics/leaks.txt\" 2>&1 || true; fi; if command -v vmmap >/dev/null 2>&1; then vmmap \"\$diag_pid\" > \"$OUT_DIR/diagnostics/vmmap.txt\" 2>&1 || true; fi; wait \"\$diag_pid\" >/dev/null 2>&1 || true; else echo missing_cpu_probe_binary > \"$OUT_DIR/diagnostics/leaks.txt\"; echo missing_cpu_probe_binary > \"$OUT_DIR/diagnostics/vmmap.txt\"; fi"
 
-run_step "D" "metal_host_harness_build" "\"$SCRIPT_DIR/build_metal_probe_host.sh\" \"$ROOT_DIR/host/metal_probe_host.m\" \"$OUT_DIR/metal_host\""
-run_step "D" "metal_variant_matrix_define" "cat > \"$OUT_DIR/metal_variant_matrix.csv\" <<'EOF'
-variant,shader,iters_correctness,iters_timing,iters_trace,notes
-baseline,probe_simdgroup_reduce.metal,1,200,1000,starter variant
-threadgroup_heavy,probe_threadgroup_heavy.metal,1,160,800,threadgroup memory pressure
-threadgroup_minimal,probe_threadgroup_minimal.metal,1,192,900,minimal threadgroup pressure
-occupancy_heavy,probe_occupancy_heavy.metal,1,160,800,arithmetic occupancy pressure
-register_pressure,probe_register_pressure.metal,1,200,800,register pressure variant
-EOF"
-run_step "D" "metal_compile_variants" "mkdir -p \"$OUT_DIR/metal_probe_variants\" \"$OUT_DIR/disassembly\"; while IFS=, read -r variant shader iters_correctness iters_timing iters_trace notes; do [ \"\$variant\" = \"variant\" ] && continue; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; \"$SCRIPT_DIR/compile_metal_probe.sh\" \"$ROOT_DIR/shaders/\$shader\" \"\$variant_dir\" || true; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -n \"\$metallib\" ] && xcrun --toolchain Metal --find metal-objdump >/dev/null 2>&1; then xcrun --toolchain Metal metal-objdump --metallib --disassemble \"\$metallib\" > \"$OUT_DIR/disassembly/\${variant}.metallib.dis.txt\" 2>/dev/null || true; fi; done < \"$OUT_DIR/metal_variant_matrix.csv\""
-run_step "D" "metal_correctness" "echo 'variant,iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum' > \"$OUT_DIR/metal_correctness.csv\"; while IFS=, read -r variant shader iters_correctness iters_timing iters_trace notes; do [ \"\$variant\" = \"variant\" ] && continue; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; row=\$(\"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"\$metallib\" --kernel probe_simdgroup_reduce --width 1024 --iters \"\$iters_correctness\" --csv 2>/dev/null | tail -n 1); [ -n \"\$row\" ] && echo \"\$variant,\$row\" >> \"$OUT_DIR/metal_correctness.csv\"; done < \"$OUT_DIR/metal_variant_matrix.csv\""
-run_step "D" "metal_timing_sweep" "echo 'variant,iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum' > \"$OUT_DIR/metal_timing.csv\"; while IFS=, read -r variant shader iters_correctness iters_timing iters_trace notes; do [ \"\$variant\" = \"variant\" ] && continue; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; row=\$(\"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"\$metallib\" --kernel probe_simdgroup_reduce --width 1024 --iters \"\$iters_timing\" --csv 2>/dev/null | tail -n 1); [ -n \"\$row\" ] && echo \"\$variant,\$row\" >> \"$OUT_DIR/metal_timing.csv\"; done < \"$OUT_DIR/metal_variant_matrix.csv\""
-run_step "D" "publish_metal_matrix" "cat \"$OUT_DIR/metal_variant_matrix.csv\" > \"$OUT_DIR/metal_variant_matrix_published.csv\""
+run_step "D" "metal_host_harness_build" "\"$SCRIPT_DIR/run_next42_metal_probes.sh\" \"$OUT_DIR\""
+run_step "D" "metal_variant_matrix_define" "test -s \"$OUT_DIR/metal_variant_matrix.csv\" && echo metal_variant_matrix_ready"
+run_step "D" "metal_compile_variants" "test -d \"$OUT_DIR/metal_probe_variants\" && find \"$OUT_DIR/metal_probe_variants\" -maxdepth 2 -name '*.metallib' | wc -l"
+run_step "D" "metal_correctness" "test -s \"$OUT_DIR/metal_correctness.csv\" && test -s \"$OUT_DIR/counter_latency_report.md\" && echo metal_correctness_ready"
+run_step "D" "metal_timing_sweep" "test -s \"$OUT_DIR/metal_timing.csv\" && echo metal_timing_ready"
+run_step "D" "publish_metal_matrix" "test -s \"$OUT_DIR/metal_variant_matrix_published.csv\" && echo metal_variant_matrix_published_ready"
 
 run_step "E" "xctrace_gpu_baseline" "if command -v xctrace >/dev/null 2>&1; then variant=baseline; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -n \"\$metallib\" ]; then stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_\${variant}.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"\$metallib\" \"\$stage_dir/\$variant.metallib\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_baseline_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_baseline.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/\$variant.metallib\" --iters 1000 --width 1024 >/dev/null 2>&1 || true; fi; else echo xctrace_missing; fi"
 run_step "E" "xctrace_gpu_compare" "if command -v xctrace >/dev/null 2>&1; then for variant in threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure; do variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_\${variant}.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"\$metallib\" \"\$stage_dir/\$variant.metallib\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_\${variant}_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_\${variant}.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/\$variant.metallib\" --iters 800 --width 1024 >/dev/null 2>&1 || true; done; else echo xctrace_missing; fi"

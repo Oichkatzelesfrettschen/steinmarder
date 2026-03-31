@@ -77,3 +77,140 @@ repeatable analysis and extension loop.
 40. Re-run the density comparison helper after any new promoted bundle.
 41. Keep the summary text aligned with the actual artifacts on disk.
 42. Commit the docs/harness patch separately from the promoted results tree.
+
+## Concrete run sequence
+
+```sh
+# 1) Compare the newest promoted keepalive bundle against the prior promoted C/D/E bundle
+python3 src/apple_re/scripts/compare_xctrace_density_runs.py \
+  src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/xctrace_row_density.csv \
+  src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/xctrace_row_density.csv \
+  /tmp/apple_r7_vs_r6_density.csv \
+  /tmp/apple_r7_vs_r6_density.md
+
+# 2) Refresh the current keepalive evidence with the patched tranche harness
+SUDO_ASKPASS=/Users/eirikr/bin/askpass \
+src/apple_re/scripts/run_apple_tranche1.sh \
+  --phase C,D,E \
+  --sudo keepalive \
+  --iters 500000
+
+# 3) Re-run the row-delta and density extraction over the refreshed run directory
+python3 src/apple_re/scripts/extract_xctrace_metrics.py /path/to/new_run_dir
+python3 src/apple_re/scripts/analyze_xctrace_row_deltas.py \
+  /path/to/new_run_dir/xctrace_metric_row_counts.csv \
+  /path/to/new_run_dir/xctrace_trace_health.csv \
+  /path/to/new_run_dir/xctrace_row_deltas.csv \
+  /path/to/new_run_dir/xctrace_row_delta_summary.md \
+  /path/to/new_run_dir/xctrace_row_density.csv
+
+# 4) Compare the refreshed density output against the prior promoted bundle again
+python3 src/apple_re/scripts/compare_xctrace_density_runs.py \
+  /path/to/new_run_dir/xctrace_row_density.csv \
+  src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/xctrace_row_density.csv \
+  /tmp/apple_new_vs_r7_density.csv \
+  /tmp/apple_new_vs_r7_density.md
+```
+
+## Run checklist with expected artifacts
+
+### 1-6: Promote and verify
+
+Use the density comparison helper first, then inspect the promoted bundle.
+
+Expected artifacts:
+- `xctrace_density_compare.csv`
+- `xctrace_density_compare.md`
+- `fs_usage_gpu_host.txt`
+- `gpu_host_leaks.txt`
+- `gpu_host_vmmap.txt`
+- `counter_latency_report.md`
+- `RUN_SUMMARY.md`
+- `KEEPALIVE_SUMMARY.md`
+
+### 7-13: CPU lane expansion
+
+Use `src/apple_re/scripts/run_next42_cpu_probes.sh` to run the CPU probe draft.
+
+Expected artifacts:
+- `cpu_probe_families.txt`
+- `cpu_probe_inventory.txt`
+- `compile_matrix.txt`
+- `cpu_runs/all_probes.csv`
+- `cpu_runs/*.csv`
+- `cpu_runs/hyperfine.csv`
+- `disassembly/*.otool.txt`
+- `disassembly/*.objdump.txt`
+- `llvm_mca/*.mca.txt`
+- `diagnostics/asan_run.csv`
+- `diagnostics/leaks.txt`
+- `diagnostics/vmmap.txt`
+- `cpu_notes.md`
+
+### 14-20: Metal lane refinement
+
+Use `src/apple_re/scripts/run_next42_metal_probes.sh` to run the Metal probe draft.
+
+Expected artifacts:
+- `metal_variant_matrix.csv`
+- `metal_variant_matrix_published.csv`
+- `metal_timing.csv`
+- `metal_probe_variants/*.metallib`
+- `gpu_baseline.trace/`
+- `gpu_threadgroup_heavy.trace/`
+- `gpu_threadgroup_minimal.trace/`
+- `gpu_occupancy_heavy.trace/`
+- `gpu_register_pressure.trace/`
+- `xctrace_trace_health.csv`
+- `xctrace_metric_row_counts.csv`
+- `xctrace_row_deltas.csv`
+- `xctrace_row_density.csv`
+- `xctrace_row_delta_summary.md`
+- `counter_latency_report.md`
+- `metal_notes.md`
+
+### 21-26: Host diagnostics
+
+Expected artifacts:
+- `host_capture_pid.txt`
+- `sample_gpu_host.txt`
+- `spindump_gpu_host.txt`
+- `fs_usage_gpu_host.txt`
+- `gpu_host_leaks.txt`
+- `gpu_host_vmmap.txt`
+- `powermetrics_gpu.txt`
+
+### 27-32: Neural lane follow-on
+
+Use `src/apple_re/scripts/run_next42_neural_suite.sh` to run the neural suite.
+
+Expected artifacts:
+- `neural_probe.json`
+- `neural_model_family.json`
+- `coreml_placement_sweep.json`
+- `torch_cpu_vs_mps.json`
+- `mlx_jax_checks.json`
+- `run_manifest.json`
+- `run_manifest_final.json`
+- `summary.md`
+
+### 33-38: Publication and linkage
+
+Expected artifacts:
+- dated promoted results directory under `src/apple_re/results/blessed/`
+- promoted bundle tarball
+- `KEEPALIVE_SUMMARY.md`
+- `docs/README.md` index entries
+- `README.md` top-level cross-links
+- `FRONTIER_ROADMAP_APPLE.md`
+- `APPLE_SILICON_RE_BRIDGE.md`
+
+### 39-42: Quality gates
+
+Expected artifacts:
+- `step_status.csv`
+- `run_manifest.json`
+- `run_manifest_final.json`
+- `quality_gates.txt`
+- `failed_steps.csv`
+- commit containing only the docs/harness patch

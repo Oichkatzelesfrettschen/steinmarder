@@ -68,6 +68,16 @@ that exist on Apple silicon:
 - `scripts/run_apple_tranche1.sh`
   - orchestrates the first 62-step deep-dive tranche across CPU, Metal, and
     neural lanes with manifest outputs
+- `scripts/run_next42_cpu_suite.sh`
+  - wrapper for the CPU follow-on tranche with the next 42-step artifact map
+- `scripts/run_next42_cpu_probes.sh`
+  - CPU-lane draft runner for the add/load-store/shuffle/atomic/transcendental probe family
+- `scripts/run_next42_metal_suite.sh`
+  - wrapper for the Metal follow-on tranche with the next 42-step artifact map
+- `scripts/run_next42_metal_probes.sh`
+  - Metal-lane draft runner for the baseline, threadgroup, occupancy, and register-pressure variants
+- `scripts/run_next42_neural_suite.sh`
+  - wrapper for the neural follow-on tranche with the next 42-step artifact map
 - `host/metal_probe_host.m`
   - minimal Metal host harness used for end-to-end GPU lane timing
 - `requirements-neural.txt`
@@ -173,6 +183,9 @@ Notes:
 - The variant matrix now includes `threadgroup_minimal` to isolate occupancy
   with the smallest shared-memory footprint that still produces a stable
   trace.
+- For lane-local drafts, run `scripts/run_next42_cpu_probes.sh` and
+  `scripts/run_next42_metal_probes.sh` when you want just the CPU or Metal
+  artifact sets without the full 62-step synthesis pass.
 - Step 27 emits structured trace artifacts:
   `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
   `xctrace_metric_row_counts.csv`, and per-schema XML exports.

@@ -28,6 +28,7 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 ### Apple track artifacts
 - [`../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md) -- promoted Apple keepalive summary + CUDA-grade evidence bundle
 - [`../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz) -- compressed promoted Apple keepalive evidence
+- [`../src/sass_re/NEXT42_APPLE_TRANCHE.md`](../src/sass_re/NEXT42_APPLE_TRANCHE.md) -- next 42-step promoted Apple run checklist and artifact map
 
 **See also:** [`src/sass_re/`](../src/sass_re/) for the full toolkit:
 - [`src/sass_re/RESULTS.md`](../src/sass_re/RESULTS.md) -- Measured latencies and encoding analysis
@@ -40,6 +41,11 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
 - [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 62-step Apple deep-dive tranche runner
+- [`src/apple_re/scripts/run_next42_cpu_suite.sh`](../src/apple_re/scripts/run_next42_cpu_suite.sh) -- next CPU follow-on wrapper
+- [`src/apple_re/scripts/run_next42_cpu_probes.sh`](../src/apple_re/scripts/run_next42_cpu_probes.sh) -- next CPU probe draft runner
+- [`src/apple_re/scripts/run_next42_metal_suite.sh`](../src/apple_re/scripts/run_next42_metal_suite.sh) -- next Metal follow-on wrapper
+- [`src/apple_re/scripts/run_next42_metal_probes.sh`](../src/apple_re/scripts/run_next42_metal_probes.sh) -- next Metal probe draft runner
+- [`src/apple_re/scripts/run_next42_neural_suite.sh`](../src/apple_re/scripts/run_next42_neural_suite.sh) -- next neural follow-on wrapper
 - [`src/sass_re/NEXT42_APPLE_TRANCHE.md`](../src/sass_re/NEXT42_APPLE_TRANCHE.md) -- next 42-step Apple follow-on tranche and analysis plan
 - [`src/apple_re/scripts/prime_sudo_cache.sh`](../src/apple_re/scripts/prime_sudo_cache.sh) -- Touch ID/password sudo cache prime for `--sudo cache` runs
 - [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) -- Ryzen 5600X3D frontier checklist
