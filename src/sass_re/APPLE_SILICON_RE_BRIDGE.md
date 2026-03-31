@@ -108,8 +108,8 @@ to force a CUDA-shaped workflow onto Apple tooling.
 
 The next useful additions are straightforward:
 
-1. Expand the CPU lane with load/store, shuffle, atomics, and transcendental
-   probes.
+1. Expand the CPU lane with load/store, shuffle, atomics, transcendental, and
+   cache-pressure probes.
 2. Add a tiny Metal host harness so the shader probes can be timed and profiled
    end to end.
 3. Add Core ML graph generators for dtype and compute-unit sweep experiments.
@@ -120,7 +120,7 @@ The next useful additions are straightforward:
 
 ## First Deep-Dive Runner
 
-The first concrete 62-step tranche is now scripted in:
+The first concrete 64-step tranche is now scripted in:
 
 - [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
 

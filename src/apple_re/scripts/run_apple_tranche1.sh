@@ -11,7 +11,7 @@ SUDO_MODE="keepalive"
 ITERS="${ITERS:-500000}"
 KEEPALIVE_PID=""
 STEP_NO=0
-TOTAL_STEPS=62
+TOTAL_STEPS=64
 SUDO_INVOKE="sudo -A"
 
 usage() {
@@ -198,6 +198,8 @@ run_step "B" "compile_matrix_define" "test -s \"$OUT_DIR/compile_matrix.txt\" &&
 run_step "B" "build_cpu_matrix" "test -d \"$OUT_DIR/cpu_bins\" && find \"$OUT_DIR/cpu_bins\" -maxdepth 1 -type f | wc -l"
 run_step "B" "disassemble_cpu_matrix" "test -d \"$OUT_DIR/disassembly\" && find \"$OUT_DIR/disassembly\" -maxdepth 1 -type f | wc -l"
 run_step "B" "llvm_mca_cpu_matrix" "test -d \"$OUT_DIR/llvm_mca\" && find \"$OUT_DIR/llvm_mca\" -maxdepth 1 -type f | wc -l"
+run_step "B" "cache_pressure_family_matrix" "\"$SCRIPT_DIR/run_next42_cpu_cache_probes.sh\" \"$OUT_DIR\""
+run_step "B" "cache_pressure_artifacts" "test -s \"$OUT_DIR/cache_pressure.csv\" && test -s \"$OUT_DIR/cache_trace_health.csv\" && test -s \"$OUT_DIR/cache_interpretation.md\" && echo cache_pressure_ready"
 
 run_step "C" "cpu_baseline_timing" "mkdir -p \"$OUT_DIR/cpu_runs\" && for bin in \"$OUT_DIR\"/cpu_bins/sm_apple_cpu_latency_*; do \"\$bin\" --iters \"$ITERS\" --csv > \"$OUT_DIR/cpu_runs/\$(basename \"\$bin\").csv\" 2>&1 || true; done"
 run_step "C" "hyperfine_cpu_timing" "if command -v hyperfine >/dev/null 2>&1; then hyperfine --runs 5 \"$OUT_DIR/cpu_bins/sm_apple_cpu_latency_O3 --iters $ITERS --csv\" --export-csv \"$OUT_DIR/cpu_runs/hyperfine.csv\"; else echo hyperfine_missing; fi"

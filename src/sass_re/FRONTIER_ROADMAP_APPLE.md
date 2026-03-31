@@ -13,12 +13,14 @@ Stable launch points:
 
 - CPU lane starter harness: `../apple_re/probes/apple_cpu_latency.c` plus
   `../apple_re/scripts/disassemble_apple_cpu_latency.sh`
+- Cache-pressure lane starter harness:
+  `../apple_re/scripts/run_next42_cpu_cache_probes.sh`
 - Metal lane starter shader: `../apple_re/shaders/probe_simdgroup_reduce.metal`
   plus `../apple_re/scripts/compile_metal_probe.sh`
 - Neural lane bootstrap: `../apple_re/scripts/bootstrap_neural_lane.sh` and
   `../apple_re/scripts/neural_lane_probe.py`
 - Environment and diagnostics scaffolding: `../apple_re/scripts/audit_macos_re_env.sh`
-- `run_apple_tranche1.sh` drives the 62-step deep dive with explicit phase
+- `run_apple_tranche1.sh` drives the 64-step deep dive with explicit phase
   slicing, `ANALYSIS_NEXT_STEPS.md` documents the host diagnostics workflow,
   and the current promoted bundles already capture density deltas, trace
   exports, and PID-scoped host captures.
@@ -162,7 +164,7 @@ track:
 - [ ] Document every lane and bundle in the repo-level docs index (see `docs/README.md`)
   so the Apple track stands beside the NVIDIA and Ryzen stories.
 
-## Tranche 1 (62-step deep dive)
+## Tranche 1 (64-step deep dive)
 
 `run_apple_tranche1.sh` now drives the CPU + Metal + neural lanes with eight phases
 (`A`..`H`). Every phase writes its manifest, capability snapshot, and per-step logs.

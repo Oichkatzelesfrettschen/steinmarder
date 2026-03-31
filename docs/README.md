@@ -40,9 +40,10 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 - [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Full-stack promoted Apple tranche baseline (42/42, trace health + schema exports + diagnostics)
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
-- [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 62-step Apple deep-dive tranche runner
+- [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 64-step Apple deep-dive tranche runner
 - [`src/apple_re/scripts/run_next42_cpu_suite.sh`](../src/apple_re/scripts/run_next42_cpu_suite.sh) -- next CPU follow-on wrapper
 - [`src/apple_re/scripts/run_next42_cpu_probes.sh`](../src/apple_re/scripts/run_next42_cpu_probes.sh) -- next CPU probe draft runner
+- [`src/apple_re/scripts/run_next42_cpu_cache_probes.sh`](../src/apple_re/scripts/run_next42_cpu_cache_probes.sh) -- next CPU cache-pressure probe runner
 - [`src/apple_re/scripts/run_next42_metal_suite.sh`](../src/apple_re/scripts/run_next42_metal_suite.sh) -- next Metal follow-on wrapper
 - [`src/apple_re/scripts/run_next42_metal_probes.sh`](../src/apple_re/scripts/run_next42_metal_probes.sh) -- next Metal probe draft runner
 - [`src/apple_re/scripts/run_next42_neural_suite.sh`](../src/apple_re/scripts/run_next42_neural_suite.sh) -- next neural follow-on wrapper

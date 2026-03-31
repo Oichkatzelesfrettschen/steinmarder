@@ -38,6 +38,9 @@ that exist on Apple silicon:
 - `probes/apple_cpu_latency.c`
   - starter dependent-chain microbenchmark for integer add, FP add, and FP
     fused multiply-add
+- `probes/apple_cpu_cache_pressure.c`
+  - cache-pressure sweep probe with working-set and stride families around the
+    likely L1/L2/LLC boundaries
 - `scripts/audit_macos_re_env.sh`
   - checks the local Xcode, Metal, Homebrew, and Python ML stack
 - `scripts/compile_metal_probe.sh`
@@ -66,12 +69,14 @@ that exist on Apple silicon:
 - `scripts/compare_xctrace_density_runs.py`
   - compares normalized xctrace density across successive promoted keepalive bundles
 - `scripts/run_apple_tranche1.sh`
-  - orchestrates the first 62-step deep-dive tranche across CPU, Metal, and
-    neural lanes with manifest outputs
+  - orchestrates the first 64-step deep-dive tranche across CPU, cache-pressure,
+    Metal, and neural lanes with manifest outputs
 - `scripts/run_next42_cpu_suite.sh`
   - wrapper for the CPU follow-on tranche with the next 42-step artifact map
 - `scripts/run_next42_cpu_probes.sh`
   - CPU-lane draft runner for the add/load-store/shuffle/atomic/transcendental probe family
+- `scripts/run_next42_cpu_cache_probes.sh`
+  - CPU cache-pressure draft runner for working-set and stride sweeps, Time Profiler export, and cache-knee analysis
 - `scripts/run_next42_metal_suite.sh`
   - wrapper for the Metal follow-on tranche with the next 42-step artifact map
 - `scripts/run_next42_metal_probes.sh`
@@ -146,7 +151,7 @@ cmake --build build --target sm_apple_cpu_latency
 ./build/bin/sm_apple_cpu_latency --csv
 ```
 
-## Tranche 1 orchestration (62 steps)
+## Tranche 1 orchestration (64 steps)
 
 Run the first deep-dive tranche end to end:
 
@@ -184,8 +189,9 @@ Notes:
   with the smallest shared-memory footprint that still produces a stable
   trace.
 - For lane-local drafts, run `scripts/run_next42_cpu_probes.sh` and
-  `scripts/run_next42_metal_probes.sh` when you want just the CPU or Metal
-  artifact sets without the full 62-step synthesis pass.
+  `scripts/run_next42_cpu_cache_probes.sh` and `scripts/run_next42_metal_probes.sh`
+  when you want just the CPU, cache-pressure, or Metal artifact sets without
+  the full 64-step synthesis pass.
 - Step 27 emits structured trace artifacts:
   `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
   `xctrace_metric_row_counts.csv`, and per-schema XML exports.

@@ -19,9 +19,11 @@ If you want the Apple-side translation of this research style, start here:
   translation and lane mapping
 - [`../apple_re/`](../apple_re/) -- sibling scaffold and scripts
 - [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
-  -- first 62-step deep-dive runner (CPU + Metal + neural lanes)
+  -- first 64-step deep-dive runner (CPU + cache-pressure + Metal + neural lanes)
 - [`../apple_re/scripts/compare_xctrace_density_runs.py`](../apple_re/scripts/compare_xctrace_density_runs.py)
   -- successive keepalive density comparison helper
+- [`../apple_re/scripts/run_next42_cpu_cache_probes.sh`](../apple_re/scripts/run_next42_cpu_cache_probes.sh)
+  -- cache-pressure probe draft runner for working-set and stride sweeps
 - [`../apple_re/shaders/probe_threadgroup_minimal.metal`](../apple_re/shaders/probe_threadgroup_minimal.metal)
   -- occupancy-isolating Metal variant with minimal threadgroup footprint
 - [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md)
