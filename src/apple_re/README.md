@@ -11,6 +11,8 @@ pretending Apple exposes the same machine-code surfaces as CUDA.
   - CPU lane: instruction-level asm plus latency and throughput microbenchmarks
   - GPU lane: Metal compute probes plus Xcode counter capture
   - Neural lane: Core ML placement and dtype studies across CPU, GPU, and ANE
+- Keep one decision-grade ledger that explains when compiler output is enough
+  and when a manual pattern changes the build choice.
 
 ## CUDA-Method Translation (M1-specific)
 
@@ -32,6 +34,8 @@ that exist on Apple silicon:
 - cross-lane synthesis:
   - keep one tranche output dir with manifest, schema inventory, row-count
     metrics, timing CSVs, and neural placement probes
+  - add a compiler-vs-manual comparison note so the outputs feed build
+    decisions instead of just preserving raw results
 
 ## Current contents
 

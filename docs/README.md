@@ -21,6 +21,8 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | Document | Description |
 |----------|-------------|
 | [APPLE_SILICON_RE_GUIDE](sass/APPLE_SILICON_RE_GUIDE.md) | Apple silicon CPU, Metal, and Core ML research plan that mirrors the SASS discipline |
+| [BUILD_DECISION_MATRIX](../src/sass_re/BUILD_DECISION_MATRIX.md) | Repo-wide compiler-vs-manual build decision matrix |
+| [CUDA_LBM_README](../src/cuda_lbm/README.md) | CUDA LBM kernel inventory, performance tables, and baseline build decisions |
 | [FRONTIER_ROADMAP_APPLE](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) | Apple silicon frontier checklist, tranche status, and checklists |
 | [FRONTIER_ROADMAP_RYZEN_5600X3D](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) | Ryzen 5600X3D frontier checklist and tool-stack mapping |
 | [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5 5600X3D CPU + 3D V-Cache translation guide |

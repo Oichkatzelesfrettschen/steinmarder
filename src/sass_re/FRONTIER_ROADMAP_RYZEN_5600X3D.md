@@ -19,6 +19,15 @@ Stable process targets:
 - keep tool snapshots and version stamps in each run directory
 - record profiler captures next to the exact binaries they describe
 
+Decision-grade evidence still missing:
+
+- a compiler-vs-manual matrix that says which source patterns should be
+  handwritten and which should stay compiler-driven
+- a normalized ledger of runtime, code size, spill count, and cache behavior
+  so the build decision is visible in one table
+- a shared note linking Ryzen cache sweeps to
+  [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+
 ## Priority ranking
 
 ### Rank 1: execution-lane probe matrix

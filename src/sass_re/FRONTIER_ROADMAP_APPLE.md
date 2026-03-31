@@ -25,6 +25,17 @@ Stable launch points:
   and the current promoted bundles already capture density deltas, trace
   exports, and PID-scoped host captures.
 
+Decision-grade evidence still missing:
+
+- a single matrix that says when the compiler already emits the desired
+  pattern and when a manual pattern still changes the build choice
+- a normalized comparison of compiler output versus handwritten CPU or Metal
+  patterns across runtime, code size, spills, and maintainability
+- a shared ledger that marks each pattern family as compiler-sufficient,
+  manual-only, or manual-preferred for the current hardware/toolchain
+- a repo-wide note tying those build decisions back to
+  [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+
 ## Priority ranking
 
 ### Rank 1: CPU lane expansion

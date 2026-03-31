@@ -24,6 +24,8 @@ If you want the Apple-side translation of this research style, start here:
   -- successive keepalive density comparison helper
 - [`../apple_re/scripts/run_next42_cpu_cache_probes.sh`](../apple_re/scripts/run_next42_cpu_cache_probes.sh)
   -- cache-pressure probe draft runner for working-set and stride sweeps
+- [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+  -- repo-wide compiler-vs-manual build decision matrix
 - [`../apple_re/shaders/probe_threadgroup_minimal.metal`](../apple_re/shaders/probe_threadgroup_minimal.metal)
   -- occupancy-isolating Metal variant with minimal threadgroup footprint
 - [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md)
@@ -32,11 +34,15 @@ If you want the Apple-side translation of this research style, start here:
   -- keepalive phase-E/C/D/E synthesis summary and CUDA-grade bundle reference
 - [`../apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz)
   -- compressed evidence bundle for reviewers
+- [`../cuda_lbm/README.md`](../cuda_lbm/README.md)
+  -- CUDA LBM kernel inventory, performance tables, and build-decision baseline
 
 ## Ryzen 5600X3D companion track
 
 - [FRONTIER_ROADMAP_RYZEN_5600X3D.md](FRONTIER_ROADMAP_RYZEN_5600X3D.md)
   -- concrete Ryzen 5600X3D CPU/cache frontier checklist
+- [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+  -- shared compiler-vs-manual ledger for SASS, Apple, and Ryzen build choices
 - [`../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md`](../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md)
   -- methodology translation guide for Zen 3 + 3D V-Cache
 

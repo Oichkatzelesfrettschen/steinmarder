@@ -5,6 +5,11 @@ for steinmarder fluid simulation and physics subsystems. All kernels follow the
 storage-compute split pattern: distributions are stored in a compressed precision
 format, but arithmetic is promoted to FP32 before any computation.
 
+For build decisions, pair this inventory with
+[`../sass_re/BUILD_DECISION_MATRIX.md`](../sass_re/BUILD_DECISION_MATRIX.md),
+which records when a handwritten CUDA path is still worth keeping versus when a
+template or compiler-generated variant is already sufficient.
+
 Two layout families exist:
 
 - **AoS ping-pong**: `f[cell * stride + dir]`, stride padded to 20 for alignment.
