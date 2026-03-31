@@ -63,9 +63,11 @@ that exist on Apple silicon:
   short interpretation report
 - `scripts/analyze_xctrace_row_deltas.py`
   - computes schema row-count deltas between baseline and variant GPU traces
+- `scripts/compare_xctrace_density_runs.py`
+  - compares normalized xctrace density across successive blessed keepalive bundles
 - `scripts/run_apple_tranche1.sh`
-  - orchestrates the first 42-step deep-dive tranche across CPU, Metal, and
-  neural lanes with manifest outputs
+  - orchestrates the first 62-step deep-dive tranche across CPU, Metal, and
+    neural lanes with manifest outputs
 - `host/metal_probe_host.m`
   - minimal Metal host harness used for end-to-end GPU lane timing
 - `requirements-neural.txt`
@@ -74,6 +76,9 @@ that exist on Apple silicon:
   - starter SIMD-group probe kernel for the Metal lane
 - `shaders/probe_threadgroup_heavy.metal`
   - threadgroup-memory-heavy variant for counter/timing deltas
+- `shaders/probe_threadgroup_minimal.metal`
+  - threadgroup-minimal variant for isolating occupancy with the smallest
+    shared-memory footprint that still produces a stable trace
 - `shaders/probe_occupancy_heavy.metal`
   - arithmetic/occupancy-heavy variant for counter/timing deltas
 
@@ -131,7 +136,7 @@ cmake --build build --target sm_apple_cpu_latency
 ./build/bin/sm_apple_cpu_latency --csv
 ```
 
-## Tranche 1 orchestration (42 steps)
+## Tranche 1 orchestration (62 steps)
 
 Run the first deep-dive tranche end to end:
 
@@ -154,13 +159,26 @@ Notes:
 - All steps write artifacts into
   `src/apple_re/results/tranche1_<timestamp>/steps/`.
 - Run subsets with `--phase A,B,C` (or any comma-separated phase list).
-- Latest promoted snapshot:
+- Phase `H` is the post-run evidence and comparison lane; it refreshes
+  `xctrace` exports, compares `xctrace_row_density.csv` against the latest
+  blessed bundle, and emits run / keepalive summaries plus bundle notes.
+- Latest promoted C/D/E synthesis snapshot:
+  `src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/`.
+- Latest promoted variant frontier snapshot:
+  `src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`.
+- Latest full-stack baseline snapshot:
   `src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`.
+- The variant matrix now includes `threadgroup_minimal` to isolate occupancy
+  with the smallest shared-memory footprint that still produces a stable
+  trace.
 - Step 27 emits structured trace artifacts:
   `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
   `xctrace_metric_row_counts.csv`, and per-schema XML exports.
 - Step 30 now also emits variant-vs-baseline delta artifacts:
   `xctrace_row_deltas.csv` and `xctrace_row_delta_summary.md`.
+- Variant focus interpretation and ranked next actions are documented for r5
+  in `ANALYSIS_NEXT_STEPS.md` and `RUN_SUMMARY.md`, while the r6 C/D/E bundle
+  adds `xctrace_row_density.csv` plus a fresh `ANALYSIS_NEXT_STEPS.md`.
 - Post-run mnemonic analysis:
   `python3 src/apple_re/scripts/analyze_tranche_mnemonics.py <run_dir>`
   writes `cpu_mnemonic_counts.csv`, `metal_air_opcode_counts.csv`, and

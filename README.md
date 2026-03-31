@@ -10,6 +10,11 @@ SASS toolkit empirically measures NVIDIA GPU instruction latencies and
 throughput at the machine-code level, feeding directly into hand-optimized
 inline PTX kernels.
 
+For Apple silicon bring-up, see the new [`src/apple_re/`](src/apple_re/)
+subtree. It ports the measurement methodology to macOS with CPU asm
+microbenchmarks, Metal shader scaffolding, and Core ML / Neural Engine audit
+scripts.
+
 ---
 
 ## Quick reference
@@ -20,6 +25,11 @@ inline PTX kernels.
 | Learn to read GPU assembly from scratch | [`LEARNING_GUIDE.md`](src/sass_re/instant_ngp/docs/LEARNING_GUIDE.md)                     |
 | See the optimized kernels + SASS diffs  | [`src/sass_re/instant_ngp/`](src/sass_re/instant_ngp/)                                     |
 | Reproduce the 3.16x benchmark           | [`src/sass_re/instant_ngp/README.md`](src/sass_re/instant_ngp/README.md)                   |
+| Start the Apple silicon port            | [`src/apple_re/README.md`](src/apple_re/README.md)                                         |
+| Latest Apple variant evidence bundle    | [`src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`](src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/) |
+| Latest Apple C/D/E synthesis bundle     | [`src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/`](src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/) |
+| Apple frontier checklist                | [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](src/sass_re/FRONTIER_ROADMAP_APPLE.md)          |
+| Ryzen 5600X3D frontier checklist        | [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) |
 | Browse the full engine                  | [`src/`](src/) -- start with [`render/render.c`](src/render/render.c)                      |
 | CUDA LBM kernel index                   | [`src/cuda_lbm/README.md`](src/cuda_lbm/README.md)                                        |
 

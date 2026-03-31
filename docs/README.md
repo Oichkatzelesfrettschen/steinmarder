@@ -8,6 +8,7 @@ Organized into four categories: **SASS**, **NeRF**, **Engine**, and **Results**.
 
 GPU shader assembly analysis, encoding research, and instant-NGP kernel optimization.
 
+### Core SASS references
 | Document | Description |
 |----------|-------------|
 | [SM89_ARCHITECTURE_REFERENCE](sass/SM89_ARCHITECTURE_REFERENCE.md) | SM 8.9 hardware specs, roofline model, L2 regime analysis |
@@ -15,21 +16,30 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | [SASS_KERNEL_OPTIMIZATION_GUIDE](sass/SASS_KERNEL_OPTIMIZATION_GUIDE.md) | Kernel optimization patterns and techniques |
 | [OPTIX_INTEGRATION_PATTERNS](sass/OPTIX_INTEGRATION_PATTERNS.md) | OptiX integration patterns |
 | [NEXT_PHASES](sass/NEXT_PHASES.md) | Planned next phases for SASS RE |
-| [APPLE_SILICON_RE_GUIDE](sass/APPLE_SILICON_RE_GUIDE.md) | Apple silicon CPU, Metal, and Core ML research plan |
-| [FRONTIER_ROADMAP_APPLE](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) | Apple silicon CPU, Metal, and Core ML frontier checklist |
-| [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5600X3D CPU and cache-lane research translation guide |
+
+### Cross-track primers
+| Document | Description |
+|----------|-------------|
+| [APPLE_SILICON_RE_GUIDE](sass/APPLE_SILICON_RE_GUIDE.md) | Apple silicon CPU, Metal, and Core ML research plan that mirrors the SASS discipline |
+| [FRONTIER_ROADMAP_APPLE](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) | Apple silicon frontier checklist, tranche status, and checklists |
 | [FRONTIER_ROADMAP_RYZEN_5600X3D](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) | Ryzen 5600X3D frontier checklist and tool-stack mapping |
+| [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5 5600X3D CPU + 3D V-Cache translation guide |
+
+### Apple track artifacts
+- [`../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md) -- keepalive phase-E/C/D/E summary + CUDA-grade evidence bundle
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz) -- compressed Apple keepalive evidence
 
 **See also:** [`src/sass_re/`](../src/sass_re/) for the full toolkit:
 - [`src/sass_re/RESULTS.md`](../src/sass_re/RESULTS.md) -- Measured latencies and encoding analysis
 - [`src/sass_re/instant_ngp/`](../src/sass_re/instant_ngp/) -- Inline PTX kernels with SASS diffs
 - [`src/sass_re/instant_ngp/docs/`](../src/sass_re/instant_ngp/docs/) -- Three-tier documentation
 - [`src/apple_re/`](../src/apple_re/) -- Apple silicon CPU, Metal, and Core ML scaffolding
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/) -- Latest M1 variant frontier bundle (3 Metal variants, row deltas, mnemonic frontier, ranked next steps)
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Full-stack CUDA-grade Apple tranche baseline (42/42, trace health + schema exports + diagnostics)
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
 - [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 42-step Apple deep-dive tranche runner
 - [`src/apple_re/scripts/prime_sudo_cache.sh`](../src/apple_re/scripts/prime_sudo_cache.sh) -- Touch ID/password sudo cache prime for `--sudo cache` runs
-- [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Latest M1 tranche evidence bundle (trace health, schema inventory, row counts, mnemonic interpretation)
 - [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) -- Ryzen 5600X3D frontier checklist
 
 ---

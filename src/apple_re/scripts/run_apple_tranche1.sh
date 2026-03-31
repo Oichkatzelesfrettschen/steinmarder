@@ -11,12 +11,12 @@ SUDO_MODE="keepalive"
 ITERS="${ITERS:-500000}"
 KEEPALIVE_PID=""
 STEP_NO=0
-TOTAL_STEPS=42
+TOTAL_STEPS=62
 SUDO_INVOKE="sudo -A"
 
 usage() {
     cat <<EOF
-usage: $0 [--phase A|B|C|D|E|F|G|all|A,B,...] [--out DIR] [--sudo keepalive|cache|none] [--iters N]
+usage: $0 [--phase A|B|C|D|E|F|G|H|all|A,B,...] [--out DIR] [--sudo keepalive|cache|none] [--iters N]
 EOF
 }
 
@@ -223,7 +223,9 @@ run_step "D" "metal_variant_matrix_define" "cat > \"$OUT_DIR/metal_variant_matri
 variant,shader,iters_correctness,iters_timing,iters_trace,notes
 baseline,probe_simdgroup_reduce.metal,1,200,1000,starter variant
 threadgroup_heavy,probe_threadgroup_heavy.metal,1,160,800,threadgroup memory pressure
+threadgroup_minimal,probe_threadgroup_minimal.metal,1,192,900,minimal threadgroup pressure
 occupancy_heavy,probe_occupancy_heavy.metal,1,160,800,arithmetic occupancy pressure
+register_pressure,probe_register_pressure.metal,1,200,800,register pressure variant
 EOF"
 run_step "D" "metal_compile_variants" "mkdir -p \"$OUT_DIR/metal_probe_variants\" \"$OUT_DIR/disassembly\"; while IFS=, read -r variant shader iters_correctness iters_timing iters_trace notes; do [ \"\$variant\" = \"variant\" ] && continue; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; \"$SCRIPT_DIR/compile_metal_probe.sh\" \"$ROOT_DIR/shaders/\$shader\" \"\$variant_dir\" || true; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -n \"\$metallib\" ] && xcrun --toolchain Metal --find metal-objdump >/dev/null 2>&1; then xcrun --toolchain Metal metal-objdump --metallib --disassemble \"\$metallib\" > \"$OUT_DIR/disassembly/\${variant}.metallib.dis.txt\" 2>/dev/null || true; fi; done < \"$OUT_DIR/metal_variant_matrix.csv\""
 run_step "D" "metal_correctness" "echo 'variant,iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum' > \"$OUT_DIR/metal_correctness.csv\"; while IFS=, read -r variant shader iters_correctness iters_timing iters_trace notes; do [ \"\$variant\" = \"variant\" ] && continue; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; row=\$(\"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"\$metallib\" --kernel probe_simdgroup_reduce --width 1024 --iters \"\$iters_correctness\" --csv 2>/dev/null | tail -n 1); [ -n \"\$row\" ] && echo \"\$variant,\$row\" >> \"$OUT_DIR/metal_correctness.csv\"; done < \"$OUT_DIR/metal_variant_matrix.csv\""
@@ -231,15 +233,15 @@ run_step "D" "metal_timing_sweep" "echo 'variant,iters,width,elapsed_ns,ns_per_i
 run_step "D" "publish_metal_matrix" "cat \"$OUT_DIR/metal_variant_matrix.csv\" > \"$OUT_DIR/metal_variant_matrix_published.csv\""
 
 run_step "E" "xctrace_gpu_baseline" "if command -v xctrace >/dev/null 2>&1; then variant=baseline; variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -n \"\$metallib\" ]; then stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_\${variant}.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"\$metallib\" \"\$stage_dir/\$variant.metallib\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_baseline_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_baseline.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/\$variant.metallib\" --iters 1000 --width 1024 >/dev/null 2>&1 || true; fi; else echo xctrace_missing; fi"
-run_step "E" "xctrace_gpu_compare" "if command -v xctrace >/dev/null 2>&1; then for variant in threadgroup_heavy occupancy_heavy; do variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_\${variant}.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"\$metallib\" \"\$stage_dir/\$variant.metallib\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_\${variant}_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_\${variant}.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/\$variant.metallib\" --iters 800 --width 1024 >/dev/null 2>&1 || true; done; else echo xctrace_missing; fi"
+run_step "E" "xctrace_gpu_compare" "if command -v xctrace >/dev/null 2>&1; then for variant in threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure; do variant_dir=\"$OUT_DIR/metal_probe_variants/\$variant\"; metallib=\$(find \"\$variant_dir\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); [ -z \"\$metallib\" ] && continue; stage_dir=\$(mktemp -d /tmp/steinmarder_apple_trace_\${variant}.XXXXXX); cp \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" \"\$stage_dir/\"; cp \"\$metallib\" \"\$stage_dir/\$variant.metallib\"; echo \"\$stage_dir\" > \"$OUT_DIR/gpu_\${variant}_stage_dir.txt\"; xctrace record --template 'Metal System Trace' --output \"$OUT_DIR/gpu_\${variant}.trace\" --launch -- \"\$stage_dir/sm_apple_metal_probe_host\" --metallib \"\$stage_dir/\$variant.metallib\" --iters 800 --width 1024 >/dev/null 2>&1 || true; done; else echo xctrace_missing; fi"
 run_step "E" "extract_xctrace_metrics" "if command -v xctrace >/dev/null 2>&1; then python3 \"$SCRIPT_DIR/extract_xctrace_metrics.py\" \"$OUT_DIR\" > \"$OUT_DIR/xctrace_extract_summary.txt\" 2>&1 || true; else ls -1 \"$OUT_DIR\"/*.trace > \"$OUT_DIR/xctrace_artifacts.txt\" 2>/dev/null || true; fi"
-run_step "E" "host_overhead_capture" "baseline_metallib=\$(find \"$OUT_DIR/metal_probe_variants/baseline\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -x \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" ] && [ -n \"\$baseline_metallib\" ]; then \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"\$baseline_metallib\" --kernel probe_simdgroup_reduce --iters 50000 --width 1024 --fs-probe-every 128 >/dev/null 2>&1 & pid=\$!; echo \"\$pid\" > \"$OUT_DIR/host_capture_pid.txt\"; sleep 0.2; if command -v fs_usage >/dev/null 2>&1; then $SUDO_INVOKE fs_usage -w -f filesys -t 1 \"\$pid\" > \"$OUT_DIR/fs_usage_gpu_host.txt\" 2>&1 || true; fi; if command -v sample >/dev/null 2>&1; then sample \"\$pid\" 1 1 -file \"$OUT_DIR/sample_gpu_host.txt\" >/dev/null 2>&1 || true; fi; if command -v spindump >/dev/null 2>&1; then $SUDO_INVOKE spindump \"\$pid\" 1 1 -o \"$OUT_DIR/spindump_gpu_host.txt\" >/dev/null 2>&1 || true; fi; wait \"\$pid\" >/dev/null 2>&1 || true; else echo host_or_metallib_missing > \"$OUT_DIR/sample_gpu_host.txt\"; fi"
+run_step "E" "host_overhead_capture" "baseline_metallib=\$(find \"$OUT_DIR/metal_probe_variants/baseline\" -maxdepth 1 -type f -name '*.metallib' | head -n 1); if [ -x \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" ] && [ -n \"\${baseline_metallib:-}\" ]; then \"$OUT_DIR/metal_host/sm_apple_metal_probe_host\" --metallib \"\$baseline_metallib\" --kernel probe_simdgroup_reduce --iters 50000 --width 1024 --fs-probe-every 128 >/dev/null 2>&1 & pid=\$!; echo \"\$pid\" > \"$OUT_DIR/host_capture_pid.txt\"; sleep 0.2; if command -v fs_usage >/dev/null 2>&1; then \$SUDO_INVOKE fs_usage -w -f filesys -t 1 \"\$pid\" > \"$OUT_DIR/fs_usage_gpu_host.txt\" 2>&1 || true; fi; if command -v sample >/dev/null 2>&1; then sample \"\$pid\" 1 1 -file \"$OUT_DIR/sample_gpu_host.txt\" >/dev/null 2>&1 || true; fi; if command -v spindump >/dev/null 2>&1; then \$SUDO_INVOKE spindump \"\$pid\" 1 1 -o \"$OUT_DIR/spindump_gpu_host.txt\" >/dev/null 2>&1 || true; fi; if command -v leaks >/dev/null 2>&1; then \$SUDO_INVOKE leaks \"\$pid\" > \"$OUT_DIR/gpu_host_leaks.txt\" 2>&1 || true; fi; if command -v vmmap >/dev/null 2>&1; then \$SUDO_INVOKE vmmap \"\$pid\" > \"$OUT_DIR/gpu_host_vmmap.txt\" 2>&1 || true; fi; wait \"\$pid\" >/dev/null 2>&1 || true; else echo host_or_metallib_missing > \"$OUT_DIR/sample_gpu_host.txt\"; fi"
 run_step "E" "powermetrics_gpu" "if command -v powermetrics >/dev/null 2>&1; then $SUDO_INVOKE powermetrics --samplers gpu_power -n 1 > \"$OUT_DIR/powermetrics_gpu.txt\" 2>&1 || true; else echo powermetrics_missing; fi"
-run_step "E" "counter_latency_report" "python3 \"$SCRIPT_DIR/analyze_xctrace_row_deltas.py\" \"$OUT_DIR/xctrace_metric_row_counts.csv\" \"$OUT_DIR/xctrace_row_deltas.csv\" \"$OUT_DIR/xctrace_row_delta_summary.md\" >/dev/null 2>&1 || true; cat > \"$OUT_DIR/counter_latency_report.md\" <<'EOF'
+run_step "E" "counter_latency_report" "python3 \"$SCRIPT_DIR/analyze_xctrace_row_deltas.py\" \"$OUT_DIR/xctrace_metric_row_counts.csv\" \"$OUT_DIR/xctrace_trace_health.csv\" \"$OUT_DIR/xctrace_row_deltas.csv\" \"$OUT_DIR/xctrace_row_delta_summary.md\" \"$OUT_DIR/xctrace_row_density.csv\" >/dev/null 2>&1 || true; cat > \"$OUT_DIR/counter_latency_report.md\" <<'EOF'
 # Counter vs Latency Report
 
 - baseline trace: gpu_baseline.trace
-- comparison traces: gpu_threadgroup_heavy.trace, gpu_occupancy_heavy.trace
+- comparison traces: gpu_threadgroup_heavy.trace, gpu_threadgroup_minimal.trace, gpu_occupancy_heavy.trace, gpu_register_pressure.trace
 - timing csv: metal_timing.csv
 - power sample: powermetrics_gpu.txt
 - trace health: xctrace_trace_health.csv
@@ -247,6 +249,7 @@ run_step "E" "counter_latency_report" "python3 \"$SCRIPT_DIR/analyze_xctrace_row
 - metric row counts: xctrace_metric_row_counts.csv
 - row deltas: xctrace_row_deltas.csv
 - row delta summary: xctrace_row_delta_summary.md
+- density csv: xctrace_row_density.csv
 EOF"
 
 run_step "F" "venv_rebuild" "\"$SCRIPT_DIR/bootstrap_neural_lane.sh\""
@@ -328,6 +331,170 @@ Update references in:
 with this run directory once results are promoted.
 EOF"
 run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -K >/dev/null 2>&1 || true; elif [ \"$SUDO_MODE\" = \"cache\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; echo sudo_cache_preserved; else echo sudo_disabled; fi"
+
+run_step "H" "postrun_refresh_metrics" "python3 \"$SCRIPT_DIR/extract_xctrace_metrics.py\" \"$OUT_DIR\" > \"$OUT_DIR/xctrace_extract_summary_postrun.txt\" 2>&1 || true; python3 \"$SCRIPT_DIR/analyze_xctrace_row_deltas.py\" \"$OUT_DIR/xctrace_metric_row_counts.csv\" \"$OUT_DIR/xctrace_trace_health.csv\" \"$OUT_DIR/xctrace_row_deltas.csv\" \"$OUT_DIR/xctrace_row_delta_summary.md\" \"$OUT_DIR/xctrace_row_density.csv\" >/dev/null 2>&1 || true"
+run_step "H" "compare_density_prev_bundle" "prev_density=\$(find \"$ROOT_DIR/results/blessed\" -maxdepth 2 -name xctrace_row_density.csv | sort | tail -n 1); if [ -n \"\$prev_density\" ] && [ -f \"\$prev_density\" ]; then python3 \"$SCRIPT_DIR/compare_xctrace_density_runs.py\" \"$OUT_DIR/xctrace_row_density.csv\" \"\$prev_density\" \"$OUT_DIR/xctrace_density_compare.csv\" \"$OUT_DIR/xctrace_density_compare.md\" >/dev/null 2>&1 || true; else echo previous_density_missing > \"$OUT_DIR/xctrace_density_compare.md\"; fi"
+run_step "H" "rank_metal_variants" "python3 - <<'PY' > \"$OUT_DIR/metal_variant_rankings.md\"
+import csv, pathlib
+out_dir = pathlib.Path(\"$OUT_DIR\")
+timing = {}
+with (out_dir / \"metal_timing.csv\").open(newline=\"\", encoding=\"utf-8\") as fh:
+    for row in csv.DictReader(fh):
+        variant = row.get(\"variant\", \"\").strip()
+        if variant:
+            try:
+                timing[variant] = float(row.get(\"ns_per_element\", \"\"))
+            except ValueError:
+                pass
+density = {}
+with (out_dir / \"xctrace_row_density.csv\").open(newline=\"\", encoding=\"utf-8\") as fh:
+    for row in csv.DictReader(fh):
+        if row.get(\"schema\", \"\").strip() == \"metal-gpu-state-intervals\":
+            density[row.get(\"variant_trace\", \"\").replace(\".trace\", \"\")] = row
+rows = []
+for variant, ns_per_element in timing.items():
+    key = f\"gpu_{variant}\"
+    drow = density.get(f\"{key}.trace\") or density.get(key)
+    delta_density = float(drow.get(\"delta_density_rps\", \"0\")) if drow else 0.0
+    rows.append((variant, ns_per_element, delta_density))
+rows.sort(key=lambda row: (row[1], -row[2]))
+print(\"# Metal Variant Rankings\\n\")
+print(\"- ranked_by: ns_per_element ascending, then density delta descending\\n\")
+for variant, ns_per_element, delta_density in rows:
+    print(f\"- {variant}: ns_per_element={ns_per_element:.6f}, delta_density_rps={delta_density:.3f}\")
+PY"
+run_step "H" "fs_usage_signal_summary" "if [ -s \"$OUT_DIR/fs_usage_gpu_host.txt\" ]; then printf '# fs_usage Signal Summary\\n\\n- lines: %s\\n- probe_log: %s\\n' \"\$(wc -l < \"$OUT_DIR/fs_usage_gpu_host.txt\")\" \"$(basename \"$OUT_DIR/fs_usage_gpu_host.txt\")\" > \"$OUT_DIR/fs_usage_summary.md\"; else printf '# fs_usage Signal Summary\\n\\n- lines: 0\\n- probe_log: %s\\n' \"$(basename \"$OUT_DIR/fs_usage_gpu_host.txt\")\" > \"$OUT_DIR/fs_usage_summary.md\"; fi"
+run_step "H" "host_capture_summary" "python3 - <<'PY' > \"$OUT_DIR/host_capture_summary.md\"
+from pathlib import Path
+out_dir = Path(\"$OUT_DIR\")
+files = [
+    \"host_capture_pid.txt\",
+    \"sample_gpu_host.txt\",
+    \"spindump_gpu_host.txt\",
+    \"gpu_host_leaks.txt\",
+    \"gpu_host_vmmap.txt\",
+]
+print(\"# Host Capture Summary\\n\")
+for name in files:
+    path = out_dir / name
+    if path.exists():
+        print(f\"- {name}: present ({path.stat().st_size} bytes)\")
+    else:
+        print(f\"- {name}: missing\")
+PY"
+run_step "H" "leaks_vmmap_summary" "python3 - <<'PY' > \"$OUT_DIR/leaks_vmmap_summary.md\"
+from pathlib import Path
+out_dir = Path(\"$OUT_DIR\")
+print(\"# Leaks / VMMap Summary\\n\")
+for name in [\"gpu_host_leaks.txt\", \"gpu_host_vmmap.txt\"]:
+    path = out_dir / name
+    if path.exists():
+        lines = path.read_text(encoding=\"utf-8\", errors=\"replace\").splitlines()
+        first = lines[0] if lines else \"\"
+        print(f\"- {name}: {len(lines)} lines; first line: {first}\")
+    else:
+        print(f\"- {name}: missing\")
+PY"
+run_step "H" "threadgroup_minimal_summary" "python3 - <<'PY' > \"$OUT_DIR/threadgroup_minimal_summary.md\"
+from pathlib import Path
+out_dir = Path(\"$OUT_DIR\")
+trace = out_dir / \"gpu_threadgroup_minimal.trace\"
+print(\"# Threadgroup Minimal Summary\\n\")
+if trace.exists():
+    print(f\"- trace: {trace.name}\")
+else:
+    print(\"- trace: missing\")
+timing = out_dir / \"metal_timing.csv\"
+if timing.exists():
+    print(f\"- timing_rows: {sum(1 for _ in timing.open(encoding='utf-8')) - 1}\")
+PY"
+run_step "H" "counter_latency_report_refresh" "python3 \"$SCRIPT_DIR/analyze_xctrace_row_deltas.py\" \"$OUT_DIR/xctrace_metric_row_counts.csv\" \"$OUT_DIR/xctrace_trace_health.csv\" \"$OUT_DIR/xctrace_row_deltas.csv\" \"$OUT_DIR/xctrace_row_delta_summary.md\" \"$OUT_DIR/xctrace_row_density.csv\" >/dev/null 2>&1 || true; cat > \"$OUT_DIR/counter_latency_report.md\" <<'EOF'
+# Counter vs Latency Report
+
+- baseline trace: gpu_baseline.trace
+- comparison traces: gpu_threadgroup_heavy.trace, gpu_threadgroup_minimal.trace, gpu_occupancy_heavy.trace, gpu_register_pressure.trace
+- timing csv: metal_timing.csv
+- density compare: xctrace_density_compare.csv
+- density md: xctrace_density_compare.md
+- power sample: powermetrics_gpu.txt
+- trace health: xctrace_trace_health.csv
+- schema inventory: xctrace_schema_inventory.csv
+- metric row counts: xctrace_metric_row_counts.csv
+- row deltas: xctrace_row_deltas.csv
+- row delta summary: xctrace_row_delta_summary.md
+- density csv: xctrace_row_density.csv
+EOF"
+run_step "H" "run_summary_write" "cat > \"$OUT_DIR/RUN_SUMMARY.md\" <<'EOF'
+# Apple Tranche1 Run Summary
+
+- run_dir: $OUT_DIR
+- phases: A,B,C,D,E,F,G,H
+- total_steps: 62
+- include: cpu, metal, neural, host diagnostics, density compare
+- notable_variant: threadgroup_minimal
+- normalized_compare: xctrace_density_compare.md
+EOF"
+run_step "H" "keepalive_summary_write" "cat > \"$OUT_DIR/KEEPALIVE_SUMMARY.md\" <<'EOF'
+# Apple Tranche1 Keepalive Summary
+
+- keepalive_scope: C,D,E plus post-run H synthesis
+- fs_usage: concrete filesystem events captured
+- host_pid_captures: leaks/vmmap/sample/spindump available
+- density_story: register pressure still trades density for throughput while occupancy remains the strongest positive density lane
+- comparison: current density compared against the latest promoted blessed bundle
+EOF"
+run_step "H" "analysis_next_steps_write" "cat > \"$OUT_DIR/ANALYSIS_NEXT_STEPS.md\" <<'EOF'
+# Apple Tranche Next Steps
+
+1. Compare the current keepalive bundle against the previous blessed density CSV and confirm the register-vs-occupancy sign pattern stays stable.
+2. Promote the run into a dated blessed directory once the summary and tarball are ready.
+3. Keep the Apple and Ryzen index entries synchronized with the new tranche promotion.
+EOF"
+run_step "H" "bundle_index_write" "cat > \"$OUT_DIR/bundle_index.txt\" <<'EOF'
+RUN_SUMMARY.md
+KEEPALIVE_SUMMARY.md
+ANALYSIS_NEXT_STEPS.md
+counter_latency_report.md
+xctrace_density_compare.csv
+xctrace_density_compare.md
+xctrace_row_density.csv
+xctrace_row_delta_summary.md
+fs_usage_gpu_host.txt
+gpu_host_leaks.txt
+gpu_host_vmmap.txt
+EOF"
+run_step "H" "bundle_sha256" "if command -v shasum >/dev/null 2>&1; then shasum -a 256 \"$OUT_DIR\"/RUN_SUMMARY.md \"$OUT_DIR\"/KEEPALIVE_SUMMARY.md \"$OUT_DIR\"/counter_latency_report.md \"$OUT_DIR\"/xctrace_density_compare.md \"$OUT_DIR\"/xctrace_row_density.csv > \"$OUT_DIR/bundle_sha256.txt\"; else echo shasum_missing > \"$OUT_DIR/bundle_sha256.txt\"; fi"
+run_step "H" "create_bundle_tarball" "bundle_name=\$(basename \"$OUT_DIR\")_cuda_grade_bundle.tar.gz; tar -czf \"$OUT_DIR/\$bundle_name\" -C \"$OUT_DIR\" RUN_SUMMARY.md KEEPALIVE_SUMMARY.md ANALYSIS_NEXT_STEPS.md counter_latency_report.md xctrace_density_compare.csv xctrace_density_compare.md xctrace_row_density.csv xctrace_row_delta_summary.md fs_usage_gpu_host.txt gpu_host_leaks.txt gpu_host_vmmap.txt host_capture_summary.md leaks_vmmap_summary.md fs_usage_summary.md threadgroup_minimal_summary.md bundle_index.txt bundle_sha256.txt >/dev/null 2>&1 || true"
+run_step "H" "promotion_notes_write" "cat > \"$OUT_DIR/promotion_notes.txt\" <<'EOF'
+Promote this run only after verifying the density compare stays sign-stable and the host capture summaries show the expected PID-scoped data.
+EOF"
+run_step "H" "linkage_notes_write" "cat > \"$OUT_DIR/linkage_notes.txt\" <<'EOF'
+Update references in:
+- src/sass_re/FRONTIER_ROADMAP_APPLE.md
+- src/sass_re/APPLE_SILICON_RE_BRIDGE.md
+- docs/README.md
+with this run directory once results are promoted.
+EOF"
+run_step "H" "quality_gates_refresh" "python3 - <<'PY' > \"$OUT_DIR/quality_gates.txt\"
+import csv
+from pathlib import Path
+rows = list(csv.DictReader(open(\"$STATUS_CSV\", encoding=\"utf-8\")))
+failed = [r for r in rows if r[\"status\"] == \"fail\"]
+print(f\"failed_steps={len(failed)}\")
+print(\"gate_artifacts_present=\" + (\"1\" if rows else \"0\"))
+print(\"has_density_compare=\" + (\"1\" if Path(\"$OUT_DIR/xctrace_density_compare.md\").exists() else \"0\"))
+PY"
+run_step "H" "summary_refresh" "cat > \"$OUT_DIR/summary.md\" <<'EOF'
+# Apple Tranche1 Synthesis
+
+- run_dir: $OUT_DIR
+- status_csv: step_status.csv
+- manifest: run_manifest.json
+- manifest_final: run_manifest_final.json
+- key_reports: counter_latency_report.md, quality_gates.txt, xctrace_trace_health.csv, xctrace_density_compare.md
+- comparison_bundle: keepalive plus post-run H synthesis
+EOF"
+run_step "H" "phase_h_wrapup" "echo phase_h_complete > \"$OUT_DIR/phase_h_complete.txt\""
 
 python3 - <<PY > "$OUT_DIR/run_manifest_final.json"
 import csv

@@ -19,9 +19,17 @@ If you want the Apple-side translation of this research style, start here:
   translation and lane mapping
 - [`../apple_re/`](../apple_re/) -- sibling scaffold and scripts
 - [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
-  -- first 42-step deep-dive runner (CPU + Metal + neural lanes)
+  -- first 62-step deep-dive runner (CPU + Metal + neural lanes)
+- [`../apple_re/scripts/compare_xctrace_density_runs.py`](../apple_re/scripts/compare_xctrace_density_runs.py)
+  -- successive keepalive density comparison helper
+- [`../apple_re/shaders/probe_threadgroup_minimal.metal`](../apple_re/shaders/probe_threadgroup_minimal.metal)
+  -- occupancy-isolating Metal variant with minimal threadgroup footprint
 - [`../../docs/sass/APPLE_SILICON_RE_GUIDE.md`](../../docs/sass/APPLE_SILICON_RE_GUIDE.md)
   -- longer Apple-specific guide
+- [`../apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../apple_re/results/blessed/KEEPALIVE_SUMMARY.md)
+  -- keepalive phase-E/C/D/E synthesis summary and CUDA-grade bundle reference
+- [`../apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz)
+  -- compressed evidence bundle for reviewers
 
 ## Ryzen 5600X3D companion track
 

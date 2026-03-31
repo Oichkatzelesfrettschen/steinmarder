@@ -1,254 +1,196 @@
 # Apple Silicon Frontier Roadmap
 
 This document scopes the highest-yield remaining work for the Apple silicon
-research track after the first bridge note, the starter CPU benchmark, the
-starter Metal probe, and the neural-lane bootstrap scripts.
+research track while mirroring the same `FRONTIER_ROADMAP` operating style:
 
-It separates three goals that should not be conflated:
-
-1. CPU instruction-level bring-up
-2. Metal graphics / compute characterization
-3. Neural placement and backend behavior
+1. Direct-lane results first (CPU, Metal, Neural)
+2. Normalized metrics and artifacts next
+3. Repeatable tranche runners and documentation last
 
 ## Current frontier
 
-Stable local facts:
+Stable launch points:
 
-- CPU lane starter exists in `../apple_re/probes/apple_cpu_latency.c`
-- Metal lane starter exists in `../apple_re/shaders/probe_simdgroup_reduce.metal`
-- Neural lane bootstrap and probe scripts exist in `../apple_re/scripts/`
-- Environment-audit coverage exists in `../apple_re/scripts/audit_macos_re_env.sh`
-- CPU disassembly helper exists in `../apple_re/scripts/disassemble_apple_cpu_latency.sh`
-- Metal compile helper exists in `../apple_re/scripts/compile_metal_probe.sh`
-- The current Apple track is intentionally scaffold-first, not claim-first
+- CPU lane starter harness: `../apple_re/probes/apple_cpu_latency.c` plus
+  `../apple_re/scripts/disassemble_apple_cpu_latency.sh`
+- Metal lane starter shader: `../apple_re/shaders/probe_simdgroup_reduce.metal`
+  plus `../apple_re/scripts/compile_metal_probe.sh`
+- Neural lane bootstrap: `../apple_re/scripts/bootstrap_neural_lane.sh` and
+  `../apple_re/scripts/neural_lane_probe.py`
+- Environment and diagnostics scaffolding: `../apple_re/scripts/audit_macos_re_env.sh`
+- `run_apple_tranche1.sh` drives the 62-step deep dive with explicit phase
+  slicing, `ANALYSIS_NEXT_STEPS.md` documents the host diagnostics workflow,
+  and the current blessed bundles already capture density deltas, trace
+  exports, and PID-scoped host captures.
 
 ## Priority ranking
 
 ### Rank 1: CPU lane expansion
 
-This is the highest-yield direct-local frontier because it gives the fastest
-iteration loop and the clearest disassembly / timing feedback.
-
 Target family:
 
-- integer add and subtract
-- floating-point add, multiply, and fused multiply-add
-- load and store chains
-- shuffle and lane-crossing operations
-- atomic operations
-- transcendental operations
+- integer add/subtract, fused multiply-add, and mixed FP chains
+- load, store, and cache-bound dependency chains
+- shuffle/quad/warp-crossing operations
+- atomics (shared/global, CAS, EXCH, INC/ADD)
+- transcendental units (MUFU, LOG/E, EX2, SQRT)
 
 Why this is the best first frontier:
 
-- the current benchmark is already in place, so the next step is extension
-  rather than new infrastructure
-- CPU timing tables are the easiest way to establish a baseline measurement
-  style for the Apple track
-- asm diffs and compiler-flag sweeps can be recorded immediately beside the
-  benchmark outputs
+- the existing `sm_apple_cpu_latency` probe already exercises a narrow
+  family, so the lane grows by extension rather than rebuilding infrastructure
+- CPU timing tables are the quickest place to demonstrate stable deltas
+  across compiler flags, targets, and `llvm-mca`/`objdump` diffs
+- the lane gives the cleanest ASM trace so the Apple track can publish a
+  direct SASS-style table beside the NVIDIA results
 
 Falsifiable hypotheses:
 
-1. A wider CPU probe corpus will surface stable timing deltas across
-   optimization levels and target CPU selections.
-2. Load/store and shuffle probes will show stronger compiler sensitivity than
-   the current narrow starter chain.
-3. Atomic and transcendental probes will give the first useful "slow path" and
-   "special unit" references for the Apple lane.
+1. Wider load/store and shuffle sweeps will surface new timing tiers that stay
+   stable between `-O2` and `-O3`, proving the compiler scheduling differences.
+2. Atomics and transcendental probes will reveal a second, slower plateau that
+   marks the special-unit border, not just the base ALU.
+3. Explicit CPU flag sweeps will produce the same raw timing ordering regardless
+   of threadgroup affinity, confirming the data dependencies.
 
 ### Rank 2: Metal graphics / compute frontier
 
-This is the best second frontier because it gives the Apple GPU track a real
-execution loop, even without assuming a public SASS-equivalent ISA.
-
 Target family:
 
-- shader lowering studies
-- simdgroup reduction and broadcast patterns
-- threadgroup memory behavior
-- resource binding and argument-buffer experiments
-- host-side timing and profiling
-- Xcode counter capture and trace export
+- shader lowering study and `metalcc` variant capture
+- simdgroup/threadgroup memory reduction and broadcast patterns
+- occupancy vs. register-pressure variants plus host-side timing
+- argument buffer and resource binding stress
+- `xctrace` export, counter snapshots, and density-normalized traces
+- host-side FS probes for `fs_usage_gpu_host.txt` plus PID-scoped host captures
 
 Why this is the right GPU frontier:
 
-- the repository already has a starter Metal shader, so the missing piece is
-  the host harness and measurement discipline
-- GPU research should focus on emitted artifacts, timings, and counters rather
-  than pretending the Apple GPU surface looks like NVIDIA SASS
-- the same probe / results / normalization pattern from `sass_re` applies
-  cleanly once a host runner exists
+- the shader is already in-tree, so the missing pieces are the host harness and
+  the profiling discipline
+- row-density normalization (`xctrace_row_density.csv`) keeps variant comparisons
+  stable even when raw row counts fluctuate
+- dual Metal paths (threadgroup-heavy, occupancy-heavy, register-pressure-heavy)
+  plus the new FS event probe prove the lane can deliver a CUDA-grade evidence
+  bundle without assuming a public ISA
 
 Falsifiable hypotheses:
 
-1. A minimal host harness will make Metal probe timings reproducible enough to
-   compare shader variants side by side.
-2. Simdgroup and threadgroup-memory changes will produce observable timing or
-   counter shifts even when the emitted artifact surface stays compact.
-3. Counter capture will be more useful than disassembly for ranking GPU probe
-   variants on Apple silicon.
+1. The `fs_event` probe keeps `fs_usage_gpu_host.txt` populated under cached
+   sudo keepalive runs, so downstream reviewers can verify trace health.
+2. Occupancy-heavy vs. register-pressure variants will keep the same row-density
+   delta even when the host workload oscillates, confirming the driver-level
+   effect.
+3. PID-scoped host captures (leaks/vmmap) plus `xctrace` metric export make step
+   27 deterministic and replayable.
 
 ### Rank 3: Neural placement frontier
 
-This is the most framework-dependent frontier, but it is still a good fit for
-the repository because it can be structured around repeatable conversion and
-placement sweeps.
-
 Target family:
 
-- Core ML conversion and execution placement
-- MPSGraph tensor experiments
+- Core ML conversion and execution placement sweeps
+- MPSGraph/MPSNNGraph tensor experiments
 - MLX and PyTorch MPS comparison points
 - CPU, GPU, and ANE fallback behavior
-- dtype, precision, and quantization sweeps
+- dtype, quantization, and precision sweeps
 
 Why this belongs in the same roadmap:
 
-- the existing neural scaffold already breaks the work into a bootstrap script
-  and a probe script
-- placement behavior is the Apple-side equivalent of "which lowering path did
-  the compiler or runtime choose?"
-- results can be normalized into matrices that compare backends, dtypes, and
-  model shapes
+- the current neural scaffold already exposes conversion + runtime probes
+- placement behavior plays the same role as lowering choices in the NVIDIA lane
+- normalized matrices can compare the backend choices against CPU/Metal timings
 
 Falsifiable hypotheses:
 
-1. Explicit compute-unit selection will produce stable placement differences
-   across the same model and input shape.
-2. Dtype and quantization changes will affect CPU, GPU, and ANE placement in
-   different ways rather than acting as a single universal toggle.
-3. The probe output can be normalized into a repeatable matrix of backend,
-   precision, and runtime choice without needing a heavyweight training loop.
+1. Explicit compute-unit selection yields stable placement differences for the
+   same model and input shape.
+2. dtype/quantization changes affect CPU, GPU, ANE placement differently rather
+   than acting as a single universal toggle.
+3. The probe outputs can be normalized into a repeatable matrix of backend and
+   precision choices without needing heavy training loops.
 
-### Rank 4: Result normalization and publication
+### Rank 4: Normalization and publication
 
-This is the last step, not the first step.
+This lane must end with the same disciplined documentation trail as the SASS
+track:
 
-The Apple track should end up with the same kind of documentation trail the
-NVIDIA track already has:
-
-- a readable README for the subtree
-- a concrete roadmap
-- a bridge note that explains the methodology transfer
-- a results summary once the lane work starts producing measurements
+- bridge note (`APPLE_SILICON_RE_BRIDGE.md`)
+- frontier checklist (`FRONTIER_ROADMAP_APPLE.md`)
+- trunk README section and cross-links in the repo and docs index
+- results manifest plus `KEEPALIVE_SUMMARY.md`/tarball so reviewers see the
+  CUDA-grade evidence
+- `ANALYSIS_NEXT_STEPS.md` capturing the host diagnostics sequence (fs probe,
+  leaks/vmmap, `xctrace` exports)
 
 ## Checklist
 
-- [ ] Expand the CPU lane with load/store, shuffle, atomics, and transcendental
-  probes.
-- [ ] Add a tiny Metal host harness so the shader probe can be timed and
-  profiled end to end.
-- [ ] Add Core ML graph generators for dtype and compute-unit sweep
-  experiments.
-- [ ] Record Apple-side results in a stable table format beside the existing
-  SASS results style.
-- [ ] Keep the bridge note linked from the SASS README so the Apple track stays
-  discoverable.
+- [ ] Expand `sm_apple_cpu_latency` with explicit load/store, shuffle, and atomic
+  subchains plus transcendental tests.
+- [ ] Keep the CPU lane results in CSV/TSV tables that mirror the existing SASS
+  timing tables and disassemble targets with `objdump`.
+- [ ] Add the FS-event probe the host harness now references so `fs_usage_gpu_host.txt`
+  is never empty under keepalive runs.
+- [ ] Add the Metal variants: threadgroup-heavy, occupancy-heavy, register-pressure-heavy,
+  and the new register-pressure-light variant focused on occupancy deltas with minimal
+  threadgroup work.
+- [ ] Add the threadgroup-minimal variant to isolate occupancy with the smallest
+  threadgroup footprint that still produces a stable Metal trace.
+- [ ] Normalize `xctrace_row_density.csv` (rows/sec) and `xctrace_row_delta_summary.md`
+  into the Metal variant reports so density bias is communicated clearly.
+- [ ] Grade the stage-27 harness to emit `xctrace` metrics plus PID-scoped `gpu_host_leaks.txt`
+  / `gpu_host_vmmap.txt` captures every rerun of the tranche.
+- [ ] Keep `ANALYSIS_NEXT_STEPS.md`, `counter_latency_report.md`, and the zipped bundle
+  referenced in the README/docs index so downstream reviewers can grab the CUDA-grade
+  bundle.
+- [ ] Document every lane and bundle in the repo-level docs index (see `docs/README.md`)
+  so the Apple track stands beside the NVIDIA and Ryzen stories.
 
-## What success looks like
+## Tranche 1 (62-step deep dive)
 
-- repeatable CPU timings and asm diffs
-- repeatable Metal probe timings and counter captures
-- repeatable Core ML placement sweeps
-- a documentation trail that explains the Apple-side limits clearly
-- a cross-link path from the SASS docs into the Apple track without forcing
-  readers to hunt for it
-
-## Tranche 1 (42-step deep dive)
-
-The first deep-dive tranche is now scripted in:
-
-- [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
-
-It is structured as 42 explicit steps across seven phases (`A` through `G`) so
-we can run the whole stack or rerun specific lanes without losing provenance.
+`run_apple_tranche1.sh` now drives the CPU + Metal + neural lanes with eight phases
+(`A`..`H`). Every phase writes its manifest, capability snapshot, and per-step logs.
 
 ### Canonical run
 
 ```sh
 SUDO_ASKPASS=/Users/eirikr/bin/askpass \
 src/apple_re/scripts/run_apple_tranche1.sh \
-  --phase all \
+  --phase C,D,E \
   --sudo keepalive \
   --iters 500000
 ```
 
-Touch ID / cached-sudo flow:
+Phase E now carries the refreshed FS probe, the PID-scoped host captures, and
+the register-vs-occupancy exports so the next bundle becomes CUDA-grade.
 
-```sh
-src/apple_re/scripts/prime_sudo_cache.sh
-src/apple_re/scripts/run_apple_tranche1.sh --phase all --sudo cache --iters 500000
-```
+### Status snapshot (keepalive C/D/E)
 
-Default output: `src/apple_re/results/tranche1_<timestamp>/`
+- [x] CPU lane still records `xctrace` time profiler, `dtrace`, and `powermetrics`
+  metadata for the expanded atomic/shuffle families.
+- [x] Metal lane compares baseline, threadgroup-heavy, occupancy-heavy, and
+  threadgroup-minimal, and register-pressure variants via
+  `xctrace_row_delta_summary.md` + density CSV.
+- [x] Register-pressure variants trade row density (`≈-103 r/s`) for throughput
+  while the occupancy-heavy variant keeps the strongest density win (`+579 r/s`
+  on `metal-gpu-state-intervals`), so the delta story stays stable through live
+  host noise.
+- [x] The new density comparison helper now compares successive keepalive
+  bundles so the sign pattern and density gap remain explicit in the post-run H
+  synthesis lane.
+- [x] Phase 27 now exports `xctrace` metrics, PID-scoped `gpu_host_leaks.txt`,
+  `gpu_host_vmmap.txt`, and `fs_usage_gpu_host.txt`, and `counter_latency_report.md`
+  links to the refreshed inventory plus the CUDA-grade bundle
+  (`2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`).
+- [x] `ANALYSIS_NEXT_STEPS.md` captures how to replay the host diagnostics (fs probe,
+  leak/vmmap capture, density normalization) so future reruns lock in the same SUDO
+  keepalive story.
 
-Latest blessed snapshot:
+## What success looks like
 
-- `src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`
-  (includes `xctrace_trace_health.csv`, `xctrace_schema_inventory.csv`,
-  `xctrace_metric_row_counts.csv`, `RUN_SUMMARY.md`,
-  `cpu_mnemonic_counts.csv`, and `mnemonic_interpretation.md`)
-
-### Tool-stack mapping (non-overlapping, complementary)
-
-- NVIDIA `ncu` / `nsys` class -> `xctrace` + host CSV timing + `powermetrics`
-- AMD `uProf` class -> `xctrace Time Profiler` + `sample` + `spindump`
-- Linux `valgrind` class -> `ASan/UBSan` + `leaks` + `vmmap`
-- Linux `strace` / syscall tracing class -> `dtruss` (via `dtrace`)
-- Linux FS trace class -> `fs_usage`
-
-### Phase map
-
-- `A` environment stamp + capability matrix + package inventory + sudo keepalive
-- `B` CPU probe matrix build + disassembly + `llvm-mca` static modeling
-- `C` CPU runtime timing + profiler + diagnostics
-- `D` Metal host harness + compile + correctness + timing sweep
-- `E` GPU trace + host-overhead capture + power sampling + synthesis note
-  (baseline + `threadgroup_heavy` + `occupancy_heavy` traces with row deltas)
-- `F` neural lane bootstrap + placement probes (`torch`, `coreml`, `mlx`, `jax`)
-- `G` manifest + quality gates + failed-step snapshot + linkage notes
-
-### 42-step checklist
-
-- [ ] 01 `A::sudo_prime`
-- [ ] 02 `A::sudo_keepalive_start`
-- [ ] 03 `A::machine_stamp`
-- [ ] 04 `A::tool_matrix`
-- [ ] 05 `A::package_inventory`
-- [ ] 06 `A::capabilities_json`
-- [ ] 07 `B::cpu_family_matrix`
-- [ ] 08 `B::cpu_probe_inventory`
-- [ ] 09 `B::compile_matrix_define`
-- [ ] 10 `B::build_cpu_matrix`
-- [ ] 11 `B::disassemble_cpu_matrix`
-- [ ] 12 `B::llvm_mca_cpu_matrix`
-- [ ] 13 `C::cpu_baseline_timing`
-- [ ] 14 `C::hyperfine_cpu_timing`
-- [ ] 15 `C::xctrace_cpu_profile`
-- [ ] 16 `C::dtrace_dtruss_cpu`
-- [ ] 17 `C::powermetrics_cpu`
-- [ ] 18 `C::cpu_diagnostics`
-- [ ] 19 `D::metal_host_harness_build`
-- [ ] 20 `D::metal_variant_matrix_define`
-- [ ] 21 `D::metal_compile_variants`
-- [ ] 22 `D::metal_correctness`
-- [ ] 23 `D::metal_timing_sweep`
-- [ ] 24 `D::publish_metal_matrix`
-- [ ] 25 `E::xctrace_gpu_baseline`
-- [ ] 26 `E::xctrace_gpu_compare`
-- [ ] 27 `E::extract_xctrace_metrics`
-- [ ] 28 `E::host_overhead_capture`
-- [ ] 29 `E::powermetrics_gpu`
-- [ ] 30 `E::counter_latency_report` (includes `xctrace_row_deltas.csv`)
-- [ ] 31 `F::venv_rebuild`
-- [ ] 32 `F::neural_probe_all`
-- [ ] 33 `F::model_family_define`
-- [ ] 34 `F::coreml_placement_sweep`
-- [ ] 35 `F::torch_cpu_vs_mps`
-- [ ] 36 `F::mlx_jax_checks`
-- [ ] 37 `G::consolidate_manifest`
-- [ ] 38 `G::quality_gates`
-- [ ] 39 `G::rerun_failed_snapshot`
-- [ ] 40 `G::synthesis_report`
-- [ ] 41 `G::linkage_notes`
-- [ ] 42 `G::sudo_teardown`
+- repeatable CPU timings and asm diffs that live beside the NVIDIA tables
+- repeatable Metal probe timings, counter exports, and row-density normalization
+- repeatable Core ML placement sweeps with clear backend matrices
+- a documentation trail (bridge note + checklist + cross-links) that explains the
+  Apple-side limits without forcing readers to re-interpret the NVIDIA story
+- a new `docs/README.md` entry and `FRONTIER_ROADMAP_APPLE.md` cross-link so the
+  Apple track sits shoulder to shoulder with the SASS and Ryzen tracks
