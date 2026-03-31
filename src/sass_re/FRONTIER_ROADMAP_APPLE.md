@@ -53,6 +53,23 @@ Falsifiable hypotheses:
 3. Explicit CPU flag sweeps will produce the same raw timing ordering regardless
    of threadgroup affinity, confirming the data dependencies.
 
+Cache-pressure follow-on plan:
+
+- add a dedicated cache probe family with working-set sweeps sized to the
+  likely L1, L2, and LLC boundaries on the current machine
+- record stride, working-set size, and miss-sensitive timing in a single
+  `cache_pressure.csv` so cache-size inference is tied to evidence rather than
+  memory of the chip family
+- export the live run into a cache-specific `xctrace`/Time Profiler bundle and
+  capture `powermetrics` alongside the timing table so latency and cache
+  residency can be compared in the same run directory
+- compare the cache-pressure sweep against the existing CPU plateau tables and
+  call out where the miss-sensitive knee appears, rather than guessing the
+  cache sizes from the vendor datasheet
+- keep the follow-on result set small and explicit: `cache_probe_families.txt`,
+  `cache_pressure.csv`, `cache_trace_health.csv`, and a short interpretation
+  note that says whether the working set crosses the observed knee
+
 ### Rank 2: Metal graphics / compute frontier
 
 Target family:
