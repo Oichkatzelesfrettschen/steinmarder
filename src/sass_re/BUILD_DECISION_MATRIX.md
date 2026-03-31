@@ -65,14 +65,32 @@ output instead of being assumed useful:
 - a standardized build-decision ledger that records code size, spills, and
   runtime together instead of treating them as separate notes
 
-### CUDA LBM track
+### CUDA LBM measurement checklist
 
-- a decision matrix that says when a CUDA LBM kernel should remain handwritten
-  versus when a template or compiler-generated path is sufficient
-- a normalized comparison of launch configuration, memory layout, precision,
-  and occupancy so kernel variants can be chosen by evidence instead of lore
-- a build-decision note that separates “research kernel,” “production kernel,”
-  and “compiler-sufficient” cases for the CUDA lane
+- [ ] Baseline the handwritten CUDA LBM kernels against the closest
+  template-generated or compiler-generated path on the same grid sizes so the
+  comparison reflects identical work rather than different problem setups.
+- [ ] Sweep the main kernel families already in the tree
+  (`int8_soa`, `fp16_soa`, `bf16_soa`, `fp32_soa`, `fp64_soa`, `aa`, `mrt`,
+  `coarsened`, and the tensor-core proxy) under the same launch bounds.
+- [ ] Record `MLUPS`, `BW_GBS`, `BW_PCT`, `mass_drift`, `VRAM_MB`, occupancy,
+  registers per thread, shared memory per block, and binary size in one CSV so
+  build choices can be compared without reopening every run log.
+- [ ] Capture `ncu`, `nsys`, and `objdump` sidecars for every CUDA run directory
+  so the runtime, occupancy, and instruction-shape claims remain reproducible.
+- [ ] Mark a kernel `compiler-sufficient` only if the generated path matches
+  the handwritten version within the expected runtime and correctness band and
+  does not lose on VRAM or occupancy.
+- [ ] Mark a kernel `manual-preferred` only if the handwritten path wins on
+  runtime, occupancy, memory footprint, or mass drift enough to justify the
+  extra maintenance cost.
+- [ ] Mark a kernel `research-only` when the variant is useful for learning but
+  does not improve the production build decision enough to keep shipping it.
+- [ ] Summarize each tranche in `cuda_variant_matrix.csv`,
+  `cuda_launch_health.csv`, `cuda_occupancy_vs_bw.csv`,
+  `cuda_benchmark_notes.md`, and `cuda_decision_summary.md`.
+- [ ] Cross-link the final verdict back to `src/cuda_lbm/README.md` so the CUDA
+  inventory and the build-decision matrix stay in sync.
 
 ### Apple track
 

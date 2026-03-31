@@ -7,8 +7,9 @@ format, but arithmetic is promoted to FP32 before any computation.
 
 For build decisions, pair this inventory with
 [`../sass_re/BUILD_DECISION_MATRIX.md`](../sass_re/BUILD_DECISION_MATRIX.md),
-which records when a handwritten CUDA path is still worth keeping versus when a
-template or compiler-generated variant is already sufficient.
+which now includes the CUDA measurement checklist for deciding when a
+handwritten path is still worth keeping versus when a template or
+compiler-generated variant is already sufficient.
 
 Two layout families exist:
 
