@@ -120,7 +120,7 @@ The next useful additions are straightforward:
 
 ## First Deep-Dive Runner
 
-The first concrete 42-step tranche is now scripted in:
+The first concrete 62-step tranche is now scripted in:
 
 - [`../apple_re/scripts/run_apple_tranche1.sh`](../apple_re/scripts/run_apple_tranche1.sh)
 
@@ -130,7 +130,11 @@ It keeps the same manifest-first discipline as the NVIDIA path:
 - status CSV
 - capability snapshot
 - run manifest and synthesis note
-- explicit phase slicing (`A`..`G`) for reruns
+- explicit phase slicing (`A`..`H`) for reruns
+
+The next 42-step follow-on is outlined in:
+
+- [`NEXT42_APPLE_TRANCHE.md`](NEXT42_APPLE_TRANCHE.md)
 
 For details, use [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md).
 

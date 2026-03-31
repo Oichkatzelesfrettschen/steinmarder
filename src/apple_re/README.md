@@ -64,7 +64,7 @@ that exist on Apple silicon:
 - `scripts/analyze_xctrace_row_deltas.py`
   - computes schema row-count deltas between baseline and variant GPU traces
 - `scripts/compare_xctrace_density_runs.py`
-  - compares normalized xctrace density across successive blessed keepalive bundles
+  - compares normalized xctrace density across successive promoted keepalive bundles
 - `scripts/run_apple_tranche1.sh`
   - orchestrates the first 62-step deep-dive tranche across CPU, Metal, and
     neural lanes with manifest outputs
@@ -161,9 +161,11 @@ Notes:
 - Run subsets with `--phase A,B,C` (or any comma-separated phase list).
 - Phase `H` is the post-run evidence and comparison lane; it refreshes
   `xctrace` exports, compares `xctrace_row_density.csv` against the latest
-  blessed bundle, and emits run / keepalive summaries plus bundle notes.
+  promoted bundle, and emits run / keepalive summaries plus bundle notes.
 - Latest promoted C/D/E synthesis snapshot:
   `src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/`.
+- Latest promoted keepalive snapshot:
+  `src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/`.
 - Latest promoted variant frontier snapshot:
   `src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`.
 - Latest full-stack baseline snapshot:

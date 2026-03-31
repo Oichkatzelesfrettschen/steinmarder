@@ -26,19 +26,21 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5 5600X3D CPU + 3D V-Cache translation guide |
 
 ### Apple track artifacts
-- [`../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md) -- keepalive phase-E/C/D/E summary + CUDA-grade evidence bundle
-- [`../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz) -- compressed Apple keepalive evidence
+- [`../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md) -- promoted Apple keepalive summary + CUDA-grade evidence bundle
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz) -- compressed promoted Apple keepalive evidence
 
 **See also:** [`src/sass_re/`](../src/sass_re/) for the full toolkit:
 - [`src/sass_re/RESULTS.md`](../src/sass_re/RESULTS.md) -- Measured latencies and encoding analysis
 - [`src/sass_re/instant_ngp/`](../src/sass_re/instant_ngp/) -- Inline PTX kernels with SASS diffs
 - [`src/sass_re/instant_ngp/docs/`](../src/sass_re/instant_ngp/docs/) -- Three-tier documentation
 - [`src/apple_re/`](../src/apple_re/) -- Apple silicon CPU, Metal, and Core ML scaffolding
-- [`src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/) -- Latest M1 variant frontier bundle (3 Metal variants, row deltas, mnemonic frontier, ranked next steps)
-- [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Full-stack CUDA-grade Apple tranche baseline (42/42, trace health + schema exports + diagnostics)
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/) -- Latest promoted Apple keepalive bundle (real fs_usage, PID-scoped leaks/vmmap, normalized density)
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r5_variants_frontier/) -- Latest promoted M1 variant frontier bundle (3 Metal variants, row deltas, mnemonic frontier, ranked next steps)
+- [`src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/`](../src/apple_re/results/blessed/2026-03-30_tranche1_r4_m1_cuda_grade/) -- Full-stack promoted Apple tranche baseline (42/42, trace health + schema exports + diagnostics)
 - [`src/sass_re/FRONTIER_ROADMAP_APPLE.md`](../src/sass_re/FRONTIER_ROADMAP_APPLE.md) -- Apple silicon frontier checklist
 - [`src/sass_re/APPLE_SILICON_RE_BRIDGE.md`](../src/sass_re/APPLE_SILICON_RE_BRIDGE.md) -- Method bridge from SASS RE to Apple silicon lanes
-- [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 42-step Apple deep-dive tranche runner
+- [`src/apple_re/scripts/run_apple_tranche1.sh`](../src/apple_re/scripts/run_apple_tranche1.sh) -- 62-step Apple deep-dive tranche runner
+- [`src/sass_re/NEXT42_APPLE_TRANCHE.md`](../src/sass_re/NEXT42_APPLE_TRANCHE.md) -- next 42-step Apple follow-on tranche and analysis plan
 - [`src/apple_re/scripts/prime_sudo_cache.sh`](../src/apple_re/scripts/prime_sudo_cache.sh) -- Touch ID/password sudo cache prime for `--sudo cache` runs
 - [`src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md`](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) -- Ryzen 5600X3D frontier checklist
 

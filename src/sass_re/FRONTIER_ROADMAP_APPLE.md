@@ -20,7 +20,7 @@ Stable launch points:
 - Environment and diagnostics scaffolding: `../apple_re/scripts/audit_macos_re_env.sh`
 - `run_apple_tranche1.sh` drives the 62-step deep dive with explicit phase
   slicing, `ANALYSIS_NEXT_STEPS.md` documents the host diagnostics workflow,
-  and the current blessed bundles already capture density deltas, trace
+  and the current promoted bundles already capture density deltas, trace
   exports, and PID-scoped host captures.
 
 ## Priority ranking
@@ -179,7 +179,7 @@ the register-vs-occupancy exports so the next bundle becomes CUDA-grade.
   synthesis lane.
 - [x] Phase 27 now exports `xctrace` metrics, PID-scoped `gpu_host_leaks.txt`,
   `gpu_host_vmmap.txt`, and `fs_usage_gpu_host.txt`, and `counter_latency_report.md`
-  links to the refreshed inventory plus the CUDA-grade bundle
+  links to the refreshed inventory plus the promoted CUDA-grade bundle
   (`2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`).
 - [x] `ANALYSIS_NEXT_STEPS.md` captures how to replay the host diagnostics (fs probe,
   leak/vmmap capture, density normalization) so future reruns lock in the same SUDO
