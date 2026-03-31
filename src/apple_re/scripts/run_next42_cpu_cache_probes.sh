@@ -189,7 +189,11 @@ if command -v xctrace >/dev/null 2>&1; then
 fi
 
 if command -v powermetrics >/dev/null 2>&1; then
-    $SUDO_INVOKE powermetrics --samplers cpu_power -n 1 > "$OUT_DIR/powermetrics_cache.txt" 2>&1 || true
+    if $SUDO_INVOKE true >/dev/null 2>&1; then
+        $SUDO_INVOKE powermetrics --samplers cpu_power -n 1 > "$OUT_DIR/powermetrics_cache.txt" 2>&1 || true
+    else
+        echo powermetrics_sudo_unavailable > "$OUT_DIR/powermetrics_cache.txt"
+    fi
 else
     echo powermetrics_missing > "$OUT_DIR/powermetrics_cache.txt"
 fi
