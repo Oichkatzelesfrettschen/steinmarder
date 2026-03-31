@@ -267,6 +267,16 @@ else()
 endif()
 
 # ════════════════════════════════════════════════════════════════
+# Apple Silicon reverse-engineering helpers (Apple only)
+# ════════════════════════════════════════════════════════════════
+option(SM_ENABLE_APPLE_RE "Build Apple Silicon reverse-engineering helpers" ON)
+if(APPLE AND SM_ENABLE_APPLE_RE)
+    add_subdirectory(src/apple_re)
+else()
+    message(STATUS "Apple RE helpers skipped")
+endif()
+
+# ════════════════════════════════════════════════════════════════
 # Standalone tools
 # ════════════════════════════════════════════════════════════════
 add_executable(inspect_ppm src/tools/inspect_ppm.c)
@@ -300,6 +310,10 @@ if(CUDAToolkit_FOUND)
     add_test(NAME lbm_benchmark_quick COMMAND lbm_bench --kernel "FP32 SoA Fused" --grid 64 --steps 5)
 endif()
 
+if(TARGET sm_apple_cpu_latency)
+    add_test(NAME apple_cpu_latency_smoke COMMAND sm_apple_cpu_latency --iters 1024 --csv)
+endif()
+
 # CPU render smoke test (dedicated binary, checks for NaN/Inf/zero)
 add_test(NAME render_smoke COMMAND test_render_smoke)
 set_tests_properties(render_smoke PROPERTIES TIMEOUT 30)
@@ -315,5 +329,6 @@ message(STATUS "  AVX2:         ${HAS_AVX2}")
 message(STATUS "  OpenMP:       ${OpenMP_C_FOUND}")
 message(STATUS "  Vulkan:       ${Vulkan_FOUND}")
 message(STATUS "  CUDA:         ${CUDAToolkit_FOUND}")
+message(STATUS "  Apple RE:     ${SM_ENABLE_APPLE_RE}")
 message(STATUS "  raylib:       ${RAYLIB_LIB}")
 message(STATUS "================================")

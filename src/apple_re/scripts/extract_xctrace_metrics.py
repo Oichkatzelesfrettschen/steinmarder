@@ -13,23 +13,11 @@ from pathlib import Path
 
 
 INTERESTING_SCHEMAS = {
-    # Generic timeline/profile context
-    "time-profile",
-    "time-sample",
-    "process-info",
-    "thread-info",
-    "gcd-perf-event",
-    "dyld-library-load",
-    "life-cycle-period",
-    # Metal/GPU execution path
     "metal-application-encoders-list",
     "metal-command-buffer-completed",
-    "metal-driver-event-per-thread-intervals",
     "metal-driver-intervals",
-    "metal-gpu-counter-intervals",
     "metal-gpu-intervals",
     "metal-gpu-state-intervals",
-    "metal-shader-profiler-intervals",
 }
 
 
@@ -116,9 +104,15 @@ def main() -> int:
 
     for trace_path in trace_paths:
         trace_name = trace_path.name
+        if not trace_name.startswith("gpu_"):
+            continue
         trace_stem = trace_path.stem
 
-        toc_xml = _run_xctrace(["--input", str(trace_path), "--toc"])
+        try:
+            toc_xml = _run_xctrace(["--input", str(trace_path), "--toc"])
+        except RuntimeError as exc:
+            print(f"error=failed_toc_export ({trace_name}): {exc}", file=sys.stderr)
+            continue
         toc_path = out_dir / f"{trace_stem}_toc.xml"
         toc_path.write_text(toc_xml, encoding="utf-8")
 
@@ -133,10 +127,17 @@ def main() -> int:
                 continue
 
             xpath = f'/trace-toc/run[@number="1"]/data/table[@schema="{schema}"]'
-            export_xml = _run_xctrace(["--input", str(trace_path), "--xpath", xpath])
             export_name = f"xctrace_{trace_stem}_{_safe_name(schema)}.xml"
             export_path = out_dir / export_name
-            export_path.write_text(export_xml, encoding="utf-8")
+            if export_path.exists():
+                export_xml = export_path.read_text(encoding="utf-8")
+            else:
+                try:
+                    export_xml = _run_xctrace(["--input", str(trace_path), "--xpath", xpath])
+                except RuntimeError as exc:
+                    print(f"error=failed_schema_export ({trace_name} {schema}): {exc}", file=sys.stderr)
+                    continue
+                export_path.write_text(export_xml, encoding="utf-8")
             row_count_rows.append(
                 {
                     "trace": trace_name,
