@@ -10,6 +10,8 @@ For build decisions, pair this inventory with
 which now includes the CUDA measurement checklist for deciding when a
 handwritten path is still worth keeping versus when a template or
 compiler-generated variant is already sufficient.
+The checklist also spells out the exact run commands and the expected
+`src/cuda_lbm/results/<run-id>/` layout per measurement pass.
 
 Two layout families exist:
 
