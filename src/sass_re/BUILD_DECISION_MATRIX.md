@@ -310,3 +310,94 @@ next person can answer “manual or compiler?” without re-reading every run lo
 | dEQP-VK | dEQP-VK | Yes | Yes | 1.7M Vulkan conformance tests |
 | umr | N/A | No | N/A | AMD GPU register debugger — not in Debian |
 | radeon_profile | N/A | No | N/A | Would need manual build |
+
+## Apple CPU + Metal GPU Decision Entries
+
+### Apple CPU latency constants (AArch64 arm64, ~3.2 GHz)
+
+Measured via dependent-chain probes in `apple_cpu_latency.c` (1M iterations, ±2%).
+Cross-validated against llvm-mca. See `cpu_runs/llvm_mca_analysis.md`.
+
+| Operation | Measured cyc/op | MCA reliable? | Decision implication |
+|-----------|----------------|--------------|----------------------|
+| Integer ADD | **1 cycle** | Yes (±4%) | Use MCA for simple integer chains |
+| f64 FADD | **~4 cycles** | Partial (−23%) | MCA under-predicts; use measured |
+| f64 FMADD | **~4 cycles** | Partial (−23%) | MCA under-predicts; use measured |
+| load+store chain (L1 bandwidth) | **1.18 cyc/op** | Partial | Arithmetic hides memory latency; not a pure load-latency probe |
+| bswap+variable-shift chain | **4.30 cyc/op** | **NO (3× error)** | MCA cannot model variable-shift data dependency; always measure |
+| relaxed atomic add | **6 cycles** | **NO (PLT stub)** | MCA cannot analyze atomic library calls; use measured |
+| sin+cos pair (libm) | **~60 cycles** (~30 each) | **NO (8× error)** | MCA models sin/cos as ~7 cyc; actual is ~60; never use MCA for transcendentals |
+
+**Rule**: llvm-mca is reliable ONLY for simple, non-library arithmetic sequences on M-series.
+For anything involving atomics, transcendentals, variable-shift dependencies, or library calls,
+use measured data from the `apple_cpu_latency.c` probe suite.
+
+### Apple M-series cache hierarchy boundaries (stream bandwidth measurement)
+
+Measured via `apple_cpu_cache_pressure.c`, stride=64 bytes (cache-line granularity).
+See `cpu_runs/cache_hierarchy_analysis.md`.
+
+| Tier | Size range | ns/access | cyc/access | Decision |
+|------|-----------|-----------|------------|----------|
+| L1 + L2 | ≤ 128 KB | 0.65–0.82 ns | 2.1–2.6 | Fit data here for zero-miss workloads |
+| SLC (System-Level Cache) | 256 KB – 8 MB | 0.95–1.02 ns | 3.0–3.3 | 50% slower than L2; size budget matters |
+| DRAM | ≥ 32 MB | 2.28 ns | 7.3 | 3.5× L2 bandwidth penalty |
+
+**Note**: boundary at ~128–256 KB (49% jump). TGSM probes should fit within L1/L2.
+True cache MISS LATENCY not yet isolated (sequential pointer-chase is prefetched).
+Expected M-series latency from public sources: L1D ~4 cyc, L2 ~12 cyc, SLC ~40 cyc, DRAM ~100–200 cyc.
+
+### Apple Metal GPU — FP32 FMA
+
+Measured via dependent-chain probes (`probe_ffma_lat.metal`) using xctrace Metal
+System Trace timing. AIR IR confirms 32 sequential `call @air.fma.f32` with preserved
+data dependency (no CSE). See `metal_air_opcode_inventory.md`.
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| Compiler emits `fma()` as `@air.fma.f32`? | **Yes** | AIR IR: 32 `call @air.fma.f32` per iteration |
+| FMA latency isolation possible at AIR level? | **Yes** — dep-chain preserved | 3 phi nodes (loop) vs 17 phi nodes (tput probe with 8 accumulators) |
+| MCA reliable for FMA throughput? | **Partial** — within ~23% for FMADD at 3.2 GHz | `llvm_mca_analysis.md`: measured 4.15 cyc, MCA predicts 3.18 |
+| Build decision: use `fma()` vs manual MAD? | **Use `fma()`** — compiler already emits optimal AIR | No manual transform needed |
+
+FP32 FMA latency on M-series: **~4 cycles**. Throughput: **multiple FMAs per cycle**
+(probe_ffma_tput with 8 independent chains expected to exceed 1 FMA/cycle throughput).
+
+### Apple Metal GPU — simdgroup operations
+
+Measured via `probe_simd_reduce_lat.metal`. AIR IR confirms:
+- `simd_sum()` → `call @air.simd_sum.f32` (8 sequential dependent calls per iter)
+- `simd_shuffle()` → `call @air.simd_shuffle.u.i32(val, idx)` (16 dependent, index derived from result)
+- `simd_broadcast()` → `call @air.simd_broadcast.f32(val, lane)` (8 dependent calls per iter)
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| Compiler emits simdgroup ops as AIR intrinsics? | **Yes** | `@air.simd_sum.f32`, `@air.simd_shuffle.u.i32`, `@air.simd_broadcast.f32` confirmed |
+| Can simdgroup ops form a dep chain at AIR level? | **Yes** — 16 dependent shuffles in AIR IR | `freeze` instructions inserted for poison-safe index computation |
+| simd_sum available for compute kernels? | **Yes** (confirmed AIR intrinsic) | Usable for cross-lane reduction without manual register shuffling |
+| simdgroup latency isolated? | **Pending** — xctrace timing for simd_reduce_lat probe not yet captured | Wave 2 probes need next tranche run |
+
+### Apple Metal GPU — occupancy vs register pressure
+
+Measured via xctrace Metal System Trace + metal_timing.csv. See `counter_latency_report.md`.
+
+| Pattern | ns/element | xctrace density (gpu-state r/s) | Decision |
+|---------|-----------|-------------------------------|----------|
+| baseline (1 uint acc, simdgroup reduce) | 257.55 | 2700.6 (reference) | Reference |
+| occupancy_heavy (3 accumulators, mixed ops) | **196.70** | **3379.1 (+678.5 r/s)** | **WINNER: use for high-throughput dispatches** |
+| register_pressure (3 FP acc + type casts) | 226.35 | 2090.7 (−609.9 r/s) | LOSER: avoid type-conversion-heavy loops |
+| threadgroup_minimal (arithmetic-dominant) | 199.04 | 3037.3 (+336.8 r/s) | Good alt to occupancy_heavy |
+| threadgroup_heavy (TG memory) | 213.73 | 2445.2 (−255.4 r/s) | TG memory overhead visible |
+
+**Rule**: On Apple Metal, minimize redundant type conversions (uint↔float casts) in
+hot loops. `@air.convert.f.f32.u.i32` appears in register_pressure but not occupancy_heavy;
+this is the dominant throughput difference.
+
+### Apple Metal GPU — critical gap
+
+`metal-gpu-counter-intervals` has ZERO hardware rows in ALL blessed runs (r5–r7,
+CDE, phaseE). The `Metal Application` xctrace template does NOT populate this table.
+
+**Required action**: use `capture_gpu_counters.sh` with `Metal GPU Counters` template.
+Until this is done, ALU utilization, memory bandwidth, L1/L2 cache hit rates, and
+SIMD utilization are **unknown** on Apple GPU.

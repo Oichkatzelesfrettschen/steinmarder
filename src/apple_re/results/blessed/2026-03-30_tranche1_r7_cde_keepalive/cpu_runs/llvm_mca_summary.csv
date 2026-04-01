@@ -1,0 +1,8 @@
+probe,unroll,measured_ns_per_op,measured_cycles_per_op,mca_ipc,mca_rthroughput,mca_cycles_per_op,latency_interpretation
+add_dep_u64,32,0.4876,1.56,1.48,26.0,1.62,~1.6 cycles/ADD → 1-cycle integer ADD latency (expected: 1 cycle on M-series)
+fadd_dep_f64,32,1.2318,3.94,0.82,26.0,3.03,~3.9 cycles/FADD → f64 FADD latency (expected: 3 cycles on M-series)
+fmadd_dep_f64,32,1.2961,4.15,0.82,26.0,3.18,~4.1 cycles/FMADD → f64 FMADD latency (expected: 4 cycles on M-series)
+load_store_chain_u64,96,0.3685,1.18,1.76,27.5,0.82,"~1.18 cycles/op → load+store+XOR chain, L1 dominant"
+shuffle_lane_cross_u64,32,1.3430,4.30,1.38,26.0,1.41,~4.3 cycles/op → bswap64+shift chain
+atomic_add_relaxed_u64,32,1.9127,6.12,,,N/A,~6.1 cycles/op → relaxed atomic fetch_add on M-series
+transcendental_sin_cos_f64,8,18.7310,59.94,1.48,26.0,7.51,"~60 cycles/sincos → sin+cos pair, slow transcendental unit"

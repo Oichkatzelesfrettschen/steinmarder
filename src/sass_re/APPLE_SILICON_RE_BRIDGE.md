@@ -148,6 +148,51 @@ For details, use [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md).
 - The bridge is best treated as a sibling research program, not as a rewrite of
   the Ada work.
 
+## Gap Analysis Cross-Link
+
+The full gap analysis between the Apple and CUDA tracks is in:
+
+- [`APPLE_TRACK_GAP_ANALYSIS.md`](APPLE_TRACK_GAP_ANALYSIS.md)
+
+It covers:
+- Tool-by-tool comparison (16 SASS tools vs Apple equivalents)
+- Probe coverage table (CPU: 14 types, Metal GPU: 19 types)
+- 16 identified gaps in 3 tiers (Critical, Important, Medium)
+- The single most impactful gap: `metal-gpu-counter-intervals` tables are
+  schema-only in all blessed runs — hardware counters require `Metal GPU Counters`
+  xctrace template (script: `capture_gpu_counters.sh`)
+
+## Current Evidence Status (as of 2026-04-01)
+
+### Confirmed measurements
+
+| Measurement | Value | Source |
+|-------------|-------|--------|
+| M-series integer ADD latency | 1 cycle | `cpu_runs/llvm_mca_analysis.md` (r7) |
+| M-series f64 FMADD latency | ~4 cycles | `cpu_runs/llvm_mca_analysis.md` (r7) |
+| M-series relaxed atomic add | ~6 cycles | `cpu_runs/llvm_mca_analysis.md` (r7) |
+| M-series sin+cos pair (libm) | ~60 cycles | `cpu_runs/llvm_mca_analysis.md` (r7) |
+| L1/L2 → SLC boundary | ~128–256 KB | `cpu_runs/cache_hierarchy_analysis.md` (r7) |
+| SLC → DRAM boundary | ~8–16 MB | `cpu_runs/cache_hierarchy_analysis.md` (r7) |
+| Fastest Metal variant | occupancy_heavy (196.7 ns/element) | `counter_latency_report.md` (r7) |
+| Density winner | occupancy_heavy (+678 r/s on gpu-state-intervals) | `counter_latency_report.md` (r7) |
+| FP32 FMA → AIR intrinsic | `@air.fma.f32` confirmed | `metal_air_opcode_inventory.md` |
+| simdgroup → AIR intrinsics | `@air.simd_sum.f32`, `@air.simd_shuffle.u.i32`, `@air.simd_broadcast.f32` | `metal_air_opcode_inventory.md` |
+| Threadgroup barrier → AIR | `call @air.wg.barrier` confirmed | `metal_air_opcode_inventory.md` |
+
+### AIR corpus (all probes compiled, 10 shaders)
+
+27 unique opcodes/intrinsics. Top: `call @air.fma.f32` (64), `zext` (51),
+`getelementptr` (51), `load` (43), `call @air.simd_shuffle.u.i32` (16).
+
+Still absent: atomics, texture sampling, simdgroup matrix ops (`simdgroup_matrix_multiply_accumulate`), fp16 variants.
+
+### Critical gap not yet resolved
+
+`metal-gpu-counter-intervals`: ZERO hardware rows in all 5 blessed runs.
+Run `scripts/capture_gpu_counters.sh` with `Metal GPU Counters` template to get:
+ALU utilization, memory bandwidth, L1/L2 cache hit rates, SIMD utilization.
+
 ## Best Starting Points
 
 - [`RESULTS.md`](RESULTS.md) for the NVIDIA measurement style this bridge is
@@ -156,5 +201,6 @@ For details, use [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md).
   for the longer Apple-specific translation
 - [`FRONTIER_ROADMAP_APPLE.md`](FRONTIER_ROADMAP_APPLE.md) for the concrete
   Apple checklist
+- [`APPLE_TRACK_GAP_ANALYSIS.md`](APPLE_TRACK_GAP_ANALYSIS.md) for the gap analysis
 - [`../apple_re/README.md`](../apple_re/README.md) for the current Apple subtree
   scaffold
