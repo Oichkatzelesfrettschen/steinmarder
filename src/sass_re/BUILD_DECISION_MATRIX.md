@@ -276,7 +276,8 @@ next person can answer “manual or compiler?” without re-reading every run lo
 | FLT16_TO_FLT32 (half conversion) | Yes — compiler uses native ops | No — conversion-only, no FP16 ALU | N/A | N/A | **Compiler wins: documented as conversion-only** |
 | DOT4_IEEE (4-component dot) | Yes — compiler packs into 4 vec slots | No — already uses all 4 slots in 1 cycle | N/A | N/A | **Compiler wins: verified via latency probes** |
 | PREV-chaining (MUL_PREV etc) | Partial — SFN uses PV forwarding extensively | Maybe — PREV variants save 1 GPR | <1% | -1 GPR | **Research: needs dependency analysis in SFN scheduler** |
-| Scratch spill (MEM_SCRATCH) | No — SFN asserts on >123 GPRs | Yes — infrastructure exists, needs spill logic | Enables compute | Enables compute | **Critical: blocks Rusticl kernel execution. NOT YET fixed; clpeak --global-bandwidth crashes here (float16 wide-vec + spill)** |
+| Wide-vector `load_global` (float8, float16) | No — `emit_load_global` called `dest_vec4` (registers only channels 0-3); components 4+ unreachable → `ssa_src` assert | Yes — emit one vec4 VFETCH per 4-component group via `temp_vec4()` + MOV to SSA slots (pin_free) | Enables `clpeak --global-bandwidth`; all 5 vector widths now measure correctly | +16 MOV per float16 load (negligible for bandwidth-bound kernels) | **FIXED (2026-04-01): sfn_shader.cpp `emit_load_global`. float8 peak = 38.85 GBPS; float16 = 28.79 GBPS** |
+| Scratch spill (MEM_SCRATCH) | No — SFN RA has no spill path; crashes when ngpr > 123 | Yes — infrastructure exists (`ScratchIOInstr`, `CF_OP_MEM_SCRATCH`, `evergreen_setup_scratch_buffers`); RA failure path not wired | Enables high-GPR compute | Increases latency | **Still pending: current clpeak kernels use 4-23 GPRs (well under 123 limit). Low priority until >123 GPR kernels appear** |
 | `evergreen_get_compute_state_info` occupancy | Hardcoded 128 (2 wavefronts, wrong) | Yes — compute `max_threads` from ngpr: `min(16, 256/ngpr) × wave_size` | Fixes `CL_INVALID_WORK_GROUP_SIZE (-54)` for all kernels using <32 GPRs | None | **FIXED (2026-04-01): evergreen_compute.c. Now 512 for 4-GPR kernels, consistent with device max 1024** |
 | Sub-32-bit INT (u2u8, i2i8 etc.) | No — SFN hit assert(0) for sub-32-bit conversion ops | Yes — `nir_lower_bit_size` promotes arithmetic; explicit `AND_INT`/`BFE_INT` handlers for conversions | Enables INT8/INT16 OpenCL paths | None | **FIXED (2026-04-01): sfn_nir.cpp + sfn_instr_alu.cpp. Verified: clpeak char=7.62, char4=15.21 GIOPS** |
 | INT8x4 packed MACC (UBYTE+MULADD) | No — compiler emits scalar loops | Yes — UBYTE0..3_FLT fills 4 vec slots in 1 bundle; PV-chained MULADD_IEEE in next bundle | 4× INT8 MACC per 2 VLIW cycles; t-slot free for parallel RCP | 9 GPRs per active chain; 36 for 4× unroll | **Target pattern: implement UBYTE→MULADD pipeline in compute kernels** |
@@ -304,19 +305,37 @@ next person can answer “manual or compiler?” without re-reading every run lo
 
 ### Measured clpeak throughput (2026-04-01, Mesa 26.0.3, AMD PALM HD 6310, debug build)
 
-All results via `RUSTICL_ENABLE=r600 clpeak` after sub-32-bit and occupancy fixes.
+All results via `LD_LIBRARY_PATH=/usr/local/mesa-debug/lib/x86_64-linux-gnu RUSTICL_ENABLE=r600 clpeak`.
 
 | Test | v1 | v2 | v4 | v8 | v16 | Peak | Notes |
 |------|----|----|----|----|-----|------|-------|
-| INT char (GIOPS) | 7.62 | 14.99 | **15.21** | 15.07 | 15.07 | 15.21 | INT8: MULLO_INT (t-slot) + ADD_INT (vec); v1 latency-bound |
-| INT int (GIOPS) | 7.34 | 14.56 | 14.51 | 14.56 | **14.67** | 14.97 | INT32: same MULLO_INT + ADD_INT pipeline |
-| FP32 (GFLOPS) | 14.96 | 29.46 | **58.16** | 41.54 | 44.49 | 58.62 | MULADD_IEEE (vec); v4 = 4-wide VLIW fills bundle; v8/v16 drop = GPR pressure |
+| Global BW (GBPS) | 10.38 | 18.22 | 30.35 | **36.38** | 28.79 | 38.85 | float8 peak; float16 drop = register pressure from 4 VFETCH + 16 MOV |
+| INT char (GIOPS) | 7.62 | 15.15 | 15.13 | 15.27 | **15.26** | 15.21 | INT8: MULLO_INT (t-slot) + ADD_INT (vec); v1 latency-bound |
+| INT short (GIOPS) | 7.70 | **15.03** | 15.03 | 14.98 | 15.03 | 15.03 | INT16: same pipeline as INT8 |
+| INT int (GIOPS) | 7.60 | **15.22** | 15.19 | 15.13 | 15.24 | 15.22 | INT32: same MULLO_INT + ADD_INT pipeline |
+| INT fast 24b (GIOPS) | 7.51 | 14.94 | **14.97** | 14.96 | 14.97 | 14.97 | MUL_UINT24 presumably; same trans-slot ceiling |
+| FP32 (GFLOPS) | 14.95 | 29.83 | **58.96** | 42.61 | 45.71 | 58.96 | MULADD_IEEE (vec); v4 = 4-wide VLIW fills bundle; v8/v16 drop = GPR pressure |
 
 Key observations:
-- **INT8 ≈ INT32 peak** (15.21 vs 14.97 GIOPS): both go through MULLO_INT (trans slot) + ADD_INT (vec). No 8-bit acceleration on TeraScale — packing wins come from UBYTE_FLT unpack, not native 8-bit ALU.
-- **FP32 v4 peak = 58.62 GFLOPS** = 4 × INT peak, confirming all 4 vec slots active for MULADD_IEEE.
-- **FP32 v8/v16 drop** (41-45 GFLOPS): register pressure from wide vectors reduces occupancy. Match: `min(16, 256/ngpr) × 64` occupancy formula.
+- **INT8 ≈ INT32 ≈ INT16 peak** (~15 GIOPS): all go through MULLO_INT (trans slot). No sub-32-bit acceleration — packing wins come from UBYTE_FLT unpack, not native 8-bit ALU.
+- **FP32 v4 peak = 58.96 GFLOPS** ≈ 4 × INT peak, confirming all 4 vec slots active for MULADD_IEEE.
+- **FP32 v8/v16 drop** (42-45 GFLOPS): register pressure from wide vectors reduces occupancy. Match: `min(16, 256/ngpr) × 64` occupancy formula.
+- **Global BW float8 peak** (38.85 GBPS): float16 drops to 28.79 because the `temp_vec4 + MOV` fix for wide loads consumes extra GPRs.
 - **Device clock unreported** (0 MHz): `r600_wavefront_size` / DPM not hooked in Rusticl `clinfo`.
+
+### VLIW t-slot packing analysis (2026-04-01)
+
+**Finding**: The `!has_lds_ready` guard in `sfn_scheduler.cpp:637` is NOT the primary blocker for t-slot utilization. The real constraint is the scheduler's one-instruction-per-group design.
+
+| Mechanism | How it works | Implication |
+|-----------|-------------|-------------|
+| Pre-formed `AluGroup` (emission time) | Code explicitly creates `AluGroup()` + adds multiple `AluInstr` → emitted as a unit | Gets multi-slot bundles (2-4 slots); these go to `alu_groups_ready` and are scheduled as pre-packed units |
+| Individual `AluInstr` (scheduler) | `schedule_alu` fills ONE slot per call, then `break`s | Gets 1-slot groups; `1 vec + 1 trans` per group IF trans op is ready simultaneously |
+| `!has_lds_ready` guard | Blocks t-slot ONLY when next `alu_vec_ready` op has LDS access | Harmless for non-LDS compute and all GL rendering shaders |
+
+**Fix path for better packing**: Pre-pack at emission time. For MULLO_INT followed by ADD_INT on independent data, emit as a 2-instruction `AluGroup` (MULLO in t-slot, ADD in x/y/z/w). Removing the scheduler `break` would help but risks disrupting latency-hiding TEX/ALU interleaving.
+
+**Current status**: `alu_trans_ready` ops CAN go in t-slot alongside one vec op. Dependency-chained kernels (clpeak) can't benefit regardless. Rendering shaders get t-slot packing for transcendental ops (SIN/COS/RCP) when an independent vec op is ready in the same scheduling round.
 
 ### Tool stack health
 
