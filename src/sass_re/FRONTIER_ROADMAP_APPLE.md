@@ -154,26 +154,71 @@ track:
 
 ## Checklist
 
-- [ ] Expand `sm_apple_cpu_latency` with explicit load/store, shuffle, and atomic
-  subchains plus transcendental tests.
-- [ ] Keep the CPU lane results in CSV/TSV tables that mirror the existing SASS
-  timing tables and disassemble targets with `objdump`.
-- [ ] Add the FS-event probe the host harness now references so `fs_usage_gpu_host.txt`
-  is never empty under keepalive runs.
-- [ ] Add the Metal variants: threadgroup-heavy, occupancy-heavy, register-pressure-heavy,
-  and the new register-pressure-light variant focused on occupancy deltas with minimal
-  threadgroup work.
-- [ ] Add the threadgroup-minimal variant to isolate occupancy with the smallest
-  threadgroup footprint that still produces a stable Metal trace.
-- [ ] Normalize `xctrace_row_density.csv` (rows/sec) and `xctrace_row_delta_summary.md`
-  into the Metal variant reports so density bias is communicated clearly.
-- [ ] Grade the stage-27 harness to emit `xctrace` metrics plus PID-scoped `gpu_host_leaks.txt`
-  / `gpu_host_vmmap.txt` captures every rerun of the tranche.
-- [ ] Keep `ANALYSIS_NEXT_STEPS.md`, `counter_latency_report.md`, and the zipped bundle
-  referenced in the README/docs index so downstream reviewers can grab the CUDA-grade
-  bundle.
+### Completed
+
+- [x] Expand `sm_apple_cpu_latency` with explicit load/store, shuffle, and atomic
+  subchains plus transcendental tests (7 probe families in r5/r7).
+- [x] Keep the CPU lane results in CSV/TSV tables that mirror the existing SASS
+  timing tables and disassemble targets with `objdump` (r5: `cpu_mnemonic_counts.csv`).
+- [x] Add the FS-event probe (`fs_usage_gpu_host.txt` populated in r7 via keepalive).
+- [x] Add the Metal variants: threadgroup-heavy, occupancy-heavy, register-pressure-heavy,
+  threadgroup-minimal — all present in r7.
+- [x] Normalize `xctrace_row_density.csv` and `xctrace_row_delta_summary.md` (r7).
+- [x] Grade the stage-27 harness to emit `xctrace` metrics plus PID-scoped
+  `gpu_host_leaks.txt` / `gpu_host_vmmap.txt` (r7).
+- [x] `counter_latency_report.md` and CUDA-grade bundle tarball present in r7.
+
+### Critical gaps (change build decisions)
+
+- [ ] **`xctrace gpu-counters` schema** — capture hardware GPU counters (ALU
+  utilization, tile cache hit rates, memory bandwidth) alongside Metal schemas.
+  Without this, we cannot answer "ALU-bound or memory-bound?" per variant.
+  See `APPLE_TRACK_GAP_ANALYSIS.md` §4.
+- [ ] **Metal dependent-chain latency probes** — add `probe_ffma_lat.metal`,
+  `probe_fadd_lat.metal`, `probe_imad_lat.metal` with 32-deep dependency chains.
+  Required to build a Metal analog to the SASS 448-mnemonic latency table.
+- [ ] **Metal independent-accumulator throughput probes** — add 8-accumulator
+  variants for FFMA, FADD, IMAD to separate latency from throughput.
+- [ ] **`llvm-mca` in every keepalive run** — present in r5, missing from r7.
+  Required for CPU-side latency-vs-predicted-throughput comparison.
+
+### Important gaps
+
+- [ ] **Metal simdgroup operation probes** — `simd_sum`, `simd_broadcast`,
+  `simd_shuffle`, `simd_prefix_inclusive_sum` dependent-chain probes. Currently
+  zero simdgroup intrinsics in any blessed AIR corpus.
+- [ ] **Metal threadgroup memory latency probe** — pointer-chase in `threadgroup`
+  buffer, analogous to SASS LDS latency measurement.
+- [ ] **Metal atomic probes** — `atomic_fetch_add` on threadgroup and device buffers.
+- [ ] **CPU pointer-chase cache sweep in blessed results** — `apple_cpu_cache_pressure.c`
+  exists but L1/L2/LLC boundary measurements are not in any promoted run.
+- [ ] **Metal register-light variant** — brackets density behavior below
+  `register_pressure` (per `NEXT42_APPLE_TRANCHE.md` Phase C step 15).
+- [ ] **`MTLCounterSet` host harness integration** — runtime GPU counter sampling
+  around each dispatch, per-dispatch granularity.
+
+### Medium gaps
+
+- [ ] **Neural lane blessed run** — Core ML placement sweep, torch CPU vs MPS,
+  MLX/JAX checks. Scripts exist in `scripts/`, no promoted results yet.
+- [ ] **Metal `flag_matrix_sweep`** — `metal -O0`, `-O1`, `-O2`, `-Os` comparison
+  on each shader variant. Shows compiler vs. manual patterns.
+- [ ] **Library mnemonic mining** — `otool -tv` on `Metal.framework`, `MPSCore`,
+  `Accelerate` to mine real-world operation usage, analogous to
+  `mine_cudnn_library_mnemonics.sh`.
+- [ ] **CPU integer multiply probe** — `UMULH`, `MADD`, `MSUB`, `SMULL` chains
+  are absent from current mnemonic corpus (only `add`, `fadd`, `fmadd` covered).
+- [ ] **CPU FP16 probes** — `FCVT`, `FMLA` (SIMD), half-precision dependent chains.
+- [ ] **Run `analyze_tranche_mnemonics.py` on every keepalive** — now run manually
+  for r7 (outputs: `cpu_mnemonic_counts.csv`, `metal_air_opcode_counts.csv`,
+  `mnemonic_interpretation.md`). Should be part of the phase-H synthesis step.
+
+### Documentation
+
 - [ ] Document every lane and bundle in the repo-level docs index (see `docs/README.md`)
   so the Apple track stands beside the NVIDIA and Ryzen stories.
+- [ ] Cross-link `APPLE_TRACK_GAP_ANALYSIS.md` from `APPLE_SILICON_RE_BRIDGE.md`
+  and `STACK_MAP.md`.
 
 ## Tranche 1 (64-step deep dive)
 
