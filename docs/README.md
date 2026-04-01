@@ -28,9 +28,27 @@ GPU shader assembly analysis, encoding research, and instant-NGP kernel optimiza
 | [FRONTIER_ROADMAP_RYZEN_5600X3D](../src/sass_re/FRONTIER_ROADMAP_RYZEN_5600X3D.md) | Ryzen 5600X3D frontier checklist and tool-stack mapping |
 | [RYZEN_5600X3D_RE_GUIDE](sass/RYZEN_5600X3D_RE_GUIDE.md) | Ryzen 5 5600X3D CPU + 3D V-Cache translation guide |
 
-### Apple track artifacts
+### Apple track artifacts (r7 blessed bundle — 2026-04-01)
+
+**CPU latency measurements (all probes, 2M iters, arm64 M-series):**
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/llvm_mca_analysis.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/llvm_mca_analysis.md) -- 7-probe MCA reliability table (ADD=1cyc, FMADD=4cyc, variable-shift 3× error, transcendental 8× error)
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/integer_multiply_latency.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/integer_multiply_latency.md) -- MUL/MADD/MSUB/UMULH/SMULL all = 3 cycles; MCA over-predicts by 67%
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/fp16_latency.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/fp16_latency.md) -- FP16 hardware same speed as f32/f64; PyTorch MPS 8× anomaly is framework issue
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/cache_pressure.csv`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/cache_pressure.csv) + [`cache_hierarchy_analysis.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/cpu_runs/cache_hierarchy_analysis.md) -- L1→SLC knee ~128-256 KB, SLC→DRAM ~8-16 MB
+
+**Metal GPU measurements:**
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/counter_latency_report.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/counter_latency_report.md) -- occupancy_heavy wins (196.7 ns/element, +678 r/s density); register_pressure penalty 35% in GPU time
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/gpu_commandbuffer_timing.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/gpu_commandbuffer_timing.md) -- GPU-actual 14-22× faster than CPU wall-clock; waitUntilCompleted dominates
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/metal_air_opcode_inventory.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/metal_air_opcode_inventory.md) -- 30 unique AIR opcodes; Metal atomics use @air.atomic.local/global.add, NOT atomicrmw
+
+**Neural lane:**
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/neural_lane_results.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/neural_lane_results.md) -- MPS crossover ~1024×1024; CoreML ANE confirmed; f16 anomaly flagged
+
+**Library mnemonic mining:**
+- [`../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/library_mnemonic_mining.md`](../src/apple_re/results/blessed/2026-03-30_tranche1_r7_cde_keepalive/library_mnemonic_mining.md) -- **Accelerate uses AMX (not NEON)** for n≥20480; 53 AMX opcodes in vDSP_vadd hot path
+
+**Probe bundles:**
 - [`../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md`](../src/apple_re/results/blessed/KEEPALIVE_SUMMARY.md) -- promoted Apple keepalive summary + CUDA-grade evidence bundle
-- [`../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz`](../src/apple_re/results/blessed/2026-03-30_tranche1_keepalive_cuda_grade_bundle.tar.gz) -- compressed promoted Apple keepalive evidence
 - [`../src/sass_re/NEXT42_APPLE_TRANCHE.md`](../src/sass_re/NEXT42_APPLE_TRANCHE.md) -- next 42-step promoted Apple run checklist and artifact map
 
 **See also:** [`src/sass_re/`](../src/sass_re/) for the full toolkit:

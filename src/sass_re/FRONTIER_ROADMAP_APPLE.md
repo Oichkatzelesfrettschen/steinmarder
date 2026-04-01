@@ -227,8 +227,9 @@ track:
 
 ### Documentation
 
-- [ ] Document every lane and bundle in the repo-level docs index (see `docs/README.md`)
-  so the Apple track stands beside the NVIDIA and Ryzen stories.
+- [x] Document every lane and bundle in the repo-level docs index (`docs/README.md`).
+  Apple track r7 blessed bundle now has dedicated artifact table covering CPU latency,
+  Metal GPU measurements, neural lane, and library mnemonic mining (AMX discovery).
 - [x] Cross-link `APPLE_TRACK_GAP_ANALYSIS.md` from `APPLE_SILICON_RE_BRIDGE.md`
   and `STACK_MAP.md`.
 
