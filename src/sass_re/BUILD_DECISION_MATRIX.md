@@ -276,7 +276,13 @@ next person can answer “manual or compiler?” without re-reading every run lo
 | FLT16_TO_FLT32 (half conversion) | Yes — compiler uses native ops | No — conversion-only, no FP16 ALU | N/A | N/A | **Compiler wins: documented as conversion-only** |
 | DOT4_IEEE (4-component dot) | Yes — compiler packs into 4 vec slots | No — already uses all 4 slots in 1 cycle | N/A | N/A | **Compiler wins: verified via latency probes** |
 | PREV-chaining (MUL_PREV etc) | Partial — SFN uses PV forwarding extensively | Maybe — PREV variants save 1 GPR | <1% | -1 GPR | **Research: needs dependency analysis in SFN scheduler** |
-| Scratch spill (MEM_SCRATCH) | No — SFN asserts on >123 GPRs | Yes — infrastructure exists, needs spill logic | Enables compute | Enables compute | **Critical: blocks Rusticl kernel execution** |
+| Scratch spill (MEM_SCRATCH) | No — SFN asserts on >123 GPRs | Yes — infrastructure exists, needs spill logic | Enables compute | Enables compute | **Critical: blocks Rusticl kernel execution. NOT YET fixed; clpeak --global-bandwidth crashes here (float16 wide-vec + spill)** |
+| `evergreen_get_compute_state_info` occupancy | Hardcoded 128 (2 wavefronts, wrong) | Yes — compute `max_threads` from ngpr: `min(16, 256/ngpr) × wave_size` | Fixes `CL_INVALID_WORK_GROUP_SIZE (-54)` for all kernels using <32 GPRs | None | **FIXED (2026-04-01): evergreen_compute.c. Now 512 for 4-GPR kernels, consistent with device max 1024** |
+| Sub-32-bit INT (u2u8, i2i8 etc.) | No — SFN hit assert(0) for sub-32-bit conversion ops | Yes — `nir_lower_bit_size` promotes arithmetic; explicit `AND_INT`/`BFE_INT` handlers for conversions | Enables INT8/INT16 OpenCL paths | None | **FIXED (2026-04-01): sfn_nir.cpp + sfn_instr_alu.cpp. Verified: clpeak char=7.62, char4=15.21 GIOPS** |
+| INT8x4 packed MACC (UBYTE+MULADD) | No — compiler emits scalar loops | Yes — UBYTE0..3_FLT fills 4 vec slots in 1 bundle; PV-chained MULADD_IEEE in next bundle | 4× INT8 MACC per 2 VLIW cycles; t-slot free for parallel RCP | 9 GPRs per active chain; 36 for 4× unroll | **Target pattern: implement UBYTE→MULADD pipeline in compute kernels** |
+| Q8.8 × Q8.8 fixed-point multiply | No — SFN has no fixed-point path | Manual: MULLO_INT + ASHR_INT 8 (INT path) OR INT_TO_FLT + MULADD + FLT_TO_INT (FP path) | INT path: trans-slot MULLO, 1 cycle + 1 ASHR. FP path: 3 cycles but uses KCACHE scale | MULLO_INT uses trans slot (bottleneck) | **Use FP32 path for throughput; INT path only when FP precision insufficient** |
+| Q16.16 × Q16.16 (full 32-bit fixed-pt) | No | MULLO_INT (low) + MULHI_INT (high) + LSHL/LSHR/OR to reassemble | 3 bundles; MULLO and MULHI compete for trans slot — require 4× unroll to hide 4-cycle latency | +16 GPRs for 4× unroll | **Use for general fixed-point; measure MULLO latency before committing** |
+| Q4.4 packed (4× per register) | No | UBYTE_FLT unpack (4 vec slots) + MULADD + AND 0xF repack | 3 bundles for one packed Q4.4 MACC; t-slot free throughout | Same as INT8 packed path | **Use UBYTE_FLT path; Q4.4 range too narrow for most neural weights** |
 
 ### Measured latencies (steinmarder dependent-chain methodology)
 
@@ -295,6 +301,22 @@ next person can answer “manual or compiler?” without re-reading every run lo
 | BFE_UINT | UINT bit-field | vec | 1 cycle | 4/cycle | **Inferred** |
 | ADD_64 | FP64 | vec pair | ~2 cycles (dual-slot) | 2/cycle | **Untested** |
 | MUL_64 | FP64 | vec pair | ~2 cycles (dual-slot) | 2/cycle | **Untested** |
+
+### Measured clpeak throughput (2026-04-01, Mesa 26.0.3, AMD PALM HD 6310, debug build)
+
+All results via `RUSTICL_ENABLE=r600 clpeak` after sub-32-bit and occupancy fixes.
+
+| Test | v1 | v2 | v4 | v8 | v16 | Peak | Notes |
+|------|----|----|----|----|-----|------|-------|
+| INT char (GIOPS) | 7.62 | 14.99 | **15.21** | 15.07 | 15.07 | 15.21 | INT8: MULLO_INT (t-slot) + ADD_INT (vec); v1 latency-bound |
+| INT int (GIOPS) | 7.34 | 14.56 | 14.51 | 14.56 | **14.67** | 14.97 | INT32: same MULLO_INT + ADD_INT pipeline |
+| FP32 (GFLOPS) | 14.96 | 29.46 | **58.16** | 41.54 | 44.49 | 58.62 | MULADD_IEEE (vec); v4 = 4-wide VLIW fills bundle; v8/v16 drop = GPR pressure |
+
+Key observations:
+- **INT8 ≈ INT32 peak** (15.21 vs 14.97 GIOPS): both go through MULLO_INT (trans slot) + ADD_INT (vec). No 8-bit acceleration on TeraScale — packing wins come from UBYTE_FLT unpack, not native 8-bit ALU.
+- **FP32 v4 peak = 58.62 GFLOPS** = 4 × INT peak, confirming all 4 vec slots active for MULADD_IEEE.
+- **FP32 v8/v16 drop** (41-45 GFLOPS): register pressure from wide vectors reduces occupancy. Match: `min(16, 256/ngpr) × 64` occupancy formula.
+- **Device clock unreported** (0 MHz): `r600_wavefront_size` / DPM not hooked in Rusticl `clinfo`.
 
 ### Tool stack health
 

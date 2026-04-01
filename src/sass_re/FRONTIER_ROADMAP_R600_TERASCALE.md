@@ -78,9 +78,12 @@ Follows the steinmarder methodology: probe → measure → decide → build.
 | Mesa debug rebuild | debugoptimized + LTO at `/usr/local/mesa-debug/` | Mesa 26.0.3 |
 | Modesetting DDX | Switched from radeon DDX to modesetting for DRI3 GLX | xorg.conf.d |
 | Terakan headless VK | VK_EXT_headless_surface fixed in Terakan desktop build | terakan_init.c |
-| r600 compute RAT | Kernel writes zeros — RAT readback bug under investigation | Task #15 (open) |
+| r600 compute RAT | 7-bug RCA fixed: cb_color_base reloc, compute_cb_target_mask, CS_PARTIAL_FLUSH, PIPE_FLUSH_ASYNC | evergreen_compute.c |
 | Branch prediction | Mesa r600/gallium hot path branches optimized + measured | sfn_*.cpp |
 | Cache-coherent data | r600 state emission redesigned for cache-friendly traversal | r600_state.c |
+| Sub-32-bit INT compiler | `nir_lower_bit_size` + u2u8/i2i8/u2u16/i2i16/u2u32/i2i32 handlers in SFN | sfn_nir.cpp + sfn_instr_alu.cpp |
+| INT8x4 VLIW packing | UBYTE0..3_FLT fills 4 vec slots in 1 bundle + PV-chained MULADD = 4 MACC/cycle | BUILD_DECISION_MATRIX.md |
+| Q-format analysis | Q4.4/Q8.8/Q16.16/Q4.28 mapped to hardware ops; FP32 path preferred for Q8.8 | BUILD_DECISION_MATRIX.md |
 
 ## Missing Evidence (Probe Gaps)
 
@@ -162,6 +165,81 @@ Following BUILD_DECISION_MATRIX.md methodology:
    HURTS because GPU is 62-75% idle waiting for CPU.
    - Evidence: VLIW5 scheduler optimization REGRESSED from 450→141 FPS
    - Verdict: Minimize CPU work, maximize GPU autonomy
+
+## Sub-32-bit Integer and Fixed-Point Packing
+
+### Register model
+
+TeraScale-2 has no native 8/16-bit ALU. All 128 GPRs are 32-bit. Sub-word types
+are handled by masking (unsigned truncation) and bit-field extraction (signed
+sign-extension). The SFN fix adds:
+
+- `nir_lower_bit_size` pass in `sfn_nir.cpp`: promotes arithmetic ops (iadd8,
+  imul8, etc.) to 32-bit before SFN sees them
+- Explicit handlers in `sfn_instr_alu.cpp`:
+  - `u2u8`, `u2u16`: `AND_INT dest, src, 0xFF/0xFFFF`
+  - `i2i8`, `i2i16`: `BFE_INT dest, src, 0, 8/16` (sign-extend)
+  - `u2u32`, `i2i32`: mask or sign-extend from source bit-size
+
+### Packing ratios
+
+| Type | Per register | Method |
+|------|-------------|--------|
+| FP32 | 1 | native |
+| FP16 | 2 | `pack_half_2x16` |
+| INT16 / UINT16 | 2 | `BFI_INT` + `LSHL_INT` + `OR_INT` |
+| INT8 / UINT8 | 4 | `AND 0xFF` + `LSHL 8/16/24` + `OR_INT` |
+| INT4 / UINT4 | 8 | `AND 0xF` + `LSHL 4/8/12...` + `OR_INT` |
+
+### UBYTE_FLT — the hardware accelerated INT8 → FP32 unpack
+
+The `UBYTE0_FLT..UBYTE3_FLT` opcodes each extract one byte of a packed INT32
+and convert to FP32 in a single cycle. All four fit in one VLIW5 bundle (4 vec
+slots), leaving the trans (t) slot free for RCP or any other transcendental.
+
+```
+VLIW5 bundle — 4 INT8 unpack in 1 cycle:
+  x: UBYTE0_FLT  f.x, packed.x    ; byte 0 [0:7]
+  y: UBYTE1_FLT  f.y, packed.x    ; byte 1 [8:15]
+  z: UBYTE2_FLT  f.z, packed.x    ; byte 2 [16:23]
+  w: UBYTE3_FLT  f.w, packed.x    ; byte 3 [24:31]
+  t: RCP         inv255, c255      ; free slot
+
+Next bundle reads PV (forwarded), no stall:
+  x: MULADD_IEEE acc.x, PV.x, wt.x, acc.x
+  y: MULADD_IEEE acc.y, PV.y, wt.y, acc.y
+  z: MULADD_IEEE acc.z, PV.z, wt.z, acc.z
+  w: MULADD_IEEE acc.w, PV.w, wt.w, acc.w
+```
+
+This gives **4 INT8-backed FP32 MACC per 2 VLIW cycles** — the optimal inner
+loop for neural inference on TeraScale-2.
+
+### Q-format fixed-point decision table
+
+| Format | Bits | Packed/reg | Best multiply path | Notes |
+|--------|------|-----------|-------------------|-------|
+| Q4.4 | 8 | 4 | UBYTE_FLT unpack → FP32 MULADD → AND 0xF | Range [-8, +7.9375] |
+| Q8.8 | 16 | 2 | FP32: INT_TO_FLT / 256.0 → MUL → FLT_TO_INT * 256.0 | FP32 has 24-bit mantissa; Q8.8 (16-bit) fits exactly |
+| Q16.16 | 32 | 1 | MULLO_INT (lo) + MULHI_INT (hi), LSHR 16 + LSHL 16 + OR | Requires 4× unroll to hide 4-cycle MULLO latency |
+| Q4.28 | 32 | 1 | MULLO_INT + MULHI_INT, LSHR 28 | For unit-length vectors; same as Q16.16 path |
+| Q8.24 | 32 | 1 | Same as Q16.16 | |
+
+**Scale factor loading**: keep `1/256.0`, `256.0`, `1/65536.0`, `65536.0`
+in KCACHE (1-cycle access) to avoid constant-buffer latency in the inner loop.
+
+### Novel hardware paths (weak CPU — avoid CPU work)
+
+1. **CF_LOOP**: submit once, GPU iterates N times on-chip. Zero CPU re-dispatch.
+2. **KCACHE pre-load**: scale factors, bias terms in KCACHE before shader start.
+3. **APU zero-copy GTT**: CPU writes input directly to GART-mapped system RAM;
+   GPU reads without DMA. No `radeon_bo_move` overhead on this Fusion APU.
+4. **RAT write coalescing**: linear thread-ID → linear address mapping = 1
+   memory transaction per 64-thread wavefront.
+5. **Dual-SIMD wavefront interleave**: 2 active wavefronts hide VRAM latency
+   during MULLO_INT's 4-cycle stall.
+6. **TEX activation lookup**: 1D texture as 256-element INT8 lookup table;
+   TEX unit reads 4 FP32 values per cycle, offloading activation compute.
 
 ## Companion Docs
 
