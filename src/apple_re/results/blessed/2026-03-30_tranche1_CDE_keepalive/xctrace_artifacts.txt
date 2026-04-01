@@ -1,0 +1,5 @@
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_CDE_keepalive_20260330_190100/cpu_time_profiler.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_CDE_keepalive_20260330_190100/gpu_baseline.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_CDE_keepalive_20260330_190100/gpu_occupancy_heavy.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_CDE_keepalive_20260330_190100/gpu_register_pressure.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_CDE_keepalive_20260330_190100/gpu_threadgroup_heavy.trace

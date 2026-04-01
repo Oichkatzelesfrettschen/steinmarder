@@ -1,0 +1,16 @@
+opcode,count
+add,11
+xor,10
+shl,7
+zext,6
+getelementptr,6
+br,6
+store,5
+tail_call,3
+ret,3
+mul,3
+phi,3
+and,3
+icmp,3
+load,3
+lshr,2

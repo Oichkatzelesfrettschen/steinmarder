@@ -1,0 +1,2 @@
+leaks[43056]: leaks cannot examine process 42989 (with name like '42989') because it no longer appears to be running.
+leaks[43056]: [fatal] mach port for process 0 not valid

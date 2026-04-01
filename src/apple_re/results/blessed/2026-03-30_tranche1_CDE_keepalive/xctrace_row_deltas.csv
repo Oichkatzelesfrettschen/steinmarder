@@ -1,0 +1,16 @@
+variant_trace,schema,baseline_rows,variant_rows,delta_rows,delta_pct
+gpu_occupancy_heavy.trace,metal-application-encoders-list,997,797,-200,-20.06%
+gpu_occupancy_heavy.trace,metal-command-buffer-completed,1075,906,-169,-15.72%
+gpu_occupancy_heavy.trace,metal-driver-intervals,2413,2261,-152,-6.30%
+gpu_occupancy_heavy.trace,metal-gpu-intervals,1655,1854,199,12.02%
+gpu_occupancy_heavy.trace,metal-gpu-state-intervals,3100,3460,360,11.61%
+gpu_register_pressure.trace,metal-application-encoders-list,997,800,-197,-19.76%
+gpu_register_pressure.trace,metal-command-buffer-completed,1075,876,-199,-18.51%
+gpu_register_pressure.trace,metal-driver-intervals,2413,1785,-628,-26.03%
+gpu_register_pressure.trace,metal-gpu-intervals,1655,1010,-645,-38.97%
+gpu_register_pressure.trace,metal-gpu-state-intervals,3100,1974,-1126,-36.32%
+gpu_threadgroup_heavy.trace,metal-application-encoders-list,997,800,-197,-19.76%
+gpu_threadgroup_heavy.trace,metal-command-buffer-completed,1075,872,-203,-18.88%
+gpu_threadgroup_heavy.trace,metal-driver-intervals,2413,1800,-613,-25.40%
+gpu_threadgroup_heavy.trace,metal-gpu-intervals,1655,1043,-612,-36.98%
+gpu_threadgroup_heavy.trace,metal-gpu-state-intervals,3100,2011,-1089,-35.13%
