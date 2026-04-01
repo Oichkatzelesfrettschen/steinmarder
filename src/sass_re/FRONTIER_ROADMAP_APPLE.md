@@ -173,51 +173,57 @@ track:
 - [ ] **`xctrace gpu-counters` schema** — capture hardware GPU counters (ALU
   utilization, tile cache hit rates, memory bandwidth) alongside Metal schemas.
   Without this, we cannot answer "ALU-bound or memory-bound?" per variant.
+  Script ready: `capture_gpu_counters.sh`. Needs next tranche run.
   See `APPLE_TRACK_GAP_ANALYSIS.md` §4.
-- [ ] **Metal dependent-chain latency probes** — add `probe_ffma_lat.metal`,
-  `probe_fadd_lat.metal`, `probe_imad_lat.metal` with 32-deep dependency chains.
-  Required to build a Metal analog to the SASS 448-mnemonic latency table.
-- [ ] **Metal independent-accumulator throughput probes** — add 8-accumulator
-  variants for FFMA, FADD, IMAD to separate latency from throughput.
-- [ ] **`llvm-mca` in every keepalive run** — present in r5, missing from r7.
-  Required for CPU-side latency-vs-predicted-throughput comparison.
+- [x] **Metal dependent-chain latency probes** — `probe_ffma_lat.metal` (32-deep
+  dep chain), `probe_tgsm_lat.metal` (TGSM pointer-chase). AIR confirmed.
+- [x] **Metal independent-accumulator throughput probes** — `probe_ffma_tput.metal`
+  (8 independent accumulators, 32 FMA ops/iter). AIR confirmed: 17 phi nodes.
+- [x] **`llvm-mca` in every keepalive run** — `cpu_runs/llvm_mca_analysis.md` and
+  `llvm_mca_summary.csv` in r7. 7 probes analyzed, M-series constants confirmed.
 
 ### Important gaps
 
-- [ ] **Metal simdgroup operation probes** — `simd_sum`, `simd_broadcast`,
-  `simd_shuffle`, `simd_prefix_inclusive_sum` dependent-chain probes. Currently
-  zero simdgroup intrinsics in any blessed AIR corpus.
-- [ ] **Metal threadgroup memory latency probe** — pointer-chase in `threadgroup`
-  buffer, analogous to SASS LDS latency measurement.
-- [ ] **Metal atomic probes** — `atomic_fetch_add` on threadgroup and device buffers.
-- [ ] **CPU pointer-chase cache sweep in blessed results** — `apple_cpu_cache_pressure.c`
-  exists but L1/L2/LLC boundary measurements are not in any promoted run.
-- [ ] **Metal register-light variant** — brackets density behavior below
-  `register_pressure` (per `NEXT42_APPLE_TRANCHE.md` Phase C step 15).
-- [ ] **`MTLCounterSet` host harness integration** — runtime GPU counter sampling
-  around each dispatch, per-dispatch granularity.
+- [x] **Metal simdgroup operation probes** — `probe_simd_reduce_lat.metal` with
+  `simd_sum`, `simd_broadcast`, `simd_shuffle` dependent chains. AIR confirmed:
+  `@air.simd_sum.f32`, `@air.simd_shuffle.u.i32`, `@air.simd_broadcast.f32`.
+- [x] **Metal threadgroup memory latency probe** — `probe_tgsm_lat.metal`:
+  32-deep pointer-chase through 256-word threadgroup array, wg.barrier. AIR confirmed.
+- [x] **Metal atomic probes** — `probe_atomic_add.metal`: `probe_atomic_tgsm_lat`
+  (32-deep serial chain on threadgroup `atomic_uint`) and `probe_atomic_device_lat`
+  (same on device buffer). Key finding: Metal does NOT emit `atomicrmw`; the compiler
+  emits AIR-specific intrinsics: `@air.atomic.local.add.u.i32` (TGSM, 33×) and
+  `@air.atomic.global.add.u.i32` (device, 33×).
+- [x] **CPU pointer-chase cache sweep in blessed results** — `cpu_runs/cache_pressure.csv`
+  and `cache_hierarchy_analysis.md` in r7. L1→SLC ~128-256 KB, SLC→DRAM ~8-16 MB.
+- [x] **Metal register-light variant** — `probe_register_light.metal`: single uint
+  LCG accumulator. AIR confirms 6 total instructions, no FP, no temps.
+- [x] **`MTLCounterSet` host harness integration** — `metal_probe_host.m` updated
+  with `--list-counters` and `--counters SETNAME`. Uses `commandBuffer.GPUStartTime/
+  GPUEndTime` (universally supported). AGXG13G: dispatch-boundary sampling unsupported.
+  Key finding: GPU-actual is 14–22× faster than CPU wall-clock. See `gpu_commandbuffer_timing.md`.
 
 ### Medium gaps
 
-- [ ] **Neural lane blessed run** — Core ML placement sweep, torch CPU vs MPS,
-  MLX/JAX checks. Scripts exist in `scripts/`, no promoted results yet.
-- [ ] **Metal `flag_matrix_sweep`** — `metal -O0`, `-O1`, `-O2`, `-Os` comparison
-  on each shader variant. Shows compiler vs. manual patterns.
+- [x] **Neural lane blessed run** — `neural_lane_results.md` in r7. PyTorch MPS
+  crossover ~1024×1024; coremltools 9.0 all compute units; MLX 0.31.1 GPU default;
+  JAX METAL experimental. f16 anomaly flagged.
+- [x] **Metal `flag_matrix_sweep`** — `run_metal_flag_sweep.sh` written and tested.
+  -O0 → -O2: 420 → 48 instructions for `probe_ffma_lat` (stack spills eliminated).
 - [ ] **Library mnemonic mining** — `otool -tv` on `Metal.framework`, `MPSCore`,
-  `Accelerate` to mine real-world operation usage, analogous to
-  `mine_cudnn_library_mnemonics.sh`.
+  `Accelerate` to mine real-world operation usage.
 - [ ] **CPU integer multiply probe** — `UMULH`, `MADD`, `MSUB`, `SMULL` chains
-  are absent from current mnemonic corpus (only `add`, `fadd`, `fmadd` covered).
+  absent from mnemonic corpus.
 - [ ] **CPU FP16 probes** — `FCVT`, `FMLA` (SIMD), half-precision dependent chains.
-- [ ] **Run `analyze_tranche_mnemonics.py` on every keepalive** — now run manually
-  for r7 (outputs: `cpu_mnemonic_counts.csv`, `metal_air_opcode_counts.csv`,
-  `mnemonic_interpretation.md`). Should be part of the phase-H synthesis step.
+  PyTorch MPS f16 anomaly (8× slower than f32) motivates this.
+- [x] **Run `analyze_tranche_mnemonics.py` on every keepalive** — automated in
+  phase-H `mnemonic_synthesis` step of `run_apple_tranche1.sh`.
 
 ### Documentation
 
 - [ ] Document every lane and bundle in the repo-level docs index (see `docs/README.md`)
   so the Apple track stands beside the NVIDIA and Ryzen stories.
-- [ ] Cross-link `APPLE_TRACK_GAP_ANALYSIS.md` from `APPLE_SILICON_RE_BRIDGE.md`
+- [x] Cross-link `APPLE_TRACK_GAP_ANALYSIS.md` from `APPLE_SILICON_RE_BRIDGE.md`
   and `STACK_MAP.md`.
 
 ## Tranche 1 (64-step deep dive)

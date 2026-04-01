@@ -393,6 +393,29 @@ Measured via xctrace Metal System Trace + metal_timing.csv. See `counter_latency
 hot loops. `@air.convert.f.f32.u.i32` appears in register_pressure but not occupancy_heavy;
 this is the dominant throughput difference.
 
+### Apple Metal GPU — atomic operations
+
+Measured via `probe_atomic_add.metal` (wave 3, AIR confirmed). Critical AIR-level finding:
+Metal does NOT emit generic LLVM `atomicrmw` instructions. It uses architecture-specific
+AIR atomic intrinsics:
+
+| Metal source | AIR intrinsic | Address space |
+|-------------|---------------|---------------|
+| `atomic_fetch_add_explicit(tgsm_ptr, ...)` | `@air.atomic.local.add.u.i32` | addrspace(3) — threadgroup |
+| `atomic_fetch_add_explicit(device_ptr, ...)` | `@air.atomic.global.add.u.i32` | addrspace(1) — device/global |
+| `atomic_store_explicit(tgsm_ptr, 0, ...)` | `@air.atomic.local.store.i32` | addrspace(3) — threadgroup |
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| Compiler emits TGSM atomics as AIR intrinsics? | **Yes — `@air.atomic.local.add.u.i32`** | probe_atomic_tgsm_lat: 33 calls |
+| Compiler emits device atomics as AIR intrinsics? | **Yes — `@air.atomic.global.add.u.i32`** | probe_atomic_device_lat: 33 calls |
+| Dep-chain structure preserved through atomic ops? | **Yes** — acc used as addend each iteration | Each call's return value feeds the next add delta |
+| CPU `atomic_add` vs Metal threadgroup atomic? | CPU relaxed add: ~6 cyc; TGSM timing: **pending next tranche run** | Need GPU-actual timing with --counters timestamp |
+| Use threadgroup atomics for reduction? | **Prefer simd_sum** — `@air.simd_sum.f32` is a single intrinsic | Atomic accumulation under contention serializes all threads |
+
+**Build decision**: for cross-lane reduction, prefer `simd_sum()` (one `@air.simd_sum.f32`)
+over per-thread threadgroup atomic accumulation (all threads serialize on one address).
+
 ### Apple Metal GPU — critical gap
 
 `metal-gpu-counter-intervals` has ZERO hardware rows in ALL blessed runs (r5–r7,

@@ -3,44 +3,47 @@
 - date: 2026-04-01
 - Metal SDK: Apple metal version 32023.830 (air64_v28)
 - compiler flags: `xcrun metal -S -emit-llvm -O2`
-- shaders: 10 kernel probes across 10 .metal files
+- shaders: 12 kernel probes across 11 .metal files (wave 3 added probe_atomic_add.metal)
 - context: cross-run corpus covering all probe variants ever compiled
 
-## Cumulative AIR Opcode Corpus (10 shaders)
+## Cumulative AIR Opcode Corpus (12 kernels, 11 shaders)
 
 | Rank | Opcode | Count | Category |
 |------|--------|-------|----------|
-| 1 | `call @air.fma.f32` | 64 | FP32 FMA intrinsic (new in wave 2) |
-| 2 | `zext` | 51 | integer zero-extend |
-| 3 | `getelementptr` | 51 | pointer arithmetic |
-| 4 | `load` | 43 | memory load |
-| 5 | `phi` | 42 | SSA phi node |
-| 6 | `xor` | 37 | integer XOR |
-| 7 | `add` | 34 | integer add |
-| 8 | `fadd` | 27 | FP32 add |
-| 9 | `br` | 24 | branch |
-| 10 | `and` | 24 | integer AND |
-| 11 | `freeze` | 24 | LLVM freeze (poison prevention) |
-| 12 | `fmul` | 22 | FP32 mul |
-| 13 | `icmp` | 19 | integer compare |
-| 14 | `store` | 16 | memory store |
-| 15 | `trunc` | 16 | integer truncate |
-| 16 | `call @air.simd_shuffle.u.i32` | 16 | simdgroup shuffle (NEW) |
-| 17 | `shl` | 14 | shift left |
-| 18 | `ret` | 12 | return |
-| 19 | `mul` | 9 | integer mul |
-| 20 | `call @air.convert.f.f32.u.i32` | 8 | uint32 → float32 |
-| 21 | `call @air.simd_sum.f32` | 8 | simdgroup reduction sum (NEW) |
-| 22 | `call @air.simd_broadcast.f32` | 8 | simdgroup broadcast (NEW) |
-| 23 | `call @air.wg.barrier` | 5 | threadgroup barrier (NEW) |
-| 24 | `lshr` | 4 | logical shift right |
-| 25 | `or` | 3 | integer OR |
-| 26 | `call @air.convert.u.i32.f.f32` | 1 | float32 → uint32 |
-| 27 | `call @llvm.fshl.i32` | 1 | funnel shift left |
+| 1 | `call @air.fma.f32` | 64 | FP32 FMA intrinsic |
+| 2 | `call @air.atomic.global.add.u.i32` | 33 | device-buffer atomic add (wave 3) |
+| 3 | `call @air.atomic.local.add.u.i32` | 33 | threadgroup atomic add (wave 3) |
+| 4 | `zext` | 51 | integer zero-extend |
+| 5 | `getelementptr` | 51 | pointer arithmetic |
+| 6 | `load` | 43 | memory load |
+| 7 | `phi` | 42 | SSA phi node |
+| 8 | `xor` | 37 | integer XOR |
+| 9 | `add` | 36 | integer add |
+| 10 | `fadd` | 27 | FP32 add |
+| 11 | `br` | 26 | branch |
+| 12 | `and` | 24 | integer AND |
+| 13 | `freeze` | 24 | LLVM freeze (poison prevention) |
+| 14 | `fmul` | 22 | FP32 mul |
+| 15 | `icmp` | 21 | integer compare |
+| 16 | `store` | 18 | memory store |
+| 17 | `trunc` | 16 | integer truncate |
+| 18 | `call @air.simd_shuffle.u.i32` | 16 | simdgroup shuffle |
+| 19 | `shl` | 14 | shift left |
+| 20 | `ret` | 14 | return |
+| 21 | `mul` | 9 | integer mul |
+| 22 | `call @air.convert.f.f32.u.i32` | 8 | uint32 → float32 |
+| 23 | `call @air.simd_sum.f32` | 8 | simdgroup reduction sum |
+| 24 | `call @air.simd_broadcast.f32` | 8 | simdgroup broadcast |
+| 25 | `call @air.wg.barrier` | 7 | threadgroup barrier |
+| 26 | `call @air.atomic.local.store.i32` | 2 | threadgroup atomic store (init) (wave 3) |
+| 27 | `lshr` | 4 | logical shift right |
+| 28 | `or` | 3 | integer OR |
+| 29 | `call @air.convert.u.i32.f.f32` | 1 | float32 → uint32 |
+| 30 | `call @llvm.fshl.i32` | 1 | funnel shift left |
 
-Total unique opcodes/intrinsics: **27**
+Total unique opcodes/intrinsics: **30** (+3 from wave 3)
 
-## Wave 1 vs Wave 2 Delta
+## Wave 1 vs Wave 2 vs Wave 3 Delta
 
 Wave 1 shaders (baseline, occupancy_heavy, register_pressure, threadgroup_heavy,
 threadgroup_minimal, simdgroup_reduce) had 19 unique ops with zero coverage of:
@@ -51,10 +54,23 @@ threadgroup_minimal, simdgroup_reduce) had 19 unique ops with zero coverage of:
 - `@air.wg.barrier`
 
 Wave 2 added 5 shaders (ffma_lat, ffma_tput, tgsm_lat, simd_reduce_lat,
-register_light) and filled ALL of those gaps.
+register_light) and filled ALL of those gaps → **27 unique ops**.
 
 **New intrinsics added by wave 2:** `@air.fma.f32`, `@air.simd_shuffle.u.i32`,
 `@air.simd_sum.f32`, `@air.simd_broadcast.f32`, `@air.wg.barrier`
+
+Wave 3 added 2 kernels in `probe_atomic_add.metal` (probe_atomic_tgsm_lat,
+probe_atomic_device_lat) and revealed a critical corpus finding:
+
+**Metal does NOT emit generic LLVM `atomicrmw` instructions.**
+The Metal compiler maps `atomic_fetch_add_explicit` to AIR-specific intrinsics:
+- TGSM path (addrspace 3): `@air.atomic.local.add.u.i32`
+- Device path (addrspace 1): `@air.atomic.global.add.u.i32`
+- TGSM init: `@air.atomic.local.store.i32`
+
+**New intrinsics added by wave 3 → 30 unique ops (+3):**
+`@air.atomic.local.add.u.i32`, `@air.atomic.global.add.u.i32`,
+`@air.atomic.local.store.i32`
 
 ## Per-Probe Breakdown
 
@@ -165,28 +181,67 @@ Standard threadgroup memory pattern without barrier. Tests basic TG memory acces
 ```
 No threadgroup barrier, minimal load count. Arithmetic-dominant.
 
+### probe_atomic_tgsm_lat (32-deep serial atomic chain on threadgroup counter)
+```
+33  call @air.atomic.local.add.u.i32  ← 32 serial dependent adds on tgsm_counter
+ 2  call @air.wg.barrier               ← init barrier
+ 2  call @air.atomic.local.store.i32   ← init tgsm_counter = 0
+ 4  icmp / br / phi
+ 2  add / zext / getelementptr / store / ret / load
+```
+**Purpose**: Measures threadgroup atomic add latency under full contention (all threads
+target address 0 of tgsm_counter). Data dependency: `acc = atomic_fetch_add(counter,
+delta + acc)` — each call uses the return value of the previous one, forcing serial
+execution.
+**Key finding**: `atomic_fetch_add_explicit` on `threadgroup atomic_uint` maps to
+`@air.atomic.local.add.u.i32` — NOT `atomicrmw`. Metal has its own AIR atomic ISA.
+**SASS analog**: `ATOMS.ADD` probe in `latency_atomic_smem_probe.cu`.
+
+### probe_atomic_device_lat (32-deep serial atomic chain on device buffer)
+```
+33  call @air.atomic.global.add.u.i32  ← 32 serial dependent adds on device counter
+ 4  icmp / br / phi
+ 2  load / add / zext / getelementptr / store / ret
+```
+**Purpose**: Measures device (global memory) atomic add latency. Same dependent-chain
+design as TGSM variant for direct comparison: device vs threadgroup atomic paths.
+**Key finding**: `atomic_fetch_add_explicit` on `device atomic_uint` maps to
+`@air.atomic.global.add.u.i32` (addrspace 1) — separate intrinsic from the TGSM path
+`@air.atomic.local.add.u.i32` (addrspace 3). Apple distinguishes global vs local atomic
+paths explicitly in AIR.
+**SASS analog**: `ATOMG.ADD` probe in `latency_atomic_gmem_probe.cu`.
+
 ## AIR Intrinsic Reference Table
 
 | Intrinsic | Count | Metal source | Notes |
 |-----------|-------|-------------|-------|
 | `@air.fma.f32` | 64 | `fma(a, b, c)` | FP32 FMA, preserves dependency |
+| `@air.atomic.global.add.u.i32` | 33 | `atomic_fetch_add_explicit(device_ptr, val, ...)` | Device-buffer atomic add (wave 3) |
+| `@air.atomic.local.add.u.i32` | 33 | `atomic_fetch_add_explicit(tgsm_ptr, val, ...)` | Threadgroup atomic add (wave 3) |
 | `@air.simd_shuffle.u.i32` | 16 | `simd_shuffle(val, idx)` | Cross-lane shuffle with integer index |
 | `@air.simd_sum.f32` | 8 | `simd_sum(val)` | SIMD-width reduction sum |
 | `@air.simd_broadcast.f32` | 8 | `simd_broadcast(val, lane)` | Broadcast from lane to all |
 | `@air.convert.f.f32.u.i32` | 8 | `(float)uint_val` | uint32 → float32 |
-| `@air.wg.barrier` | 5 | `threadgroup_barrier(mem_flags::mem_threadgroup)` | Threadgroup memory fence |
+| `@air.wg.barrier` | 7 | `threadgroup_barrier(mem_flags::mem_threadgroup)` | Threadgroup memory fence |
+| `@air.atomic.local.store.i32` | 2 | `atomic_store_explicit(tgsm_ptr, 0, ...)` | Threadgroup atomic store (init) (wave 3) |
 | `@air.convert.u.i32.f.f32` | 1 | `(uint)float_val` | float32 → uint32 |
 | `@llvm.fshl.i32` | 1 | compiler-generated | Funnel shift left |
+
+**Critical finding**: Metal NEVER emits generic LLVM `atomicrmw` instructions.
+All atomic operations are lowered to AIR-specific intrinsics:
+- `@air.atomic.local.*` for `threadgroup` address space (addrspace 3)
+- `@air.atomic.global.*` for `device` address space (addrspace 1)
+- Naming convention: `@air.atomic.<scope>.add.u.i32` — scope, op, sign, type
 
 ## Coverage Gaps (AIR Intrinsics Not Yet Seen)
 
 | Missing intrinsic (expected) | Metal source | Gap |
 |------------------------------|-------------|-----|
-| `@air.atomicrmw.*` / `@air.atomic_fetch_add.*` | `atomic_fetch_add_explicit(...)` | No atomic probe yet |
 | `@air.texture.*` / `@air.sample.*` | `texture.sample(...)` | No texture sampling probe |
 | `@air.simdgroup_matrix_*` | `simdgroup_float8x8::multiply_accumulate` | AGX AMX/matrix units |
 | `@air.convert.f.f16.*` | `half` precision ops | No fp16 probe |
 | `@air.fma.f16` | `half fma(...)` | fp16 FMA variant |
+| `@air.atomic.*.cas.*` | `atomic_compare_exchange_weak_explicit` | CAS atomic operation |
 | `@air.rsqrt.*` / `@air.sqrt.*` | `rsqrt()`, `sqrt()` | Transcendental intrinsics |
 | `@air.read_imageui` / texture reads | `texture2d<float>.read(coord)` | Texture read intrinsic |
 
