@@ -59,12 +59,28 @@ Follows the steinmarder methodology: probe → measure → decide → build.
 | GPU pipeline utilization | 25-38% under CPU load (62-75% idle) | HW_BOUNDARY_MEASUREMENTS.md |
 | CPU hotspots | radeon_cs_context_cleanup #1 | STUTTER_RCA_AND_FIX.md |
 | Stutter RCA | Double-buffer CS sync + hash clear | STUTTER_RCA_AND_FIX.md |
-| Vulkan compliance | 41/41 pass (Terakan) | vk_compliance results |
+| Stutter fix result | Selective hash clear: 2.1× frametime improvement | STUTTER_RCA_AND_FIX.md |
+| Full-stack GL baseline | ~148 FPS (`glmark2 -s 400x300 -b shading:phong`) | FULL_STACK_PROFILE_MESA26.md |
+| Full-stack VK baseline | **619 FPS** (vkmark headless, vertex test) — 4× over GL | FULL_STACK_PROFILE_MESA26.md |
+| Headless vkmark baseline | **519 FPS** (Mesa 26.0.3 debug, all assertions on) | FULL_STACK_PROFILE_MESA26.md |
+| CPU bottleneck | GPU is 62-75% idle — CPU overhead starves it, not GPU compute capacity | HW_BOUNDARY_MEASUREMENTS.md |
+| Vulkan compliance | 41/41 pass (Terakan), 0 failures on unsupported_image_usage | vk_compliance results |
+| Rusticl OpenCL | 77% pass, crash fixed, GPR spill RCA'd (no spill-to-scratch fallback) | RUSTICL_BASELINE.md |
 | Numeric formats | 426 opcodes, native FP64 confirmed | NUMERIC_PACKING_RESEARCH.md |
 | Novel opcodes | UBYTE_FLT, MUL_UINT24 implemented | sfn_instr_alu.cpp |
 | ALU latency | All vec ops = 1 cycle (PV fwd), trans = 1 cycle (throughput-limited) | LATENCY_PROBE_RESULTS.md |
 | SIN/COS expansion | 8 instructions per trig call (range reduction + hw SIN/COS) | LATENCY_PROBE_RESULTS.md |
 | DOT4 packing | Full 4-slot VLIW5 bundle, 1-cycle latency confirmed | LATENCY_PROBE_RESULTS.md |
+| Numeric packing | INT8x4 unpack = 1 cycle, Dekker double-single analyzed | NUMERIC_PACKING_RESEARCH.md |
+| IBS CPU profiling | AMDuProfCLI IBS-fetch + IBS-op capable on E-300 Bobcat | tooling confirmed |
+| DRM fence tracing | radeon:* ftrace tracepoints captured via trace-cmd | Phase 0.5 complete |
+| Perf flamegraph | Mesa GL hot path flamegraph via `perf record + FlameGraph` | flamegraph.svg |
+| Mesa debug rebuild | debugoptimized + LTO at `/usr/local/mesa-debug/` | Mesa 26.0.3 |
+| Modesetting DDX | Switched from radeon DDX to modesetting for DRI3 GLX | xorg.conf.d |
+| Terakan headless VK | VK_EXT_headless_surface fixed in Terakan desktop build | terakan_init.c |
+| r600 compute RAT | Kernel writes zeros — RAT readback bug under investigation | Task #15 (open) |
+| Branch prediction | Mesa r600/gallium hot path branches optimized + measured | sfn_*.cpp |
+| Cache-coherent data | r600 state emission redesigned for cache-friendly traversal | r600_state.c |
 
 ## Missing Evidence (Probe Gaps)
 
