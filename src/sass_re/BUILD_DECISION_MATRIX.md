@@ -262,3 +262,51 @@ The repo should eventually produce the following per-tranche artifacts:
 
 Those files should be cross-linked from the Apple and Ryzen roadmaps so the
 next person can answer “manual or compiler?” without re-reading every run log.
+
+## r600 / TeraScale-2 Decision Entries
+
+### Pattern families compared against compiler output
+
+| Pattern | Compiler emits at -O2? | Manual improvement? | Runtime delta | Spill impact | Decision |
+|---------|----------------------|--------------------|--------------|-----------| ---------|
+| UBYTE_FLT (byte→float) | No — compiler emits AND+SHIFT+INT_TO_FLT (3 ops) | Yes — single UBYTE0_FLT opcode | 3x fewer ALU cycles | None | **Keep manual: implemented in sfn_instr_alu.cpp** |
+| MUL_UINT24 (24-bit int mul) | No — compiler emits MULLO_INT (trans-only, multi-cycle) | Yes — MUL_UINT24 (vec slot, single-cycle) | Free vec slot + faster | None | **Keep manual: implemented in sfn_instr_alu.cpp** |
+| MULADD_M2/M4/D2 (power-of-2 scale) | No — compiler emits separate MUL+ADD | Yes — uses output modifier bits (free) | 1 fewer instruction | None | **Keep manual: sfn_peephole.cpp** |
+| BFE_UINT/BFI_INT (bit-field ops) | Yes — compiler already emits via nir_op_ubfe/ibfe | No — already optimal | N/A | N/A | **Compiler wins: no manual pattern needed** |
+| FLT16_TO_FLT32 (half conversion) | Yes — compiler uses native ops | No — conversion-only, no FP16 ALU | N/A | N/A | **Compiler wins: documented as conversion-only** |
+| DOT4_IEEE (4-component dot) | Yes — compiler packs into 4 vec slots | No — already uses all 4 slots in 1 cycle | N/A | N/A | **Compiler wins: verified via latency probes** |
+| PREV-chaining (MUL_PREV etc) | Partial — SFN uses PV forwarding extensively | Maybe — PREV variants save 1 GPR | <1% | -1 GPR | **Research: needs dependency analysis in SFN scheduler** |
+| Scratch spill (MEM_SCRATCH) | No — SFN asserts on >123 GPRs | Yes — infrastructure exists, needs spill logic | Enables compute | Enables compute | **Critical: blocks Rusticl kernel execution** |
+
+### Measured latencies (steinmarder dependent-chain methodology)
+
+| Opcode | Math type | Slot | Latency | Throughput | Status |
+|--------|-----------|------|---------|------------|--------|
+| ADD_IEEE | FP32 | vec | 1 cycle | 4/cycle | Inferred (NIR folds chain) |
+| MUL_IEEE | FP32 | vec | 1 cycle | 4/cycle | **Confirmed** via PV forwarding |
+| MULADD_IEEE | FP32 | vec | 1 cycle | 4/cycle | **Confirmed** |
+| DOT4_IEEE | FP32 | vec×4 | 1 cycle | 1/cycle | **Confirmed** |
+| RECIPSQRT_IEEE | FP32 | trans | 1 cycle | 1/cycle | **Confirmed** |
+| SIN | FP32 | trans | 1 cycle (hw) + 7 instr range reduction | 1/cycle | **Confirmed** |
+| COS | FP32 | trans | 1 cycle (hw) + 7 instr range reduction | 1/cycle | **Confirmed** |
+| MULLO_INT | INT32 | trans | 1 cycle | 1/cycle | **Confirmed** |
+| MUL_UINT24 | UINT24 | vec | 1 cycle | 4/cycle | **Inferred** (same pipeline) |
+| UBYTE0_FLT | UINT8→FP32 | vec | 1 cycle | 4/cycle | **Inferred** |
+| BFE_UINT | UINT bit-field | vec | 1 cycle | 4/cycle | **Inferred** |
+| ADD_64 | FP64 | vec pair | ~2 cycles (dual-slot) | 2/cycle | **Untested** |
+| MUL_64 | FP64 | vec pair | ~2 cycles (dual-slot) | 2/cycle | **Untested** |
+
+### Tool stack health
+
+| Tool | steinmarder equivalent | Installed? | Working? | Notes |
+|------|----------------------|-----------|---------|-------|
+| R600_DEBUG | cuobjdump | Yes | Yes | Full ISA dump per shader stage |
+| GALLIUM_HUD | ncu | Yes | Yes | CSV pipeline counters |
+| AMDuProfCLI | nsys | Yes | Yes | IBS sampling for CPU hotspots |
+| radeontop | nvidia-smi | Yes | Yes | GPU block utilization in real-time |
+| apitrace | nsys trace | Yes | Yes | GL/VK API recording + replay |
+| perf | perf | Yes | Yes | CPU PMU counters |
+| piglit | N/A | Yes | Yes | Shader correctness + ISA capture |
+| dEQP-VK | dEQP-VK | Yes | Yes | 1.7M Vulkan conformance tests |
+| umr | N/A | No | N/A | AMD GPU register debugger — not in Debian |
+| radeon_profile | N/A | No | N/A | Would need manual build |
