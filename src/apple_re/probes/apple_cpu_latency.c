@@ -144,6 +144,157 @@ static uint64_t bench_load_store_chain(uint64_t iters) {
     return end - start;
 }
 
+/* FP16 probes — FCVT (f32↔f16 conversion), FMLA (SIMD half-precision FMA).
+ *
+ * Motivation: PyTorch MPS f16 matmul at 512×512 is 8× slower than f32 —
+ * either JIT compilation cost or the f16 path not hitting hardware FP16.
+ * These CPU probes baseline the AArch64 hardware FP16 path so the MPS
+ * anomaly can be assessed against a known reference.
+ *
+ * AArch64 FP16 (FEAT_FP16, armv8.2-a):
+ *   FCVT   Hd, Ss     f32 → f16 (scalar, rounds to nearest)
+ *   FCVT   Sd, Hh     f16 → f32 (scalar, exact widening)
+ *   FADD   Hd, Hn, Hm f16 scalar add
+ *   FMUL   Hd, Hn, Hm f16 scalar multiply
+ *   FMADD  Hd, Hn, Hm, Ha  f16 scalar fused multiply-add
+ *   FMLA   Vd.4h, Vn.4h, Vm.4h  f16 SIMD (4-wide)
+ *   FMLA   Vd.8h, Vn.8h, Vm.8h  f16 SIMD (8-wide)
+ *
+ * Note: FEAT_FP16 is required (armv8.2-a). Apple M1 supports this.
+ * The _Float16 type is available in Clang on M-series; the SIMD probes use
+ * __fp16 / vector types from <arm_neon.h>.
+ */
+
+#include <arm_neon.h>  /* float16x8_t, vfmaq_f16, etc. */
+
+static uint64_t bench_fcvt_f32_to_f16_dep(uint64_t iters) {
+    /* f32 → f16 → f32 → f16 ... dep chain via FCVT round-trip.
+     * Each FCVT (f32→f16) truncates and the FCVT (f16→f32) widens.
+     * The two-step round-trip keeps the value in a representable range while
+     * creating a dependency: the f32 value after widening feeds the next f32→f16. */
+    float acc_f32 = 1.0f;
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__) && defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC)
+        /* FCVT H, S then FCVT S, H — 32-deep dep chain (16 round-trips).
+         * %h0 = H-register view of operand 0; %s0 = S-register view.
+         * Both refer to the same underlying FP register. */
+        asm volatile(
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0\n\t"
+            "fcvt %h0, %s0\n\tfcvt %s0, %h0"
+            : "+w"(acc_f32));
+#else
+        for (int lane = 0; lane < 32; ++lane) {
+            _Float16 h = (_Float16)acc_f32;
+            acc_f32 = (float)h;
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_f64_sink = (double)acc_f32;
+    return end - start;
+}
+
+static uint64_t bench_fadd_f16_dep(uint64_t iters) {
+    /* f16 scalar FADD dep chain — measures scalar f16 add latency.
+     * Uses _Float16 (Clang extension) which emits scalar FADD H-register ops. */
+    _Float16 acc = (_Float16)1.0f;
+    const _Float16 increment = (_Float16)0.001f;
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__) && defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC)
+        /* %h0 = H-register view of acc; %h1 = H-register view of increment. */
+        asm volatile(
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\t"
+            "fadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1\n\tfadd %h0, %h0, %h1"
+            : "+w"(acc)
+            : "w"(increment));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc += increment;
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_f64_sink = (double)(float)acc;
+    return end - start;
+}
+
+static uint64_t bench_fmla_f16x8_dep(uint64_t iters) {
+    /* FMLA .8h — 8-wide SIMD f16 fused multiply-add dep chain.
+     * All 8 lanes use the same scalar multiplier and addend constant.
+     * The dep chain is across all 8 lanes in lockstep — each FMLA reads
+     * the result of the previous FMLA (all lanes).
+     * This measures f16 SIMD FMA latency on the NEON unit.
+     *
+     * Expected: same pipeline latency as FMLA .4s (FP32 SIMD) since M-series
+     * has native f16 NEON. If f16 is slower, that is the anomaly. */
+    float16x8_t acc = vdupq_n_f16(1.0f);
+    const float16x8_t mul_val = vdupq_n_f16(1.0001f);
+    const float16x8_t add_val = vdupq_n_f16(0.0001f);
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__) && defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
+        /* 32 dependent FMLA .8h instructions. */
+        asm volatile(
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h\n\t"
+            "fmla %0.8h, %1.8h, %2.8h\n\tfmla %0.8h, %1.8h, %2.8h"
+            : "+w"(acc)
+            : "w"(mul_val), "w"(add_val));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc = vfmaq_f16(add_val, acc, mul_val);
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_f64_sink = (double)(float)vgetq_lane_f16(acc, 0);
+    return end - start;
+}
+
 /* Integer multiply probes — MUL, MADD, MSUB, UMULH, SMULL dep chains.
  *
  * On AArch64:
@@ -403,18 +554,21 @@ static void print_result(const char *name, uint64_t elapsed_ns, uint64_t iters, 
 }
 
 static const struct probe_def g_probes[] = {
-    {"add_dep_u64",               bench_add_dep,             APPLE_RE_UNROLL},
-    {"fadd_dep_f64",              bench_fadd_dep,            APPLE_RE_UNROLL},
-    {"fmadd_dep_f64",             bench_fmadd_dep,           APPLE_RE_UNROLL},
-    {"mul_dep_u64",               bench_mul_dep,             APPLE_RE_UNROLL},
-    {"madd_dep_u64",              bench_madd_dep,            APPLE_RE_UNROLL},
-    {"msub_dep_u64",              bench_msub_dep,            APPLE_RE_UNROLL},
-    {"umulh_dep_u64",             bench_umulh_dep,           APPLE_RE_UNROLL},
-    {"smull_dep_i32_to_i64",      bench_smull_dep,           APPLE_RE_UNROLL},
-    {"load_store_chain_u64",      bench_load_store_chain,    APPLE_RE_LOAD_STORE_UNROLL * 3u},
-    {"shuffle_lane_cross_u64",    bench_shuffle_dep,         APPLE_RE_UNROLL},
-    {"atomic_add_relaxed_u64",    bench_atomic_add_dep,      APPLE_RE_ATOMIC_UNROLL},
-    {"transcendental_sin_cos_f64",bench_transcendental_dep,  APPLE_RE_TRANSC_UNROLL * 2u},
+    {"add_dep_u64",               bench_add_dep,                 APPLE_RE_UNROLL},
+    {"fadd_dep_f64",              bench_fadd_dep,                APPLE_RE_UNROLL},
+    {"fmadd_dep_f64",             bench_fmadd_dep,               APPLE_RE_UNROLL},
+    {"fcvt_f32_f16_roundtrip",    bench_fcvt_f32_to_f16_dep,     32u},
+    {"fadd_dep_f16_scalar",       bench_fadd_f16_dep,            APPLE_RE_UNROLL},
+    {"fmla_dep_f16x8_simd",       bench_fmla_f16x8_dep,         APPLE_RE_UNROLL},
+    {"mul_dep_u64",               bench_mul_dep,                 APPLE_RE_UNROLL},
+    {"madd_dep_u64",              bench_madd_dep,                APPLE_RE_UNROLL},
+    {"msub_dep_u64",              bench_msub_dep,                APPLE_RE_UNROLL},
+    {"umulh_dep_u64",             bench_umulh_dep,               APPLE_RE_UNROLL},
+    {"smull_dep_i32_to_i64",      bench_smull_dep,               APPLE_RE_UNROLL},
+    {"load_store_chain_u64",      bench_load_store_chain,        APPLE_RE_LOAD_STORE_UNROLL * 3u},
+    {"shuffle_lane_cross_u64",    bench_shuffle_dep,             APPLE_RE_UNROLL},
+    {"atomic_add_relaxed_u64",    bench_atomic_add_dep,          APPLE_RE_ATOMIC_UNROLL},
+    {"transcendental_sin_cos_f64",bench_transcendental_dep,      APPLE_RE_TRANSC_UNROLL * 2u},
 };
 
 int main(int argc, char **argv) {

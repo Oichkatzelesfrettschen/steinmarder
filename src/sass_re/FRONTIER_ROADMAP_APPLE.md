@@ -215,8 +215,10 @@ track:
 - [x] **CPU integer multiply probe** — `MUL`, `MADD`, `MSUB`, `UMULH`, `SMULL` dep
   chains added to `apple_cpu_latency.c`. All measure **3 cycles** on M-series.
   MCA over-predicts by 60–70% (predicts 5 cyc). See `cpu_runs/integer_multiply_latency.md`.
-- [ ] **CPU FP16 probes** — `FCVT`, `FMLA` (SIMD), half-precision dependent chains.
-  PyTorch MPS f16 anomaly (8× slower than f32) motivates this.
+- [x] **CPU FP16 probes** — `FCVT`, `FADD H`, `FMLA .8h` dep chains added to
+  `apple_cpu_latency.c`. FCVT: ~3 cyc/conversion; scalar FADD f16: ~3 cyc;
+  FMLA .8h SIMD: ~4 cyc. All same speed as f32/f64 counterparts. PyTorch MPS
+  f16 8× anomaly is a framework issue, NOT hardware. See `cpu_runs/fp16_latency.md`.
 - [x] **Run `analyze_tranche_mnemonics.py` on every keepalive** — automated in
   phase-H `mnemonic_synthesis` step of `run_apple_tranche1.sh`.
 

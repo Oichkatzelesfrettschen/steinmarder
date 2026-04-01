@@ -315,8 +315,9 @@ next person can answer “manual or compiler?” without re-reading every run lo
 
 ### Apple CPU latency constants (AArch64 arm64, ~3.2 GHz)
 
-Measured via dependent-chain probes in `apple_cpu_latency.c` (1M iterations, ±2%).
-Cross-validated against llvm-mca. See `cpu_runs/llvm_mca_analysis.md`.
+Measured via dependent-chain probes in `apple_cpu_latency.c` (2M iterations).
+Cross-validated against llvm-mca. See `cpu_runs/llvm_mca_analysis.md`,
+`cpu_runs/integer_multiply_latency.md`, and `cpu_runs/fp16_latency.md`.
 
 | Operation | Measured cyc/op | MCA reliable? | Decision implication |
 |-----------|----------------|--------------|----------------------|
@@ -326,8 +327,11 @@ Cross-validated against llvm-mca. See `cpu_runs/llvm_mca_analysis.md`.
 | Integer MSUB (fused mul-sub) | **3 cycles** | **NO (+63% over-predict)** | Same latency as MADD — single unified multiply unit |
 | UMULH (upper 64 of 64×64) | **3 cycles** | **NO (+67% over-predict)** | Not slower than MUL — use freely in 128-bit and Montgomery arithmetic |
 | SMULL (32×32→64) | **3 cycles** | **NO (+67% over-predict)** | Same cost as 64-bit MUL — no penalty for 32-bit input form |
-| f64 FADD | **~3.5 cycles** | Partial (−12%) | MCA under-predicts; use measured |
-| f64 FMADD | **~4 cycles** | Partial (−23%) | MCA under-predicts; use measured |
+| FCVT f32↔f16 | **3 cycles/conversion** | Not tested | Same as FADD f64; conversion is cheap |
+| FADD f16 scalar (Hd,Hn,Hm) | **3 cycles** | Not tested | Same latency as f64 FADD |
+| FMLA f16×8 SIMD (.8h) | **4 cycles** | Not tested | Same as FMADD f64; 8 elements per op |
+| f64 FADD | **~3.1 cycles** | Partial | MCA may under-predict; use measured |
+| f64 FMADD | **~4.1 cycles** | Partial (−23%) | MCA under-predicts; use measured |
 | load+store chain (L1 bandwidth) | **1.18 cyc/op** | Partial | Arithmetic hides memory latency; not a pure load-latency probe |
 | bswap+variable-shift chain | **4.30 cyc/op** | **NO (3× error)** | MCA cannot model variable-shift data dependency; always measure |
 | relaxed atomic add | **6 cycles** | **NO (PLT stub)** | MCA cannot analyze atomic library calls; use measured |
@@ -351,6 +355,21 @@ See `cpu_runs/cache_hierarchy_analysis.md`.
 **Note**: boundary at ~128–256 KB (49% jump). TGSM probes should fit within L1/L2.
 True cache MISS LATENCY not yet isolated (sequential pointer-chase is prefetched).
 Expected M-series latency from public sources: L1D ~4 cyc, L2 ~12 cyc, SLC ~40 cyc, DRAM ~100–200 cyc.
+
+### Apple CPU — FP16 hardware: same speed as f32/f64
+
+Measured via `apple_cpu_latency.c` FP16 probes. See `cpu_runs/fp16_latency.md`.
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| Is f16 FADD slower than f64 FADD on M-series? | **No — same ~3 cycles** | Both 0.95 ns/op measured |
+| Is FMLA .8h SIMD slower than FMADD scalar? | **No — same ~4 cycles** | 1.27 ns/op, same as FMADD f64 |
+| Is FCVT f32↔f16 expensive? | **No — ~3 cycles/conversion** | Convert freely |
+| Why is PyTorch MPS f16 8× slower than f32? | **Framework issue, not hardware** | CPU f16 hardware is full speed; MPS likely JIT-compiles f16 path on first dispatch |
+
+**Rule**: Do not avoid f16 out of fear of hardware slowdown on M-series. The issue
+is at the Metal/MPS framework layer (JIT compilation, code path selection, or lack
+of a specialized f16 matmul kernel). Re-measure MPS f16 with warmup passes.
 
 ### Apple Metal GPU — FP32 FMA
 
