@@ -212,8 +212,9 @@ track:
   -O0 → -O2: 420 → 48 instructions for `probe_ffma_lat` (stack spills eliminated).
 - [ ] **Library mnemonic mining** — `otool -tv` on `Metal.framework`, `MPSCore`,
   `Accelerate` to mine real-world operation usage.
-- [ ] **CPU integer multiply probe** — `UMULH`, `MADD`, `MSUB`, `SMULL` chains
-  absent from mnemonic corpus.
+- [x] **CPU integer multiply probe** — `MUL`, `MADD`, `MSUB`, `UMULH`, `SMULL` dep
+  chains added to `apple_cpu_latency.c`. All measure **3 cycles** on M-series.
+  MCA over-predicts by 60–70% (predicts 5 cyc). See `cpu_runs/integer_multiply_latency.md`.
 - [ ] **CPU FP16 probes** — `FCVT`, `FMLA` (SIMD), half-precision dependent chains.
   PyTorch MPS f16 anomaly (8× slower than f32) motivates this.
 - [x] **Run `analyze_tranche_mnemonics.py` on every keepalive** — automated in

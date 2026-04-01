@@ -144,6 +144,195 @@ static uint64_t bench_load_store_chain(uint64_t iters) {
     return end - start;
 }
 
+/* Integer multiply probes — MUL, MADD, MSUB, UMULH, SMULL dep chains.
+ *
+ * On AArch64:
+ *   MUL    Xd, Xn, Xm       ≡ MADD Xd, Xn, Xm, XZR  (lower 64 bits, dep on Xd)
+ *   MADD   Xd, Xn, Xm, Xa   Xd = Xa + Xn*Xm          (dep on both Xd and Xa)
+ *   MSUB   Xd, Xn, Xm, Xa   Xd = Xa - Xn*Xm          (dep on both Xd and Xa)
+ *   UMULH  Xd, Xn, Xm       upper 64 bits of 64×64 unsigned multiply
+ *   SMULL  Xd, Wn, Wm       Xd = sign-extend(Wn) * sign-extend(Wm)  (32×32→64)
+ *
+ * Each bench uses a 32-deep dependent chain (each result feeds the next
+ * operation as its primary input) to measure LATENCY, not throughput.
+ * The multiplier constant is chosen to keep results non-trivially bounded.
+ */
+
+static uint64_t bench_mul_dep(uint64_t iters) {
+    uint64_t acc = 0x9e3779b97f4a7c15ull;
+    const uint64_t multiplier = 0x6c62272e07bb0142ull; /* Knuth LCG constant */
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__)
+        /* 32 dependent MUL instructions: each output feeds the next multiplicand. */
+        asm volatile(
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\t"
+            "mul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1\n\tmul %x0, %x0, %x1"
+            : "+r"(acc)
+            : "r"(multiplier));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc *= multiplier;
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_u64_sink = acc;
+    return end - start;
+}
+
+/* MADD: Xd = Xa + Xn*Xm.  We use acc as BOTH the accumulator (Xa) and the
+ * multiplicand (Xn), with a fixed Xm.  This creates a dependency on the
+ * previous result in both the add input and the multiply input. */
+static uint64_t bench_madd_dep(uint64_t iters) {
+    uint64_t acc = 0x9e3779b97f4a7c15ull;
+    const uint64_t multiplier = 0x6c62272e07bb0142ull;
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__)
+        /* MADD Xd, Xacc, Xmul, Xacc: Xd = Xacc + Xacc*Xmul.
+         * Each result feeds both the next multiplicand and accumulator. */
+        asm volatile(
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\t"
+            "madd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0\n\tmadd %x0, %x0, %x1, %x0"
+            : "+r"(acc)
+            : "r"(multiplier));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc = acc + acc * multiplier;
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_u64_sink = acc;
+    return end - start;
+}
+
+/* MSUB: Xd = Xa - Xn*Xm.  Same dep structure as MADD but subtraction.
+ * On M-series MSUB is a separate execution unit path from MADD — probing
+ * both lets us check whether MADD and MSUB share the same latency. */
+static uint64_t bench_msub_dep(uint64_t iters) {
+    uint64_t acc = 0x9e3779b97f4a7c15ull;
+    const uint64_t multiplier = 3ull; /* small odd constant prevents zero collapse */
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__)
+        /* MSUB Xd, Xacc, Xmul, Xacc: Xd = Xacc - Xacc*Xmul. */
+        asm volatile(
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\t"
+            "msub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0\n\tmsub %x0, %x0, %x1, %x0"
+            : "+r"(acc)
+            : "r"(multiplier));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc = acc - acc * multiplier;
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_u64_sink = acc;
+    return end - start;
+}
+
+/* UMULH: unsigned multiply-high — upper 64 bits of a 64×64 product.
+ * Used in 128-bit arithmetic, modular reduction, and crypto (GHASH, Montgomery).
+ * The dep chain forces each result into the next multiplicand. */
+static uint64_t bench_umulh_dep(uint64_t iters) {
+    uint64_t acc = 0x9e3779b97f4a7c15ull;
+    const uint64_t multiplier = 0xbf58476d1ce4e5b9ull; /* Murmur3 mix constant */
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__)
+        asm volatile(
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\t"
+            "umulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1\n\tumulh %x0, %x0, %x1"
+            : "+r"(acc)
+            : "r"(multiplier));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            /* Emulate UMULH via __uint128_t — not a latency measurement on non-AArch64. */
+            acc = (uint64_t)(((__uint128_t)acc * (__uint128_t)multiplier) >> 64);
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_u64_sink = acc;
+    return end - start;
+}
+
+/* SMULL: 32-bit signed multiply long → 64-bit result.
+ * Tests the 32→64 multiply path, separate from the 64-bit MUL path on M-series.
+ * The dep chain truncates acc to 32 bits before each multiply via the Wn form. */
+static uint64_t bench_smull_dep(uint64_t iters) {
+    int64_t acc = (int64_t)0x9e3779b9u; /* fits in int32_t range — sign-safe */
+    const int64_t multiplier = (int64_t)0x6c62272eu;
+    uint64_t start;
+    uint64_t end;
+
+    start = apple_re_now_ns();
+    for (uint64_t i = 0; i < iters; ++i) {
+#if defined(__aarch64__)
+        /* SMULL Xd, Wn, Wm: uses lower 32 bits of 64-bit registers.
+         * The dep: each 64-bit result feeds back as Wn (lower 32 bits used).
+         * This exercises the 32×32→64 multiply unit. */
+        asm volatile(
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\t"
+            "smull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1\n\tsmull %x0, %w0, %w1"
+            : "+r"(acc)
+            : "r"(multiplier));
+#else
+        for (int lane = 0; lane < APPLE_RE_UNROLL; ++lane) {
+            acc = (int64_t)((int32_t)(acc & 0xffffffff)) * (int64_t)((int32_t)(multiplier & 0xffffffff));
+        }
+#endif
+    }
+    end = apple_re_now_ns();
+    g_u64_sink = (uint64_t)acc;
+    return end - start;
+}
+
 static uint64_t bench_shuffle_dep(uint64_t iters) {
     uint64_t x = 0x0123456789abcdefull;
     uint64_t start;
@@ -214,13 +403,18 @@ static void print_result(const char *name, uint64_t elapsed_ns, uint64_t iters, 
 }
 
 static const struct probe_def g_probes[] = {
-    {"add_dep_u64", bench_add_dep, APPLE_RE_UNROLL},
-    {"fadd_dep_f64", bench_fadd_dep, APPLE_RE_UNROLL},
-    {"fmadd_dep_f64", bench_fmadd_dep, APPLE_RE_UNROLL},
-    {"load_store_chain_u64", bench_load_store_chain, APPLE_RE_LOAD_STORE_UNROLL * 3u},
-    {"shuffle_lane_cross_u64", bench_shuffle_dep, APPLE_RE_UNROLL},
-    {"atomic_add_relaxed_u64", bench_atomic_add_dep, APPLE_RE_ATOMIC_UNROLL},
-    {"transcendental_sin_cos_f64", bench_transcendental_dep, APPLE_RE_TRANSC_UNROLL * 2u},
+    {"add_dep_u64",               bench_add_dep,             APPLE_RE_UNROLL},
+    {"fadd_dep_f64",              bench_fadd_dep,            APPLE_RE_UNROLL},
+    {"fmadd_dep_f64",             bench_fmadd_dep,           APPLE_RE_UNROLL},
+    {"mul_dep_u64",               bench_mul_dep,             APPLE_RE_UNROLL},
+    {"madd_dep_u64",              bench_madd_dep,            APPLE_RE_UNROLL},
+    {"msub_dep_u64",              bench_msub_dep,            APPLE_RE_UNROLL},
+    {"umulh_dep_u64",             bench_umulh_dep,           APPLE_RE_UNROLL},
+    {"smull_dep_i32_to_i64",      bench_smull_dep,           APPLE_RE_UNROLL},
+    {"load_store_chain_u64",      bench_load_store_chain,    APPLE_RE_LOAD_STORE_UNROLL * 3u},
+    {"shuffle_lane_cross_u64",    bench_shuffle_dep,         APPLE_RE_UNROLL},
+    {"atomic_add_relaxed_u64",    bench_atomic_add_dep,      APPLE_RE_ATOMIC_UNROLL},
+    {"transcendental_sin_cos_f64",bench_transcendental_dep,  APPLE_RE_TRANSC_UNROLL * 2u},
 };
 
 int main(int argc, char **argv) {

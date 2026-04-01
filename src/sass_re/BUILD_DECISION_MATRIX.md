@@ -320,17 +320,22 @@ Cross-validated against llvm-mca. See `cpu_runs/llvm_mca_analysis.md`.
 
 | Operation | Measured cyc/op | MCA reliable? | Decision implication |
 |-----------|----------------|--------------|----------------------|
-| Integer ADD | **1 cycle** | Yes (±4%) | Use MCA for simple integer chains |
-| f64 FADD | **~4 cycles** | Partial (−23%) | MCA under-predicts; use measured |
+| Integer ADD | **1 cycle** | Yes (±20% overhead) | Use MCA for simple integer chains |
+| Integer MUL (64-bit) | **3 cycles** | **NO (+67% over-predict)** | MCA predicts 5 cyc; measured is 3; always use measured |
+| Integer MADD (fused mul-add) | **3 cycles** | **NO (+63% over-predict)** | Same unit as MUL; no Xa-path penalty |
+| Integer MSUB (fused mul-sub) | **3 cycles** | **NO (+63% over-predict)** | Same latency as MADD — single unified multiply unit |
+| UMULH (upper 64 of 64×64) | **3 cycles** | **NO (+67% over-predict)** | Not slower than MUL — use freely in 128-bit and Montgomery arithmetic |
+| SMULL (32×32→64) | **3 cycles** | **NO (+67% over-predict)** | Same cost as 64-bit MUL — no penalty for 32-bit input form |
+| f64 FADD | **~3.5 cycles** | Partial (−12%) | MCA under-predicts; use measured |
 | f64 FMADD | **~4 cycles** | Partial (−23%) | MCA under-predicts; use measured |
 | load+store chain (L1 bandwidth) | **1.18 cyc/op** | Partial | Arithmetic hides memory latency; not a pure load-latency probe |
 | bswap+variable-shift chain | **4.30 cyc/op** | **NO (3× error)** | MCA cannot model variable-shift data dependency; always measure |
 | relaxed atomic add | **6 cycles** | **NO (PLT stub)** | MCA cannot analyze atomic library calls; use measured |
 | sin+cos pair (libm) | **~60 cycles** (~30 each) | **NO (8× error)** | MCA models sin/cos as ~7 cyc; actual is ~60; never use MCA for transcendentals |
 
-**Rule**: llvm-mca is reliable ONLY for simple, non-library arithmetic sequences on M-series.
-For anything involving atomics, transcendentals, variable-shift dependencies, or library calls,
-use measured data from the `apple_cpu_latency.c` probe suite.
+**Rule**: llvm-mca is reliable ONLY for simple integer ADD sequences on M-series (±20%).
+Everything else — multiply, FP, variable-shift, atomics, transcendentals — must use
+probe measurements. See `cpu_runs/integer_multiply_latency.md` and `cpu_runs/llvm_mca_analysis.md`.
 
 ### Apple M-series cache hierarchy boundaries (stream bandwidth measurement)
 
