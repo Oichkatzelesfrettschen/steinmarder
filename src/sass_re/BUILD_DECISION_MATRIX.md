@@ -356,6 +356,23 @@ See `cpu_runs/cache_hierarchy_analysis.md`.
 True cache MISS LATENCY not yet isolated (sequential pointer-chase is prefetched).
 Expected M-series latency from public sources: L1D ~4 cyc, L2 ~12 cyc, SLC ~40 cyc, DRAM ~100–200 cyc.
 
+### Apple CPU — Accelerate uses AMX, not NEON (n ≥ 20480)
+
+Discovered via runtime disassembly (`lldb`) of `libvDSP.dylib` from dyld shared cache.
+See `library_mnemonic_mining.md`.
+
+| Question | Answer |
+|----------|--------|
+| Does Accelerate use NEON for large vector ops? | **No** — `vDSP_vadd` hot path has zero NEON float instructions |
+| What does Accelerate use? | **AMX (Apple Matrix Extension)** — proprietary co-processor, opcode space 0x00201000–0x00201FFF |
+| At what size does Accelerate switch to AMX? | n ≥ 0x5000 = **20480 elements** (checked at function entry) |
+| Can our NEON probes match Accelerate's throughput? | **No** — AMX has wider data paths; manual NEON cannot compete for large arrays |
+| Should I write NEON to beat Accelerate on CPU? | **No** — use Accelerate/BLAS directly for n > 20K |
+| Do our CPU latency probes measure AMX? | **No** — all probes measure NEON FP pipeline only; AMX is a gap |
+
+**Rule**: For large CPU-side float arrays, call Accelerate. For n < 20480 (NEON path)
+or Metal GPU kernels, our probe measurements apply.
+
 ### Apple CPU — FP16 hardware: same speed as f32/f64
 
 Measured via `apple_cpu_latency.c` FP16 probes. See `cpu_runs/fp16_latency.md`.

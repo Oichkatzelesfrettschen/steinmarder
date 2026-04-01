@@ -210,8 +210,11 @@ track:
   JAX METAL experimental. f16 anomaly flagged.
 - [x] **Metal `flag_matrix_sweep`** — `run_metal_flag_sweep.sh` written and tested.
   -O0 → -O2: 420 → 48 instructions for `probe_ffma_lat` (stack spills eliminated).
-- [ ] **Library mnemonic mining** — `otool -tv` on `Metal.framework`, `MPSCore`,
-  `Accelerate` to mine real-world operation usage.
+- [x] **Library mnemonic mining** — runtime disassembly via `lldb` + `dyld_info`
+  (dyld shared cache; `otool` doesn't work on macOS 13+). Critical finding:
+  **Accelerate (libvDSP) uses AMX, not NEON**. The `vDSP_vadd` hot path contains
+  53 AMX opcodes (0x00201xxx) and zero NEON float instructions for n≥20480.
+  See `library_mnemonic_mining.md`.
 - [x] **CPU integer multiply probe** — `MUL`, `MADD`, `MSUB`, `UMULH`, `SMULL` dep
   chains added to `apple_cpu_latency.c`. All measure **3 cycles** on M-series.
   MCA over-predicts by 60–70% (predicts 5 cyc). See `cpu_runs/integer_multiply_latency.md`.
