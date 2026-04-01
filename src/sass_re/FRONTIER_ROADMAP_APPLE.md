@@ -170,11 +170,11 @@ track:
 
 ### Critical gaps (change build decisions)
 
-- [ ] **`xctrace gpu-counters` schema** — capture hardware GPU counters (ALU
-  utilization, tile cache hit rates, memory bandwidth) alongside Metal schemas.
-  Without this, we cannot answer "ALU-bound or memory-bound?" per variant.
-  Script ready: `capture_gpu_counters.sh`. Needs next tranche run.
-  See `APPLE_TRACK_GAP_ANALYSIS.md` §4.
+- [x] **`xctrace gpu-counters` schema** — captured via `--instrument 'Metal GPU
+  Counters'`, 60,703 samples/counter over 20s. Key result: `occupancy_heavy`
+  is ALU-balanced (peak 79%), not ALU-bound; Fragment Occupancy 100% for
+  compute kernels = M1 TBDR routes compute through fragment pipeline. Average
+  1.6% ALU due to host dispatch overhead confirmed. See `gpu_hardware_counters.md`.
 - [x] **Metal dependent-chain latency probes** — `probe_ffma_lat.metal` (32-deep
   dep chain), `probe_tgsm_lat.metal` (TGSM pointer-chase). AIR confirmed.
 - [x] **Metal independent-accumulator throughput probes** — `probe_ffma_tput.metal`

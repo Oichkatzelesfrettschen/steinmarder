@@ -457,11 +457,46 @@ AIR atomic intrinsics:
 **Build decision**: for cross-lane reduction, prefer `simd_sum()` (one `@air.simd_sum.f32`)
 over per-thread threadgroup atomic accumulation (all threads serialize on one address).
 
-### Apple Metal GPU — critical gap
+### Apple Metal GPU — hardware counter measurements (occupancy_heavy, 2026-04-01)
 
-`metal-gpu-counter-intervals` has ZERO hardware rows in ALL blessed runs (r5–r7,
-CDE, phaseE). The `Metal Application` xctrace template does NOT populate this table.
+Captured via `xcrun xctrace record --instrument 'Metal GPU Counters' --time-limit 20s`.
+60,703 samples/counter. **Prior blessed runs (r5–r7) had zero counter rows** because
+they used the `Metal Application` template — this is the first real hardware capture.
 
-**Required action**: use `capture_gpu_counters.sh` with `Metal GPU Counters` template.
-Until this is done, ALU utilization, memory bandwidth, L1/L2 cache hit rates, and
-SIMD utilization are **unknown** on Apple GPU.
+See `gpu_hardware_counters.md` and `gpu_hardware_counters.csv`.
+
+| Counter | P99% | Max% | Avg% | Interpretation |
+|---------|------|------|------|---------------|
+| ALU Utilization | 34.41 | 78.94 | 1.59 | Balanced, not ALU-limited; headroom to add work |
+| F32 Utilization | 6.77 | 38.44 | 0.46 | FP32 pipeline lightly used at sustained load |
+| Fragment Occupancy | 90.11 | 100.00 | 3.93 | **M1 TBDR compute occupancy** — 100% at peak |
+| Compute Occupancy | 0.00 | 98.34 | 0.03 | Burst metric; Fragment Occupancy is primary |
+| GPU Read Bandwidth | 28.07 | 44.68 | 1.05 | Not memory-read-bound |
+| GPU Write Bandwidth | 23.96 | 53.74 | 0.79 | Not memory-write-bound |
+| LLC Utilization | 24.63 | 38.78 | 1.15 | Moderate LLC; on-chip data mostly resident |
+| Total Occupancy | 94.26 | 100.08 | 16.15 | 16% average due to host dispatch gaps |
+| Top Performance Limiter | 67.27 | 100.00 | 3.05 | 3% sustained top-limiter activity |
+
+**Critical findings:**
+
+1. **M1 TBDR architecture**: `Fragment Occupancy` hits 100% for compute kernels. Apple
+   GPU routes compute work through the tile/fragment pipeline. Do not interpret this as
+   fragment shader activity — it is the compute occupancy metric on M1.
+
+2. **Host dispatch overhead is the real bottleneck**: Average ALU utilization is 1.59%
+   across the 20s window. Peak is 79%. The GPU executes work 14–22× faster than the
+   host can schedule the next dispatch (confirmed in gpu_commandbuffer_timing.md). To
+   close this gap, batch multiple kernel dispatches per command buffer.
+
+3. **Not ALU-bound, not memory-bound**: Peak ALU 79% with 44–54% peak bandwidth means
+   neither the ALU pipeline nor the memory bus is saturated. The shader has headroom
+   in both dimensions.
+
+4. **How to capture hardware GPU counters** (fix for future runs):
+   ```sh
+   xcrun xctrace record --instrument 'Metal GPU Counters' --output gpu.trace \
+     --time-limit 20s -- ./sm_apple_metal_probe_host --variant occupancy_heavy \
+     --iters 5000000 --width 1024
+   ```
+   Note: `--template 'Metal GPU Counters'` is NOT a valid template name (the instrument
+   is not exposed as a standalone template). Use `--instrument 'Metal GPU Counters'`.
