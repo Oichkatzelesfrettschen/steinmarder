@@ -316,6 +316,7 @@ EOF"
 run_step "G" "sudo_teardown" "if [ \"$SUDO_MODE\" = \"keepalive\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; sudo -K >/dev/null 2>&1 || true; elif [ \"$SUDO_MODE\" = \"cache\" ]; then echo \"keepalive_pid=$KEEPALIVE_PID\"; echo sudo_cache_preserved; else echo sudo_disabled; fi"
 
 run_step "H" "postrun_refresh_metrics" "python3 \"$SCRIPT_DIR/extract_xctrace_metrics.py\" \"$OUT_DIR\" > \"$OUT_DIR/xctrace_extract_summary_postrun.txt\" 2>&1 || true; python3 \"$SCRIPT_DIR/analyze_xctrace_row_deltas.py\" \"$OUT_DIR/xctrace_metric_row_counts.csv\" \"$OUT_DIR/xctrace_trace_health.csv\" \"$OUT_DIR/xctrace_row_deltas.csv\" \"$OUT_DIR/xctrace_row_delta_summary.md\" \"$OUT_DIR/xctrace_row_density.csv\" >/dev/null 2>&1 || true"
+run_step "H" "mnemonic_synthesis" "python3 \"$SCRIPT_DIR/analyze_tranche_mnemonics.py\" \"$OUT_DIR\" > \"$OUT_DIR/mnemonic_synthesis.log\" 2>&1 || true"
 run_step "H" "compare_density_prev_bundle" "prev_density=\$(find \"$ROOT_DIR/results/blessed\" -maxdepth 2 -name xctrace_row_density.csv | sort | tail -n 1); if [ -n \"\$prev_density\" ] && [ -f \"\$prev_density\" ]; then python3 \"$SCRIPT_DIR/compare_xctrace_density_runs.py\" \"$OUT_DIR/xctrace_row_density.csv\" \"\$prev_density\" \"$OUT_DIR/xctrace_density_compare.csv\" \"$OUT_DIR/xctrace_density_compare.md\" >/dev/null 2>&1 || true; else echo previous_density_missing > \"$OUT_DIR/xctrace_density_compare.md\"; fi"
 run_step "H" "rank_metal_variants" "python3 - <<'PY' > \"$OUT_DIR/metal_variant_rankings.md\"
 import csv, pathlib
