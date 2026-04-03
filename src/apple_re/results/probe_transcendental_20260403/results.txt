@@ -1,0 +1,56 @@
+Transcendental / special-function dep-chain probes
+Date: 2026-04-03
+Shader: probe_transcendental_tp.metal (8 independent chains each, ops_per_iter=8)
+Host: sm_apple_metal_probe_host --width 1024 --iters 30
+C (per-dispatch overhead) = 3,153,956 ns; inner_iters = 100,000
+
+=== Raw measurements ===
+probe_exp2_lat  ns_per_dispatch=15,300,667
+probe_log2_lat  ns_per_dispatch= 6,574,867
+probe_sqrt_lat  ns_per_dispatch=11,030,833
+probe_fmax_lat  ns_per_dispatch= 4,576,067
+
+=== Derived values ===
+Formula: ns/op = (ns_per_dispatch - C) / (inner_iters * ops_per_iter)
+
+Probe           ns/dispatch    net_ns      ns/op    cyc@1.3GHz  T_outer(cyc)  Philip_adj_lat
+------------------------------------------------------------------------------------------
+probe_exp2_lat  15,300,667  12,146,711   15.183     19.74       157.9         4.31 (CONFOUNDED: fract overhead on same SFU)
+probe_log2_lat   6,574,867   3,420,911    4.276      5.56        44.5         4.31 (SFU TP=4 confirmed: 8ops×4=32cyc + lat ≈ 44cyc)
+probe_sqrt_lat  11,030,833   7,876,877    9.846     12.80       102.4         8.99 (SFU TP=8 confirmed: 8ops×8=64cyc + lat ≈ 102cyc)
+probe_fmax_lat   4,576,067   1,422,111    1.778      2.31        18.5         4.74 (INVALID: fmax(a,a*0.9999+ε)=a by fast-math; only fmul+fadd remain)
+
+=== Notes ===
+
+Measurement methodology: 8 independent dep-chains share one SIMD-group (32 threads).
+All 8 ops feed through the AGX complex math pipeline (SFU) sequentially.
+T_outer ≈ 8 × SFU_TP + L_last_op (SFU TP = 4 for LOG2/EXP2, 8 for SQRT).
+This makes the measurement SFU-throughput-dominated, not pure dep-chain latency.
+
+LOG2_32 (valid): T_outer = 44.5 cyc ≈ 8×4 (queue) + ~12.5 (last op latency+overhead).
+  Confirms LOG2_TP = 4 cycles. Philip adj_lat = 4.31 cycles.
+
+SQRT_32 (valid): T_outer = 102.4 cyc ≈ 8×8 (queue) + ~38 (last op + overhead).
+  Confirms SQRT_TP = 8 cycles. Philip adj_lat = 8.99 cycles.
+  Implied SQRT latency from SFU model: 102.4 - 8×8 - fmul_fadd_dispatch ≈ 8-12 cycles.
+  Consistent with Philip raw latency range 8.57-11.13 cycles.
+
+EXP2_32 (design issue): fract(exp2(a)) probe puts TWO SFU ops (EXP2 + TRUNC32) per chain.
+  With 8 chains: 8×EXP2 + 8×TRUNC = 16 SFU ops total, 16×4=64 cyc SFU minimum.
+  Cannot cleanly separate EXP2 latency. Need redesign: use scale+offset to bound values,
+  or single-chain probe with high inner_iters.
+  Lower bound: EXP2 latency < 157.9 - 8×4 (fract SFU contribution) - overhead = ~86 cyc? No.
+  Philip adj_lat = 4.31 cycles should be trusted for EXP2.
+
+FMAX_32 (compiler eliminated): fmax(a, a*0.9999+0.0001) → a always (for a>0.01, fast-math).
+  Measurement of 2.31 cyc/op reflects only fmul+fadd overhead. INVALID for FMAX latency.
+  Philip FMAX32 adj_lat = 4.74 cycles should be trusted.
+  To fix: use gid-dependent b = (gid&1)?+0.1:-0.1 outside loop; compute fmax(a+b, a-b).
+  Or use: a = fmax(a, 0.5-a) which toggles around fixed point.
+
+=== AIR verification ===
+Confirmed instructions used:
+  probe_exp2_lat: air.fast_exp2.f32, air.fast_fract.f32
+  probe_log2_lat: air.fast_log2.f32 (with fmul + fadd in dep chain)
+  probe_sqrt_lat: air.fast_sqrt.f32 (with fmul + fadd in dep chain)
+  probe_fmax_lat: air.fast_fmax.f32 (likely DCE'd; only fmul+fadd remain active)

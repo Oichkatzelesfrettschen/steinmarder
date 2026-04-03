@@ -31,19 +31,19 @@ steinmarder dep-chain ≈ structural stall time. Neither is wrong; they measure 
 | FADD32    | 1–2       | 2.20            | **1.695**        | **2.20** ✓        | 1.090     | 1.42       | Agree perfectly |
 | FMUL32    | 1–2       | 2.21            | **1.347**        | **1.75**          | 0.751     | 0.97       | S dep slightly lower — fmul has shorter pipeline? |
 | FFMA32    | 1–2       | 2.21            | **1.993**        | **2.59**          | 1.764     | 2.29       | S TP anomaly (reg pressure at 8 acc); P=1 cyc TP |
-| FMAX32    | 1         | 4.74            | —                | — (**gap**)       | —         | —          | P only; select-like 4.74 cyc latency |
-| FMIN32    | 1         | 4.74            | —                | — (**gap**)       | —         | —          | same as FMAX |
+| FMAX32    | 1         | 4.74            | 1.778 (invalid)  | — (DCE'd)         | —         | —          | S probe: compiler eliminated fmax(a, a*0.9999+ε)=a via fast-math; only fmul+fadd remain. P adj_lat=4.74 trusted |
+| FMIN32    | 1         | 4.74            | —                | — (**gap**)       | —         | —          | same as FMAX; P adj_lat=4.74 |
 | FCMPSEL32 | 1         | 4.74            | —                | — (**gap**)       | —         | —          | conditional select |
 | CONVERT(F→I32) | 4    | 3.66            | —                | — (**gap**)       | —         | —          | rounding/convert |
 | RINT32    | 4         | 3.66            | —                | — (**gap**)       | —         | —          |
 | FRACT32   | 4         | ~5 (seq)        | —                | — (**gap**)       | —         | —          | TRUNC+FADD sequence |
-| FSQRT32   | 8         | 8.57–11.13      | —                | — (**gap**)       | —         | —          | P only |
+| FSQRT32   | 8         | 8.57–11.13      | **9.846** (8-ch) | **12.80** (8-ch)  | —         | —          | S (2026-04-03): 8-chain TP probe. T_outer=102.4cyc ≈ 8×TP_sqrt=64+overhead+lat. SQRT_TP=8 confirmed; SQRT_lat ≈ 9-12 cyc from model |
 | RECIP32 (fast) | 6    | 6.50            | **8.605**        | **11.18**         | 6.269     | 8.15       | S dep > P adj: SFU stall; P TP=6 confirmed by S TP=8 (discrepancy) |
 | RSQRT32 (fast) | 8    | 8.99            | **9.405**        | **12.23**         | 9.393     | 12.21      | T=L=12 cyc — **non-pipelineable on M1**; P TP=8 on M2? |
 | RSQRT32 precise | 8  | 8.99 (P same!)  | **29.2**         | **37.97**         | —         | —          | AIR: `air.rsqrt.f32` = Newton-Raphson multi-step. P may have older SDK that compiled precise→fast |
 | FDIV32    | 6.01      | 7.62–8.90       | —                | — (**gap**)       | —         | —          | P: = RECIP32 + FMUL32 in sequence |
-| EXP2_32   | 4         | 4.31            | —                | — (**gap**)       | —         | —          | Hardware transcendental unit |
-| LOG2_32   | 4         | 4.31            | —                | — (**gap**)       | —         | —          |
+| EXP2_32   | 4         | 4.31            | 15.183 (probe design issue) | — (confounded) | —  | —          | S probe includes fract on same SFU pipeline; cannot isolate EXP2. P adj_lat=4.31 trusted |
+| LOG2_32   | 4         | 4.31            | **4.276** (8-ch) | **5.56** (8-ch)   | —         | —          | S (2026-04-03): 8-chain TP probe. T_outer=44.5cyc ≈ 8×TP_log2=32+latency. LOG2_TP=4 CONFIRMED |
 | EXPE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          | Software: base-2 change + EXP2 |
 | LOGE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          |
 | SIN32     | 14.28     | 23.04–27.35     | —                | — (**gap**)       | —         | —          | Two hardware phases: SIN_PT1+SIN_PT2 |
