@@ -290,7 +290,7 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 - [x] B3: RECIP32 dep=8.605 ns (~11 cyc), RSQRT32 dep=9.405 ns (~12 cyc); TP probes captured (RECIP 8-acc=6.27 ns; RSQRT TP has self-loop bug)
 - [x] B4: RSQRT TP investigation complete — M1 fast_rsqrt: T=L=12 cyc (non-pipelined). `metal::precise::rsqrt` = `air.rsqrt.f32` = Newton-Raphson multi-step, ~31 cycles (NOT hardware rcp). Philip's 8-cycle TP may be M2/M3. All chain counts give 12 cyc/op.
 - [x] B5: RECIP TP investigation complete — M1 fdiv arcp: dep-chain 11 cyc, 8-chain gives ~8.1 cyc (TP ≈ 8 on M1). `metal::fast::divide(1.0f, x)` dep-feedback folded by compiler (algebraic identity). Best measured TP = 8 cycles.
-- [ ] B6: Metal IMUL 64-bit dep-chain (`uint64_t` version) — AGX may not have native 64-bit int-mul
+- [x] B6: Metal IMUL 64-bit dep-chain — 8.529 ns = 11.1 cycles (2.53× int32 mul). AIR: LLVM folds 32 serial `mul i64` → 1 × `mul i64 acc, -4842297668175259519`. Compiler uses hardware `IMUL(32x32=64)` 8-cyc path for multiply-by-constant. True `IMUL(64x64=64)` (both operands variable) = 16 cyc per Philip. AGX has hardware 64-bit multiply acceleration.
 
 ### Tier C: Memory hierarchy completions
 - [x] C1: T5-fix genuine LDS latency — volatile threadgroup + cross-thread access: 43.66 ns/step, 21.8 ns/access, ~28 GPU cycles
