@@ -85,11 +85,13 @@
 | Warm L1 global load | **10.07** | ~13 | Per-thread, no contention; 8KB L1 fits |
 | LDS store→load (volatile) | **21.8**/access | ~28 | Per access; L1 is FASTER than LDS! |
 | threadgroup_barrier | **25.44** | ~33 | Barrier-only isolation |
-| simdgroup_matmul 8×8 (SGMM f32) | **24.235** | ~31.5 | 512 MADs/call; 0.024 ns/effective-FP-op (71× scalar fadd); faster than simd_sum! |
+| simdgroup_matmul 8×8 (SGMM f32) | **24.235** | ~31.5 | 512 MADs/call; 0.024 ns/FP-op effective; 71× scalar fadd; T=L=~32 cyc (NON-pipelineable) |
+| simd_prefix_inclusive_sum | **23.720** | ~30.8 | 2.32× single shuffle; log2(32) stages in 2.15× naive serial; faster than simd_sum! |
+| simd_prefix_exclusive_sum | **22.275** | ~29.0 | 1.73 ns cheaper than inclusive (no final self-element add) |
 | simd_broadcast (lane 0 → all) | **10.690** | ~13.9 | ≈ L1 global load! All permutations cost same |
 | simd_shuffle_down (delta=1) | **10.162** | ~13.2 | Same tier as broadcast and L1 load |
 | simd_shuffle_xor (mask=1) | **10.215** | ~13.3 | Adjacent-lane butterfly step = shuffle_down latency |
-| simdgroup_sum (32-lane) | **28.31** | ~36 | 2.77× single shuffle; hardware tree reduction |
+| simdgroup_sum (32-lane) | **28.31** | ~36.8 | 2.77× single shuffle; reduction broadcast step adds ~6 cyc vs prefix scan |
 | Threadgroup atomic_fetch_add | **89.6** | ~115 | Serial dep-chain; 47× CPU atomic |
 | Global atomic_fetch_add | **143.8** | ~184 | 60% slower than TG atomic |
 

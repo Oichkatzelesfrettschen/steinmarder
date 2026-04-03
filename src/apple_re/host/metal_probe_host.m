@@ -100,6 +100,84 @@ static int print_counter_sample(id<MTLCounterSampleBuffer> sampleBuf,
     return (int)counter_count;
 }
 
+// Measure MTLSharedEvent CPU wakeup latency.
+// Encodes an empty command buffer that signals the event, then blocks the CPU thread
+// with [event waitUntilSignaledValue:]. The wall-clock delta measures:
+//   command-buffer dispatch overhead + GPU scheduling + event signal + CPU wakeup.
+// Reports ns statistics across `n_iters` iterations (warm-up: first 5% of iterations
+// are discarded from stats).
+static void measure_event_latency(id<MTLDevice> device, uint32_t n_iters) {
+    id<MTLCommandQueue> queue = [device newCommandQueue];
+    id<MTLSharedEvent> event = [device newSharedEvent];
+
+    // Allocate a tiny output buffer (required by some pipeline setups; unused here).
+    id<MTLBuffer> dummy = [device newBufferWithLength:4 options:MTLResourceStorageModeShared];
+
+    // Warm-up: 10 iterations before recording stats.
+    uint32_t warmup = n_iters / 10 < 10 ? 10 : n_iters / 10;
+    uint32_t total = n_iters + warmup;
+
+    double *samples = (double *)malloc(sizeof(double) * n_iters);
+    if (samples == NULL) {
+        fprintf(stderr, "event_latency: out of memory\n");
+        return;
+    }
+
+    uint64_t signal_value = 0;
+    uint32_t recorded = 0;
+
+    for (uint32_t i = 0; i < total; ++i) {
+        signal_value++;
+
+        id<MTLCommandBuffer> cb = [queue commandBuffer];
+        // Encode a trivial compute pass — just endEncoding with no work.
+        id<MTLBlitCommandEncoder> blit = [cb blitCommandEncoder];
+        [blit endEncoding];
+        // Signal the shared event at the end of this command buffer.
+        [cb encodeSignalEvent:event value:signal_value];
+
+        uint64_t t0 = now_ns();
+        [cb commit];
+        // Block until the GPU signals the event.
+        [event waitUntilSignaledValue:signal_value timeoutMS:2000];
+        uint64_t t1 = now_ns();
+
+        if (i >= warmup) {
+            samples[recorded++] = (double)(t1 - t0);
+        }
+    }
+
+    // Sort samples for percentile computation.
+    // Simple insertion sort (n_iters is typically small, e.g. 200–1000).
+    for (uint32_t i = 1; i < recorded; ++i) {
+        double key = samples[i];
+        int32_t j = (int32_t)i - 1;
+        while (j >= 0 && samples[j] > key) {
+            samples[j + 1] = samples[j];
+            j--;
+        }
+        samples[j + 1] = key;
+    }
+
+    double sum = 0.0;
+    for (uint32_t i = 0; i < recorded; ++i) { sum += samples[i]; }
+    double mean_ns = sum / (double)recorded;
+    double min_ns  = samples[0];
+    double max_ns  = samples[recorded - 1];
+    double p50_ns  = samples[(uint32_t)(recorded * 0.50)];
+    double p95_ns  = samples[(uint32_t)(recorded * 0.95)];
+    double p99_ns  = samples[(uint32_t)(recorded * 0.99 < recorded ? recorded * 0.99 : recorded - 1)];
+
+    fprintf(stdout,
+        "event_latency_ns: n=%u warmup=%u\n"
+        "  min=%.0f  p50=%.0f  mean=%.0f  p95=%.0f  p99=%.0f  max=%.0f\n",
+        recorded, warmup,
+        min_ns, p50_ns, mean_ns, p95_ns, p99_ns, max_ns);
+
+    (void)dummy;
+    free(samples);
+}
+
 int main(int argc, char **argv) {
     @autoreleasepool {
         const char *metallib_path = NULL;
@@ -107,6 +185,7 @@ int main(int argc, char **argv) {
         uint32_t width = 1024;
         uint32_t iterations = 100;
         uint32_t fs_probe_every = 0;
+        uint32_t event_latency_iters = 0;  // 0 = disabled
         int csv = 0;
         int do_list_counters = 0;
         const char *counter_set_name = NULL;  // NULL = no counter sampling
@@ -130,17 +209,25 @@ int main(int argc, char **argv) {
                 do_list_counters = 1;
             } else if (strcmp(argv[i], "--counters") == 0 && i + 1 < argc) {
                 counter_set_name = argv[++i];
+            } else if (strcmp(argv[i], "--measure-event-latency") == 0 && i + 1 < argc) {
+                event_latency_iters = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--help") == 0) {
                 fprintf(stdout,
                     "usage: %s [--metallib path] [--kernel name] [--width N] [--iters N]\n"
                     "          [--fs-probe|--fs-probe-every N] [--csv]\n"
                     "          [--list-counters] [--counters SETNAME]\n"
+                    "          [--measure-event-latency N]\n"
                     "\n"
                     "MTLCounterSet options:\n"
                     "  --list-counters        List all available counter sets and their counters, then exit.\n"
                     "  --counters SETNAME     Enable counter sampling for the named counter set.\n"
                     "                         SETNAME examples: 'Timestamp', 'StatisticCounters'\n"
-                    "                         Counter values printed to stdout after the run.\n",
+                    "                         Counter values printed to stdout after the run.\n"
+                    "\n"
+                    "Event latency:\n"
+                    "  --measure-event-latency N  Measure MTLSharedEvent CPU wakeup latency over N iters.\n"
+                    "                             Encodes empty command buffer + signal; blocks CPU with\n"
+                    "                             waitUntilSignaledValue. Prints min/p50/mean/p95/p99/max.\n",
                     argv[0]);
                 return 0;
             } else {
@@ -158,6 +245,12 @@ int main(int argc, char **argv) {
         // Handle --list-counters before requiring --metallib
         if (do_list_counters) {
             list_counter_sets(device);
+            return 0;
+        }
+
+        // Handle --measure-event-latency before requiring --metallib
+        if (event_latency_iters > 0) {
+            measure_event_latency(device, event_latency_iters);
             return 0;
         }
 

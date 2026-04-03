@@ -53,6 +53,9 @@
 | — | GPU simdgroup_sum | GPU | 28.31 | — | 28.31 | — | 32-lane reduction; 2.77× single shuffle (~36 GPU cycles) |
 | — | CPU log/exp (f64) | CPU | ~14.5 | 14.5 | — | — | libm software: ~15 cycles |
 | — | CPU sin/cos (f64) | CPU | 20.30 | 20.30 | — | — | libm software: ~21 cycles |
+| — | GPU simd_prefix_inclusive_sum | GPU | 23.720 | — | 23.720 | — | ~30.8 cyc; 2.15× naive serial; faster than simd_sum |
+| — | GPU simd_prefix_exclusive_sum | GPU | 22.275 | — | 22.275 | — | ~29.0 cyc; 1.73 ns cheaper than inclusive; no final self-element add |
+| — | GPU SGMM f32 8×8 (dep/tp, non-pipelineable) | GPU | 24.235 | — | 24.235 | 24.384 | T_issue=T_lat=~32 cyc; 0 ILP benefit from independent accumulators |
 | — | GPU TG barrier | GPU | 25.44 | — | 25.44 | — | threadgroup_barrier isolation |
 | — | GPU TG atomic | GPU | 89.6 | 1.912 | 89.6 | — | GPU 47× slower than CPU for serial atomic |
 | — | GPU global atomic | GPU | 143.8 | — | 143.8 | — | 60% slower than TG atomic |
@@ -194,7 +197,11 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 
 12. **AGX simd cross-lane latency = L1 global load latency = ~13 cycles.** `simd_broadcast`, `simd_shuffle_down`, and `simd_shuffle_xor` all cost 10.16–10.69 ns (~13.2–13.9 cycles) — essentially the same. This suggests inter-lane communication uses the same interconnect as L1 global loads, not a dedicated "free" butterfly unit. `simd_sum` (36 cycles) takes 2.77 × single shuffle — the hardware tree reduction is faster than 5 serial shuffles (log2(32)), but cross-lane data movement is far from free.
 
-11. **ANE atomics are a category error.** The Apple Neural Engine has no per-thread execution model and no user-visible atomics. The correct "atomic equivalent" is a full CoreML inference graph boundary, signaled via hardware interrupt — operating at millisecond-scale (1–10 ms dispatch), not nanosecond-scale. The synchronization hierarchy spans 7 orders of magnitude: CPU int ADD (0.3 ns) → CPU atomic (1.9 ns) → GPU atomic (90–144 ns) → MTLSharedEvent (~5–50 µs) → CoreML ANE dispatch (~1–10 ms).
+11. **ANE atomics are a category error.** The Apple Neural Engine has no per-thread execution model and no user-visible atomics. The correct "atomic equivalent" is a full CoreML inference graph boundary, signaled via hardware interrupt — operating at millisecond-scale (1–10 ms dispatch), not nanosecond-scale. The synchronization hierarchy spans 7 orders of magnitude: CPU int ADD (0.3 ns) → CPU atomic (1.9 ns) → GPU atomic (90–144 ns) → MTLSharedEvent (p50=10 µs) → CoreML ANE dispatch (~1–10 ms).
+
+13. **AGX simdgroup_multiply_accumulate is non-pipelineable.** 4 independent C accumulators gives ILP=0.994× — effectively zero ILP benefit. T_issue = T_latency = ~32 cycles. The SGMM unit does not accept new work before the previous result is available. Contrast with scalar fadd (ILP 1.55×) and fmul (ILP 1.79×). SGMM throughput is limited by occupancy (many simdgroups in parallel), not instruction-level parallelism within a single simdgroup.
+
+14. **simd_prefix_sum (30.8 cyc) < simdgroup_sum (36.8 cyc) < naive serial prefix (65 cyc).** The hardware tree reduction in simd_sum costs 6 extra cycles vs prefix_inclusive_sum — the final broadcast step is exposed. simd_prefix_exclusive_sum (29.0 cyc) is 1.73 ns cheaper than inclusive because it omits the final self-element add. log2(32)=5 butterfly stages complete in ~31 cycles, demonstrating 2.1× hardware pipelining of the butterfly tree (vs the 65-cycle naive serial upper bound).
 
 ---
 
@@ -212,7 +219,7 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 | GPU threadgroup | `atomic_fetch_add` (u32) | **89,600** | 46,800× | ✓ measured |
 | GPU global | `atomic_fetch_add` (u32) | **143,800** | 75,200× | ✓ measured |
 | CPU→GPU (warm) | `commandBuffer` overhead component | **~130–215** | 68–112× | ✓ measured (single-dispatch, warm queues) |
-| CPU↔GPU | `MTLSharedEvent` CPU wakeup | **~5,000–50,000** | 2,600–26,100× | estimated (OS scheduling latency; not directly probed) |
+| CPU↔GPU | `MTLSharedEvent` CPU wakeup | **10,000** (p50) | 5,200× | ✓ measured (F5: min=5µs, p50=10µs, p95=17µs, p99=30µs, max=44µs) |
 | CPU→GPU | MPS dispatch (small matmul <1024×1024) | **500,000–3,000,000** | 260,000–1,570,000× | ✓ measured (`neural_lane_results.md`) |
 | CPU→ANE | CoreML model dispatch (task-level) | **~1,000,000–10,000,000** | 520,000–5,200,000× | estimated (IOMMU + task-descriptor; no direct measurement) |
 | ANE | `atomic_fetch_add` per-element | **DOES NOT EXIST** | N/A | ANE has no programmable threads |
@@ -259,9 +266,9 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 ### Tier D: Simdgroup completions
 - [x] D1: simd_broadcast_lat = 10.690 ns (~13.9 cyc) — ≈ L1 global load latency; all cross-lane ops converge
 - [x] D2: simd_shuffle_down_lat = 10.162 ns (~13.2 cyc), simd_shuffle_xor_lat = 10.215 ns (~13.3 cyc) — permutation cost = broadcast cost
-- [ ] D3: simd_prefix_sum / simd_scan dep chain — prefix scan latency (needs Metal 3.x scan API)
+- [x] D3: simd_prefix_inclusive_sum dep-chain = 23.720 ns (~30.8 cyc); simd_prefix_exclusive_sum = 22.275 ns (~29.0 cyc). 2.32× single shuffle. log2(32) stages in 2.15× naive serial — hardware pipelining. Inclusive FASTER than simd_sum (36.8 cyc).
 - [x] D4: SGMM f32 8×8 dep-chain = 24.235 ns (~31.5 cyc). 512 MADs = 0.024 ns/FP-op effective = 71× scalar fadd. Faster than simd_sum (36.8 cyc)! Dedicated matrix unit confirmed.
-- [ ] D4b: SGMM throughput (multiple independent C accumulators) — expose actual issue throughput
+- [x] D4b: SGMM throughput (4 independent C accumulators) = 24.384 ns (~31.7 cyc). ILP gain = 0.994× ≈ 1.0. CONCLUSION: simdgroup_multiply_accumulate is NON-PIPELINEABLE on M1 AGX. T_issue = T_latency = ~32 cycles.
 
 ### Tier E: Cross-arch comparisons
 - [ ] E1: r600 (TeraScale-2) double-single latency — CPU host measures OpenCL kernel doing DS-mul via Rusticl
@@ -275,7 +282,7 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 - [ ] F2: Neural int8 GEMM MPS timing — quantized matmul path
 - [ ] F3: Neural BF16 GEMM comparison vs fp16
 - [ ] F4: Cross-domain GEMM table: CPU BLAS vs MPS vs Neural Engine for fp32/fp16/int8
-- [ ] F5: MTLSharedEvent direct latency probe — measure CPU wakeup latency from GPU signal (estimate currently 5–50 µs; needs direct measurement)
+- [x] F5: MTLSharedEvent direct latency probe — MEASURED. min=5,000 ns, p50=10,000 ns, mean=10,830 ns, p95=17,000 ns, p99=30,000 ns, max=44,000 ns. Confirms C overhead decomposition: 10 µs event + ~3.14 ms GPU launch infra.
 - [ ] F6: CoreML ANE dispatch latency — single-layer model, measure wall-clock for first and subsequent predictions
 
 ### Tier G: Documentation and synthesis
@@ -308,4 +315,4 @@ Range 1.19–1.33 GHz is consistent with M1 GPU dynamic clock. Best estimate: **
 
 ---
 
-*Last updated: 2026-04-03. Tiers A–B–C–D1/D2 completed. ANE sync model researched (APPLE_ANE_SYNC_MODEL.md). RECIP/RSQRT dep-chain + throughput measured. FP16 throughput measured. SIMD cross-lane latency measured (all ops = ~13 cyc = L1 load latency).*
+*Last updated: 2026-04-03. Tiers A–B–C–D1/D2/D3/D4/D4b completed. F5 MTLSharedEvent latency directly measured. ANE sync model researched (APPLE_ANE_SYNC_MODEL.md). RECIP/RSQRT dep-chain + throughput measured. FP16 throughput measured. SIMD cross-lane latency measured (all ops = ~13 cyc = L1 load latency). SGMM non-pipelineable confirmed. Prefix scan < simd_sum.*
