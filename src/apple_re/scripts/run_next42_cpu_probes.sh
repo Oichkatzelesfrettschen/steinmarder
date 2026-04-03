@@ -12,7 +12,10 @@ mkdir -p "$OUT_DIR/cpu_runs" "$OUT_DIR/disassembly" "$OUT_DIR/llvm_mca" "$OUT_DI
 
 cat > "$OUT_DIR/cpu_probe_families.txt" <<'EOF'
 integer_add_sub
+typed_integer_widths
 floating_add_mul_fma
+typed_float_widths
+bf16_proxy
 load_store_chain
 shuffle_lane_cross
 atomics
@@ -51,7 +54,10 @@ EOF
     exit 0
 fi
 
-for probe in add_dep_u64 fadd_dep_f64 fmadd_dep_f64 load_store_chain_u64 shuffle_lane_cross_u64 atomic_add_relaxed_u64 transcendental_sin_cos_f64; do
+for probe in \
+    add_dep_u64 add_dep_u32 add_dep_i64 add_dep_i16 add_dep_i8 add_dep_u16 add_dep_u8 \
+    fadd_dep_f64 fadd_dep_f32 fmadd_dep_f64 bf16_f32_roundtrip_proxy \
+    load_store_chain_u64 shuffle_lane_cross_u64 atomic_add_relaxed_u64 transcendental_sin_cos_f64; do
     "$BINARY" --iters "$ITERS" --probe "$probe" --csv > "$OUT_DIR/cpu_runs/$probe.csv" 2>&1 || true
 done
 
@@ -116,6 +122,7 @@ cat > "$OUT_DIR/cpu_notes.md" <<'EOF'
 # Next42 CPU Probe Draft
 
 - families: integer add/sub, floating add/mul/FMA, load/store, shuffle, atomics, transcendentals
+- widened types: int8, int16, int64, uint8, uint16, uint32, float32, bf16 proxy
 - binary: sm_apple_cpu_latency
 - expected artifacts: cpu_probe_families.txt, cpu_probe_inventory.txt, compile_matrix.txt, cpu_bins/*, cpu_runs/*.csv, disassembly/*.txt, llvm_mca/*.txt
 EOF

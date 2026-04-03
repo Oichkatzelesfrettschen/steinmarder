@@ -1,0 +1,13 @@
+cuda_probe_family,reference_path,apple_lane,apple_asset,status,next_step
+conversion_sweep,probes/conversion_sweep/probe_conv_chain_all_types.cu,cpu,../apple_re/probes/apple_cpu_latency.c,partial,Add typed CPU conversion probes for int8/int16/uint32/bfloat16/float32.
+conversion_sweep,probes/conversion_sweep/probe_conv_f16_bf16_cross.cu,metal,../apple_re/scripts/classify_metal_type_surface.py,partial,Add direct Metal conversion kernels and AIR inspection.
+int_tiling,probes/int_tiling/probe_int8_tile_dp4a_stencil.cu,metal,../apple_re/scripts/classify_metal_type_surface.py,partial,Add packed integer stencil and reduction probe kernels.
+int_tiling,probes/int_tiling/probe_int16_tile_reduce.cu,cpu,../apple_re/probes/apple_cpu_latency.c,planned,Add int16/int64 reference chains.
+mx_nf_tiling,probes/mx_nf_tiling/probe_mxfp8_tile_reduce.cu,metal,../apple_re/scripts/classify_metal_type_surface.py,partial,Pair current MX proxies with AGX trace/counter capture.
+mx_nf_tiling,probes/mx_nf_tiling/probe_mxint8_tile_matmul.cu,neural,../apple_re/scripts/neural_typed_matrix.py,planned,Add MX proxy workloads to the neural typed matrix.
+mx_nf_tiling,probes/mx_nf_tiling/probe_nf4_tile_smem_lut.cu,vulkan_moltenvk,../apple_re/scripts/run_next42_moltenvk_probe_suite.sh,planned,Compile and stage frontier compute probes through MoltenVK.
+cache_control,probes/cache_control/probe_ldg_cache_hints.cu,cpu,../apple_re/probes/apple_cpu_cache_pressure.c,partial,Extend cache-pressure families with typed working-set variants.
+data_movement,probes/data_movement/probe_dm_global_to_shared.cu,metal,../apple_re/shaders/probe_threadgroup_heavy.metal,partial,Add typed global-to-threadgroup transfer variants.
+edge_atomics,probes/edge_atomics/probe_edge_fp8_block_reduce.cu,metal,../apple_re/shaders/probe_atomic_add.metal,planned,Add mixed-precision atomic and reduction probes.
+tensor_core_tf32,../src/cuda_lbm/kernels_tensor_core.cu,metal,../apple_re/scripts/classify_metal_type_surface.py,partial,Current TF32 proxy exists; next step is GPU-side counter capture.
+graphics_texture_stride,probes/data_movement/probe_dm_ldg_readonly_vec.cu,opengl,../apple_re/scripts/run_next42_opengl_probe_suite.sh,planned,Use fragment-texture stride probes as the OpenGL analogue.

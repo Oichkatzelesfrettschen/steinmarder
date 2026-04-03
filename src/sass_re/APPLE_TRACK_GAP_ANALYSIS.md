@@ -6,6 +6,12 @@ Source runs: `2026-03-30_tranche1_r5_variants_frontier`, `2026-03-30_tranche1_r7
 This document compares the Apple track methodology against the mature SASS/SM89
 track to identify gaps in scripts, tools, and measurement coverage.
 
+The analysis changed meaningfully after the r7 keepalive bundle and the typed
+atlas landing in `src/sass_re`: raw Metal GPU counters, GPU command-buffer
+timing, and promoted neural placement artifacts now exist. The main gap is no
+longer "can we see anything," but "can we keep every requested type family
+honest across CPU, Metal, and neural lanes?"
+
 ---
 
 ## 1. Tooling Stack Comparison
@@ -16,12 +22,12 @@ track to identify gaps in scripts, tools, and measurement coverage.
 |------|---------|-----------------|
 | `nvcc` / `ptxas` | GPU kernel compilation | `xcrun metal` |
 | `cuobjdump` / `nvdisasm` | **Actual GPU ISA** disassembly (SASS) | `xcrun metallib --disassemble` → AIR/LLVM IR only, NOT GPU ISA |
-| `ncu` (Nsight Compute) | Per-kernel hardware counters: L1/L2 hit rate, warp efficiency, ALU utilization | `xctrace` Metal schemas (timing intervals only) + `MTLCounterSet` API (not yet wired) |
+| `ncu` (Nsight Compute) | Per-kernel hardware counters: L1/L2 hit rate, warp efficiency, ALU utilization | `xctrace --instrument 'Metal GPU Counters'` + `MTLCounterSet` host timing/counter hooks |
 | `nsys` (Nsight Systems) | Timeline profiling — kernel launch to completion | `xctrace` command buffer / driver / GPU state intervals ✓ |
 | `hyperfine` | Host-side timing | `hyperfine` ✓ |
 | `perf` / `valgrind` | CPU-side profiling | `sample`, `spindump`, `leaks`, `vmmap` ✓ |
 | `objdump` | CPU binary disassembly | `otool -tv`, `llvm-objdump` ✓ |
-| `llvm-mca` | Throughput/latency prediction from asm | `llvm-mca` (in r5, missing from r7) |
+| `llvm-mca` | Throughput/latency prediction from asm | `llvm-mca` ✓ (promoted in r7) |
 | CUDA sanitizers | Memory/UB checks | ASan/UBSan ✓ |
 | `strace` / FS traces | Syscall and filesystem event tracing | `fs_usage` ✓ (with sudo keepalive) |
 | `probe_manifest.py` | Machine-readable probe inventory | `apple_capability_report.py` (partial) |
@@ -56,30 +62,23 @@ Observation tools:
   powermetrics        — GPU power + thermal + performance counters ✓
 ```
 
-**Gap A: `xctrace gpu-counters` schema not in use**
+**Resolved baseline: GPU counters and GPU-side timing are now promoted**
 
-`xctrace list instruments` exposes a `gpu-counters` instrument with Apple GPU
-hardware performance counters. This is the closest Apple analogue to `ncu`:
-- ALU utilization (vertex/fragment/compute pipelines)
-- Texture unit utilization
-- Memory bandwidth (read/write bytes)
-- L1/L2 tile cache hit rates (Apple Tiled Deferred Rendering)
+The Apple lane now has both:
+- `xctrace --instrument 'Metal GPU Counters'` promoted in blessed artifacts
+- host-side `GPUStartTime` / `GPUEndTime` timing in the Metal harness
 
-Current status: all five Metal traces use only Metal application-level schemas
-(`metal-gpu-state-intervals`, `metal-driver-intervals`, `metal-gpu-intervals`,
-`metal-command-buffer-completed`, `metal-application-encoders-list`).
-The `gpu-counters` schema is never passed to `xctrace record --template`.
+That means the Apple gap has shifted from "no hardware signal" to "typed
+surface still too narrow."
 
-**Gap B: `MTLCounterSet` not wired into host harness**
+**Current top gap: no end-to-end typed matrix runner**
 
-`MTLDevice` exposes `counterSets` with `MTLCommonCounter` values including:
-- `MTLCommonCounterTotalCycles`
-- `MTLCommonCounterVertexCycles` / `MTLCommonCounterFragmentCycles`
-- `MTLCommonCounterShaderExecutions`
-- `MTLCommonCounterComputeKernelInvocations`
-
-The Metal host harness (`metal_host/`) times command buffer completion but does
-not call `MTLCounterSampleBuffer` before/after dispatch to read hardware counters.
+We still lack one runner that:
+- preserves raw JSON plus normalized CSV for each requested family
+- keeps `int`, `uint`, `fp`, `bf`, `tf`, `mx`, and `more` visible even when
+  support is proxy-only or unsupported
+- aligns neural placement-only evidence with CPU and Metal direct measurements
+- writes the same schema into promoted bundles every time
 
 ---
 
@@ -120,24 +119,24 @@ The O2 build is the probe-hot path: `add`, `subs`, `cmp`, `stp`, `ldp`, `bl`, `m
 
 | SASS/CUDA probe | Method | Apple Metal probe | Method | Gap |
 |----------------|--------|-------------------|--------|-----|
-| FFMA latency (FP32) | 32-deep dependent chain | **Missing** | — | **Critical gap** |
-| FADD latency (FP32) | dependent chain | **Missing** | — | **Critical gap** |
-| IMUL latency (INT32) | dependent chain | **Missing** | — | **Critical gap** |
-| LDS/Threadgroup latency | dependent threadgroup load chain | **Missing** | — | **Gap** |
-| Global memory L1 latency | dependent load chain (L1 sized buf) | **Missing** | — | **Gap** |
-| Global memory L2 latency | dependent load chain (L2 sized buf) | **Missing** | — | **Gap** |
+| FFMA latency (FP32) | 32-deep dependent chain | `probe_fma_lat.metal` | 8-step serial fma dep chain, reassoc(off) ✓ | **RESOLVED** 1.993 ns (2026-04-02) |
+| FADD latency (FP32) | dependent chain | `probe_fadd_fmul_lat_cmp.metal` | 8-step serial fadd dep chain ✓ | **RESOLVED** 1.695 ns (2026-04-02) |
+| IMUL latency (INT32) | dependent chain | `probe_imul_lat.metal` | 8-step serial imul dep chain ✓ | **RESOLVED** 3.376 ns = 2.0× fadd (2026-04-02) |
+| LDS/Threadgroup latency | dependent threadgroup load chain | `probe_threadgroup_lat.metal` | serial store→load dep chain in threadgroup[] ✓ | **RESOLVED** (T5, pending documentation) |
+| Global memory L1 latency | dependent load chain (L1 sized buf) | `probe_global_l1_lat.metal` | dep load chain in 4KB output buffer ✓ | **RESOLVED** (T6, pending documentation) |
+| Global memory L2 latency | dependent load chain (L2 sized buf) | **Missing** | — | **Gap** (requires larger buffer; host API constraint) |
 | Texture sample latency | dependent textureSample chain | **Missing** | — | **Gap** |
-| IADD throughput (independent acc) | 8 independent accumulators | **Missing** | — | **Gap** |
-| FFMA throughput | 8 independent accumulators | **Missing** | — | **Gap** |
+| IADD throughput (independent acc) | 8 independent accumulators | `probe_fp32_throughput.metal` | 8 independent fadd accumulators ✓ | **RESOLVED** fadd-tp=1.090 ns, fmul-tp=0.751 ns (2026-04-02) |
+| FFMA throughput | 8 independent accumulators | `probe_fp32_throughput.metal` | 8 independent fma accumulators ✓ | **RESOLVED** fma-tp=1.764 ns (half-rate unit confirmed) (2026-04-02) |
 | Warp/simdgroup reduce | `__reduce_add_sync` | `probe_simdgroup_reduce.metal` | single barrier + arithmetic ✓ | Partial |
-| Simdgroup sum latency | `simd_sum` dependent chain | **Missing** | — | **Gap** |
+| Simdgroup sum latency | `simd_sum` dependent chain | `probe_simdgroup_lat.metal` | serial simd_sum dep chain ✓ | **RESOLVED** (T7, pending documentation) |
 | Simdgroup broadcast | `simd_broadcast` chain | **Missing** | — | **Gap** |
 | Simdgroup shuffle | `simd_shuffle` dependent chain | **Missing** | — | **Gap** |
 | Register pressure sweep | explicit GPR count variants | `probe_register_pressure.metal` | 3 accumulators + float mix ✓ | Partial |
 | Occupancy sweep | varying threadgroup sizes | `probe_occupancy_heavy.metal` | 32-iter LCG loop ✓ | Partial |
 | Threadgroup memory bandwidth | read/write threadgroup[] arrays | `probe_threadgroup_heavy.metal` | threadgroup pressure ✓ | Partial |
-| Atomic (threadgroup) | `atomic_fetch_add` on threadgroup | **Missing** | — | **Gap** |
-| Atomic (global) | `atomic_fetch_add` on device buffer | **Missing** | — | **Gap** |
+| Atomic (threadgroup) | `atomic_fetch_add` on threadgroup | `probe_atomic_lat.metal` | serial atomic_fetch_add dep chain ✓ | **RESOLVED** (T8, pending documentation) |
+| Atomic (global) | `atomic_fetch_add` on device buffer | `probe_atomic_lat.metal` | serial atomic_fetch_add on device buffer ✓ | **RESOLVED** (T8, pending documentation) |
 
 ### Metal AIR opcode coverage (r7, `metal_air_opcode_counts.csv`)
 
@@ -159,8 +158,9 @@ Notable absences from AIR corpus:
 - `call @air.threadgroup*` — no explicit threadgroup memory ops in any shader
 - `call @air.simd.*` — no simdgroup intrinsics used
 
-This confirms the current Metal probes are integer-arithmetic and FP-light, with
-no coverage of Apple GPU's vector, simdgroup, or atomic capabilities.
+This confirms the current promoted AIR corpus is still narrow relative to the
+typed atlas: it has better simdgroup and atomic coverage than the earliest
+Apple runs, but it still does not classify the full requested type surface.
 
 ---
 
@@ -171,7 +171,7 @@ no coverage of Apple GPU's vector, simdgroup, or atomic capabilities.
 | SASS script | Purpose | Apple equivalent | Status |
 |-------------|---------|-----------------|--------|
 | `flag_matrix_sweep.sh` | 4+ compiler flag combinations | `compile_matrix.txt` (O0/O2 only) | Incomplete |
-| `ncu_profile_all_probes.sh` | Run `ncu` on every probe | **Missing** — `xctrace gpu-counters` not scripted | Gap |
+| `ncu_profile_all_probes.sh` | Run `ncu` on every probe | `capture_gpu_counters.sh` + tranche integration | Partial |
 | `probe_manifest.py` | Machine-readable probe registry | `apple_capability_report.py` | Partial |
 | `mine_cudnn_library_mnemonics.sh` | Mine production libraries | **Missing** — no Metal.framework mining | Gap |
 | `encoding_analysis.py` | Bit-field layout of ISA encoding | Not applicable (AIR = LLVM IR) | N/A |
@@ -197,13 +197,21 @@ no coverage of Apple GPU's vector, simdgroup, or atomic capabilities.
 
 ### Critical (changes build decisions)
 
-1. **`xctrace` `gpu-counters` schema capture** — this is the single biggest gap. Without hardware GPU counter capture (ALU utilization, tile cache hit rate, memory BW), we cannot answer "is this variant ALU-bound or memory-bound?" in the same way `ncu` answers it for CUDA.
+1. **Typed atlas runner parity** — the repo now has canonical Apple type tables,
+   but the tranche runner still does not emit them directly. Until the runner
+   writes typed JSON/CSV artifacts, the atlas remains partially hand-curated.
 
-2. **Metal latency probes (FP32/INT32 dependent chains)** — without clean dependent-chain shaders measuring `ffma`, `fadd`, `imad` etc. in isolation, we cannot build a Metal-equivalent of the SASS latency table.
+2. **Metal type-surface classification** — we now have FFMA, TGSM, simdgroup,
+   and atomic probes, but we still do not have compile-and-AIR classification
+   for `f16`, `bf16`, `int8`, `uint8`, `fp8`, `tf32`, and `MX`.
 
-3. **Metal throughput probes (independent accumulators)** — without independent-accumulator variants, we cannot separate latency from throughput.
+3. **Neural typed sweep** — the blessed neural story is still placement-first
+   and summary-heavy. We need a real backend/type matrix for `CoreML CPU_ONLY`,
+   `CPU_AND_GPU`, `CPU_AND_NE`, `ALL`, PyTorch CPU/MPS, and MLX GPU.
 
-4. **`llvm-mca` re-integration** — present in r5, missing from r7. Needs to be in every keepalive run. Gives theoretical throughput predictions for the CPU probe functions, completing the latency-vs-predicted-throughput comparison.
+4. **Cross-lane build-decision synthesis** — the Apple lane still needs one
+   explicit answer per family: native, lowered, framework proxy, host proxy,
+   emulated, unsupported, or unknown.
 
 ### Important (fills major gaps)
 
@@ -219,7 +227,8 @@ no coverage of Apple GPU's vector, simdgroup, or atomic capabilities.
 
 ### Medium (completes evidence chain)
 
-10. **Neural lane blessed run** — Core ML placement sweep, `torch_cpu_vs_mps.json`, `mlx_jax_checks.json`. Scripts exist, no promoted results.
+10. **Neural lane raw artifact preservation** — promoted neural results exist,
+    but Phase F still collapses too much into summaries and one-off JSON files.
 
 11. **Metal `register-light` variant** — brackets density behavior from the other side of `register_pressure`. The FRONTIER_ROADMAP_APPLE.md checklist already calls for this.
 
@@ -234,29 +243,22 @@ no coverage of Apple GPU's vector, simdgroup, or atomic capabilities.
 In priority order:
 
 ```sh
-# 1. Add xctrace gpu-counters schema to the tranche runner
-#    Edit run_apple_tranche1.sh phase D/E to also capture:
-xctrace record --template 'Metal Application' \
-  --output gpu_counters.trace \
-  -- ./sm_apple_metal_probe_host
+# 1. Replace the thin neural phase with a typed matrix sweep
+#    Preserve raw JSON and normalized CSV rows for:
+#    CoreML CPU_ONLY / CPU_AND_GPU / CPU_AND_NE / ALL
+#    PyTorch CPU / MPS
+#    MLX GPU
 
-# 2. Add Metal dependent-chain latency probes
-# New files needed:
-#   shaders/probe_ffma_lat.metal       — 32-deep dependent fma chain
-#   shaders/probe_fadd_lat.metal       — 32-deep dependent fadd chain
-#   shaders/probe_imad_lat.metal       — 32-deep dependent int multiply-add
-#   shaders/probe_tgsm_lat.metal       — pointer-chase in threadgroup memory
-#   shaders/probe_simd_reduce_lat.metal — dependent simd_sum chain
+# 2. Add Metal type-surface classification rows
+#    Compile small kernels for:
+#    f16, bf16, int8, uint8, fp8, tf32, mxfp8
+#    Then classify each row as native / lowered / unsupported from AIR.
 
-# 3. Re-add llvm-mca to every keepalive run
-#    Already scripted in run_next42_cpu_probes.sh — confirm it runs in phases
-#    that produce blessed results (not just phase B)
+# 3. Keep GPU counters and GPUStart/GPUEnd timing in every typed Metal sweep
 
-# 4. Run cache pressure probe and promote results
-cd src/apple_re && xcodebuild ... -target apple_cpu_cache_pressure
-./apple_cpu_cache_pressure --csv > results/cache_pressure.csv
+# 4. Extend CPU reference probes only where Apple exposes direct execution
 
-# 5. Run neural lane suite
+# 5. Regenerate the typed atlas tables from runner output
 src/apple_re/scripts/run_next42_neural_suite.sh \
   --out src/apple_re/results/blessed/2026-04-01_neural_tranche1/
 ```
@@ -267,15 +269,15 @@ src/apple_re/scripts/run_next42_neural_suite.sh \
 
 | Capability | SASS status | Apple status |
 |-----------|-------------|-------------|
-| Per-opcode latency table | 448 mnemonics measured | 0 GPU, 7 CPU families |
-| Per-opcode throughput table | 448 mnemonics | 0 GPU, 7 CPU families |
-| Hardware counter capture | ncu (L1/L2/ALU/warp) | xctrace timing only — NO counters |
+| Per-opcode latency table | 448 mnemonics measured | partial GPU, promoted CPU families, typed atlas seeded |
+| Per-opcode throughput table | 448 mnemonics | partial GPU, CPU reference lane only |
+| Hardware counter capture | ncu (L1/L2/ALU/warp) | xctrace GPU counters + host GPUStart/GPUEnd timing |
 | ISA disassembly | Full SASS assembly | AIR/LLVM IR only (no GPU ISA) |
 | Mnemonic mining (libraries) | cudnn/cublas mined | **Missing** |
 | Encoding analysis | Bit-field layout done | N/A (IR not encoded) |
-| Cache hierarchy measured | L1/L2/DRAM latency | CPU: L1/L2/LLC needed; GPU: missing |
-| Simdgroup / warp ops | Measured | **Missing** |
-| Threadgroup / LDS latency | Measured | **Missing** |
-| Neural / compute placement | N/A | Scripts ready, not promoted |
+| Cache hierarchy measured | L1/L2/DRAM latency | CPU cache knees promoted; GPU still missing |
+| Simdgroup / warp ops | Measured | partial, not fully typed |
+| Threadgroup / LDS latency | Measured | partial, not fully typed |
+| Neural / compute placement | N/A | promoted, but not yet typed-matrix complete |
 | Cross-run stability | Claims matrix + deltas | Density CSV stable ✓ |
 | Publication artifacts | Paper draft + figures | **Missing** |

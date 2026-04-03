@@ -14,6 +14,19 @@
 
 ## Target: 2000 FPS vkmark (headless)
 
+## Source-of-truth notes
+
+- live workspace: `nick@x130e:~/mesa-26-debug/`
+- evidence depot: `nick@x130e:~/eric/TerakanMesa/`
+- local compendium: [`results/x130e_terascale/README.md`](results/x130e_terascale/README.md)
+
+Current preservation snapshot facts:
+
+- remote Mesa commit observed: `3f173c0`
+- checkout state: detached `HEAD`
+- active dirty worktree spans `r600`, `zink`, winsys, runtime, and NIR
+- untracked Terakan tree present at `src/amd/terascale/`
+
 ## Key Findings
 
 ### Build Configuration
@@ -62,6 +75,56 @@ headroom for future GPU-feeding optimizations.
 **FAILED**: Zink requires DRI3/VK_KHR_swapchain which Terakan doesn't support yet.
 Error: "DRI3 not available" → glXChooseFBConfig() failed.
 Zink needs Terakan swapchain implementation before it can be tested.
+
+## Current bring-up blockers
+
+### Terakan Mesa 26 integration
+
+- `src/amd/terascale/` has already been copied into the remote Mesa 26 tree
+- remaining documented build blockers sit in custom NIR intrinsic and builder
+  wiring rather than broad driver absence
+- preserve the current tree before any cleanup because it is not yet attached
+  to a named branch
+
+## Rusticl Compute RAT Readback Fix (2026-04-02)
+
+### Bug #15: RAT readback — FIXED, 5/5 PASS
+
+The `out[i] = in[i] * 3.0` kernel now produces correct output on all 16 floats.
+
+**Root cause**: UB cast of `pool_bo` (`pipe_buffer`) as `r600_texture` inside
+`evergreen_emit_framebuffer_state`, plus CS space undercount in
+`r600_need_cs_space`.
+
+**Fix** (3 parts in `evergreen_compute.c`):
+1. Direct `CB_COLOR0_BASE` register emission from `r600_cb_surface` instead of
+   the invalid `r600_as_texture()` cast
+2. `r600_need_cs_space(rctx, 23, ...)` to account for the 23 extra dwords
+3. `compute_cb_target_mask` to set the correct RAT export mask
+
+### Kernel CS validator findings
+
+- `SHADER_TYPE` bit is invisible to opcode extraction; compute and non-compute
+  packets are processed identically by the kernel CS validator
+- `radeon_add_to_buffer_list` returns `index * 4`, matching kernel `idx / 4` —
+  reloc encoding is correct
+
+### Conformance status
+
+| Test | Result | Notes |
+|------|--------|-------|
+| rat_test_fixed (scale ×3.0) | **5/5 PASS** | INT8-range float arithmetic verified correct |
+| Custom 2-arg kernels | PASS | Isolated dispatches work |
+| Sequential dispatch | FAIL | Second kernel reads stale data from first kernel's output |
+| clpeak compute | CL_INVALID_WORK_GROUP_SIZE (-54) | Work-group size exceeds HW max |
+| clpeak transfer | 1.34 GBPS write | DDR3-533 UMA bandwidth |
+
+### Remaining bugs
+
+- Sequential dispatch: stale data between kernels (cache flush / barrier missing
+  between consecutive compute dispatches)
+- clpeak: `CL_INVALID_WORK_GROUP_SIZE` — need to clamp max work-group size to
+  hardware limit (likely 64 or 128 threads per SIMD)
 
 ## Next Steps
 1. ~~Get clean baseline at load < 1.0~~ DONE (385 FPS, matches -O0)

@@ -90,6 +90,7 @@ Useful outputs:
 
 The Apple subtree already provides the first pass at that translation:
 
+- [`APPLE_TYPED_BOUNDARY_ATLAS.md`](APPLE_TYPED_BOUNDARY_ATLAS.md)
 - [`../apple_re/README.md`](../apple_re/README.md)
 - [`../apple_re/CMakeLists.txt`](../apple_re/CMakeLists.txt)
 - [`../apple_re/probes/apple_cpu_latency.c`](../apple_re/probes/apple_cpu_latency.c)
@@ -104,19 +105,21 @@ The Apple subtree already provides the first pass at that translation:
 That scaffold is enough to start collecting repeatable evidence without trying
 to force a CUDA-shaped workflow onto Apple tooling.
 
-## Recommended First Expansion
+## Current Expansion Status
 
-The next useful additions are straightforward:
+The bridge has now moved beyond the original starter scaffold:
 
-1. Expand the CPU lane with load/store, shuffle, atomics, transcendental, and
-   cache-pressure probes.
-2. Add a tiny Metal host harness so the shader probes can be timed and profiled
-   end to end.
-3. Add Core ML graph generators for dtype and compute-unit sweep experiments.
-4. Normalize Apple result output so it can sit beside the existing
-   `src/sass_re/` tables and scripts.
+1. The CPU lane already has promoted integer, atomic, cache, multiply, and
+   fp16 reference rows.
+2. The Metal lane already has host harness timing, GPU command-buffer timing,
+   and promoted hardware counters.
+3. The neural lane already has promoted placement evidence, but it still needs
+   a true typed matrix runner instead of a thin blessed summary.
+4. The new atlas tables in `src/sass_re/tables/` are now the canonical place to
+   say whether a format is native, lowered, proxy-only, or unsupported.
 5. Use [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md) as the working
-   checklist while the Apple lane grows.
+   checklist and [APPLE_TYPED_BOUNDARY_ATLAS.md](APPLE_TYPED_BOUNDARY_ATLAS.md)
+   as the typed ledger while the runner side catches up.
 
 ## First Deep-Dive Runner
 
@@ -158,9 +161,9 @@ It covers:
 - Tool-by-tool comparison (16 SASS tools vs Apple equivalents)
 - Probe coverage table (CPU: 14 types, Metal GPU: 19 types)
 - 16 identified gaps in 3 tiers (Critical, Important, Medium)
-- The single most impactful gap: `metal-gpu-counter-intervals` tables are
-  schema-only in all blessed runs — hardware counters require `Metal GPU Counters`
-  xctrace template (script: `capture_gpu_counters.sh`)
+- The current top gap is no longer raw GPU counters; it is the missing typed
+  matrix runner that keeps low-bit, TF, BF, and MX families explicit across CPU,
+  Metal, and neural lanes
 
 ## Current Evidence Status (as of 2026-04-01)
 
@@ -187,11 +190,17 @@ It covers:
 
 Still absent: atomics, texture sampling, simdgroup matrix ops (`simdgroup_matrix_multiply_accumulate`), fp16 variants.
 
-### Critical gap not yet resolved
+### Remaining frontier gap
 
-`metal-gpu-counter-intervals`: ZERO hardware rows in all 5 blessed runs.
-Run `scripts/capture_gpu_counters.sh` with `Metal GPU Counters` template to get:
-ALU utilization, memory bandwidth, L1/L2 cache hit rates, SIMD utilization.
+The weak link is now typed normalization, not basic visibility:
+
+- GPU counters and GPUStart/GPUEnd timing are promoted and real
+- the CPU lane has direct measured type rows, but not yet the full requested
+  4/8/16/32/64 matrix
+- the Metal lane still needs compile-and-AIR classification for `f16`, `bf16`,
+  `int8`, `uint8`, `fp8`, `tf32`, and `MX`
+- the neural lane still needs a blessed typed matrix runner that preserves raw
+  JSON/CSV artifacts instead of a thin markdown summary
 
 ## Best Starting Points
 
@@ -202,5 +211,7 @@ ALU utilization, memory bandwidth, L1/L2 cache hit rates, SIMD utilization.
 - [`FRONTIER_ROADMAP_APPLE.md`](FRONTIER_ROADMAP_APPLE.md) for the concrete
   Apple checklist
 - [`APPLE_TRACK_GAP_ANALYSIS.md`](APPLE_TRACK_GAP_ANALYSIS.md) for the gap analysis
+- [`APPLE_TYPED_BOUNDARY_ATLAS.md`](APPLE_TYPED_BOUNDARY_ATLAS.md) for the typed
+  Apple boundary ledger
 - [`../apple_re/README.md`](../apple_re/README.md) for the current Apple subtree
   scaffold

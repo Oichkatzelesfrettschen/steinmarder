@@ -1,0 +1,9 @@
+Track,Claim type,Claim,Current status,Primary evidence,Canonical doc,Next action
+sass-re,project-shape,src/sass_re is the canonical control plane for the x130e TeraScale effort,active,AGENTS.md,AGENTS.md,Keep all new x130e ledgers here
+r600-terascale,workspace,The x130e Mesa source state is preserved but still detached and dirty,active,table_x130e_terascale_findings_matrix.csv,MEMORY_FINDINGS.md,Branch and remote-normalize the source tree
+r600-terascale,build,Terakan build blockage is now a focused Mesa 26 NIR integration problem,active,table_x130e_build_blockers.csv,TERASCALE_CAPABILITY_LEDGER.md,Patch builder drift and missing intrinsic
+r600-terascale,validation,Unsupported image usage conformance failures are currently at zero,active,table_x130e_terascale_findings_matrix.csv,TERASCALE_CAPABILITY_LEDGER.md,Preserve through future refactors
+r600-terascale,performance,CPU-side winsys cleanup remains a first-order hotspot on Bobcat,active,table_x130e_terascale_findings_matrix.csv,TERASCALE_SYNTHESIS.md,Profile and reduce cleanup/teardown cost
+r600-terascale,method,Optimization work should follow manifest-backed evidence standards already used in stronger tracks,active,table_x130e_pattern_transfer.csv,TERASCALE_METHOD_TRANSFER.md,Expand run manifests and probe tranches
+r600-terascale,scope,Remote x130e corpus must be vacuumed and classified instead of curated ad hoc,active,table_x130e_home_corpus.csv,TERASCALE_FILE_SCOPE.md,Keep inventories current after migration
+r600-terascale,dependency,Zink and DXVK are dependent validation lanes rather than early bring-up targets,active,TERAKAN_PERFORMANCE_TRACKER.md,TERASCALE_EXTERNAL_REFERENCES.md,Gate them on native Vulkan readiness

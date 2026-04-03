@@ -6,6 +6,7 @@ REPO_ROOT="$(CDPATH= cd -- "$ROOT_DIR/../.." && pwd)"
 OUT_DIR="${1:-$ROOT_DIR/results/next42_metal_probes_$(date +%Y%m%d_%H%M%S)}"
 ITERS="${ITERS:-800}"
 WIDTH="${WIDTH:-1024}"
+TYPE_SURFACE_ITERS="${TYPE_SURFACE_ITERS:-256}"
 FS_PROBE_EVERY="${FS_PROBE_EVERY:-128}"
 SUDO_MODE="${SUDO_MODE:-keepalive}"
 SUDO_INVOKE="sudo -n"
@@ -21,26 +22,38 @@ HOST_BIN="$HOST_OUT_DIR/sm_apple_metal_probe_host"
 mkdir -p "$OUT_DIR" "$HOST_OUT_DIR" "$METAL_OUT_DIR" "$OUT_DIR/disassembly"
 
 cat > "$OUT_DIR/metal_variant_matrix.csv" <<'EOF'
-variant,shader,iters_correctness,iters_timing,iters_trace,notes
-baseline,probe_simdgroup_reduce.metal,1,200,1000,starter variant
-threadgroup_heavy,probe_threadgroup_heavy.metal,1,160,800,threadgroup memory pressure
-threadgroup_minimal,probe_threadgroup_minimal.metal,1,192,900,minimal threadgroup pressure
-occupancy_heavy,probe_occupancy_heavy.metal,1,160,800,arithmetic occupancy pressure
-register_pressure,probe_register_pressure.metal,1,200,800,register pressure variant
+variant,shader,kernel,iters_correctness,iters_timing,iters_trace,notes
+baseline,probe_simdgroup_reduce.metal,probe_simdgroup_reduce,1,200,1000,starter variant
+threadgroup_heavy,probe_threadgroup_heavy.metal,probe_threadgroup_heavy,1,160,800,threadgroup memory pressure
+threadgroup_minimal,probe_threadgroup_minimal.metal,probe_threadgroup_minimal,1,192,900,minimal threadgroup pressure
+occupancy_heavy,probe_occupancy_heavy.metal,probe_occupancy_heavy,1,160,800,arithmetic occupancy pressure
+register_pressure,probe_register_pressure.metal,probe_register_pressure,1,200,800,register pressure variant
+dd_lat,probe_dd_lat.metal,probe_dd_lat,1,200,800,double-double dep chain latency (float2 hi/lo)
+dd_tput,probe_dd_tput.metal,probe_dd_tput,1,200,800,double-double throughput 4 independent pairs
 EOF
 cp "$OUT_DIR/metal_variant_matrix.csv" "$OUT_DIR/metal_variant_matrix_published.csv"
+
+python3 "$(dirname -- "$0")/classify_metal_type_surface.py" \
+    --out "$OUT_DIR/metal_type_surface_matrix.csv" \
+    --json-out "$OUT_DIR/metal_type_surface_matrix.json" \
+    --timing-out "$OUT_DIR/metal_frontier_timing.csv" \
+    --build-dir "$OUT_DIR/metal_type_surface_build" \
+    --width "$WIDTH" \
+    --iters "$TYPE_SURFACE_ITERS" >/dev/null 2>&1 || true
 
 if [ ! -x "$HOST_BIN" ]; then
     "$(dirname -- "$0")/build_metal_probe_host.sh" "$ROOT_DIR/host/metal_probe_host.m" "$HOST_OUT_DIR" >/dev/null 2>&1 || true
 fi
 
-for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure; do
+for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure dd_lat dd_tput; do
     shader="probe_simdgroup_reduce.metal"
     case "$variant" in
         threadgroup_heavy) shader="probe_threadgroup_heavy.metal" ;;
         threadgroup_minimal) shader="probe_threadgroup_minimal.metal" ;;
         occupancy_heavy) shader="probe_occupancy_heavy.metal" ;;
         register_pressure) shader="probe_register_pressure.metal" ;;
+        dd_lat)  shader="probe_dd_lat.metal" ;;
+        dd_tput) shader="probe_dd_tput.metal" ;;
     esac
 
     variant_dir="$METAL_OUT_DIR/$variant"
@@ -51,14 +64,24 @@ done
 echo 'variant,iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum' > "$OUT_DIR/metal_correctness.csv"
 echo 'variant,iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum' > "$OUT_DIR/metal_timing.csv"
 
-for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure; do
+for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure dd_lat dd_tput; do
     metallib="$(find "$METAL_OUT_DIR/$variant" -maxdepth 1 -type f -name '*.metallib' | head -n 1)"
     [ -z "$metallib" ] && continue
 
-    row="$("$HOST_BIN" --metallib "$metallib" --kernel probe_simdgroup_reduce --width "$WIDTH" --iters 1 --csv 2>/dev/null | tail -n 1)"
+    kernel_name="probe_simdgroup_reduce"
+    case "$variant" in
+        threadgroup_heavy)   kernel_name="probe_threadgroup_heavy" ;;
+        threadgroup_minimal) kernel_name="probe_threadgroup_minimal" ;;
+        occupancy_heavy)     kernel_name="probe_occupancy_heavy" ;;
+        register_pressure)   kernel_name="probe_register_pressure" ;;
+        dd_lat)              kernel_name="probe_dd_lat" ;;
+        dd_tput)             kernel_name="probe_dd_tput" ;;
+    esac
+
+    row="$("$HOST_BIN" --metallib "$metallib" --kernel "$kernel_name" --width "$WIDTH" --iters 1 --csv 2>/dev/null | tail -n 1)"
     [ -n "$row" ] && printf '%s,%s\n' "$variant" "$row" >> "$OUT_DIR/metal_correctness.csv"
 
-    row="$("$HOST_BIN" --metallib "$metallib" --kernel probe_simdgroup_reduce --width "$WIDTH" --iters "$ITERS" --csv 2>/dev/null | tail -n 1)"
+    row="$("$HOST_BIN" --metallib "$metallib" --kernel "$kernel_name" --width "$WIDTH" --iters "$ITERS" --csv 2>/dev/null | tail -n 1)"
     [ -n "$row" ] && printf '%s,%s\n' "$variant" "$row" >> "$OUT_DIR/metal_timing.csv"
 done
 
@@ -90,9 +113,20 @@ if [ -x "$HOST_BIN" ] && [ -n "$baseline_metallib" ]; then
 fi
 
 if command -v xctrace >/dev/null 2>&1 && [ -x "$HOST_BIN" ]; then
-    for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure; do
+    for variant in baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure dd_lat dd_tput; do
         metallib="$(find "$METAL_OUT_DIR/$variant" -maxdepth 1 -type f -name '*.metallib' | head -n 1)"
         [ -z "$metallib" ] && continue
+
+        kernel_name="probe_simdgroup_reduce"
+        case "$variant" in
+            threadgroup_heavy)   kernel_name="probe_threadgroup_heavy" ;;
+            threadgroup_minimal) kernel_name="probe_threadgroup_minimal" ;;
+            occupancy_heavy)     kernel_name="probe_occupancy_heavy" ;;
+            register_pressure)   kernel_name="probe_register_pressure" ;;
+            dd_lat)              kernel_name="probe_dd_lat" ;;
+            dd_tput)             kernel_name="probe_dd_tput" ;;
+        esac
+
         stage_dir="$(mktemp -d /tmp/steinmarder_next42_${variant}.XXXXXX)"
         cp "$HOST_BIN" "$stage_dir/sm_apple_metal_probe_host"
         cp "$metallib" "$stage_dir/$variant.metallib"
@@ -100,7 +134,7 @@ if command -v xctrace >/dev/null 2>&1 && [ -x "$HOST_BIN" ]; then
         xctrace record --template 'Metal System Trace' --output "$OUT_DIR/gpu_${variant}.trace" --launch -- \
             "$stage_dir/sm_apple_metal_probe_host" \
             --metallib "$stage_dir/$variant.metallib" \
-            --kernel probe_simdgroup_reduce \
+            --kernel "$kernel_name" \
             --iters 800 \
             --width "$WIDTH" >/dev/null 2>&1 || true
     done
@@ -129,8 +163,10 @@ fi
 cat > "$OUT_DIR/metal_notes.md" <<'EOF'
 # Next42 Metal Probe Draft
 
-- variants: baseline, threadgroup_heavy, threadgroup_minimal, occupancy_heavy, register_pressure
-- expected artifacts: metal_variant_matrix.csv, metal_variant_matrix_published.csv, metal_correctness.csv, metal_timing.csv, gpu_*.trace, fs_usage_gpu_host.txt, gpu_host_leaks.txt, gpu_host_vmmap.txt
+- variants: baseline, threadgroup_heavy, threadgroup_minimal, occupancy_heavy, register_pressure, dd_lat, dd_tput
+- dd_lat: double-double dep chain (float2 hi/lo, 8 steps/iter); measures AGX FP32 dep-chain latency for Knuth 2-sum
+- dd_tput: double-double throughput (4 independent float2 pairs, 32 steps/iter); measures peak DD issue bandwidth
+- expected artifacts: metal_variant_matrix.csv, metal_variant_matrix_published.csv, metal_type_surface_matrix.csv, metal_frontier_timing.csv, metal_correctness.csv, metal_timing.csv, gpu_*.trace, fs_usage_gpu_host.txt, gpu_host_leaks.txt, gpu_host_vmmap.txt
 EOF
 
 printf '%s\n' "$OUT_DIR"

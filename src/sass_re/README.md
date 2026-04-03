@@ -16,11 +16,28 @@ future architecture slots aligned, start here:
 
 - [STACK_MAP.md](STACK_MAP.md) -- side-by-side living architecture map and
   placeholder slots for the next track families
+- [CROSS_TRACK_CONTROL_PLANE.md](CROSS_TRACK_CONTROL_PLANE.md) -- explicit
+  coexistence contract and promotion rules across SASS, CUDA, Apple, and
+  TeraScale / Terakan
+- [tables/table_cross_track_control_plane.csv](tables/table_cross_track_control_plane.csv)
+  -- machine-readable registry of canonical docs, ledgers, runners, and result
+  roots for each active architecture lane
 
 ## Apple silicon track
 
 If you want the Apple-side translation of this research style, start here:
 
+- [APPLE_TYPED_BOUNDARY_ATLAS.md](APPLE_TYPED_BOUNDARY_ATLAS.md) -- canonical
+  typed Apple control plane across CPU, Metal, and neural lanes
+- [tables/table_apple_type_taxonomy.csv](tables/table_apple_type_taxonomy.csv)
+  -- requested family/format/width taxonomy with honesty tiers
+- [tables/table_apple_type_boundary_matrix.csv](tables/table_apple_type_boundary_matrix.csv)
+  -- boundary ledger for native, lowered, proxy, and unsupported rows
+- [tables/table_apple_type_timings.csv](tables/table_apple_type_timings.csv)
+  -- promoted timing values and cache knees
+- [`scripts/sync_apple_typed_atlas.py`](scripts/sync_apple_typed_atlas.py)
+  -- promotes typed runner outputs from `src/apple_re/results/...` back into
+  the canonical Apple tables
 - [FRONTIER_ROADMAP_APPLE.md](FRONTIER_ROADMAP_APPLE.md) -- concrete checklist
   and work order
 - [APPLE_SILICON_RE_BRIDGE.md](APPLE_SILICON_RE_BRIDGE.md) -- method
@@ -53,6 +70,33 @@ If you want the Apple-side translation of this research style, start here:
   -- shared compiler-vs-manual ledger for SASS, Apple, and Ryzen build choices
 - [`../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md`](../../docs/sass/RYZEN_5600X3D_RE_GUIDE.md)
   -- methodology translation guide for Zen 3 + 3D V-Cache
+
+## r600 / TeraScale-2 companion track
+
+- [FRONTIER_ROADMAP_R600_TERASCALE.md](FRONTIER_ROADMAP_R600_TERASCALE.md)
+  -- concrete x130e / Radeon HD 6310 / Terakan frontier checklist
+- [TERAKAN_PERFORMANCE_TRACKER.md](TERAKAN_PERFORMANCE_TRACKER.md)
+  -- FPS, build, and CPU/GPU bottleneck ledger for Mesa 26 on x130e
+- [AGENTS.md](AGENTS.md)
+  -- subtree-specific x130e / TeraScale control-plane entrypoint
+- [MEMORY_PROJECT.md](MEMORY_PROJECT.md)
+  -- mission, scope, and success criteria for the x130e program
+- [MEMORY_WORKSPACE.md](MEMORY_WORKSPACE.md)
+  -- local/remote workspace contract and normalized target layout
+- [MEMORY_METHODS.md](MEMORY_METHODS.md)
+  -- method transfer from the stronger CUDA and SASS lanes into TeraScale
+- [MEMORY_FINDINGS.md](MEMORY_FINDINGS.md)
+  -- compact current-state x130e findings ledger
+- [results/x130e_terascale/README.md](results/x130e_terascale/README.md)
+  -- local compendium and preservation layout for imported x130e evidence
+- [`scripts/sync_x130e_terascale_compendium.py`](scripts/sync_x130e_terascale_compendium.py)
+  -- preservation-first SSH importer for the remote `mesa-26-debug` and
+  `TerakanMesa` state
+- [`scripts/build_terascale_project_state.py`](scripts/build_terascale_project_state.py)
+  -- local/remote corpus inventory generator for the x130e project tables
+- [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+  -- shared compiler-vs-manual ledger for SASS, Apple, Ryzen, and TeraScale
+  build choices
 
 See [RESULTS.md](RESULTS.md) for measurements and confirmed findings, and see
 [SM89_SASS_INSTRUCTION_REFERENCE.md](SM89_SASS_INSTRUCTION_REFERENCE.md) for the

@@ -151,10 +151,20 @@ def write_summary(
     out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def default_baseline_name(counts: dict[str, dict[str, int]]) -> str:
+    if "gpu_baseline.trace" in counts:
+        return "gpu_baseline.trace"
+    if "gpu_fmt_float32.trace" in counts:
+        return "gpu_fmt_float32.trace"
+    if counts:
+        return sorted(counts)[0]
+    return "gpu_baseline.trace"
+
+
 def main() -> int:
-    if len(sys.argv) != 6:
+    if len(sys.argv) not in {6, 7}:
         print(
-            "usage: analyze_xctrace_row_deltas.py <xctrace_metric_row_counts.csv> <xctrace_trace_health.csv> <out_deltas.csv> <out_summary.md> <out_density.csv>",
+            "usage: analyze_xctrace_row_deltas.py <xctrace_metric_row_counts.csv> <xctrace_trace_health.csv> <out_deltas.csv> <out_summary.md> <out_density.csv> [baseline_trace]",
             file=sys.stderr,
         )
         return 2
@@ -171,7 +181,7 @@ def main() -> int:
 
     counts = load_counts(in_csv)
     durations = load_trace_durations(health_csv)
-    baseline_name = "gpu_baseline.trace"
+    baseline_name = sys.argv[6] if len(sys.argv) == 7 else default_baseline_name(counts)
     rows_out = write_deltas(baseline_name, counts, out_csv)
     density_rows = write_density(baseline_name, counts, durations, out_density_csv)
     write_summary(baseline_name, rows_out, out_md, density_rows)

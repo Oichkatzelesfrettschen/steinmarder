@@ -288,6 +288,11 @@ int main(int argc, char **argv) {
 
             [encoder setComputePipelineState:pipeline];
             [encoder setBuffer:outBuffer offset:0 atIndex:0];
+            // Pass iteration count to shaders that declare `constant uint &iters [[buffer(1)]]`.
+            // Without this, the constant reads as 0 and the inner loop never executes.
+            // Use a fixed high value (100000) so GPU compute dominates command-buffer overhead.
+            uint32_t shader_inner_iters = 100000u;
+            [encoder setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
 
             NSUInteger threadsPerTG = pipeline.maxTotalThreadsPerThreadgroup;
             if (threadsPerTG > 128) {

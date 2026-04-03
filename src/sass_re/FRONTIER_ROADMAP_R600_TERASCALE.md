@@ -3,6 +3,27 @@
 Track for the AMD Radeon HD 6310 (Wrestler die, Evergreen ISA, VLIW5).
 Follows the steinmarder methodology: probe → measure → decide → build.
 
+For the shared cross-track registry that keeps this Terakan/Vulkan lane visible
+beside CUDA, Apple, and NVIDIA SASS work, see
+[`CROSS_TRACK_CONTROL_PLANE.md`](CROSS_TRACK_CONTROL_PLANE.md) and
+[`tables/table_cross_track_control_plane.csv`](tables/table_cross_track_control_plane.csv).
+
+## Current program shape
+
+This track now operates across three intentionally distinct locations:
+
+- live driver source of truth: `eirikr@x130e:/home/eirikr/workspaces/mesa/mesa-26-debug/`
+- raw evidence + helper tooling:
+  `eirikr@x130e:/home/eirikr/workspaces/research/TerakanMesa/`
+- curated local compendium:
+  [`results/x130e_terascale/`](results/x130e_terascale/README.md)
+- canonical local probe program:
+  [`TERASCALE_PROBE_PROGRAM.md`](TERASCALE_PROBE_PROGRAM.md)
+
+The preservation rule is strict: snapshot the remote state before cleanup or
+refactor, because the active Mesa 26 tree is detached and carries significant
+tracked plus untracked work, including `src/amd/terascale/`.
+
 ## Hardware
 
 | Item | Value |
@@ -65,7 +86,7 @@ Follows the steinmarder methodology: probe → measure → decide → build.
 | Headless vkmark baseline | **519 FPS** (Mesa 26.0.3 debug, all assertions on) | FULL_STACK_PROFILE_MESA26.md |
 | CPU bottleneck | GPU is 62-75% idle — CPU overhead starves it, not GPU compute capacity | HW_BOUNDARY_MEASUREMENTS.md |
 | Vulkan compliance | 41/41 pass (Terakan), 0 failures on unsupported_image_usage | vk_compliance results |
-| Rusticl OpenCL | 77% pass, crash fixed, GPR spill RCA'd (no spill-to-scratch fallback) | RUSTICL_BASELINE.md |
+| Rusticl OpenCL | 77% pass, crash fixed, GPR spill RCA'd (no spill-to-scratch fallback). RAT readback bug #15 now FIXED (5/5 PASS). Sequential dispatch stale-data bug remains. | RUSTICL_BASELINE.md |
 | Numeric formats | 426 opcodes, native FP64 confirmed | NUMERIC_PACKING_RESEARCH.md |
 | Novel opcodes | UBYTE_FLT, MUL_UINT24 implemented | sfn_instr_alu.cpp |
 | ALU latency | All vec ops = 1 cycle (PV fwd), trans = 1 cycle (throughput-limited) | LATENCY_PROBE_RESULTS.md |
@@ -79,11 +100,59 @@ Follows the steinmarder methodology: probe → measure → decide → build.
 | Modesetting DDX | Switched from radeon DDX to modesetting for DRI3 GLX | xorg.conf.d |
 | Terakan headless VK | VK_EXT_headless_surface fixed in Terakan desktop build | terakan_init.c |
 | r600 compute RAT | 7-bug RCA fixed: cb_color_base reloc, compute_cb_target_mask, CS_PARTIAL_FLUSH, PIPE_FLUSH_ASYNC | evergreen_compute.c |
+| RAT readback bug #15 | **FIXED** — 5/5 PASS for `out[i] = in[i] * 3.0` kernel. Root cause: UB cast of pool_bo as r600_texture + CS space undercount. Fix: direct CB_COLOR0_BASE emission from r600_cb_surface + r600_need_cs_space(rctx, 23) + compute_cb_target_mask | evergreen_compute.c |
+| Kernel CS validator | SHADER_TYPE bit invisible to opcode extraction; compute/non-compute packets processed identically. radeon_add_to_buffer_list returns index*4 matching kernel idx/4 — reloc encoding correct | radeon_drm_cs.c |
+| Rusticl conformance | 1/8 custom tests pass initially; isolated 2-arg kernels work; sequential dispatch has stale-data bug (second kernel reads first kernel's output) | RUSTICL_BASELINE.md |
+| clpeak on r600 | CL_INVALID_WORK_GROUP_SIZE (-54) for compute tests; transfer bandwidth 1.34 GBPS write (DDR3-533 UMA) | clpeak results |
 | Branch prediction | Mesa r600/gallium hot path branches optimized + measured | sfn_*.cpp |
 | Cache-coherent data | r600 state emission redesigned for cache-friendly traversal | r600_state.c |
 | Sub-32-bit INT compiler | `nir_lower_bit_size` + u2u8/i2i8/u2u16/i2i16/u2u32/i2i32 handlers in SFN | sfn_nir.cpp + sfn_instr_alu.cpp |
 | INT8x4 VLIW packing | UBYTE0..3_FLT fills 4 vec slots in 1 bundle + PV-chained MULADD = 4 MACC/cycle | BUILD_DECISION_MATRIX.md |
 | Q-format analysis | Q4.4/Q8.8/Q16.16/Q4.28 mapped to hardware ops; FP32 path preferred for Q8.8 | BUILD_DECISION_MATRIX.md |
+
+## Preservation and workspace normalization
+
+### Remote state confirmed on 2026-04-01
+
+- remote Mesa commit: `3f173c0`
+- checkout state: detached `HEAD`
+- active worktree touches `r600`, `zink`, winsys, Vulkan runtime, and NIR
+- untracked Terakan source tree exists at `src/amd/terascale/`
+
+### Local preservation lane
+
+Use the importer below to preserve the current remote state before attempting
+branch cleanup, workspace surgery, or broader refactors:
+
+```sh
+python3 scripts/sync_x130e_terascale_compendium.py \
+  --snapshot-name 20260401_source_snapshot
+```
+
+That preservation pass records:
+
+- remote Mesa `HEAD`, branch/detached state, and dirty worktree listing
+- `src/amd/terascale/` file inventory
+- findings-tree inventory and hashes
+- curated copies of the key x130e findings and toolkit docs
+
+Promoted snapshots should move into
+[`results/x130e_terascale/blessed/`](results/x130e_terascale/blessed/README.md)
+with their `SOURCE_MANIFEST.tsv`.
+
+### Workspace normalization goals
+
+Keep `~/mesa-26-debug` as the one true remote driver workspace, but separate:
+
+- source
+- build directories
+- stage/install outputs
+- profiler and trace captures
+- dEQP / Piglit / clpeak result bundles
+- package/export artifacts
+
+so future Terakan, r600, Zink, Rusticl, and observability work stop competing
+for the same filesystem space.
 
 ## Missing Evidence (Probe Gaps)
 
@@ -144,8 +213,23 @@ Existing: 18 GLSL fragment shaders in `~/eric/TerakanMesa/re-toolkit/probes/`
 - TEX: latency (dependent), bandwidth (independent)
 - VLIW5: scalar, vec4, mixed (vec4+trans)
 
-Needed: Latency chain probes (steinmarder probe_latency_* pattern),
-cache sweep probes, clause boundary probes, LDS probes, FP64 probes.
+Imported locally under [`probes/r600/`](probes/r600/README.md), with seeded
+compute and tracing lanes for:
+
+- Vulkan compute: [`probes/r600/vulkan_compute/`](probes/r600/vulkan_compute/README.md)
+- OpenCL: [`probes/r600/opencl/`](probes/r600/opencl/README.md)
+- OpenGL compute:
+  [`probes/r600/opengl_compute/`](probes/r600/opengl_compute/README.md)
+- system tracing: [`probes/r600/system/`](probes/r600/system/README.md)
+
+Canonical tranche tools:
+
+- [`scripts/emit_terascale_probe_manifest.py`](scripts/emit_terascale_probe_manifest.py)
+- [`scripts/run_terascale_probe_tranche.sh`](scripts/run_terascale_probe_tranche.sh)
+- [`scripts/run_terascale_trace_stack.sh`](scripts/run_terascale_trace_stack.sh)
+
+Needed next: executable compute harnesses, cache sweep probes, LDS probes, FP64
+compute probes, and promoted run bundles.
 
 ## Decision Artifacts Needed
 
@@ -245,5 +329,9 @@ in KCACHE (1-cycle access) to avoid constant-buffer latency in the inner loop.
 
 - [`STACK_MAP.md`](STACK_MAP.md) — cross-architecture living map
 - [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md) — compiler-vs-manual ledger
+- [`TERAKAN_PERFORMANCE_TRACKER.md`](TERAKAN_PERFORMANCE_TRACKER.md) — FPS and
+  build-state tracker
+- [`results/x130e_terascale/README.md`](results/x130e_terascale/README.md) —
+  local compendium layout
 - `~/eric/TerakanMesa/findings/` — all measurement reports
 - `~/eric/TerakanMesa/re-toolkit/` — probe shaders and session scripts

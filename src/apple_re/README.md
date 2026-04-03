@@ -62,9 +62,32 @@ that exist on Apple silicon:
   - reports versions and basic availability for `mlx`, `coremltools`,
     PyTorch MPS, and JAX
 - `scripts/bootstrap_neural_lane.sh`
-  - creates the repo-local `.venv` with the neural-lane Python stack
+  - prepares the repo-local `.venv` with the neural-lane Python stack and
+    reuses it when the interpreter and requirements hash still match
 - `scripts/neural_lane_probe.py`
   - exercises `torch`, `mlx`, `jax-metal`, and `coremltools` in one pass
+- `scripts/neural_typed_matrix.py`
+  - emits raw typed neural JSON/CSV artifacts for PyTorch CPU/MPS, MLX, and
+    Core ML compute-unit surfaces
+  - writes `neural_progress.json` plus incremental CSV/JSON snapshots while the
+    sweep is still running, so long Phase F jobs stay observable
+  - now also supports targeted follow-on runs with `--skip-torch-native`,
+    `--skip-torch-proxy`, `--skip-mlx`, and `--skip-coreml`, which is useful
+    for fast frontier-only `tf32`/`fp8`/`mx` timing sweeps
+- `scripts/classify_metal_type_surface.py`
+  - compiles tiny Metal kernels across scalar types and records which MSL
+    surfaces compile cleanly versus staying proxy-only
+- `scripts/capture_gpu_counters.sh`
+  - records `Metal GPU Counters` traces against staged per-variant `.metallib`
+    bundles and emits normalized `gpu_hardware_counters.csv` summaries
+- `scripts/capture_gpu_format_counters.sh`
+  - records per-format `Metal GPU Counters` and `Metal System Trace` bundles
+    for the typed Metal surfaces and frontier proxies
+  - current widened follow-on target set includes `int16/int32/int64`,
+    `uint16/uint32/uint64`, and the packed `int4/uint4/fp4` proxy formats
+- `scripts/analyze_gpu_counter_deltas.py`
+  - compares normalized counter summaries against the chosen baseline variant
+    and emits compact delta CSV/markdown sidecars
 - `scripts/analyze_tranche_mnemonics.py`
   - parses tranche disassembly outputs into opcode/mnemonic counts and a
   short interpretation report
@@ -73,7 +96,7 @@ that exist on Apple silicon:
 - `scripts/compare_xctrace_density_runs.py`
   - compares normalized xctrace density across successive promoted keepalive bundles
 - `scripts/run_apple_tranche1.sh`
-  - orchestrates the first 64-step deep-dive tranche across CPU, cache-pressure,
+  - orchestrates the first 65-step deep-dive tranche across CPU, cache-pressure,
     Metal, and neural lanes with manifest outputs
 - `scripts/run_next42_cpu_suite.sh`
   - wrapper for the CPU follow-on tranche with the next 42-step artifact map
@@ -87,6 +110,37 @@ that exist on Apple silicon:
   - Metal-lane draft runner for the baseline, threadgroup, occupancy, and register-pressure variants
 - `scripts/run_next42_neural_suite.sh`
   - wrapper for the neural follow-on tranche with the next 42-step artifact map
+- `scripts/run_next42_neural_raw_probes.sh`
+  - direct neural smoke/typed-proxy runner for the raw probe lane
+- `scripts/run_next42_opengl_probe_suite.sh`
+  - draft OpenGL shader-probe lane for fragment/register/texture-pressure analogues
+- `scripts/run_next42_moltenvk_probe_suite.sh`
+  - draft MoltenVK/Vulkan-on-Metal shader and environment validation lane
+- `scripts/run_next42_full_stack_suite.sh`
+  - top-level wrapper that runs CPU, Metal, neural, OpenGL, and MoltenVK suites
+    with RAM/IO/disk telemetry sidecars
+- `../sass_re/scripts/sync_apple_typed_atlas.py`
+  - promotes typed Apple runner outputs back into the canonical atlas tables in
+    `src/sass_re/tables/`, including neural backend/timing rows plus Metal
+    type-surface, `metal_timing.csv` variant timings, and
+    `metal_frontier_timing.csv` typed format timings
+  - also promotes selected `gpu_hardware_counters.csv` summaries into
+    variant-prefixed `agx_counters` rows and per-format
+    `agx_format_counters` rows
+  - promotes a compact comparison slice from
+    `gpu_hardware_counter_deltas.csv` into `agx_counter_deltas` and
+    `agx_format_counter_deltas` rows while leaving the full delta report as a
+    bundle-side sidecar
+  - also promotes selected `xctrace` trace facts into the atlas timing table:
+    trace duration, per-schema row counts, row density and delta density,
+    command-buffer completion-gap timing, and the per-format `agx_format_trace`
+    surface
+- `../sass_re/APPLE_STEINMARDER_PROBE_EXAMPLES.md`
+  - maps Apple typed probes back to concrete steinmarder workloads, including
+    nibble-packed `INT4`/`FP4` plus widened `8/16/32/64` integer examples
+- `../sass_re/tables/table_apple_steinmarder_probe_examples.csv`
+  - machine-readable ledger for the packed and widened steinmarder-inspired
+    Apple example set
 - `host/metal_probe_host.m`
   - minimal Metal host harness used for end-to-end GPU lane timing
 - `requirements-neural.txt`
@@ -100,6 +154,41 @@ that exist on Apple silicon:
     shared-memory footprint that still produces a stable trace
 - `shaders/probe_occupancy_heavy.metal`
   - arithmetic/occupancy-heavy variant for counter/timing deltas
+- `shaders_gl/*`
+  - draft OpenGL shader probes for fullscreen, register pressure, texture stride,
+    and integer/quantization-style fragment work
+- `shaders_vk/*`
+  - draft Vulkan compute probes intended for MoltenVK validation and eventual
+    host-dispatch work
+
+The current typed Metal bundle now classifies and times direct `float32`,
+`float16`, `bfloat16`, `int32`, `uint32`, `int16`, `uint16`, `int64`, and
+`uint64` kernels, while `float64` is now explicitly recorded as unsupported on
+this machine. AIR-backed evidence now splits the direct rows honestly:
+`float32`, `float16`, `bfloat16`, `int32`, `uint32`, `int64`, and `uint64`
+promote as `native`, while `int8`, `uint8`, `int16`, and `uint16` promote as
+`compiler_lowered` because the public MSL packed surfaces widen into `i32`
+operations in AIR. Frontier `tf32`, `fp8_e4m3`, `fp8_e5m2`, `mxfp8`, `mxint8`,
+`mxfp6`, and `mxfp4` remain deliberate `host_proxy` rows.
+
+The CPU typed reference lane is now promoted too: `uint32`, `int64`, and
+`float32` are direct native reference rows, `int8`/`uint8`/`int16`/`uint16`
+are explicit lowered reference rows using AArch64 narrowing ops, and the
+`bfloat16` lane is an explicit host-side roundtrip proxy.
+
+The per-format AGX bundle under
+`results/typed_metal_suite_20260401_apple_sync/typed_format_agx_20260401`
+is now promoted too. The atlas carries `agx_format_trace`,
+`agx_format_counters`, and `agx_format_counter_deltas` rows for `bfloat16`,
+`float16`, `int8`, `uint8`, `tf32`, both tracked `fp8` variants, and the
+tracked `MX` proxies.
+
+The current full-scope and stack-planning references live in:
+
+- [`../sass_re/APPLE_FULL_SCOPE_GAP_MAP.md`](../sass_re/APPLE_FULL_SCOPE_GAP_MAP.md)
+- [`../sass_re/APPLE_DEEP_DIVE_STACK.md`](../sass_re/APPLE_DEEP_DIVE_STACK.md)
+- [`../sass_re/tables/table_apple_full_scope_gap_matrix.csv`](../sass_re/tables/table_apple_full_scope_gap_matrix.csv)
+- [`../sass_re/tables/table_apple_probe_migration_matrix.csv`](../sass_re/tables/table_apple_probe_migration_matrix.csv)
 
 ## Local bootstrap
 
@@ -139,10 +228,23 @@ If the neural-lane packages are missing, bootstrap the repo-local environment:
 src/apple_re/scripts/bootstrap_neural_lane.sh
 ```
 
+Set `FORCE_NEURAL_VENV_REBUILD=1` only when you intentionally want to discard
+and recreate that environment.
+
 Then probe the full neural lane:
 
 ```sh
 .venv/bin/python src/apple_re/scripts/neural_lane_probe.py
+```
+
+For a quick typed neural smoke pass without a full tranche:
+
+```sh
+.venv/bin/python src/apple_re/scripts/neural_typed_matrix.py \
+  --out-dir /tmp/apple_neural_typed_smoke \
+  --workloads gemm_256 \
+  --warmup-runs 1 \
+  --measured-runs 1
 ```
 
 ## Build
@@ -181,6 +283,8 @@ Notes:
 - Phase `H` is the post-run evidence and comparison lane; it refreshes
   `xctrace` exports, compares `xctrace_row_density.csv` against the latest
   promoted bundle, and emits run / keepalive summaries plus bundle notes.
+- Phase `F` now also emits `neural_typed_matrix.json`,
+  `neural_backend_matrix.csv`, and `neural_timing_matrix.csv`.
 - Latest promoted C/D/E synthesis snapshot:
   `src/apple_re/results/blessed/2026-03-30_tranche1_r6_cde/`.
 - Latest promoted keepalive snapshot:
@@ -201,6 +305,8 @@ Notes:
   `xctrace_metric_row_counts.csv`, and per-schema XML exports.
 - Step 30 now also emits variant-vs-baseline delta artifacts:
   `xctrace_row_deltas.csv` and `xctrace_row_delta_summary.md`.
+- The Metal lane follow-on suite now also emits `metal_type_surface_matrix.csv`
+  and `metal_type_surface_matrix.json`.
 - Variant focus interpretation and ranked next actions are documented for r5
   in `ANALYSIS_NEXT_STEPS.md` and `RUN_SUMMARY.md`, while the r6 C/D/E bundle
   adds `xctrace_row_density.csv` plus a fresh `ANALYSIS_NEXT_STEPS.md`.
@@ -210,6 +316,12 @@ Notes:
   `mnemonic_interpretation.md` into that run directory.
 - If GUI askpass is unavailable in terminal automation, use `--sudo none` to
   complete non-root evidence capture without hanging.
+- To promote a typed Apple run back into the canonical cross-track tables:
+
+```sh
+python3 src/sass_re/scripts/sync_apple_typed_atlas.py \
+  --run-dir src/apple_re/results/tranche1_<timestamp>
+```
 
 ## Recommended workflow
 
@@ -222,7 +334,7 @@ Notes:
    - wrap it in a tiny host harness
    - capture timings and counters with Xcode Metal tools
 3. Neural lane
-   - bootstrap the repo-local `.venv`
+   - prepare the repo-local `.venv`
    - run `scripts/neural_lane_probe.py`
    - convert controlled graphs with `coremltools`
    - compare `CPU only`, `CPU and GPU`, and `all compute units`

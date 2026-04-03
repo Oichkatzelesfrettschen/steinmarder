@@ -25,16 +25,24 @@ Stable launch points:
   and the current promoted bundles already capture density deltas, trace
   exports, and PID-scoped host captures.
 
-Decision-grade evidence still missing:
+Decision-grade evidence now exists for CPU timing, Metal counters, and the
+first neural placement boundary. The remaining frontier is typed normalization:
 
-- a single matrix that says when the compiler already emits the desired
-  pattern and when a manual pattern still changes the build choice
-- a normalized comparison of compiler output versus handwritten CPU or Metal
-  patterns across runtime, code size, spills, and maintainability
-- a shared ledger that marks each pattern family as compiler-sufficient,
-  manual-only, or manual-preferred for the current hardware/toolchain
+- a single matrix that keeps every requested family visible, including
+  unsupported and proxy-only rows
+- a normalized comparison of compiler/native exposure versus lowered or
+  framework-mediated exposure across CPU, Metal, and neural lanes
+- a shared ledger that marks each format family as `native`, `lowered`,
+  `framework_proxy`, `host_proxy`, `emulated`, `unsupported`, or `unknown`
 - a repo-wide note tying those build decisions back to
   [`BUILD_DECISION_MATRIX.md`](BUILD_DECISION_MATRIX.md)
+
+The canonical typed ledger is now:
+
+- [`APPLE_TYPED_BOUNDARY_ATLAS.md`](APPLE_TYPED_BOUNDARY_ATLAS.md)
+- [`tables/table_apple_type_taxonomy.csv`](tables/table_apple_type_taxonomy.csv)
+- [`tables/table_apple_type_boundary_matrix.csv`](tables/table_apple_type_boundary_matrix.csv)
+- [`tables/table_apple_type_timings.csv`](tables/table_apple_type_timings.csv)
 
 ## Priority ranking
 
@@ -122,13 +130,15 @@ Target family:
 - MPSGraph/MPSNNGraph tensor experiments
 - MLX and PyTorch MPS comparison points
 - CPU, GPU, and ANE fallback behavior
-- dtype, quantization, and precision sweeps
+- dtype, quantization, precision, TF, BF, and MX sweeps
 
 Why this belongs in the same roadmap:
 
 - the current neural scaffold already exposes conversion + runtime probes
 - placement behavior plays the same role as lowering choices in the NVIDIA lane
 - normalized matrices can compare the backend choices against CPU/Metal timings
+- the typed atlas now gives us a fixed place to record low-bit and proxy-only
+  families honestly instead of dropping them from the promoted story
 
 Falsifiable hypotheses:
 
@@ -139,11 +149,20 @@ Falsifiable hypotheses:
 3. The probe outputs can be normalized into a repeatable matrix of backend and
    precision choices without needing heavy training loops.
 
+Primary remaining deliverables:
+
+- replace the thin neural blessed summary with raw typed JSON/CSV artifacts
+- sweep `CoreML CPU_ONLY`, `CPU_AND_GPU`, `CPU_AND_NE`, and `ALL` alongside
+  PyTorch CPU/MPS and MLX GPU
+- preserve planned rows for `tf32`, `mxfp8`, `mxfp6`, `mxfp4`, `mxint8`, `nf4`,
+  and `fp4` even when the backend only exposes them as proxies
+
 ### Rank 4: Normalization and publication
 
 This lane must end with the same disciplined documentation trail as the SASS
 track:
 
+- typed atlas note plus machine-readable Apple tables in `src/sass_re/tables/`
 - bridge note (`APPLE_SILICON_RE_BRIDGE.md`)
 - frontier checklist (`FRONTIER_ROADMAP_APPLE.md`)
 - trunk README section and cross-links in the repo and docs index
@@ -265,6 +284,25 @@ the register-vs-occupancy exports so the next bundle becomes CUDA-grade.
 - [x] The new density comparison helper now compares successive keepalive
   bundles so the sign pattern and density gap remain explicit in the post-run H
   synthesis lane.
+- [x] int4/uint4/fp4 CPU nibble-unpack probes (`nibble_unpack_u4`, `nibble_unpack_i4`):
+  0.338 ns/op (add+and) and 0.316 ns/op (add+sbfx) — both 1-cycle dep chains.
+- [x] long-double alias confirmed on AArch64: `fadd_dep_ld_aarch64` = 0.949 ns/op,
+  indistinguishable from `fadd_dep_f64` (0.001 ns delta). `long double` == binary64.
+- [x] `__float128` / `_Float128` confirmed absent from Apple Clang / AArch64.
+  fp80 is x86-exclusive; the extended-precision path is always the NEON FPU.
+- [x] Five-level wide-precision fastpath ladder measured (see Rank 0 above):
+  scalar dd-2sum (1.348 ns/106-bit), FMA-dd (1.347 ns, same), f64×2 NEON
+  (0.473 ns/value), f32×4 FMA (0.237 ns/value), vectorised dd (0.520 ns/106-bit).
+- [x] BREAKTHROUGH: NEON-vectorised double-double at 0.520 ns/value dep-chain —
+  and 0.144 ns/value in throughput mode (6.6× faster than scalar f64 for 106-bit precision).
+  Updated: NEON DD throughput probe (f64x2_dd_throughput) confirmed 0.289 ns/vector = 0.144 ns/value.
+- [x] int4/uint4/fp4 neural proxy timing via pytorch_proxy_cpu and pytorch_proxy_mps
+  promoted from `planned` to `measured` across gemm_1024 and gemm_2048.
+  fp4/int4/uint4 added to `TORCH_PROXY_FORMATS` in `neural_typed_matrix.py`.
+- [x] All widened AGX GPU counter bundles (int4-64, uint4-64, fp4) synced to atlas.
+  int4 ALU peak 93.7% / Top Limiter P99 98.7% — AGX is genuinely ALU-bound on int16.
+- [x] Gap matrix fully updated: fp/80 (not_available), fp/128 (software_emulation),
+  fp/160 alias (measured), fp/106 dd (measured), fp/128_neon (measured).
 - [x] Phase 27 now exports `xctrace` metrics, PID-scoped `gpu_host_leaks.txt`,
   `gpu_host_vmmap.txt`, and `fs_usage_gpu_host.txt`, and `counter_latency_report.md`
   links to the refreshed inventory plus the promoted CUDA-grade bundle
@@ -272,6 +310,95 @@ the register-vs-occupancy exports so the next bundle becomes CUDA-grade.
 - [x] `ANALYSIS_NEXT_STEPS.md` captures how to replay the host diagnostics (fs probe,
   leak/vmmap capture, density normalization) so future reruns lock in the same SUDO
   keepalive story.
+
+### Rank 0 (newly opened): Wide-precision and extended-FP fastpath lane
+
+The int4/uint4/fp4 and wide-precision work revealed a new measurement lane that
+did not exist in the original roadmap: the **emulated-type fastpath ladder**.
+
+The key experimental finding (2026-04-02):
+
+- `__float128` and `_Float128` are both absent from Apple Clang / AArch64.
+  `long double` is binary64 (confirmed: 0.0001 ns delta vs `fadd_dep_f64`).
+  There is no x87 80-bit path; fp80 is x86-exclusive hardware.
+- The software fastpath for extended precision on M-series is NOT integer ALU
+  softfp — it is the NEON FPU the whole time.
+- Five levels were measured; the top level is a **novel finding**:
+
+| probe | ns/value | ×f64 | precision | note |
+|---|---|---|---|---|
+| `fadd_dep_f64` | 0.992 | 1.00× | 53-bit | baseline |
+| `dd_twosum_dep` | 1.348 | 1.36× | **106-bit** | scalar 2-sum; 4 FP ops/step |
+| `dd_twosum_fma_dep` | 1.347 | 1.36× | **106-bit** | FMA neutral on linear dep chain |
+| `f64x2_vadd_dep` | 0.473 | 0.48× | 53-bit × 2 | NEON: 2 doubles per instruction |
+| `f32x4_vfma_dep` | 0.237 | **0.24×** | 24-bit × 4 | NEON: 4-wide FMA, 4.2× f64 |
+| `f64x2_dd_twosum_dep` | **0.520** | **0.52×** | **106-bit × 2** | **BREAKTHROUGH** |
+
+The last row is the core finding: **NEON-vectorised double-double delivers
+106-bit extended precision at 0.520 ns per value — 1.91× more throughput than
+scalar f64.** The M-series OOO engine collapses a 4-op dep chain to ~3.3 cycles
+by overlapping 2 independent (hi, lo) pairs in the same 128-bit Q-register.
+The 128-bit NEON register IS fp128-equivalent precision for this workload, and
+it costs less per value than plain float64.
+
+FMA is neutral for dep-chain double-double addition (both paths = 4.31 cycles).
+FMA only pays out for independent-pair throughput or Veltkamp product splitting.
+
+These probes are now in `../apple_re/probes/apple_cpu_latency.c` and their
+results are in `tables/table_apple_type_timings.csv` under backend
+`aarch64_neon_dd`.
+
+#### Metal arithmetic latency sub-lane — COMPLETED (2026-04-02/03)
+
+This sub-lane is now fully measured. See `APPLE_WIDE_PRECISION_FINDINGS.md` sections 7–12
+and `APPLE_CROSS_DOMAIN_PERF_ATLAS.md` for the complete tables.
+
+**Completed measurements:**
+- [x] AGX FP32 fadd/fmul/fma dep-chain latency: 1.695 / 1.347 / 1.993 ns
+- [x] AGX FP32 fadd/fmul/fma throughput (8 independent chains): 1.090 / 0.751 / 1.764 ns
+  - FMA half-rate unit confirmed: only 1.13× ILP gain vs 1.79× for fmul
+- [x] AGX INT32 imul dep-chain: 3.376 ns (2× fadd; separate pipeline)
+- [x] AGX FP16 fadd/fmul/fma dep-chain: all ~2.0 ns (widening overhead dominates)
+- [x] AGX DS-multiply step: 2.072 ns (FMA-bottlenecked; not 3 serial ops)
+- [x] AGX DD genuine dep-chain: 3.348 ns/step (fadd-chain bottleneck)
+- [x] AGX Veltkamp product split dep-chain: 11.739 ns/step (1.468 ns/FP-op)
+- [x] AGX simdgroup_sum: 28.31 ns (~36 cycles for 32-lane cross-lane reduction)
+- [x] AGX threadgroup atomic / global atomic: 89.6 / 143.8 ns
+- [x] AGX genuine LDS latency (volatile fix): 43.66 ns/step (~22 ns/access, ~28 cycles)
+- [x] AGX threadgroup_barrier cost: 25.44 ns (~33 cycles)
+- [x] AGX warm L1 global latency (per-thread): 10.07 ns (~13 cycles) ← L1 faster than LDS!
+- [x] FP8x8 / FP16x4 cascade probes: 295 ms / 17.1 ms (software emulation impractical)
+- [x] Metal fast-math folding characterized: #pragma clang fp reassociate(off) fix documented
+
+**Completed CPU measurements (extended, 2026-04-03):**
+- [x] CPU fp16 scalar fadd: 0.945–0.980 ns (= fp32 latency; FEAT_FP16 zero-penalty)
+- [x] CPU fp16 scalar fmul: 1.306 ns (slightly slower than fadd)
+- [x] CPU int32/int64 mul: ~0.944–0.979 ns (= FP add tier; M-series multiply pipeline)
+- [x] CPU sqrt (f64): 4.87 ns (~5 cycles, hardware FSQRT)
+- [x] CPU log/exp: ~14.5–14.9 ns (libm software, ~15 cycles — no hardware transcendental)
+- [x] CPU CRC32: 0.998 ns (~1 cycle, FEAT_CRC32 hardware)
+- [x] CPU CLZ: 0.645 ns (sub-cycle effective latency)
+- [x] CPU fmadd dep-chain: 1.260 ns (1.33× slower than fadd — FMA deeper on CPU too)
+- [x] NEON DD throughput probe (4 independent pairs): 0.540 ns/4-pairs = 0.132 ns/pair
+- [x] NEON DD throughput (f64x2 vector mode): 0.289 ns/vector = **0.144 ns/value** (fastest measured)
+- [x] CPU Veltkamp DS-multiply dep-chain: 5.44–5.57 ns/step (CPU 2.16× faster than GPU)
+- [x] CPU int ADD (all widths): 0.315–0.333 ns (3× faster than CPU FP add)
+
+**Cross-domain atlas created:** `APPLE_CROSS_DOMAIN_PERF_ATLAS.md`
+**AGX RE sources indexed:** `dougallj/applegpu` ISA docs, `philipturner/metal-benchmarks`,
+Rosenzweig blog series, Asahi Linux hardware docs (L1=8KB/LDS=60KB/L2=768KB/L3=8MB confirmed)
+
+#### Remaining wide-precision / cross-arch targets
+
+- **Metal f32x4 Kahan reduction**: compensated sum shader via `float4` lanes — tests
+  whether NEON vectorisation OOO benefit transfers to GPU SIMD lanes (hypothesis: no,
+  GPU lanes are in-order within a simdgroup).
+- **Cross-arch DD**: r600 TeraScale double-single on 32-bit VLIW5 f32 pairs via
+  OpenCL/Rusticl — expected ~4–5× f32 overhead; compare against AGX DS-mul (2.07 ns).
+- **Metal FP16 throughput probes** (independent accumulators) — expose the "more 16-bit
+  ALUs than 32-bit" advantage that Rosenzweig identifies; dep-chain probes hide it.
+- **Metal FMA throughput re-probe with 16 accumulators + AIR dump verification** —
+  reconcile our 1.764 ns throughput with philipturner's "1-cycle FFMA" claim.
 
 ## What success looks like
 

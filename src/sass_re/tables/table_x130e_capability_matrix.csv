@@ -1,0 +1,16 @@
+Subsystem,Target API,Target version,Current status,Evidence,Blocker class,Next milestone,Hard limit note
+OpenGL,GL,4.6,working,FULL_STACK_PROFILE_MESA26.md,none,Preserve baseline through workspace migration,None recorded
+GLES,ES,3.1,working,FULL_STACK_PROFILE_MESA26.md,none,Preserve parity checks after winsys work,None recorded
+Vulkan,Terakan baseline,1.0 working,working,FULL_STACK_PROFILE_MESA26.md,implementation,Rebuild Mesa 26 Terakan branch cleanly,None recorded
+Vulkan,dEQP smoke,6/6 pass,working,TERAKAN_CONFORMANCE_PLAN.md,none,Keep as smoke gate,None recorded
+Vulkan,dEQP unsupported_image_usage,0 failures,working,TERAKAN_CONFORMANCE_PLAN.md,none,Preserve after refactors,Unsupported cases tracked separately
+Vulkan,dEQP format_properties,187/225 pass,partial,TERAKAN_CONFORMANCE_PLAN.md,implementation,Investigate remaining caps and unsupported exposure,Some formats may be hardware-limited
+Vulkan,dEQP renderpass,not yet run,not-started,TERAKAN_CONFORMANCE_PLAN.md,workflow,Run targeted tranche,Unknown
+Vulkan,dEQP pipeline,not yet run,not-started,TERAKAN_CONFORMANCE_PLAN.md,workflow,Run targeted tranche,Unknown
+Vulkan,dEQP spirv_assembly,not yet run,not-started,TERAKAN_CONFORMANCE_PLAN.md,workflow,Run targeted tranche,Unknown
+Vulkan,Native-max progression,1.3 target,planned,TERASCALE_CAPABILITY_LEDGER.md,implementation,Separate driver-blocked from hardware-blocked features,Must record hard stops honestly
+Rusticl,OpenCL,device enumeration working,partial,RUSTICL_BASELINE.md,implementation,Fix global binding and spill blockers,Embedded-profile and sampler ceilings remain
+Rusticl,OpenCL conformance,37/48 pass,partial,TERAKAN_CONFORMANCE_PLAN.md,implementation,Close fixable failure class,Some failures are hardware-profile limits
+VA-API,Decode exposure,10 profiles,working,FULL_STACK_PROFILE_MESA26.md,none,Keep vainfo/decode smoke in manifests,None recorded
+Zink,GL over Vulkan viability,not ready,blocked,TERAKAN_PERFORMANCE_TRACKER.md,dependency,Re-evaluate after swapchain/kernel capability proof,Dependent on Vulkan + DRI3 class support
+DXVK,D3D over Vulkan viability,not ready,planned,COMPREHENSIVE_SCOPE.md,dependency,Only validate after stable Vulkan path,Downstream validation lane only

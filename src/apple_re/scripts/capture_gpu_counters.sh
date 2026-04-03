@@ -1,60 +1,61 @@
 #!/usr/bin/env bash
 # capture_gpu_counters.sh — Record and export Metal hardware GPU counters.
 #
-# Fills Critical Gap A from APPLE_TRACK_GAP_ANALYSIS.md:
-# Prior blessed runs (r5–r7) used the 'Metal Application' xctrace template,
-# which includes the metal-gpu-counter-intervals schema but NEVER populates
-# it with actual data. Hardware counters require the 'Metal GPU Counters'
-# or 'GPU' template.
-#
 # Usage:
-#   ./capture_gpu_counters.sh <output_dir> [--iters N] [--variant NAME]
+#   ./capture_gpu_counters.sh <output_dir> [--source-dir DIR] [--iters N]
+#                             [--variant NAME] [--width N] [--time-limit 20s]
 #
 # What this captures:
-#   metal-gpu-counter-intervals: ALU utilization (vertex/fragment/compute),
-#     texture unit utilization, memory bandwidth, L1/L2 tile cache hit rates,
-#     SIMD utilization, fragment overflow, tiling cycles, render cycles.
-#   metal-shader-profiler-intervals: per-shader timing with GPU-side profiler.
+#   metal-gpu-counter-intervals: hardware counter windows sampled by xctrace
+#   metal-shader-profiler-intervals: per-shader timing with GPU-side profiler
 #
 # Output artifacts:
 #   <output_dir>/gpu_counters_<variant>.trace   — raw xctrace bundle (excluded from git)
 #   <output_dir>/gpu_counter_<variant>_*.xml    — exported counter table XML
-#   <output_dir>/gpu_counter_summary.csv        — parsed counter values
-#   <output_dir>/gpu_counter_analysis.md        — interpretation
+#   <output_dir>/gpu_counter_summary.csv        — normalized raw counter rows
+#   <output_dir>/gpu_hardware_counters.csv      — blessed percentile summary
+#   <output_dir>/gpu_hardware_counters.md       — human-readable summary
+#   <output_dir>/gpu_counter_analysis.md        — capture notes
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../../" && pwd)"
-METAL_HOST_SRC="$REPO_ROOT/src/apple_re/metal_host"
-SHADERS_DIR="$REPO_ROOT/src/apple_re/shaders"
 
 OUTPUT_DIR="${1:-/tmp/gpu_counters_$(date +%Y%m%d_%H%M%S)}"
-ITERS=200000
+SOURCE_DIR="$OUTPUT_DIR"
+ITERS=5000000
 VARIANT="all"
+WIDTH=1024
+TIME_LIMIT="20s"
 
 shift || true
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --source-dir) SOURCE_DIR="$2"; shift 2 ;;
         --iters) ITERS="$2"; shift 2 ;;
         --variant) VARIANT="$2"; shift 2 ;;
+        --width) WIDTH="$2"; shift 2 ;;
+        --time-limit) TIME_LIMIT="$2"; shift 2 ;;
         *) echo "unknown arg: $1"; exit 1 ;;
     esac
 done
 
 mkdir -p "$OUTPUT_DIR"
 echo "Output dir: $OUTPUT_DIR"
+echo "Source dir: $SOURCE_DIR"
 echo "Iters: $ITERS"
 echo "Variant: $VARIANT"
+echo "Width: $WIDTH"
+echo "Time limit: $TIME_LIMIT"
 
-# Locate the Metal probe host binary.
 METAL_HOST=""
 for candidate in \
-    "$OUTPUT_DIR/../../*/metal_host/sm_apple_metal_probe_host" \
+    "$SOURCE_DIR/metal_host/sm_apple_metal_probe_host" \
     "$REPO_ROOT/src/apple_re/results/"*"/metal_host/sm_apple_metal_probe_host" \
     "/tmp/sm_apple_metal_probe_host"; do
-    if [[ -x "$(echo $candidate | head -1)" ]]; then
-        METAL_HOST="$(echo $candidate | head -1)"
+    if [[ -x "$candidate" ]]; then
+        METAL_HOST="$candidate"
         break
     fi
 done
@@ -71,7 +72,7 @@ echo "Metal host: $METAL_HOST"
 # Variants to capture. For each variant we record a separate trace so that
 # per-variant counter values can be compared directly.
 if [[ "$VARIANT" == "all" ]]; then
-    VARIANTS=(baseline occupancy_heavy register_pressure threadgroup_heavy threadgroup_minimal ffma_lat ffma_tput tgsm_lat)
+    VARIANTS=(baseline threadgroup_heavy threadgroup_minimal occupancy_heavy register_pressure)
 else
     VARIANTS=("$VARIANT")
 fi
@@ -85,22 +86,39 @@ for variant in "${VARIANTS[@]}"; do
     echo ""
     echo "=== Recording variant: $variant ==="
     trace_file="$OUTPUT_DIR/gpu_counters_${variant}.trace"
-
-    # Record with Metal GPU Counters template. This template enables the
-    # hardware GPU counter instruments that populate metal-gpu-counter-intervals.
-    xcrun xctrace record \
-        --template 'Metal GPU Counters' \
-        --output "$trace_file" \
-        --env "METAL_PROBE_VARIANT=$variant" \
-        --env "METAL_PROBE_ITERS=$ITERS" \
-        -- "$METAL_HOST" \
-            --variant "$variant" \
-            --iters "$ITERS" \
-            --width 1024 \
-        2>&1 || {
-        echo "WARNING: xctrace record failed for $variant — skipping"
+    metallib="$(find "$SOURCE_DIR/metal_probe_variants/$variant" -maxdepth 1 -type f -name '*.metallib' | head -n 1)"
+    if [[ -z "$metallib" ]]; then
+        echo "WARNING: no metallib found for $variant under $SOURCE_DIR/metal_probe_variants/$variant — skipping"
         continue
-    }
+    fi
+    stage_dir="$(mktemp -d "/tmp/steinmarder_gpu_counters_${variant}.XXXXXX")"
+    cp "$METAL_HOST" "$stage_dir/sm_apple_metal_probe_host"
+    cp "$metallib" "$stage_dir/$variant.metallib"
+    printf '%s\n' "$stage_dir" > "$OUTPUT_DIR/gpu_counter_${variant}_stage_dir.txt"
+
+    # Use the instrument form, which is the working capture route for Apple
+    # hardware counters. The trace contains the counter windows; we summarize
+    # them after export.
+    set +e
+    xcrun xctrace record \
+        --instrument 'Metal GPU Counters' \
+        --output "$trace_file" \
+        --time-limit "$TIME_LIMIT" \
+        --launch -- "$stage_dir/sm_apple_metal_probe_host" \
+            --metallib "$stage_dir/$variant.metallib" \
+            --kernel probe_simdgroup_reduce \
+            --iters "$ITERS" \
+            --width "$WIDTH" \
+        2>&1
+    record_status=$?
+    set -e
+    if [[ $record_status -ne 0 && ! -d "$trace_file" ]]; then
+        echo "WARNING: xctrace record failed for $variant and no trace was saved — skipping"
+        continue
+    fi
+    if [[ $record_status -ne 0 ]]; then
+        echo "WARNING: xctrace record returned status $record_status for $variant, but trace was saved; continuing with export"
+    fi
 
     echo "Recorded: $trace_file"
 
@@ -127,13 +145,25 @@ done
 
 echo ""
 echo "=== Extracting counter values ==="
-python3 "$SCRIPT_DIR/extract_gpu_counters.py" "$OUTPUT_DIR" && \
-    echo "GPU counter analysis complete." || \
+extract_ok=0
+for attempt in 1 2 3; do
+    if python3 "$SCRIPT_DIR/extract_gpu_counters.py" "$OUTPUT_DIR" --schema metal-gpu-counter-intervals; then
+        echo "GPU counter analysis complete."
+        extract_ok=1
+        break
+    fi
+    echo "Extraction attempt $attempt failed; retrying after export flush..."
+    sleep 2
+done
+if [[ $extract_ok -ne 1 ]]; then
     echo "Extraction ran (check gpu_counter_analysis.md for details)."
+fi
 
 echo ""
 echo "=== Summary ==="
 echo "Trace files (excluded from git): $OUTPUT_DIR/gpu_counters_*.trace"
 echo "Counter XML exports:             $OUTPUT_DIR/gpu_counter_*.xml"
-echo "Parsed CSV:                      $OUTPUT_DIR/gpu_counter_summary.csv"
+echo "Normalized raw CSV:              $OUTPUT_DIR/gpu_counter_summary.csv"
+echo "Hardware summary CSV:            $OUTPUT_DIR/gpu_hardware_counters.csv"
+echo "Hardware summary doc:            $OUTPUT_DIR/gpu_hardware_counters.md"
 echo "Analysis doc:                    $OUTPUT_DIR/gpu_counter_analysis.md"

@@ -11,7 +11,7 @@ SUDO_MODE="keepalive"
 ITERS="${ITERS:-500000}"
 KEEPALIVE_PID=""
 STEP_NO=0
-TOTAL_STEPS=64
+TOTAL_STEPS=65
 SUDO_INVOKE="sudo -A"
 
 usage() {
@@ -239,11 +239,13 @@ run_step "F" "venv_rebuild" "\"$SCRIPT_DIR/bootstrap_neural_lane.sh\""
 run_step "F" "neural_probe_all" "\"$REPO_ROOT/.venv/bin/python\" \"$SCRIPT_DIR/neural_lane_probe.py\" > \"$OUT_DIR/neural_probe.json\" 2>&1 || true"
 run_step "F" "model_family_define" "cat > \"$OUT_DIR/neural_model_family.json\" <<'EOF'
 {
-  \"models\": [\"tiny_linear\", \"tiny_mlp\", \"tiny_conv\"],
-  \"batch_sizes\": [1, 4, 16],
-  \"dtypes\": [\"float32\", \"float16\"]
+  \"models\": [\"tiny_linear\", \"tiny_mlp\", \"tiny_conv\", \"matmul_proxy\"],
+  \"workloads\": [\"gemm_256\", \"gemm_1024\", \"gemm_2048\", \"reduce_1m\"],
+  \"backends\": [\"pytorch_cpu\", \"pytorch_mps\", \"coreml_cpu_only\", \"coreml_cpu_and_gpu\", \"coreml_cpu_and_ne\", \"coreml_all\", \"mlx_gpu\"],
+  \"dtypes\": [\"int8\", \"uint8\", \"float16\", \"float32\", \"bfloat16\", \"float64\", \"tf32\", \"mxfp8\", \"mxfp6\", \"mxfp4\", \"mxint8\", \"nf4\", \"fp4\"]
 }
 EOF"
+run_step "F" "neural_typed_matrix" "if [ -x \"$REPO_ROOT/.venv/bin/python\" ]; then \"$REPO_ROOT/.venv/bin/python\" \"$SCRIPT_DIR/neural_typed_matrix.py\" --out-dir \"$OUT_DIR\"; else echo missing_venv_python; fi"
 run_step "F" "coreml_placement_sweep" "if [ -x \"$REPO_ROOT/.venv/bin/python\" ]; then \"$REPO_ROOT/.venv/bin/python\" \"$SCRIPT_DIR/neural_lane_probe.py\" > \"$OUT_DIR/coreml_placement_sweep.json\" 2>&1 || true; else echo missing_venv_python; fi"
 run_step "F" "torch_cpu_vs_mps" "if [ -x \"$REPO_ROOT/.venv/bin/python\" ]; then \"$REPO_ROOT/.venv/bin/python\" - <<'PY' > \"$OUT_DIR/torch_cpu_vs_mps.json\" 2>&1
 import json, time
