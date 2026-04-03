@@ -186,6 +186,7 @@ int main(int argc, char **argv) {
         uint32_t iterations = 100;
         uint32_t fs_probe_every = 0;
         uint32_t event_latency_iters = 0;  // 0 = disabled
+        uint32_t l2_chase_entries = 0;     // 0 = disabled; when set, allocates chase buffer as buffer(2)
         int csv = 0;
         int do_list_counters = 0;
         const char *counter_set_name = NULL;  // NULL = no counter sampling
@@ -211,6 +212,8 @@ int main(int argc, char **argv) {
                 counter_set_name = argv[++i];
             } else if (strcmp(argv[i], "--measure-event-latency") == 0 && i + 1 < argc) {
                 event_latency_iters = (uint32_t)strtoul(argv[++i], NULL, 10);
+            } else if (strcmp(argv[i], "--l2-chase-entries") == 0 && i + 1 < argc) {
+                l2_chase_entries = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--help") == 0) {
                 fprintf(stdout,
                     "usage: %s [--metallib path] [--kernel name] [--width N] [--iters N]\n"
@@ -227,7 +230,14 @@ int main(int argc, char **argv) {
                     "Event latency:\n"
                     "  --measure-event-latency N  Measure MTLSharedEvent CPU wakeup latency over N iters.\n"
                     "                             Encodes empty command buffer + signal; blocks CPU with\n"
-                    "                             waitUntilSignaledValue. Prints min/p50/mean/p95/p99/max.\n",
+                    "                             waitUntilSignaledValue. Prints min/p50/mean/p95/p99/max.\n"
+                    "\n"
+                    "L2 cache probe (C3):\n"
+                    "  --l2-chase-entries N       Allocate a uint32 pointer-chase buffer of N entries\n"
+                    "                             (N*4 bytes) as buffer(2). Host initializes chase[i] =\n"
+                    "                             (i + 2053) %% N (stride coprime to N, step > L1=8KB).\n"
+                    "                             Use with --kernel probe_l2_lat. N=65536 gives 256KB\n"
+                    "                             (fits in L2=768KB, guarantees L1 misses at step 8212B).\n",
                     argv[0]);
                 return 0;
             } else {
@@ -296,6 +306,28 @@ int main(int argc, char **argv) {
         if (outBuffer == nil) {
             fprintf(stderr, "failed to allocate output buffer (%u entries)\n", width);
             return 8;
+        }
+
+        // Allocate and initialize L2 pointer-chase buffer if requested (C3 probe).
+        // chase[i] = (i + stride) % n_entries  where stride=2053 is coprime to 65536.
+        // Step size = 2053 × 4 = 8212 bytes, just above L1 (8192 bytes) → guaranteed L1 miss.
+        id<MTLBuffer> chaseBuffer = nil;
+        if (l2_chase_entries > 0) {
+            NSUInteger chase_bytes = (NSUInteger)l2_chase_entries * sizeof(uint32_t);
+            chaseBuffer = [device newBufferWithLength:chase_bytes options:MTLResourceStorageModeShared];
+            if (chaseBuffer == nil) {
+                fprintf(stderr, "failed to allocate chase buffer (%u entries)\n", l2_chase_entries);
+                return 8;
+            }
+            uint32_t *chase_data = (uint32_t *)chaseBuffer.contents;
+            const uint32_t l2_chase_stride = 2053u;
+            for (uint32_t chase_idx = 0u; chase_idx < l2_chase_entries; chase_idx++) {
+                chase_data[chase_idx] = (chase_idx + l2_chase_stride) % l2_chase_entries;
+            }
+            fprintf(stdout, "l2_chase: entries=%u stride=%u step_bytes=%u total_bytes=%llu\n",
+                    l2_chase_entries, l2_chase_stride,
+                    l2_chase_stride * (uint32_t)sizeof(uint32_t),
+                    (unsigned long long)chase_bytes);
         }
 
         // Set up MTLCounterSet sampling if requested.
@@ -386,6 +418,10 @@ int main(int argc, char **argv) {
             // Use a fixed high value (100000) so GPU compute dominates command-buffer overhead.
             uint32_t shader_inner_iters = 100000u;
             [encoder setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
+            // Bind pointer-chase buffer as buffer(2) when --l2-chase-entries is set.
+            if (chaseBuffer != nil) {
+                [encoder setBuffer:chaseBuffer offset:0 atIndex:2];
+            }
 
             NSUInteger threadsPerTG = pipeline.maxTotalThreadsPerThreadgroup;
             if (threadsPerTG > 128) {

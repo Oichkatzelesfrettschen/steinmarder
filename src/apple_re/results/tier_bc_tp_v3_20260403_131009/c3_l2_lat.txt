@@ -1,0 +1,2 @@
+l2_chase: entries=65536 stride=2053 step_bytes=8212 total_bytes=262144
+metal_probe elapsed_ns=2705518000 ns_per_iter=90183933.333333 ns_per_element=88070.247395833 checksum=11725374293440672643

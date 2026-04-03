@@ -1,0 +1,1 @@
+metal_probe elapsed_ns=461771000 ns_per_iter=15392366.666667 ns_per_element=15031.608072917 checksum=2458617878680216513
