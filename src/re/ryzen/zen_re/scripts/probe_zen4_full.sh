@@ -58,6 +58,9 @@ run_probe probe_avx512_bf16          --iterations 100000 --cpu "$CPU" --csv
 run_probe probe_avx512_bandwidth     --iterations 5000   --cpu "$CPU"
 run_probe probe_avx512_throttle      --cpu "$CPU" --csv
 run_probe probe_avx512_port_contention --iterations 50000 --cpu "$CPU" --size 262144 --csv
+run_probe probe_avx512_shuffle        --iterations 50000  --cpu "$CPU" --csv
+run_probe probe_avx512_convert        --iterations 50000  --cpu "$CPU" --csv
+run_probe probe_avx512_mask            --iterations 50000  --cpu "$CPU" --csv
 
 # Collect all CSV lines into a single summary
 echo "=== Summary CSV ===" > "$OUTDIR/summary.csv"
