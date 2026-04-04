@@ -90,9 +90,10 @@ src/re/r600/results/x130e_terascale/workspace/
 *.air
 *.metallib
 
-# Compiled probe host binaries
+# Compiled probe host binaries (anywhere under results or host)
+**/sm_apple_metal_probe_host
+**/sm_apple_cpu_latency_*
 src/re/apple/host/metal_probe_host
-src/re/apple/host/sm_apple_*
 
 # CUDA compiled intermediates
 *.cubin
