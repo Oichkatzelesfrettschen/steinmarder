@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float v = seed + gl_FragCoord.x * 0.001;
+    float bias = gl_FragCoord.y * 0.0001;
+    // 32-deep SIN/COS chain (trans slot only)
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    v = sin(v) + bias; v = cos(v) + bias; v = sin(v) + bias; v = cos(v) + bias;
+    gl_FragColor = vec4(v, v, v, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

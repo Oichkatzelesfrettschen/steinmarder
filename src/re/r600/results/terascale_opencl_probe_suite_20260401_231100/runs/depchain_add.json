@@ -1,0 +1,15 @@
+{
+  "source_path": "/tmp/terascale_opencl_probe_19608/probes/r600/opencl/depchain_add.cl",
+  "kernel_name": "depchain_add",
+  "platform_name": "rusticl",
+  "device_name": "AMD PALM (DRM 2.51.0 / 6.18.20-x64v1-xanmod1)",
+  "mode": "scalar_f32",
+  "elements": 4096,
+  "local_size": 64,
+  "build_ns": 46108865,
+  "kernel_ns": 6735660,
+  "read_ns": 2173600,
+  "checksum": -nan,
+  "first": [0.000000000, 0.000000000, 0.000000000, 0.000000000],
+  "last": [0.000000000, 0.000000000, 0.000000000, 0.000000000]
+}

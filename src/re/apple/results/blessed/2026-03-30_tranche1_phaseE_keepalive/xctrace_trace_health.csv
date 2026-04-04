@@ -1,0 +1,1 @@
+trace,template_name,duration_s,end_reason,target_process_name,target_pid,target_exit_status,target_termination_reason,schema_count

@@ -1,0 +1,73 @@
+backend,format,workload,status,support_tier,median_ms,p90_ms,warmup_runs,measured_runs,checksum,notes
+pytorch_cpu,float16,gemm_256,measured,native,5.628728999909072,5.705024999770103,5,20,10.8125,device=cpu
+pytorch_cpu,float16,gemm_1024,measured,native,710.7441039997866,712.9496169998674,5,20,80.6875,device=cpu
+pytorch_cpu,float16,reduce_1m,measured,native,0.04154149974056054,0.042108100205950905,5,20,-738.5,device=cpu
+pytorch_cpu,float32,gemm_256,measured,native,0.032812498830026016,0.0330083003063919,5,20,-24.716236114501953,device=cpu
+pytorch_cpu,float32,gemm_1024,measured,native,2.0612709995475598,2.414124699498643,5,20,-10.838068008422852,device=cpu
+pytorch_cpu,float32,reduce_1m,measured,native,0.04635450022760779,0.05414170100266347,5,20,-2111.162353515625,device=cpu
+pytorch_cpu,float64,gemm_256,measured,native,0.1188335008919239,0.1231999996889499,5,20,13.9902278262138,device=cpu
+pytorch_cpu,float64,gemm_1024,measured,native,7.898083499640052,8.174716999747034,5,20,-65.76067200359857,device=cpu
+pytorch_cpu,float64,reduce_1m,measured,native,0.07856249976612162,0.09215809968736723,5,20,452.87769607704,device=cpu
+pytorch_cpu,bfloat16,gemm_256,measured,native_or_proxy,5.695458499758388,5.770058599227923,5,20,-24.125,device=cpu
+pytorch_cpu,bfloat16,gemm_1024,measured,native_or_proxy,716.2759374996313,718.344533000527,5,20,-10.0625,device=cpu
+pytorch_cpu,bfloat16,reduce_1m,measured,native_or_proxy,0.04279149925423553,0.0446874995759572,5,20,1304.0,device=cpu
+pytorch_cpu,int8,gemm_256,measured,native_or_proxy,0.6765835005353438,0.6959036007174291,5,20,10.0,device=cpu
+pytorch_cpu,int8,gemm_1024,measured,native_or_proxy,39.37966650028102,39.92827889978798,5,20,-61.0,device=cpu
+pytorch_cpu,int8,reduce_1m,measured,native_or_proxy,0.1800419995561242,0.27124559946969384,5,20,-510551.0,device=cpu
+pytorch_cpu,uint8,gemm_256,measured,native_or_proxy,0.6749789990863064,0.7053836008708458,5,20,221.0,device=cpu
+pytorch_cpu,uint8,gemm_1024,measured,native_or_proxy,39.167041500149935,39.379520500551735,5,20,143.0,device=cpu
+pytorch_cpu,uint8,reduce_1m,measured,native_or_proxy,0.13291649884195067,0.13570810078817885,5,20,63458116.0,device=cpu
+pytorch_cpu,int16,gemm_256,measured,native_or_proxy,1.2612915006684489,1.3170961989089847,5,20,-2772.0,device=cpu
+pytorch_cpu,int16,gemm_1024,measured,native_or_proxy,77.43591650068993,78.3268458008024,5,20,3546.0,device=cpu
+pytorch_cpu,int16,reduce_1m,measured,native_or_proxy,0.2174165010728757,0.2215375012383447,5,20,-517064.0,device=cpu
+pytorch_cpu,int32,gemm_256,measured,native,2.427770499707549,2.458378799383354,5,20,-2767.0,device=cpu
+pytorch_cpu,int32,gemm_1024,measured,native,153.51189600005455,155.17682560112007,5,20,-20923.0,device=cpu
+pytorch_cpu,int32,reduce_1m,measured,native,0.15277049988071667,0.2700122000533156,5,20,-441591.0,device=cpu
+pytorch_cpu,int64,gemm_256,measured,native,8.462958500786044,8.6228330997983,5,20,-13573.0,device=cpu
+pytorch_cpu,int64,gemm_1024,measured,native,560.1017709996086,562.7861921999283,5,20,-44645.0,device=cpu
+pytorch_cpu,int64,reduce_1m,measured,native,0.05114550094731385,0.054200001068238635,5,20,-478238.0,device=cpu
+pytorch_cpu,uint16,gemm_256,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt16'"
+pytorch_cpu,uint16,gemm_1024,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt16'"
+pytorch_cpu,uint16,reduce_1m,measured,native_or_proxy,0.13954150017525535,0.15394610054499935,5,20,63514358.0,device=cpu
+pytorch_cpu,uint32,gemm_256,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt32'"
+pytorch_cpu,uint32,gemm_1024,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt32'"
+pytorch_cpu,uint32,reduce_1m,measured,native_or_proxy,0.18968750009662472,0.24975800024549244,5,20,63528294.0,device=cpu
+pytorch_cpu,uint64,gemm_256,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt64'"
+pytorch_cpu,uint64,gemm_1024,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt64'"
+pytorch_cpu,uint64,reduce_1m,measured,native_or_proxy,0.3082289995290921,0.31760409838170744,5,20,63541447.0,device=cpu
+pytorch_mps,float16,gemm_256,measured,native,0.44660399998974754,0.4816047001440893,5,20,-9.203125,device=mps
+pytorch_mps,float16,gemm_1024,measured,native,1.7935629994099145,2.5660877998234373,5,20,2.337890625,device=mps
+pytorch_mps,float16,reduce_1m,measured,native,0.3816459993686294,0.46959970095485914,5,20,-748.5,device=mps
+pytorch_mps,float32,gemm_256,measured,native,0.41299950044049183,0.4579167001793394,5,20,-2.879790782928467,device=mps
+pytorch_mps,float32,gemm_1024,measured,native,2.4457710005663102,3.2086291999803507,5,20,2.689640760421753,device=mps
+pytorch_mps,float32,reduce_1m,measured,native,0.47195849947456736,0.5710619001547458,5,20,-436.5874328613281,device=mps
+pytorch_mps,float64,gemm_256,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,float64,gemm_1024,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,float64,reduce_1m,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,bfloat16,gemm_256,measured,native_or_proxy,0.5504789996848558,0.599571100610774,5,20,10.5625,device=mps
+pytorch_mps,bfloat16,gemm_1024,measured,native_or_proxy,2.7093335002064123,2.922116599984293,5,20,29.125,device=mps
+pytorch_mps,bfloat16,reduce_1m,measured,native_or_proxy,0.3908955004590098,0.4390119005620364,5,20,-764.0,device=mps
+pytorch_mps,int8,gemm_256,measured,native_or_proxy,0.5281044996081619,0.9219707997544903,5,20,60.0,device=mps
+pytorch_mps,int8,gemm_1024,measured,native_or_proxy,8.42279150037939,9.330262199364372,5,20,-120.0,device=mps
+pytorch_mps,int8,reduce_1m,measured,native_or_proxy,0.5342715003280318,0.5729582999265403,5,20,-514686.0,device=mps
+pytorch_mps,uint8,gemm_256,measured,native_or_proxy,0.5102080003780429,0.5578372001764365,5,20,199.0,device=mps
+pytorch_mps,uint8,gemm_1024,measured,native_or_proxy,8.433916500507621,8.644408399231907,5,20,101.0,device=mps
+pytorch_mps,uint8,reduce_1m,measured,native_or_proxy,0.47447899942199,0.5989951987430686,5,20,63512936.0,device=mps
+pytorch_mps,int16,gemm_256,measured,native_or_proxy,0.518021000061708,0.5567833008171874,5,20,-32566.0,device=mps
+pytorch_mps,int16,gemm_1024,measured,native_or_proxy,9.108062500672531,9.351591699305574,5,20,-1471.0,device=mps
+pytorch_mps,int16,reduce_1m,measured,native_or_proxy,0.5028544992455863,0.570700299613236,5,20,-544002.0,device=mps
+pytorch_mps,int32,gemm_256,measured,native,0.599791500462743,0.6538584004374572,5,20,-19109.0,device=mps
+pytorch_mps,int32,gemm_1024,measured,native,13.018707999435719,13.552166400768328,5,20,-89798.0,device=mps
+pytorch_mps,int32,reduce_1m,measured,native,0.4514165002547088,0.6444249997002772,5,20,-433430.0,device=mps
+pytorch_mps,int64,gemm_256,measured,native,0.8660414996484178,1.1520785001266638,5,20,7225.0,device=mps
+pytorch_mps,int64,gemm_1024,measured,native,28.26975049902103,34.827271399626625,5,20,31827.0,device=mps
+pytorch_mps,int64,reduce_1m,measured,native,0.690292000399495,0.7711744005064247,5,20,-516589.0,device=mps
+pytorch_mps,uint16,gemm_256,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ushort
+pytorch_mps,uint16,gemm_1024,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ushort
+pytorch_mps,uint16,reduce_1m,measured,native_or_proxy,0.4056464995301212,0.47457530108658835,5,20,63443184.0,device=mps
+pytorch_mps,uint32,gemm_256,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_uint
+pytorch_mps,uint32,gemm_1024,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_uint
+pytorch_mps,uint32,reduce_1m,measured,native_or_proxy,0.4568744998323382,0.5536756005312782,5,20,63494012.0,device=mps
+pytorch_mps,uint64,gemm_256,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ulong
+pytorch_mps,uint64,gemm_1024,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ulong
+pytorch_mps,uint64,reduce_1m,measured,native_or_proxy,0.6060830000933493,0.6606583012398916,5,20,63505160.0,device=mps

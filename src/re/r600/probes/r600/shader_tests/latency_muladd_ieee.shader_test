@@ -1,0 +1,36 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float px = gl_FragCoord.x * 0.001;
+    float py = gl_FragCoord.y * 0.001 + 1.0;
+    float c = px * 0.01;
+    float v = seed + px;
+    // 64-deep MULADD chain: v = v * py + c (FMA, each depends on prev)
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    v = v * py + c; v = v * py + c; v = v * py + c; v = v * py + c;
+    gl_FragColor = vec4(v, v, v, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform sampler2D tex;
+void main() {
+    // 16-deep dependent texture fetch chain
+    // Each fetch uses the previous result as UV coords
+    vec2 uv = gl_FragCoord.xy / vec2(64.0, 64.0);
+    vec4 v;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv); uv = v.xy * 0.5 + 0.25;
+    v = texture(tex, uv);
+    gl_FragColor = v;
+}
+
+[test]
+texture checkerboard 0 0 64 64
+draw rect -1 -1 2 2

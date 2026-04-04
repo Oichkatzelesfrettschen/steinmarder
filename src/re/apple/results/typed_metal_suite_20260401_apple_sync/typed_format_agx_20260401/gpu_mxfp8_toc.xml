@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<trace-toc>
+    <run number="1">
+        <info>
+            <target>
+                <device uuid="A23CDF4E-484E-5C1F-A585-AA2FD5883BA6" model="MacBook Air" name="Eirikr’s MacBook Air" os-version="26.4 (25E246)" platform="macOS"/>
+                <process arguments="--metallib /tmp/steinmarder_gpu_format_mxfp8.sQRwl4/mxfp8.metallib --kernel probe_mxfp8_proxy --iters 200000 --width 1024" type="launched" return-exit-status="9" name="sm_apple_metal_probe_host" pid="14879" termination-reason="SIGKILL"/>
+            </target>
+            <summary>
+                <start-date>2026-04-01T22:42:02.037-07:00</start-date>
+                <end-date>2026-04-01T22:42:12.332-07:00</end-date>
+                <duration>10.295803</duration>
+                <end-reason>Time limit reached</end-reason>
+                <instruments-version>26.0 (17A5295f)</instruments-version>
+                <template-name>Blank</template-name>
+                <recording-mode>Deferred</recording-mode>
+                <time-limit>10 seconds</time-limit>
+                <intruments-recording-settings>
+                    <instrument name="Metal GPU Counters">
+                        <array>
+                            <dictionary>
+                                <key name="GPU">
+                                    <value>Counter Set: Performance Limiters</value>
+                                    <value>Shader Timeline: Enabled</value>
+                                    <value>Induced GPU Performance State: Default</value>
+                                </key>
+                            </dictionary>
+                        </array>
+                    </instrument>
+                </intruments-recording-settings>
+            </summary>
+        </info>
+        <processes>
+            <process name="sm_apple_metal_probe_host" pid="14879" path="/tmp/steinmarder_gpu_format_mxfp8.sQRwl4/sm_apple_metal_probe_host"/>
+            <process name="kernel.release.t8103" pid="0" path="/System/Library/Kernels/kernel.release.t8103"/>
+        </processes>
+        <data>
+            <table schema="device-gpu-info"/>
+            <table schema="gpu-counter-value"/>
+            <table schema="tick" frequency="10"/>
+            <table schema="dyld-library-load" target-pid="SINGLE"/>
+            <table shader-profiler="1" counter-profile="3" schema="gpu-counter-info" counter-device="0"/>
+            <table schema="gpu-aps-stream"/>
+            <table codes="&quot;0x1f,0x05&quot;" schema="kdebug-strings" target="SINGLE"/>
+            <table codes="&quot;0x07,0x00&quot; &quot;0x1f,0x05&quot;" schema="kdebug" target="SINGLE"/>
+            <table schema="metal-gpu-counter-intervals"/>
+            <table schema="thread-info"/>
+            <table schema="process-info"/>
+            <table shader-profiler="1" counter-profile="3" schema="metal-gpu-counter-profile" counter-device="0"/>
+        </data>
+        <tracks/>
+    </run>
+</trace-toc>

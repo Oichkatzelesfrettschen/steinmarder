@@ -1,0 +1,9 @@
+timestamp_utc,step,status,artifact
+2026-04-02T05:24:07Z,machine_stamp,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/01_machine_stamp
+2026-04-02T05:24:07Z,dri_inventory,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/02_dri_inventory
+2026-04-02T05:24:07Z,tool_inventory,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/03_tool_inventory
+2026-04-02T05:24:07Z,vulkan_summary,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/04_vulkan_summary
+2026-04-02T05:24:08Z,perf_stat_capability,fail,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/05_perf_stat_capability
+2026-04-02T05:24:08Z,tracecmd_radeon_list,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/06_tracecmd_radeon_list
+2026-04-02T05:24:09Z,radeontop_probe,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/07_radeontop_probe
+2026-04-02T05:24:12Z,vm_io_probe,ok,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/08_vm_io_probe

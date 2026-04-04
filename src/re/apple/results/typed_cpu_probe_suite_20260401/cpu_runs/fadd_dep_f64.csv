@@ -1,0 +1,2 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+fadd_dep_f64,200000,32,6220250,0.971914,1.028898

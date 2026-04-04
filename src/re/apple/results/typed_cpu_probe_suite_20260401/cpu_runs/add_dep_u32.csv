@@ -1,0 +1,2 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+add_dep_u32,50000000,32,579645875,0.362279,2.760306

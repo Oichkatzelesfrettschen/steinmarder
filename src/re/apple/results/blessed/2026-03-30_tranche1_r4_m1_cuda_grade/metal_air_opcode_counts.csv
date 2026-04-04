@@ -1,0 +1,9 @@
+opcode,count
+shl,2
+xor,2
+tail_call,1
+add,1
+zext,1
+getelementptr,1
+store,1
+ret,1

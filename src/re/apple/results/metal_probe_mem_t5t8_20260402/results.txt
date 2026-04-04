@@ -1,0 +1,65 @@
+Metal AGX Memory/Sync Latency Probes T5–T8
+Run date: 2026-04-02
+Host: sm_apple_metal_probe_host  (--width 1024 --iters 30)
+Constants: C (per-dispatch overhead) = 3,153,956 ns; shader_inner_iters = 100,000; ops_per_iter = 8
+
+=== Raw host output ===
+
+T5: probe_threadgroup_lat
+  metal_probe elapsed_ns=108032000 ns_per_iter=3601066.666667 ns_per_element=3516.666666667 checksum=15232936422226017952
+
+T6: probe_global_l1_lat
+  metal_probe elapsed_ns=1501497000 ns_per_iter=50049900.000000 ns_per_element=48876.855468750 checksum=14458285009550783363
+
+T7: probe_simdgroup_sum_lat
+  metal_probe elapsed_ns=774144000 ns_per_iter=25804800.000000 ns_per_element=25200.000000000 checksum=10599093769827713923
+
+T8a: probe_atomic_tg_lat
+  metal_probe elapsed_ns=2245096000 ns_per_iter=74836533.333333 ns_per_element=73082.552083333 checksum=6081180492312766339
+
+T8b: probe_atomic_global_lat
+  metal_probe elapsed_ns=3545058000 ns_per_iter=118168600.000000 ns_per_element=115399.023437500 checksum=4063759729469651237
+
+=== Latency table ===
+Formula: latency_ns = (ns_per_dispatch - C) / (inner_iters * ops_per_iter)
+
+Probe                     ns/dispatch    (ns-C)      lat_ns   lat_cyc@1.4GHz   Notes
+------------------------------------------------------------------------------------------
+T5  threadgroup_lat        3,601,067      447,111       0.56        0.78        see note 1
+T6  global_l1_lat         50,049,900   46,895,944      58.6       82.1         L1 hit (4KB)
+T7  simdgroup_sum_lat     25,804,800   22,650,844      28.3       39.6         simd_sum 32 lanes
+T8a atomic_tg_lat         74,836,533   71,682,577      89.6      125.4         uncontended (lid==0 only)
+T8b atomic_global_lat    118,168,600  115,014,644     143.8      201.3         uncontended (gid==0 only)
+
+=== Notes ===
+
+1. T5 threadgroup_lat: The measured latency of 0.56 ns (~0.78 cycles) is sub-cycle and almost
+   certainly reflects the Metal compiler promoting the threadgroup float tg[1024] store→load chain
+   into registers.  Without a barrier between the store and the next load to the SAME thread-owned
+   address, Metal/LLVM can prove no other thread touches tg[lid] and scalar-replaces the array.
+   The measurement therefore captures register-to-register forwarding cost, not true LDS latency.
+   A barrier-based probe (which measures barrier + LDS round-trip) or a cross-thread access pattern
+   would be needed to force real LDS traffic.  Filed as a known limitation.
+
+2. T6 global_l1_lat: 58.6 ns / 82 cycles for an L1-resident (4 KB) buffer.  This is substantially
+   higher than typical GPU L1 latencies (~10-20 cycles) and likely reflects the volatile device
+   pointer preventing any load-to-use forwarding.  The address computed from acc may also cause
+   address-generation interlock (AGI) each iteration.  Treat as an upper bound on AGX L1 latency
+   for fully-dependent random-access loads.
+
+3. T7 simdgroup_sum_lat: 28.3 ns / ~40 cycles per simd_sum reduction across 32 lanes.  This is
+   consistent with a butterfly reduction requiring ~5 shuffle steps at ~8 cycles per step on AGX.
+
+4. T8a atomic_tg_lat: 89.6 ns / ~125 cycles per uncontended threadgroup atomic fetch_add.
+   Only lid==0 does work; the dispatch overhead included covers all 1024 threads, so the
+   effective per-op latency is a lower bound for the single-thread atomic path.
+
+5. T8b atomic_global_lat: 143.8 ns / ~201 cycles per uncontended device-buffer atomic fetch_add
+   (gid==0 only).  The ratio T8b/T8a ≈ 1.6x reflects the longer global-memory path vs.
+   threadgroup-local storage.
+
+=== Shader files ===
+shaders/probe_threadgroup_lat.metal   → kernel probe_threadgroup_lat
+shaders/probe_global_mem_lat.metal    → kernel probe_global_l1_lat
+shaders/probe_simdgroup_lat.metal     → kernel probe_simdgroup_sum_lat
+shaders/probe_atomic_lat.metal        → kernels probe_atomic_tg_lat, probe_atomic_global_lat

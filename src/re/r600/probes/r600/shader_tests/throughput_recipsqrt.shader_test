@@ -1,0 +1,29 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float a = abs(seed + gl_FragCoord.x * 0.001) + 1.0;
+    float b = abs(seed + gl_FragCoord.y * 0.001) + 1.0;
+    float c = a + 0.5;
+    float d = b + 0.5;
+    float bias = gl_FragCoord.y * 0.0001;
+    // 4 independent chains (8 each = 32 total)
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    a=inversesqrt(a)+bias; b=inversesqrt(b)+bias; c=inversesqrt(c)+bias; d=inversesqrt(d)+bias;
+    gl_FragColor = vec4(a, b, c+d, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

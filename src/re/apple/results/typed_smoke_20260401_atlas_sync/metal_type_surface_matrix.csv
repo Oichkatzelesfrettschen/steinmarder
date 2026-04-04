@@ -1,0 +1,11 @@
+format,bit_width,msl_type,compile_status,support_tier,notes
+float32,32,float,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+float16,16,half,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+int32,32,int,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+uint32,32,uint,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+int8,8,char,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+uint8,8,uchar,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+bfloat16,16,bfloat,compiled,native_or_lowered,MSL surface compiled; inspect AIR/disassembly later to split native from lowered.
+tf32,19,,not_attempted,unsupported_or_proxy,No public MSL scalar type for TF32.
+fp8_e4m3,8,,not_attempted,unsupported_or_proxy,No public MSL scalar type for FP8 e4m3.
+mxfp8,8,,not_attempted,unsupported_or_proxy,No public MSL scalar type for MXFP8.

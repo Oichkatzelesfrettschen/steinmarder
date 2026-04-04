@@ -1,0 +1,27 @@
+Process 84666 is not debuggable. Due to security restrictions, leaks can only show or save contents of readonly memory of restricted processes.
+
+Process:         sm_apple_cpu_latency_O3 [84666]
+Path:            /Users/USER/Documents/*/sm_apple_cpu_latency_O3
+Load Address:    0x1044dc000
+Identifier:      sm_apple_cpu_latency_O3
+Version:         0
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  bash [83263]
+Target Type:     live task
+
+Date/Time:       2026-03-30 14:29:17.716 -0700
+Launch Time:     2026-03-30 14:29:17.389 -0700
+OS Version:      macOS 26.3.1 (25D2128)
+Report Version:  7
+Analysis Tool:   /usr/bin/leaks
+
+Physical footprint:         865K
+Physical footprint (peak):  881K
+Idle exit:                  untracked
+----
+
+leaks Report Version: 4.0
+Process 84666: 185 nodes malloced for 14 KB
+Process 84666: 0 leaks for 0 total leaked bytes.
+

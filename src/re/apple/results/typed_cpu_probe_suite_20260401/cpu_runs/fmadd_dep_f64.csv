@@ -1,0 +1,2 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+fmadd_dep_f64,200000,32,8300667,1.296979,0.771022

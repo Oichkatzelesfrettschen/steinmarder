@@ -1,0 +1,19 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    float values[];
+} outbuf;
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    float acc = float(index) * 0.125;
+
+    // A straight dependency chain gives us the cleanest latency surface.
+    for (int i = 0; i < 512; ++i) {
+        acc = acc + 1.0;
+    }
+
+    outbuf.values[index] = acc;
+}

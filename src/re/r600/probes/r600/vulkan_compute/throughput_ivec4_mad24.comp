@@ -1,0 +1,24 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    vec4 values[];
+} outbuf;
+
+ivec4 sign_extend24_ivec4(ivec4 value) {
+    return (value << 8) >> 8;
+}
+
+void main(void) {
+    int index = int(gl_GlobalInvocationID.x);
+    ivec4 acc = sign_extend24_ivec4(ivec4(index, index + 1, index + 2, index + 3) * 257 - 0x00300000);
+    const ivec4 a = ivec4(3, 5, 7, 11);
+    const ivec4 b = ivec4(-17, 19, -23, 29);
+
+    for (int i = 0; i < 256; ++i) {
+        acc = sign_extend24_ivec4((acc * a) + b);
+    }
+
+    outbuf.values[index] = vec4(acc) * (1.0 / 8388608.0);
+}

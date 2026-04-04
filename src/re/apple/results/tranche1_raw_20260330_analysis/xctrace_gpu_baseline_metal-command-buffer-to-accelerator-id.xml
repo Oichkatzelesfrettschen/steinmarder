@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[111]'><schema name="metal-command-buffer-to-accelerator-id"><col><mnemonic>timestamp</mnemonic><name>Timestamp</name><engineering-type>start-time</engineering-type></col><col><mnemonic>cmdbuffer-id</mnemonic><name>Commmand Buffer Id</name><engineering-type>metal-command-buffer-id</engineering-type></col><col><mnemonic>accelerator-id</mnemonic><name>Accelerator ID</name><engineering-type>uint64</engineering-type></col></schema><row><start-time id="1" fmt="00:00.408.646">408646000</start-time><metal-command-buffer-id id="2" fmt="0xa12bf36">169000758</metal-command-buffer-id><uint64 id="3" fmt="1,848">1848</uint64></row>
+<row><start-time id="4" fmt="00:00.409.425">409425833</start-time><metal-command-buffer-id id="5" fmt="0x4d0c873">80791667</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="6" fmt="00:00.409.637">409637041</start-time><metal-command-buffer-id id="7" fmt="0x4d0c876">80791670</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="8" fmt="00:00.443.202">443202583</start-time><metal-command-buffer-id id="9" fmt="0xa12bf38">169000760</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="10" fmt="00:00.458.550">458550041</start-time><metal-command-buffer-id id="11" fmt="0xa12bf3a">169000762</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="12" fmt="00:00.459.343">459343250</start-time><metal-command-buffer-id id="13" fmt="0x4d0c877">80791671</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="14" fmt="00:00.459.560">459560833</start-time><metal-command-buffer-id id="15" fmt="0x4d0c87a">80791674</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="16" fmt="00:00.493.014">493014625</start-time><metal-command-buffer-id id="17" fmt="0x4d0c87b">80791675</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="18" fmt="00:00.493.367">493367208</start-time><metal-command-buffer-id id="19" fmt="0x4d0c87e">80791678</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="20" fmt="00:00.528.885">528885125</start-time><metal-command-buffer-id id="21" fmt="0xa12bf3c">169000764</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="22" fmt="00:00.543.045">543045958</start-time><metal-command-buffer-id id="23" fmt="0x4d0c87f">80791679</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="24" fmt="00:00.543.350">543350875</start-time><metal-command-buffer-id id="25" fmt="0xa12bf3e">169000766</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="26" fmt="00:00.543.378">543378375</start-time><metal-command-buffer-id id="27" fmt="0x4d0c882">80791682</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="28" fmt="00:00.559.458">559458916</start-time><metal-command-buffer-id id="29" fmt="0x4d0c883">80791683</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="30" fmt="00:00.559.762">559762666</start-time><metal-command-buffer-id id="31" fmt="0x4d0c886">80791686</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="32" fmt="00:00.575.251">575251750</start-time><metal-command-buffer-id id="33" fmt="0xa12bf40">169000768</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="34" fmt="00:00.609.288">609288833</start-time><metal-command-buffer-id id="35" fmt="0x4d0c887">80791687</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="36" fmt="00:00.609.546">609546500</start-time><metal-command-buffer-id id="37" fmt="0x4d0c88a">80791690</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="38" fmt="00:00.609.939">609939791</start-time><metal-command-buffer-id id="39" fmt="0xa12bf42">169000770</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="40" fmt="00:00.626.093">626093375</start-time><metal-command-buffer-id id="41" fmt="0x4d0c88b">80791691</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="42" fmt="00:00.626.356">626356333</start-time><metal-command-buffer-id id="43" fmt="0x4d0c88e">80791694</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="44" fmt="00:00.642.778">642778458</start-time><metal-command-buffer-id id="45" fmt="0xa12bf44">169000772</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="46" fmt="00:00.659.888">659888250</start-time><metal-command-buffer-id id="47" fmt="0xa12bf46">169000774</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="48" fmt="00:00.659.901">659901083</start-time><metal-command-buffer-id id="49" fmt="0x4d0c88f">80791695</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="50" fmt="00:00.660.155">660155375</start-time><metal-command-buffer-id id="51" fmt="0x4d0c892">80791698</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="52" fmt="00:00.675.073">675073541</start-time><metal-command-buffer-id id="53" fmt="0xa12bf48">169000776</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="54" fmt="00:00.676.090">676090458</start-time><metal-command-buffer-id id="55" fmt="0x4d0c893">80791699</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="56" fmt="00:00.676.328">676328791</start-time><metal-command-buffer-id id="57" fmt="0x4d0c896">80791702</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="58" fmt="00:00.710.601">710601875</start-time><metal-command-buffer-id id="59" fmt="0x4d0c897">80791703</metal-command-buffer-id><uint64 ref="3"/></row>
+<row><start-time id="60" fmt="00:00.711.077">711077625</start-time><metal-command-buffer-id id="61" fmt="0x4d0c89a">80791706</metal-command-buffer-id><uint64 ref="3"/></row>
+</node></trace-query-result>

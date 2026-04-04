@@ -1,0 +1,5 @@
+label,family
+stream_l1_hot,stream
+stream_l2_boundary,stream
+pointer_chase_llc,pointer
+reuse_stride_hotset,reuse

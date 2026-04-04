@@ -1,0 +1,82 @@
+# Terakan Vulkan Driver Source Manifest
+# Extracted from libvulkan_terascale.so debug strings
+# Package: terakan-vulkan-icd 25.2.0~terakan+git20260111.38146e0a9a8b+local-2
+# Based on Mesa 25.2.0 with Terakan branch
+
+## Driver Core (src/amd/terascale/vulkan/)
+terakan_barrier.c
+terakan_bo.c
+terakan_buffer.c
+terakan_command_buffer.c
+terakan_cp_dma.c
+terakan_descriptor.c
+terakan_descriptor_set.c
+terakan_descriptor_set_layout.c
+terakan_device.c
+terakan_device_memory.c
+terakan_draw.c
+terakan_entrypoints.c
+terakan_format.c
+terakan_hw_state.c
+terakan_image.c
+terakan_instance.c
+terakan_physical_device.c
+terakan_pipeline.c
+terakan_pipeline_graphics.c
+terakan_pipeline_layout.c
+terakan_push_constants.c
+terakan_query.c
+terakan_queue.c
+terakan_render_pass.c
+terakan_sampler.c
+terakan_shader.c
+terakan_shader_sfn.cpp      # <-- Uses r600 SFN compiler for VLIW5
+terakan_state.c
+terakan_state_color.c
+terakan_state_depth_stencil.c
+terakan_state_input_assembly.c
+terakan_state_multisample.c
+terakan_state_rasterization.c
+terakan_sync_completion.c
+terakan_vertex_input.c
+terakan_wsi.c
+
+## NIR Lowering Passes (src/amd/terascale/vulkan/nir/)
+terakan_nir_alu.c            # <-- ALU lowering for TeraScale
+terakan_nir_buffer.c
+terakan_nir_compact_fragment_data_locations.c
+terakan_nir_lower_bindings.c
+
+## Meta Operations (src/amd/terascale/vulkan/meta/)
+terakan_meta.c
+terakan_meta_2d.c
+terakan_meta_clear.c
+terakan_meta_copy_buffer_image.c
+terakan_meta_copy_expand_3x.c
+terakan_meta_copy_image.c
+terakan_meta_query_accum.c
+terakan_meta_query_copy.c
+
+## Winsys (src/amd/terascale/vulkan/winsys/drm_radeon/)
+terakan_bo_drm_radeon.c
+terakan_device_drm_radeon.c
+terakan_instance_drm_radeon.c
+terakan_physical_device_drm_radeon.c
+terakan_queue_drm_radeon.c
+
+## Common (src/amd/terascale/common/)
+terascale_format.c
+terascale_formats.c
+
+## Key Integration Points
+- Uses src/gallium/drivers/r600/sfn/ for VLIW5 shader compilation
+- Uses src/compiler/spirv/ for SPIR-V -> NIR translation
+- Uses src/vulkan/runtime/ for Vulkan common infrastructure
+- Uses src/vulkan/wsi/ for window system integration
+
+## To Port to Mesa 26:
+1. Clone Mesa 26.0.3
+2. Add src/amd/terascale/ tree from the Terakan branch
+3. Add meson.build entries for the new driver
+4. Resolve API changes between Mesa 25.2 and 26.0
+5. Build with -Dvulkan-drivers=terascale (or whatever the option name is)

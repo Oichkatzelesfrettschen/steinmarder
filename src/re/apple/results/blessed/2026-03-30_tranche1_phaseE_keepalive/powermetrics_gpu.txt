@@ -1,0 +1,18 @@
+Machine model: MacBookAir10,1
+OS version: 25D2128
+Boot arguments: 
+Boot time: Sun Mar 29 16:05:12 2026
+
+
+
+*** Sampled system activity (Mon Mar 30 19:11:35 2026 -0700) (5002.73ms elapsed) ***
+
+
+**** GPU usage ****
+
+GPU HW active frequency: 398 MHz
+GPU HW active residency:  19.29% (396 MHz:  19% 528 MHz: .14% 720 MHz: .04% 924 MHz:   0% 1128 MHz:   0% 1278 MHz:   0%)
+GPU SW requested state: (P1 :  99% P2 : .13% P3 : .59% P4 :   0% P5 :   0% P6 :   0%)
+GPU idle residency:  80.71%
+GPU Power: 55 mW
+

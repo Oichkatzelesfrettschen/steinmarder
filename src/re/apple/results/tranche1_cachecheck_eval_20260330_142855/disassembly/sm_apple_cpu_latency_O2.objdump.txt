@@ -1,0 +1,375 @@
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_cachecheck_eval_20260330_142855/cpu_bins/sm_apple_cpu_latency_O2:
+(__TEXT,__text) section
+_main:
+1000004f8:	ff 83 02 d1	sub	sp, sp, #0xa0
+1000004fc:	e9 23 03 6d	stp	d9, d8, [sp, #0x30]
+100000500:	fc 6f 04 a9	stp	x28, x27, [sp, #0x40]
+100000504:	fa 67 05 a9	stp	x26, x25, [sp, #0x50]
+100000508:	f8 5f 06 a9	stp	x24, x23, [sp, #0x60]
+10000050c:	f6 57 07 a9	stp	x22, x21, [sp, #0x70]
+100000510:	f4 4f 08 a9	stp	x20, x19, [sp, #0x80]
+100000514:	fd 7b 09 a9	stp	x29, x30, [sp, #0x90]
+100000518:	fd 43 02 91	add	x29, sp, #0x90
+10000051c:	13 48 88 52	mov	w19, #0x4240
+100000520:	f3 01 a0 72	movk	w19, #0xf, lsl #16
+100000524:	1f 08 00 71	cmp	w0, #0x2
+100000528:	0b 05 00 54	b.lt	0x1000005c8
+10000052c:	f4 03 01 aa	mov	x20, x1
+100000530:	f5 03 00 aa	mov	x21, x0
+100000534:	19 00 80 52	mov	w25, #0x0
+100000538:	3a 00 80 52	mov	w26, #0x1
+10000053c:	16 00 00 90	adrp	x22, 0 ; 0x100000000
+100000540:	d6 72 2c 91	add	x22, x22, #0xb1c ; literal pool for: "--iters"
+100000544:	17 00 00 90	adrp	x23, 0 ; 0x100000000
+100000548:	f7 92 2c 91	add	x23, x23, #0xb24 ; literal pool for: "--csv"
+10000054c:	09 00 00 14	b	0x100000570
+100000550:	80 7a 7b f8	ldr	x0, [x20, x27, lsl #3]
+100000554:	01 00 80 d2	mov	x1, #0x0
+100000558:	42 01 80 52	mov	w2, #0xa
+10000055c:	6d 01 00 94	bl	0x100000b10 ; symbol stub for: _strtoull
+100000560:	f3 03 00 aa	mov	x19, x0
+100000564:	7a 07 00 11	add	w26, w27, #0x1
+100000568:	5f 03 15 6b	cmp	w26, w21
+10000056c:	2a 02 00 54	b.ge	0x1000005b0
+100000570:	5b 7f 40 93	sxtw	x27, w26
+100000574:	98 da 7a f8	ldr	x24, [x20, w26, sxtw #3]
+100000578:	e0 03 18 aa	mov	x0, x24
+10000057c:	e1 03 16 aa	mov	x1, x22
+100000580:	61 01 00 94	bl	0x100000b04 ; symbol stub for: _strcmp
+100000584:	1f 00 00 71	cmp	w0, #0x0
+100000588:	7b 07 00 91	add	x27, x27, #0x1
+10000058c:	60 03 55 7a	ccmp	w27, w21, #0x0, eq
+100000590:	0b fe ff 54	b.lt	0x100000550
+100000594:	e0 03 18 aa	mov	x0, x24
+100000598:	e1 03 17 aa	mov	x1, x23
+10000059c:	5a 01 00 94	bl	0x100000b04 ; symbol stub for: _strcmp
+1000005a0:	e0 26 00 35	cbnz	w0, 0x100000a7c
+1000005a4:	39 00 80 52	mov	w25, #0x1
+1000005a8:	fb 03 1a aa	mov	x27, x26
+1000005ac:	ee ff ff 17	b	0x100000564
+1000005b0:	d9 00 00 36	tbz	w25, #0x0, 0x1000005c8
+1000005b4:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+1000005b8:	00 6c 2f 91	add	x0, x0, #0xbdb ; literal pool for: "probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops"
+1000005bc:	4f 01 00 94	bl	0x100000af8 ; symbol stub for: _puts
+1000005c0:	35 00 80 52	mov	w21, #0x1
+1000005c4:	02 00 00 14	b	0x1000005cc
+1000005c8:	15 00 80 52	mov	w21, #0x0
+1000005cc:	57 00 00 90	adrp	x23, 8 ; 0x100008000
+1000005d0:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+1000005d4:	88 00 00 35	cbnz	w8, 0x1000005e4
+1000005d8:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+1000005dc:	00 20 00 91	add	x0, x0, #0x8
+1000005e0:	40 01 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+1000005e4:	3c 01 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+1000005e8:	f4 03 00 aa	mov	x20, x0
+1000005ec:	56 00 00 90	adrp	x22, 8 ; 0x100008000
+1000005f0:	d6 22 00 91	add	x22, x22, #0x8
+1000005f4:	d9 6a 40 29	ldp	w25, w26, [x22]
+1000005f8:	38 00 80 52	mov	w24, #0x1
+1000005fc:	d3 22 00 b4	cbz	x19, 0x100000a54
+100000600:	e8 03 13 aa	mov	x8, x19
+100000604:	18 07 00 91	add	x24, x24, #0x1
+100000608:	18 07 00 91	add	x24, x24, #0x1
+10000060c:	18 07 00 91	add	x24, x24, #0x1
+100000610:	18 07 00 91	add	x24, x24, #0x1
+100000614:	18 07 00 91	add	x24, x24, #0x1
+100000618:	18 07 00 91	add	x24, x24, #0x1
+10000061c:	18 07 00 91	add	x24, x24, #0x1
+100000620:	18 07 00 91	add	x24, x24, #0x1
+100000624:	18 07 00 91	add	x24, x24, #0x1
+100000628:	18 07 00 91	add	x24, x24, #0x1
+10000062c:	18 07 00 91	add	x24, x24, #0x1
+100000630:	18 07 00 91	add	x24, x24, #0x1
+100000634:	18 07 00 91	add	x24, x24, #0x1
+100000638:	18 07 00 91	add	x24, x24, #0x1
+10000063c:	18 07 00 91	add	x24, x24, #0x1
+100000640:	18 07 00 91	add	x24, x24, #0x1
+100000644:	18 07 00 91	add	x24, x24, #0x1
+100000648:	18 07 00 91	add	x24, x24, #0x1
+10000064c:	18 07 00 91	add	x24, x24, #0x1
+100000650:	18 07 00 91	add	x24, x24, #0x1
+100000654:	18 07 00 91	add	x24, x24, #0x1
+100000658:	18 07 00 91	add	x24, x24, #0x1
+10000065c:	18 07 00 91	add	x24, x24, #0x1
+100000660:	18 07 00 91	add	x24, x24, #0x1
+100000664:	18 07 00 91	add	x24, x24, #0x1
+100000668:	18 07 00 91	add	x24, x24, #0x1
+10000066c:	18 07 00 91	add	x24, x24, #0x1
+100000670:	18 07 00 91	add	x24, x24, #0x1
+100000674:	18 07 00 91	add	x24, x24, #0x1
+100000678:	18 07 00 91	add	x24, x24, #0x1
+10000067c:	18 07 00 91	add	x24, x24, #0x1
+100000680:	18 07 00 91	add	x24, x24, #0x1
+100000684:	08 05 00 f1	subs	x8, x8, #0x1
+100000688:	e1 fb ff 54	b.ne	0x100000604
+10000068c:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+100000690:	88 00 00 35	cbnz	w8, 0x1000006a0
+100000694:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+100000698:	00 20 00 91	add	x0, x0, #0x8
+10000069c:	11 01 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+1000006a0:	88 7e 19 9b	mul	x8, x20, x25
+1000006a4:	14 09 da 9a	udiv	x20, x8, x26
+1000006a8:	0b 01 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+1000006ac:	c8 26 40 29	ldp	w8, w9, [x22]
+1000006b0:	08 7c 08 9b	mul	x8, x0, x8
+1000006b4:	09 09 c9 9a	udiv	x9, x8, x9
+1000006b8:	48 00 00 90	adrp	x8, 8 ; 0x100008000
+1000006bc:	18 01 00 f9	str	x24, [x8]
+1000006c0:	28 01 14 cb	sub	x8, x9, x20
+1000006c4:	60 02 63 9e	ucvtf	d0, x19
+1000006c8:	0a 08 e8 d2	mov	x10, #0x4040000000000000
+1000006cc:	41 01 67 9e	fmov	d1, x10
+1000006d0:	08 08 61 1e	fmul	d8, d0, d1
+1000006d4:	01 e4 00 2f	movi	d1, #0000000000000000
+1000006d8:	08 21 60 1e	fcmp	d8, #0.0
+1000006dc:	00 e4 00 2f	movi	d0, #0000000000000000
+1000006e0:	ed 01 00 54	b.le	0x10000071c
+1000006e4:	00 01 63 9e	ucvtf	d0, x8
+1000006e8:	00 18 68 1e	fdiv	d0, d0, d8
+1000006ec:	3f 01 14 eb	cmp	x9, x20
+1000006f0:	a0 01 00 54	b.eq	0x100000724
+1000006f4:	01 01 63 9e	ucvtf	d1, x8
+1000006f8:	01 19 61 1e	fdiv	d1, d8, d1
+1000006fc:	75 01 00 35	cbnz	w21, 0x100000728
+100000700:	09 00 00 90	adrp	x9, 0 ; 0x100000000
+100000704:	29 99 2d 91	add	x9, x9, #0xb66 ; literal pool for: "add_dep_u64"
+100000708:	e0 07 01 6d	stp	d0, d1, [sp, #0x10]
+10000070c:	e9 23 00 a9	stp	x9, x8, [sp]
+100000710:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+100000714:	00 a0 2e 91	add	x0, x0, #0xba8 ; literal pool for: "%-16s elapsed_ns=%llu ns/op=%.6f approx_Gops=%.6f\n"
+100000718:	0c 00 00 14	b	0x100000748
+10000071c:	3f 01 14 eb	cmp	x9, x20
+100000720:	a1 fe ff 54	b.ne	0x1000006f4
+100000724:	f5 fe ff 34	cbz	w21, 0x100000700
+100000728:	e0 07 02 6d	stp	d0, d1, [sp, #0x20]
+10000072c:	09 04 80 52	mov	w9, #0x20
+100000730:	0a 00 00 90	adrp	x10, 0 ; 0x100000000
+100000734:	4a 99 2d 91	add	x10, x10, #0xb66 ; literal pool for: "add_dep_u64"
+100000738:	e9 23 01 a9	stp	x9, x8, [sp, #0x10]
+10000073c:	ea 4f 00 a9	stp	x10, x19, [sp]
+100000740:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+100000744:	00 34 2e 91	add	x0, x0, #0xb8d ; literal pool for: "%s,%llu,%d,%llu,%.6f,%.6f\n"
+100000748:	e9 00 00 94	bl	0x100000aec ; symbol stub for: _printf
+10000074c:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+100000750:	88 00 00 35	cbnz	w8, 0x100000760
+100000754:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+100000758:	00 20 00 91	add	x0, x0, #0x8
+10000075c:	e1 00 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+100000760:	dd 00 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+100000764:	f4 03 00 aa	mov	x20, x0
+100000768:	d8 66 40 29	ldp	w24, w25, [x22]
+10000076c:	b3 17 00 b4	cbz	x19, 0x100000a60
+100000770:	00 10 6e 1e	fmov	d0, #1.00000000
+100000774:	e8 03 13 aa	mov	x8, x19
+100000778:	09 10 6e 1e	fmov	d9, #1.00000000
+10000077c:	29 29 60 1e	fadd	d9, d9, d0
+100000780:	29 29 60 1e	fadd	d9, d9, d0
+100000784:	29 29 60 1e	fadd	d9, d9, d0
+100000788:	29 29 60 1e	fadd	d9, d9, d0
+10000078c:	29 29 60 1e	fadd	d9, d9, d0
+100000790:	29 29 60 1e	fadd	d9, d9, d0
+100000794:	29 29 60 1e	fadd	d9, d9, d0
+100000798:	29 29 60 1e	fadd	d9, d9, d0
+10000079c:	29 29 60 1e	fadd	d9, d9, d0
+1000007a0:	29 29 60 1e	fadd	d9, d9, d0
+1000007a4:	29 29 60 1e	fadd	d9, d9, d0
+1000007a8:	29 29 60 1e	fadd	d9, d9, d0
+1000007ac:	29 29 60 1e	fadd	d9, d9, d0
+1000007b0:	29 29 60 1e	fadd	d9, d9, d0
+1000007b4:	29 29 60 1e	fadd	d9, d9, d0
+1000007b8:	29 29 60 1e	fadd	d9, d9, d0
+1000007bc:	29 29 60 1e	fadd	d9, d9, d0
+1000007c0:	29 29 60 1e	fadd	d9, d9, d0
+1000007c4:	29 29 60 1e	fadd	d9, d9, d0
+1000007c8:	29 29 60 1e	fadd	d9, d9, d0
+1000007cc:	29 29 60 1e	fadd	d9, d9, d0
+1000007d0:	29 29 60 1e	fadd	d9, d9, d0
+1000007d4:	29 29 60 1e	fadd	d9, d9, d0
+1000007d8:	29 29 60 1e	fadd	d9, d9, d0
+1000007dc:	29 29 60 1e	fadd	d9, d9, d0
+1000007e0:	29 29 60 1e	fadd	d9, d9, d0
+1000007e4:	29 29 60 1e	fadd	d9, d9, d0
+1000007e8:	29 29 60 1e	fadd	d9, d9, d0
+1000007ec:	29 29 60 1e	fadd	d9, d9, d0
+1000007f0:	29 29 60 1e	fadd	d9, d9, d0
+1000007f4:	29 29 60 1e	fadd	d9, d9, d0
+1000007f8:	29 29 60 1e	fadd	d9, d9, d0
+1000007fc:	08 05 00 f1	subs	x8, x8, #0x1
+100000800:	e1 fb ff 54	b.ne	0x10000077c
+100000804:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+100000808:	88 00 00 35	cbnz	w8, 0x100000818
+10000080c:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+100000810:	00 20 00 91	add	x0, x0, #0x8
+100000814:	b3 00 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+100000818:	88 7e 18 9b	mul	x8, x20, x24
+10000081c:	14 09 d9 9a	udiv	x20, x8, x25
+100000820:	ad 00 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+100000824:	c8 26 40 29	ldp	w8, w9, [x22]
+100000828:	08 7c 08 9b	mul	x8, x0, x8
+10000082c:	09 09 c9 9a	udiv	x9, x8, x9
+100000830:	58 00 00 90	adrp	x24, 8 ; 0x100008000
+100000834:	09 0b 00 fd	str	d9, [x24, #0x10]
+100000838:	28 01 14 cb	sub	x8, x9, x20
+10000083c:	01 e4 00 2f	movi	d1, #0000000000000000
+100000840:	08 21 60 1e	fcmp	d8, #0.0
+100000844:	00 e4 00 2f	movi	d0, #0000000000000000
+100000848:	ed 01 00 54	b.le	0x100000884
+10000084c:	00 01 63 9e	ucvtf	d0, x8
+100000850:	00 18 68 1e	fdiv	d0, d0, d8
+100000854:	3f 01 14 eb	cmp	x9, x20
+100000858:	a0 01 00 54	b.eq	0x10000088c
+10000085c:	01 01 63 9e	ucvtf	d1, x8
+100000860:	01 19 61 1e	fdiv	d1, d8, d1
+100000864:	75 01 00 35	cbnz	w21, 0x100000890
+100000868:	09 00 00 90	adrp	x9, 0 ; 0x100000000
+10000086c:	29 c9 2d 91	add	x9, x9, #0xb72 ; literal pool for: "fadd_dep_f64"
+100000870:	e0 07 01 6d	stp	d0, d1, [sp, #0x10]
+100000874:	e9 23 00 a9	stp	x9, x8, [sp]
+100000878:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+10000087c:	00 a0 2e 91	add	x0, x0, #0xba8 ; literal pool for: "%-16s elapsed_ns=%llu ns/op=%.6f approx_Gops=%.6f\n"
+100000880:	0c 00 00 14	b	0x1000008b0
+100000884:	3f 01 14 eb	cmp	x9, x20
+100000888:	a1 fe ff 54	b.ne	0x10000085c
+10000088c:	f5 fe ff 34	cbz	w21, 0x100000868
+100000890:	e0 07 02 6d	stp	d0, d1, [sp, #0x20]
+100000894:	09 04 80 52	mov	w9, #0x20
+100000898:	0a 00 00 90	adrp	x10, 0 ; 0x100000000
+10000089c:	4a c9 2d 91	add	x10, x10, #0xb72 ; literal pool for: "fadd_dep_f64"
+1000008a0:	e9 23 01 a9	stp	x9, x8, [sp, #0x10]
+1000008a4:	ea 4f 00 a9	stp	x10, x19, [sp]
+1000008a8:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+1000008ac:	00 34 2e 91	add	x0, x0, #0xb8d ; literal pool for: "%s,%llu,%d,%llu,%.6f,%.6f\n"
+1000008b0:	8f 00 00 94	bl	0x100000aec ; symbol stub for: _printf
+1000008b4:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+1000008b8:	88 00 00 35	cbnz	w8, 0x1000008c8
+1000008bc:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+1000008c0:	00 20 00 91	add	x0, x0, #0x8
+1000008c4:	87 00 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+1000008c8:	83 00 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+1000008cc:	f4 03 00 aa	mov	x20, x0
+1000008d0:	d9 6a 40 29	ldp	w25, w26, [x22]
+1000008d4:	09 10 6e 1e	fmov	d9, #1.00000000
+1000008d8:	d3 0c 00 b4	cbz	x19, 0x100000a70
+1000008dc:	08 00 a4 d2	mov	x8, #0x20000000
+1000008e0:	08 fe e7 f2	movk	x8, #0x3ff0, lsl #48
+1000008e4:	00 01 67 9e	fmov	d0, x8
+1000008e8:	e8 4b 63 b2	mov	x8, #0xffffe0000000
+1000008ec:	e8 fd e7 f2	movk	x8, #0x3fef, lsl #48
+1000008f0:	01 01 67 9e	fmov	d1, x8
+1000008f4:	e8 03 13 aa	mov	x8, x19
+1000008f8:	29 05 40 1f	fmadd	d9, d9, d0, d1
+1000008fc:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000900:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000904:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000908:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000090c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000910:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000914:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000918:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000091c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000920:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000924:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000928:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000092c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000930:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000934:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000938:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000093c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000940:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000944:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000948:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000094c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000950:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000954:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000958:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000095c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000960:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000964:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000968:	29 05 40 1f	fmadd	d9, d9, d0, d1
+10000096c:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000970:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000974:	29 05 40 1f	fmadd	d9, d9, d0, d1
+100000978:	08 05 00 f1	subs	x8, x8, #0x1
+10000097c:	e1 fb ff 54	b.ne	0x1000008f8
+100000980:	e8 0e 40 b9	ldr	w8, [x23, #0xc]
+100000984:	88 00 00 35	cbnz	w8, 0x100000994
+100000988:	40 00 00 90	adrp	x0, 8 ; 0x100008000
+10000098c:	00 20 00 91	add	x0, x0, #0x8
+100000990:	54 00 00 94	bl	0x100000ae0 ; symbol stub for: _mach_timebase_info
+100000994:	88 7e 19 9b	mul	x8, x20, x25
+100000998:	14 09 da 9a	udiv	x20, x8, x26
+10000099c:	4e 00 00 94	bl	0x100000ad4 ; symbol stub for: _mach_absolute_time
+1000009a0:	c8 26 40 29	ldp	w8, w9, [x22]
+1000009a4:	08 7c 08 9b	mul	x8, x0, x8
+1000009a8:	09 09 c9 9a	udiv	x9, x8, x9
+1000009ac:	09 0b 00 fd	str	d9, [x24, #0x10]
+1000009b0:	28 01 14 cb	sub	x8, x9, x20
+1000009b4:	01 e4 00 2f	movi	d1, #0000000000000000
+1000009b8:	08 21 60 1e	fcmp	d8, #0.0
+1000009bc:	00 e4 00 2f	movi	d0, #0000000000000000
+1000009c0:	ed 01 00 54	b.le	0x1000009fc
+1000009c4:	00 01 63 9e	ucvtf	d0, x8
+1000009c8:	00 18 68 1e	fdiv	d0, d0, d8
+1000009cc:	3f 01 14 eb	cmp	x9, x20
+1000009d0:	a0 01 00 54	b.eq	0x100000a04
+1000009d4:	01 01 63 9e	ucvtf	d1, x8
+1000009d8:	01 19 61 1e	fdiv	d1, d8, d1
+1000009dc:	75 01 00 35	cbnz	w21, 0x100000a08
+1000009e0:	09 00 00 90	adrp	x9, 0 ; 0x100000000
+1000009e4:	29 fd 2d 91	add	x9, x9, #0xb7f ; literal pool for: "fmadd_dep_f64"
+1000009e8:	e0 07 01 6d	stp	d0, d1, [sp, #0x10]
+1000009ec:	e9 23 00 a9	stp	x9, x8, [sp]
+1000009f0:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+1000009f4:	00 a0 2e 91	add	x0, x0, #0xba8 ; literal pool for: "%-16s elapsed_ns=%llu ns/op=%.6f approx_Gops=%.6f\n"
+1000009f8:	0c 00 00 14	b	0x100000a28
+1000009fc:	3f 01 14 eb	cmp	x9, x20
+100000a00:	a1 fe ff 54	b.ne	0x1000009d4
+100000a04:	f5 fe ff 34	cbz	w21, 0x1000009e0
+100000a08:	e0 07 02 6d	stp	d0, d1, [sp, #0x20]
+100000a0c:	09 04 80 52	mov	w9, #0x20
+100000a10:	0a 00 00 90	adrp	x10, 0 ; 0x100000000
+100000a14:	4a fd 2d 91	add	x10, x10, #0xb7f ; literal pool for: "fmadd_dep_f64"
+100000a18:	e9 23 01 a9	stp	x9, x8, [sp, #0x10]
+100000a1c:	ea 4f 00 a9	stp	x10, x19, [sp]
+100000a20:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+100000a24:	00 34 2e 91	add	x0, x0, #0xb8d ; literal pool for: "%s,%llu,%d,%llu,%.6f,%.6f\n"
+100000a28:	31 00 00 94	bl	0x100000aec ; symbol stub for: _printf
+100000a2c:	00 00 80 52	mov	w0, #0x0
+100000a30:	fd 7b 49 a9	ldp	x29, x30, [sp, #0x90]
+100000a34:	f4 4f 48 a9	ldp	x20, x19, [sp, #0x80]
+100000a38:	f6 57 47 a9	ldp	x22, x21, [sp, #0x70]
+100000a3c:	f8 5f 46 a9	ldp	x24, x23, [sp, #0x60]
+100000a40:	fa 67 45 a9	ldp	x26, x25, [sp, #0x50]
+100000a44:	fc 6f 44 a9	ldp	x28, x27, [sp, #0x40]
+100000a48:	e9 23 43 6d	ldp	d9, d8, [sp, #0x30]
+100000a4c:	ff 83 02 91	add	sp, sp, #0xa0
+100000a50:	c0 03 5f d6	ret
+100000a54:	e8 03 1a aa	mov	x8, x26
+100000a58:	48 e2 ff 35	cbnz	w8, 0x1000006a0
+100000a5c:	0e ff ff 17	b	0x100000694
+100000a60:	09 10 6e 1e	fmov	d9, #1.00000000
+100000a64:	e8 03 19 aa	mov	x8, x25
+100000a68:	88 ed ff 35	cbnz	w8, 0x100000818
+100000a6c:	68 ff ff 17	b	0x10000080c
+100000a70:	e8 03 1a aa	mov	x8, x26
+100000a74:	08 f9 ff 35	cbnz	w8, 0x100000994
+100000a78:	c4 ff ff 17	b	0x100000988
+100000a7c:	01 00 00 90	adrp	x1, 0 ; 0x100000000
+100000a80:	21 a8 2c 91	add	x1, x1, #0xb2a ; literal pool for: "--help"
+100000a84:	e0 03 18 aa	mov	x0, x24
+100000a88:	1f 00 00 94	bl	0x100000b04 ; symbol stub for: _strcmp
+100000a8c:	40 01 00 34	cbz	w0, 0x100000ab4
+100000a90:	28 00 00 90	adrp	x8, 4 ; 0x100004000
+100000a94:	08 01 40 f9	ldr	x8, [x8] ; literal pool symbol address: ___stderrp
+100000a98:	00 01 40 f9	ldr	x0, [x8]
+100000a9c:	f8 03 00 f9	str	x24, [sp]
+100000aa0:	01 00 00 90	adrp	x1, 0 ; 0x100000000
+100000aa4:	21 40 2d 91	add	x1, x1, #0xb50 ; literal pool for: "unknown argument: %s\n"
+100000aa8:	08 00 00 94	bl	0x100000ac8 ; symbol stub for: _fprintf
+100000aac:	20 00 80 52	mov	w0, #0x1
+100000ab0:	e0 ff ff 17	b	0x100000a30
+100000ab4:	88 02 40 f9	ldr	x8, [x20]
+100000ab8:	e8 03 00 f9	str	x8, [sp]
+100000abc:	00 00 00 90	adrp	x0, 0 ; 0x100000000
+100000ac0:	00 c4 2c 91	add	x0, x0, #0xb31 ; literal pool for: "usage: %s [--iters N] [--csv]\n"
+100000ac4:	d9 ff ff 17	b	0x100000a28

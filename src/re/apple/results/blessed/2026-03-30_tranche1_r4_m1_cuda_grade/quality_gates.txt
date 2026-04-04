@@ -1,0 +1,2 @@
+failed_steps=0
+gate_artifacts_present=1

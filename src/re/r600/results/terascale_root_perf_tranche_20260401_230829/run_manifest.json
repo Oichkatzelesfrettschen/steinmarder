@@ -1,0 +1,9 @@
+{
+  "host": "x130e",
+  "prompt_host": "x130e-x11",
+  "remote_work": "/tmp/terascale_root_perf_19150",
+  "remote_icd": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc/src/amd/terascale/vulkan/terascale_devenv_icd.x86_64.json",
+  "status_csv": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_root_perf_tranche_20260401_230829/step_status.csv",
+  "stdout_log": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_root_perf_tranche_20260401_230829/remote_driver.stdout.log",
+  "stderr_log": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_root_perf_tranche_20260401_230829/remote_driver.stderr.log"
+}

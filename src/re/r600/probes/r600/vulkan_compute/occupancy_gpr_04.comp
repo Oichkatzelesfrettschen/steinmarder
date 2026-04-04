@@ -1,0 +1,30 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    float values[];
+} outbuf;
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    float seed = float(index);
+    float a0 = float(1) + seed * 0.0001000f;
+    float a1 = float(2) + seed * 0.0002000f;
+    float a2 = float(3) + seed * 0.0003000f;
+    float a3 = float(4) + seed * 0.0004000f;
+
+    for (int iter = 0; iter < 256; ++iter) {
+        a0 = a0 * 1.00000000f + 0.12500000f + a1 * 0.0009765625f;
+        a1 = a1 * 1.03125000f + 0.14062500f + a2 * 0.0009765625f;
+        a2 = a2 * 1.06250000f + 0.15625000f + a3 * 0.0009765625f;
+        a3 = a3 * 1.09375000f + 0.17187500f + a0 * 0.0009765625f;
+    }
+
+    float sum = 0.0;
+    sum += a0;
+    sum += a1;
+    sum += a2;
+    sum += a3;
+    outbuf.values[index] = sum;
+}

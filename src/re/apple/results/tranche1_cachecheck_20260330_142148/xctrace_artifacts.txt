@@ -1,0 +1,3 @@
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_cachecheck_20260330_142148/cpu_time_profiler.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_cachecheck_20260330_142148/gpu_baseline.trace
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_cachecheck_20260330_142148/gpu_compare.trace

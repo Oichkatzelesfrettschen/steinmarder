@@ -1,0 +1,92 @@
+Metal Probe Tier-B Results — 2026-04-03
+Hardware: Apple M1, GPU clock ~1277 MHz (cycle = 0.7831 ns)
+Harness: sm_apple_metal_probe_host, shader_inner_iters=100000, --width 1024 --iters 30
+Overhead C = 3,153,956 ns/dispatch
+Formula: latency_ns = (ns_per_dispatch - C) / (inner_iters * ops_per_iter)
+
+=== RAW MEASUREMENTS ===
+
+Kernel                    ns_per_dispatch   net_ns       ns/op    ~cycles
+---------------------------------------------------------------------------
+P1  fma16acc_tp  (fp32)     10,915,400    7,761,444     4.851     6.19
+P2a fadd16_tp    (fp16)      4,136,600      982,644     1.228     1.57
+P2b fmul16_tp    (fp16)      3,822,767      668,811     0.836     1.07
+P2c fma16_tp     (fp16)      3,742,367      588,411     0.736     0.94
+P3a recip_lat    (fp32)     10,038,300    6,884,344     8.605    10.99
+P3b rsqrt_lat    (fp32)     10,677,600    7,523,644     9.405    12.01
+P3c recip_tp     (fp32)      8,169,233    5,015,277     6.269     8.01
+P3d rsqrt_tp     (fp32)     10,668,667    7,514,711     9.393    11.99
+P4  fadd16acc_tp (fp32)      8,248,833    5,094,877     3.184     4.07
+
+=== PRIOR 8-ACCUMULATOR FP32 BASELINES ===
+
+fadd_tp (8-acc)   1.090 ns  = 1.39 cycles
+fmul_tp (8-acc)   0.751 ns  = 0.96 cycles
+fma_tp  (8-acc)   1.764 ns  = 2.25 cycles
+
+=== FINDINGS ===
+
+1. PROBE 1 + 4 — 16-accumulator FP32 REGISTER PRESSURE
+   fma16acc_tp = 4.851 ns (6.19 cyc) vs 8-acc fma_tp = 1.764 ns (2.25 cyc): 2.75x WORSE
+   fadd16acc_tp = 3.184 ns (4.07 cyc) vs 8-acc fadd_tp = 1.090 ns (1.39 cyc): 2.92x WORSE
+   Conclusion: 16 independent accumulators + 16 delta/step variables = ~32 FP32 regs.
+   M1 GPU register file pressure causing spills or scheduling stalls.
+   The 8-accumulator design was already at or near the optimal point.
+   Going to 16 accs does NOT help expose more parallelism — it hurts.
+   AIR IR confirmed 16 independent air.fma.f32 calls in loop (no serialization at IR level).
+   Degradation is microarchitectural, not a compiler issue.
+
+2. PROBE 2 — FP16 THROUGHPUT vs FP32
+   fadd16 = 1.228 ns (1.57 cyc) vs fadd32 = 1.090 ns (1.39 cyc):  fp16 is 12.7% SLOWER
+   fmul16 = 0.836 ns (1.07 cyc) vs fmul32 = 0.751 ns (0.96 cyc):  fp16 is 11.3% SLOWER
+   fma16  = 0.736 ns (0.94 cyc) vs fma32  = 1.764 ns (2.25 cyc):  fp16 is 58% FASTER
+   Rosenzweig claim ("more 16-bit ALUs → fp16 faster"): NOT CONFIRMED for fadd/fmul.
+   fp16 fadd and fmul both measure slightly SLOWER than fp32 on M1 with this harness.
+   Possible explanations:
+   a) fp16 operations run through the same ALU path as fp32 on M1 (no separate fp16 units)
+      with minor type-conversion overhead in the half→float final sum.
+   b) M1 does pack 2xfp16 per 32-bit slot, but overhead from the conversion at the output
+      sum neutralizes the gain at only 8 accumulators.
+   c) The fma16 result (0.94 cyc — sub-cycle) is suspicious; may reflect measurement
+      artifact where dispatch overhead subtraction overestimates net GPU work at this
+      short dispatch time (~0.59M net ns vs ~7.76M for fma32 16-acc).
+   The fma32 8-acc anomaly (1.764 ns = 2.25 cyc, vs expected ~1 cyc from philipturner)
+   and the fma16 result being sub-cycle together suggest the FMA measurement environment
+   has a systematic issue. Both need a re-probe with a self-contained accumulator pattern
+   that cannot be detected as convergent by the optimizer.
+
+3. PROBE 3 — RECIP32 and RSQRT32 LATENCY + THROUGHPUT
+   recip_lat  = 8.61 ns = 11.0 cycles  (latency, 8 serial dep-chains)
+   rsqrt_lat  = 9.40 ns = 12.0 cycles  (latency, 8 serial dep-chains)
+   recip_tp   = 6.27 ns =  8.0 cycles  (throughput, 8 independent chains)
+   rsqrt_tp   = 9.39 ns = 12.0 cycles  (throughput — EQUALS latency!)
+
+   philipturner reference: RECIP32_tp = 6 cycles, RSQRT32_tp = 8 cycles
+
+   recip_tp DISCREPANCY: measured 8.0 cyc vs philipturner 6 cyc (+33%).
+   Possible: 8 chains insufficient to overlap the 11-cycle pipeline, or
+   the 1/x self-loop limits pipelining (each iteration ends at ~6-cycle boundary
+   but waits on latency from prior before issuing next if scheduler is conservative).
+
+   rsqrt_tp == rsqrt_lat (both 12.0 cyc): The "independent" rsqrt probe is NOT truly
+   independent. rsqrt(rsqrt(x)) forms oscillating pairs — but each iteration still
+   serializes on the previous output. The value oscillation does NOT help throughput
+   because the data dependency exists regardless. Need truly independent rsqrt sources
+   (e.g., rsqrt(acc0), acc0 += small_delta — keep acc separate from rsqrt output).
+   rsqrt_tp result should be treated as a second latency measurement, not throughput.
+
+   ACTIONABLE: Design rsqrt_tp probe as: out_k = rsqrt(acc_k); acc_k += delta_k
+   (discard rsqrt result into a separate accumulator — breaks the dependency chain).
+
+   Best current estimates:
+   RECIP32 latency  = 11 cycles
+   RECIP32 throughput = 8 cycles (lower bound; true tp likely 6 as per philipturner)
+   RSQRT32 latency  = 12 cycles
+   RSQRT32 throughput = UNKNOWN (rsqrt_tp probe was measuring latency, not throughput)
+
+=== FILES ===
+shaders/probe_fma16acc_tp.metal
+shaders/probe_fp16_throughput.metal    (kernels: probe_fadd16_tp, probe_fmul16_tp, probe_fma16_tp)
+shaders/probe_recip_rsqrt.metal        (kernels: probe_recip_lat, probe_rsqrt_lat, probe_recip_tp, probe_rsqrt_tp)
+shaders/probe_fadd16acc_tp.metal
+results/metal_probe_tier_b_20260403/probe_fma16acc_tp.air_text   (LLVM AIR IR dump)

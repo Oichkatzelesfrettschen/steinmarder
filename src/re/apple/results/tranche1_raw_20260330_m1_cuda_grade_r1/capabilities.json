@@ -1,0 +1,182 @@
+{
+  "generated_at_utc": "2026-03-30T20:29:54.453498+00:00",
+  "host": {
+    "cwd": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re",
+    "machine": "arm64",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3",
+    "sudo_askpass": "/Users/eirikr/bin/askpass"
+  },
+  "package_managers": {
+    "brew": {
+      "available": true,
+      "path": "/opt/homebrew/bin/brew"
+    },
+    "pkgutil": {
+      "available": true,
+      "path": "/usr/sbin/pkgutil"
+    },
+    "port": {
+      "available": true,
+      "path": "/opt/local/bin/port"
+    }
+  },
+  "substitution_map": {
+    "ncu_or_nsys_class": "xctrace + app timing CSV + powermetrics",
+    "uprof_class": "xctrace Time Profiler + sample + spindump",
+    "valgrind_class": "ASan/UBSan + leaks + vmmap"
+  },
+  "toolchains": {
+    "amd": {
+      "rocm-smi": {
+        "available": false,
+        "path": null
+      },
+      "rocprof": {
+        "available": false,
+        "path": null
+      },
+      "rocprofv2": {
+        "available": false,
+        "path": null
+      },
+      "uprof": {
+        "available": false,
+        "path": null
+      }
+    },
+    "apple": {
+      "dtrace": {
+        "available": true,
+        "path": "/usr/sbin/dtrace"
+      },
+      "dtruss": {
+        "available": true,
+        "path": "/usr/bin/dtruss"
+      },
+      "fs_usage": {
+        "available": true,
+        "path": "/usr/bin/fs_usage"
+      },
+      "leaks": {
+        "available": true,
+        "path": "/usr/bin/leaks"
+      },
+      "lldb": {
+        "available": true,
+        "path": "/usr/bin/lldb"
+      },
+      "powermetrics": {
+        "available": true,
+        "path": "/usr/bin/powermetrics"
+      },
+      "sample": {
+        "available": true,
+        "path": "/usr/bin/sample"
+      },
+      "spindump": {
+        "available": true,
+        "path": "/usr/sbin/spindump"
+      },
+      "vmmap": {
+        "available": true,
+        "path": "/usr/bin/vmmap"
+      },
+      "xcode-select": {
+        "available": true,
+        "path": "/usr/bin/xcode-select"
+      },
+      "xcodebuild": {
+        "available": true,
+        "path": "/usr/bin/xcodebuild"
+      },
+      "xcrun": {
+        "available": true,
+        "path": "/usr/bin/xcrun"
+      },
+      "xctrace": {
+        "available": true,
+        "path": "/usr/bin/xctrace"
+      }
+    },
+    "metal": {
+      "metal": {
+        "available": true,
+        "path": "/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.1.5295.6.HUCfh8/Metal.xctoolchain/usr/bin/metal"
+      },
+      "metallib": {
+        "available": true,
+        "path": "/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.1.5295.6.HUCfh8/Metal.xctoolchain/usr/bin/metallib"
+      }
+    },
+    "nvidia": {
+      "compute-sanitizer": {
+        "available": false,
+        "path": null
+      },
+      "cuobjdump": {
+        "available": false,
+        "path": null
+      },
+      "ncu": {
+        "available": false,
+        "path": null
+      },
+      "nsys": {
+        "available": false,
+        "path": null
+      },
+      "nvcc": {
+        "available": false,
+        "path": null
+      },
+      "nvdisasm": {
+        "available": false,
+        "path": null
+      },
+      "nvidia-smi": {
+        "available": false,
+        "path": null
+      }
+    },
+    "unix": {
+      "bpftrace": {
+        "available": false,
+        "path": null
+      },
+      "gdb": {
+        "available": true,
+        "path": "/opt/homebrew/bin/gdb"
+      },
+      "hyperfine": {
+        "available": true,
+        "path": "/opt/homebrew/bin/hyperfine"
+      },
+      "ltrace": {
+        "available": false,
+        "path": null
+      },
+      "perf": {
+        "available": false,
+        "path": null
+      },
+      "strace": {
+        "available": false,
+        "path": null
+      },
+      "valgrind": {
+        "available": false,
+        "path": null
+      }
+    }
+  },
+  "versions": {
+    "brew": "Homebrew 5.1.1",
+    "clang": "Apple clang version 17.0.0 (clang-1700.3.16.4)",
+    "port": "Version: 2.12.4",
+    "python3": "Python 3.14.3",
+    "xcode_select": "/Applications/Xcode-beta.app/Contents/Developer",
+    "xcodebuild": "Xcode 26.0",
+    "xctrace": "xctrace version 26.0 (17A5295f)"
+  }
+}

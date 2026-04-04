@@ -1,0 +1,95 @@
+{
+  "probes": [
+    {
+      "name": "alu_mul_chain",
+      "file": "alu_mul_chain.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_mad_chain",
+      "file": "alu_mad_chain.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_transcendental",
+      "file": "alu_transcendental.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_sin_cos",
+      "file": "alu_sin_cos.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_normalize",
+      "file": "alu_normalize.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_dot_product",
+      "file": "alu_dot_product.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "gpr_pressure_4",
+      "file": "gpr_pressure_4.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "gpr_pressure_8",
+      "file": "gpr_pressure_8.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "gpr_pressure_16",
+      "file": "gpr_pressure_16.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "gpr_pressure_32",
+      "file": "gpr_pressure_32.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "gpr_pressure_64",
+      "file": "gpr_pressure_64.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "tex_fetch_latency",
+      "file": "tex_fetch_latency.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "tex_bandwidth",
+      "file": "tex_bandwidth.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "alu_heavy",
+      "file": "alu_heavy.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "tex_heavy",
+      "file": "tex_heavy.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "vliw5_scalar",
+      "file": "vliw5_scalar.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "vliw5_vec4",
+      "file": "vliw5_vec4.frag",
+      "type": "fragment"
+    },
+    {
+      "name": "vliw5_mixed_vec4_trans",
+      "file": "vliw5_mixed_vec4_trans.frag",
+      "type": "fragment"
+    }
+  ],
+  "total": 18
+}

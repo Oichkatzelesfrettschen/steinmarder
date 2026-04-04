@@ -1,0 +1,4 @@
+stream_l1_hot
+stream_l2_boundary
+pointer_chase_llc
+reuse_stride_hotset

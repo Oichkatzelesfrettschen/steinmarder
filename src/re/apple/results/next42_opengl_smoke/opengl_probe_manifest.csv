@@ -1,0 +1,5 @@
+stage,shader,kind,notes
+baseline,probe_fullscreen.vert,vertex,fullscreen triangle vertex stage
+register_pressure,probe_register_pressure.frag,fragment,ALU/register-heavy fragment probe
+texture_stride,probe_texture_stride.frag,fragment,texture/cache-like address stride probe
+int_quantize,probe_int_quantize.frag,fragment,integer and quantization style fragment probe

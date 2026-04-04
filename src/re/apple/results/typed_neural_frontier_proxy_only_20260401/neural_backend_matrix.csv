@@ -1,0 +1,37 @@
+backend,format,workload,status,support_tier,median_ms,p90_ms,warmup_runs,measured_runs,checksum,notes
+pytorch_proxy_cpu,tf32,gemm_1024,measured,framework_proxy,3.835895491647534,4.02327909541782,1,2,20.2490234375,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,tf32,gemm_2048,measured,framework_proxy,29.79747900099028,29.900795794674195,1,2,-42.052734375,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e4m3,gemm_1024,measured,framework_proxy,4.134083486860618,4.156850295839831,1,2,-33.0,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e4m3,gemm_2048,measured,framework_proxy,28.867395987617783,29.0700791956624,1,2,18.5,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e5m2,gemm_1024,measured,framework_proxy,3.625707991886884,3.628507989924401,1,2,18.75,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e5m2,gemm_2048,measured,framework_proxy,27.52018799947109,27.67270479525905,1,2,-85.5,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp8,gemm_1024,measured,framework_proxy,5.188208000618033,5.368041605106555,1,2,25.242061614990234,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp8,gemm_2048,measured,framework_proxy,32.602458479232155,33.390025279368274,1,2,22.442617416381836,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp6,gemm_1024,measured,framework_proxy,4.515561988228001,4.565578795154579,1,2,26.625337600708008,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp6,gemm_2048,measured,framework_proxy,31.348770993645303,31.691454196698032,1,2,48.53436279296875,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp4,gemm_1024,measured,framework_proxy,4.417104020831175,4.463220821344294,1,2,-68.71129608154297,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp4,gemm_2048,measured,framework_proxy,28.90785400813911,28.935770809766836,1,2,-0.0,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxint8,gemm_1024,measured,framework_proxy,4.041500011226162,4.181533603696153,1,2,-26.089672088623047,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxint8,gemm_2048,measured,framework_proxy,33.89127099944744,34.435954203945585,1,2,-2.9650168418884277,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,nf4,gemm_1024,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,nf4,gemm_2048,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,fp4,gemm_1024,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,fp4,gemm_2048,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_mps,tf32,gemm_1024,measured,framework_proxy,2.7283750096103176,2.9252414096845314,1,2,7.12890625,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,tf32,gemm_2048,measured,framework_proxy,13.32366700808052,13.454667016048916,1,2,-12.005859375,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e4m3,gemm_1024,measured,framework_proxy,2.238208515336737,2.2833417111542076,1,2,-21.5,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e4m3,gemm_2048,measured,framework_proxy,13.690979511011392,13.957995909731835,1,2,1.5,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e5m2,gemm_1024,measured,framework_proxy,2.2339580027619377,2.264691612799652,1,2,-6.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e5m2,gemm_2048,measured,framework_proxy,13.380937511101365,13.546987506560981,1,2,5.75,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp8,gemm_1024,measured,framework_proxy,3.3934785024030134,3.4884285036241636,1,2,-15.885798454284668,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp8,gemm_2048,measured,framework_proxy,17.694875001325272,17.72737500432413,1,2,18.353666305541992,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp6,gemm_1024,measured,framework_proxy,3.3774585026549175,3.396991701447405,1,2,-0.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp6,gemm_2048,measured,framework_proxy,17.5658329972066,17.75306659983471,1,2,0.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp4,gemm_1024,measured,framework_proxy,3.7372705119196326,3.827420511515811,1,2,0.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp4,gemm_2048,measured,framework_proxy,17.990833497606218,18.143200292252004,1,2,0.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxint8,gemm_1024,measured,framework_proxy,3.2038965146057308,3.2457465189509094,1,2,-22.541872024536133,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxint8,gemm_2048,measured,framework_proxy,16.82733348570764,16.88486668281257,1,2,53.98588180541992,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,nf4,gemm_1024,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,nf4,gemm_2048,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,fp4,gemm_1024,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,fp4,gemm_2048,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.

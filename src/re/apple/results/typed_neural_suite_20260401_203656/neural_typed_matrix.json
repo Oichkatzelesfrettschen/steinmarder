@@ -1,0 +1,1648 @@
+{
+  "measured_runs": 30,
+  "python": {
+    "executable": "/Users/eirikr/Documents/GitHub/steinmarder/.venv/bin/python",
+    "version": "3.12.13"
+  },
+  "rows": {
+    "coreml": [
+      {
+        "backend": "coreml_cpu_only",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_ONLY present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_ONLY present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_AND_GPU present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_AND_GPU present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_AND_NE present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_AND_NE present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "float16",
+        "notes": "ComputeUnit.ALL present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "float32",
+        "notes": "ComputeUnit.ALL present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      }
+    ],
+    "mlx": [
+      {
+        "backend": "mlx_gpu",
+        "checksum": -10.875,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 0.23383300140267238,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.25073390133911744,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 16.71875,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 1.4441874955082312,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 1.8188122048741207,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 31.0,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 8.51829149905825,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 8.824474694847595,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 34.75,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 0.27077099366579205,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.2830743993399665,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 6.726591110229492,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.30216600134735927,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.3287750048912131,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 57.3711051940918,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 1.4592089937650599,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 1.5029159956611693,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 28.881614685058594,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 10.540750001382548,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 11.011836901889183,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": 704.3546142578125,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.29479099612217396,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.3226413973607123,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "bfloat16",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "bfloat16",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "bfloat16",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "bfloat16",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "int8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "int8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "int8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "int8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "uint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "uint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "uint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "uint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "tf32",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "tf32",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "tf32",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "tf32",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp6",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp6",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp6",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp6",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "nf4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "nf4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "nf4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "nf4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "fp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "fp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "fp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "fp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      }
+    ],
+    "torch": [
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 8.9453125,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 5.889458501769695,
+        "notes": "device=cpu",
+        "p90_ms": 5.957375004072674,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -9.234375,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 714.2547920011566,
+        "notes": "device=cpu",
+        "p90_ms": 716.7116872020415,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 48.03125,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 9583.433083498676,
+        "notes": "device=cpu",
+        "p90_ms": 10018.269746396983,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -1884.0,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 0.042187013605143875,
+        "notes": "device=cpu",
+        "p90_ms": 0.047129108861554414,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -6.988542079925537,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.033083008020184934,
+        "notes": "device=cpu",
+        "p90_ms": 0.03316700167488307,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 2.409029722213745,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 2.572687495558057,
+        "notes": "device=cpu",
+        "p90_ms": 2.9010537968133576,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 4.164613246917725,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 24.535916505556088,
+        "notes": "device=cpu",
+        "p90_ms": 25.28954590379726,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -1719.4859619140625,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.03939550515497103,
+        "notes": "device=cpu",
+        "p90_ms": 0.04045809182571247,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 11.637105885404774,
+        "format": "float64",
+        "measured_runs": 30,
+        "median_ms": 0.12514550326159224,
+        "notes": "device=cpu",
+        "p90_ms": 0.12521309981821105,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -19.320616058706502,
+        "format": "float64",
+        "measured_runs": 30,
+        "median_ms": 10.302500493708067,
+        "notes": "device=cpu",
+        "p90_ms": 10.76422080222983,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 25.99689385138327,
+        "format": "float64",
+        "measured_runs": 30,
+        "median_ms": 90.40297950559761,
+        "notes": "device=cpu",
+        "p90_ms": 92.2200165950926,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 615.9180747435827,
+        "format": "float64",
+        "measured_runs": 30,
+        "median_ms": 0.07041599747026339,
+        "notes": "device=cpu",
+        "p90_ms": 0.0732540909666568,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 6.28125,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 6.596770996111445,
+        "notes": "device=cpu",
+        "p90_ms": 6.684012501500547,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 18.75,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 826.7134580019047,
+        "notes": "device=cpu",
+        "p90_ms": 861.5144743947894,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 34.75,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 8559.807207995618,
+        "notes": "device=cpu",
+        "p90_ms": 8786.372820792894,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 488.0,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 0.040812497900333256,
+        "notes": "device=cpu",
+        "p90_ms": 0.046020800073165447,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 14.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 0.6688745052088052,
+        "notes": "device=cpu",
+        "p90_ms": 0.7443374968715945,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 61.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 47.419458504009526,
+        "notes": "device=cpu",
+        "p90_ms": 50.73767019493971,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 20.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 375.24129200028256,
+        "notes": "device=cpu",
+        "p90_ms": 385.0043295053183,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -518947.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 0.15931249072309583,
+        "notes": "device=cpu",
+        "p90_ms": 0.1716372004011646,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 126.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 0.7393334963126108,
+        "notes": "device=cpu",
+        "p90_ms": 0.7436752988724038,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 121.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 46.83193800156005,
+        "notes": "device=cpu",
+        "p90_ms": 47.88845349976327,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 210.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 371.45466699439567,
+        "notes": "device=cpu",
+        "p90_ms": 379.5278336969204,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 15486525.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 0.15593750140396878,
+        "notes": "device=cpu",
+        "p90_ms": 0.1654961000895128,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -0.01396942138671875,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 0.43366650061216205,
+        "notes": "device=mps",
+        "p90_ms": 0.5126461910549551,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 2.86328125,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 2.011728996876627,
+        "notes": "device=mps",
+        "p90_ms": 2.3947252964717336,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 67.9375,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 9.315937495557591,
+        "notes": "device=mps",
+        "p90_ms": 9.57112470350694,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -1350.0,
+        "format": "float16",
+        "measured_runs": 30,
+        "median_ms": 0.51777099724859,
+        "notes": "device=mps",
+        "p90_ms": 0.580416392767802,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -3.106632709503174,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.5714584985980764,
+        "notes": "device=mps",
+        "p90_ms": 0.6897920058690943,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -51.41694259643555,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 2.1475624962477013,
+        "notes": "device=mps",
+        "p90_ms": 2.540425304323435,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -87.94053649902344,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 10.828438003954943,
+        "notes": "device=mps",
+        "p90_ms": 11.096291705325712,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -299.02008056640625,
+        "format": "float32",
+        "measured_runs": 30,
+        "median_ms": 0.5427500000223517,
+        "notes": "device=mps",
+        "p90_ms": 0.5618039009277709,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -4.25,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 0.617458499618806,
+        "notes": "device=mps",
+        "p90_ms": 0.6277920023421757,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 67.0,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 2.772937004920095,
+        "notes": "device=mps",
+        "p90_ms": 3.007383394287899,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -16.625,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 18.923979499959387,
+        "notes": "device=mps",
+        "p90_ms": 19.669645310204942,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -492.0,
+        "format": "bfloat16",
+        "measured_runs": 30,
+        "median_ms": 0.534624996362254,
+        "notes": "device=mps",
+        "p90_ms": 0.5507169946213253,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 55.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 0.5409995064837858,
+        "notes": "device=mps",
+        "p90_ms": 0.5550037938519381,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -4.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 8.506250000209548,
+        "notes": "device=mps",
+        "p90_ms": 8.599667300586589,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 91.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 61.970479000592604,
+        "notes": "device=mps",
+        "p90_ms": 62.91567850712454,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -494082.0,
+        "format": "int8",
+        "measured_runs": 30,
+        "median_ms": 0.548792006156873,
+        "notes": "device=mps",
+        "p90_ms": 0.5866040984983556,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 63.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 0.5772500007878989,
+        "notes": "device=mps",
+        "p90_ms": 0.602658704156056,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 220.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 8.510874999046791,
+        "notes": "device=mps",
+        "p90_ms": 8.712158698472194,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 27.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 61.87233349919552,
+        "notes": "device=mps",
+        "p90_ms": 62.707696403958835,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 15484528.0,
+        "format": "uint8",
+        "measured_runs": 30,
+        "median_ms": 0.48258349852403626,
+        "notes": "device=mps",
+        "p90_ms": 0.5312588866217993,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 10,
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "tf32",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "tf32",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "tf32",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "tf32",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp6",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp6",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp6",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp6",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxint8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxint8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxint8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxint8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "nf4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "nf4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "nf4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "nf4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "fp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "fp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_1024"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "fp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "fp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "reduce_1m"
+      }
+    ]
+  },
+  "warmup_runs": 10,
+  "workloads": [
+    {
+      "id": "gemm_256",
+      "k": 256,
+      "kind": "gemm",
+      "m": 256,
+      "n": 256
+    },
+    {
+      "id": "gemm_1024",
+      "k": 1024,
+      "kind": "gemm",
+      "m": 1024,
+      "n": 1024
+    },
+    {
+      "id": "gemm_2048",
+      "k": 2048,
+      "kind": "gemm",
+      "m": 2048,
+      "n": 2048
+    },
+    {
+      "id": "reduce_1m",
+      "kind": "reduce",
+      "size": 1000000
+    }
+  ]
+}

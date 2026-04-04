@@ -1,0 +1,41 @@
+Metal Arithmetic Probe Suite — T1-T4
+Date: 2026-04-02
+Host binary: results/metal_probe_host/sm_apple_metal_probe_host
+Width: 1024 threads, 30 dispatches (outer iters)
+shader_inner_iters: 100,000 (hardcoded)
+C (dispatch overhead): 3,153,956 ns
+
+Formula: latency_ns = (gpu_ns_per_dispatch - C) / (100000 * ops_per_iter)
+
+--- Raw measurements ---
+probe_imul_lat          ns_per_dispatch=5,854,967
+probe_fadd8_tp          ns_per_dispatch=4,026,300
+probe_fmul8_tp          ns_per_dispatch=3,755,167
+probe_fma8_tp           ns_per_dispatch=4,565,467
+probe_fadd16_lat        ns_per_dispatch=4,834,900
+probe_fmul16_lat        ns_per_dispatch=4,768,000
+probe_fma16_lat         ns_per_dispatch=4,758,733
+probe_veltkamp_split    ns_per_dispatch=12,544,933
+
+--- Derived latencies ---
+Probe                   gpu_ns/dispatch   latency_ns/step   vs_fadd32_lat(1.695ns)
+probe_imul_lat          5,854,967         3.376 ns          1.99x
+probe_fadd8_tp          4,026,300         1.090 ns (tp)     0.64x
+probe_fmul8_tp          3,755,167         0.751 ns (tp)     0.44x
+probe_fma8_tp           4,565,467         1.764 ns (tp)     1.04x
+probe_fadd16_lat        4,834,900         2.101 ns          1.24x
+probe_fmul16_lat        4,768,000         2.018 ns          1.19x
+probe_fma16_lat         4,758,733         2.006 ns          1.18x
+probe_veltkamp_split    12,544,933        11.739 ns         6.93x
+
+Notes:
+- Throughput probes (tp): latency_ns is "ns per 8-parallel-op issue slot" (throughput metric)
+- probe_veltkamp_split: 8 steps unrolled, each step ~7 FP ops on critical path
+  => effective per-FP-op latency within chain: ~11.74/7 = 1.677 ns (close to fadd32 lat)
+- fp16 latency ~2.0 ns: ~18% SLOWER than fp32 (1.695 ns) — M1 fp16 ALU shares fp32 pipeline,
+  same latency expected; ~0.3 ns overhead may be fp16<->fp32 conversion or rounding pass
+- imul (int32 mul) at 3.376 ns: ~2x fadd32, consistent with separate int multiply pipeline
+- fmul32 throughput (0.751 ns) < fadd32 throughput (1.090 ns): fmul likely has higher issue rate
+  or shorter throughput latency on M1 GPU
+- fma8_tp (1.764 ns) higher than fadd8_tp (1.090 ns): suggests fma is not 1-cycle throughput,
+  or 8 independent fmas saturate a different resource than 8 independent fadds

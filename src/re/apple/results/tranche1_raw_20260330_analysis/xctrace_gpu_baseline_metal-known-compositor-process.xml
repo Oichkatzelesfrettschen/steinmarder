@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[107]'><schema name="metal-known-compositor-process"><col><mnemonic>timestamp</mnemonic><name>Timestamp</name><engineering-type>start-time</engineering-type></col><col><mnemonic>compositor-name</mnemonic><name>Compositor Name</name><engineering-type>metal-object-label</engineering-type></col><col><mnemonic>pid</mnemonic><name>PID</name><engineering-type>uint64</engineering-type></col><col><mnemonic>process</mnemonic><name>Process</name><engineering-type>process</engineering-type></col></schema><row><start-time id="1" fmt="00:00.000.000">0</start-time><metal-object-label id="2" fmt="WindowServer">WindowServer</metal-object-label><uint64 id="3" fmt="420">420</uint64><process id="4" fmt="WindowServer (420)"><pid id="5" fmt="420">420</pid><device-session id="6" fmt="TODO">TODO</device-session></process></row>
+</node></trace-query-result>

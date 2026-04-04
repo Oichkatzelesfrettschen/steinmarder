@@ -1,0 +1,4 @@
+stage,shader,kind,notes
+fp32_pressure,probe_fp32_pressure.comp,compute,fp32 pressure and register/ALU style probe
+fp16_convert,probe_fp16_convert.comp,compute,fp16 conversion-heavy probe
+int8_pack,probe_int8_pack.comp,compute,int8 pack/unpack and accumulation probe

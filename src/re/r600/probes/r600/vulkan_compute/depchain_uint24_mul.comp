@@ -1,0 +1,18 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    float values[];
+} outbuf;
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    uint acc = (index & 0x00fffffdu) + 3u;
+
+    for (int i = 0; i < 512; ++i) {
+        acc = ((acc * 3u) + 7u) & 0x00ffffffu;
+    }
+
+    outbuf.values[index] = float(acc) * (1.0 / 16777216.0);
+}

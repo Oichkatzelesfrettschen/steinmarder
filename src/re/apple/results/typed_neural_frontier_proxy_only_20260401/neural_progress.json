@@ -1,0 +1,12 @@
+{
+  "completed_groups": [
+    "torch"
+  ],
+  "completed_rows": 36,
+  "expected_rows": 32,
+  "last_backend": "pytorch_proxy_mps",
+  "last_format": "fp4",
+  "last_group": "torch",
+  "last_workload": "gemm_2048",
+  "status": "completed"
+}

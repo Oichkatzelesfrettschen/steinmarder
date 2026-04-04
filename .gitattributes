@@ -1,4 +1,7 @@
 *.sass !text !filter !merge !diff
 *.reg !text !filter !merge !diff
 *.csv !text !filter !merge !diff
+src/re/apple/results/typed_metal_suite_20260401_apple_sync/gpu_counter_summary.csv filter=lfs diff=lfs merge=lfs -text
 *.svg !text !filter !merge !diff
+*.xml !text !filter !merge !diff
+*metal-gpu-counter-intervals.xml filter=lfs diff=lfs merge=lfs -text

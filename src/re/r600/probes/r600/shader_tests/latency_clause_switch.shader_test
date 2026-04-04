@@ -1,0 +1,39 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform sampler2D tex;
+uniform float seed;
+void main() {
+    // Alternating ALU and TEX to measure clause switching overhead
+    float v = seed + gl_FragCoord.x * 0.001;
+    vec2 uv = vec2(v, v);
+    
+    // ALU block 1
+    v = v * 1.0001 + 0.0001; v = v * 1.0001 + 0.0001;
+    v = v * 1.0001 + 0.0001; v = v * 1.0001 + 0.0001;
+    // TEX fetch 1
+    vec4 t = texture(tex, uv * v);
+    // ALU block 2
+    v = t.x * 1.0001 + t.y; v = v * 1.0001 + t.z;
+    v = v * 1.0001 + 0.0001; v = v * 1.0001 + 0.0001;
+    // TEX fetch 2
+    t = texture(tex, vec2(v, t.w));
+    // ALU block 3
+    v = t.x * 1.0001 + t.y; v = v * 1.0001 + t.z;
+    v = v * 1.0001 + 0.0001; v = v * 1.0001 + 0.0001;
+    // TEX fetch 3
+    t = texture(tex, vec2(v, t.w));
+    // ALU block 4
+    v = t.x * 1.0001 + t.y; v = v * 1.0001 + t.z;
+    
+    gl_FragColor = vec4(v, v, v, 1.0);
+}
+
+[test]
+texture checkerboard 0 0 64 64
+uniform float seed 0.5
+draw rect -1 -1 2 2

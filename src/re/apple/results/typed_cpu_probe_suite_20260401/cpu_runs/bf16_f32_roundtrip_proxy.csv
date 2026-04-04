@@ -1,0 +1,2 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+bf16_f32_roundtrip_proxy,1000000,32,167808875,5.244027,0.190693

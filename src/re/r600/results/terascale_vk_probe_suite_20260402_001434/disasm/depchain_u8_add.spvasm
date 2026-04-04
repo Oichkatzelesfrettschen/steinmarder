@@ -1,0 +1,108 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 11
+; Bound: 64
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
+               OpExecutionMode %main LocalSize 64 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %narrow_u8_u1_ "narrow_u8(u1;"
+               OpName %x "x"
+               OpName %index "index"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %acc "acc"
+               OpName %param "param"
+               OpName %i "i"
+               OpName %param_0 "param"
+               OpName %OutputBuffer "OutputBuffer"
+               OpMemberName %OutputBuffer 0 "values"
+               OpName %outbuf "outbuf"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpDecorate %_runtimearr_float ArrayStride 4
+               OpDecorate %OutputBuffer BufferBlock
+               OpMemberDecorate %OutputBuffer 0 Offset 0
+               OpDecorate %outbuf Binding 0
+               OpDecorate %outbuf DescriptorSet 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+          %8 = OpTypeFunction %uint %_ptr_Function_uint
+   %uint_255 = OpConstant %uint 255
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+     %uint_1 = OpConstant %uint 1
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+    %int_512 = OpConstant %int 512
+       %bool = OpTypeBool
+     %uint_3 = OpConstant %uint 3
+      %int_1 = OpConstant %int 1
+      %float = OpTypeFloat 32
+%_runtimearr_float = OpTypeRuntimeArray %float
+%OutputBuffer = OpTypeStruct %_runtimearr_float
+%_ptr_Uniform_OutputBuffer = OpTypePointer Uniform %OutputBuffer
+     %outbuf = OpVariable %_ptr_Uniform_OutputBuffer Uniform
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+    %uint_64 = OpConstant %uint 64
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_64 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_uint Function
+        %acc = OpVariable %_ptr_Function_uint Function
+      %param = OpVariable %_ptr_Function_uint Function
+          %i = OpVariable %_ptr_Function_int Function
+    %param_0 = OpVariable %_ptr_Function_uint Function
+         %23 = OpAccessChain %_ptr_Input_uint %gl_GlobalInvocationID %uint_0
+         %24 = OpLoad %uint %23
+               OpStore %index %24
+         %26 = OpLoad %uint %index
+         %28 = OpIAdd %uint %26 %uint_1
+               OpStore %param %28
+         %30 = OpFunctionCall %uint %narrow_u8_u1_ %param
+               OpStore %acc %30
+               OpStore %i %int_0
+               OpBranch %35
+         %35 = OpLabel
+               OpLoopMerge %37 %38 None
+               OpBranch %39
+         %39 = OpLabel
+         %40 = OpLoad %int %i
+         %43 = OpSLessThan %bool %40 %int_512
+               OpBranchConditional %43 %36 %37
+         %36 = OpLabel
+         %44 = OpLoad %uint %acc
+         %46 = OpIAdd %uint %44 %uint_3
+               OpStore %param_0 %46
+         %48 = OpFunctionCall %uint %narrow_u8_u1_ %param_0
+               OpStore %acc %48
+               OpBranch %38
+         %38 = OpLabel
+         %49 = OpLoad %int %i
+         %51 = OpIAdd %int %49 %int_1
+               OpStore %i %51
+               OpBranch %35
+         %37 = OpLabel
+         %57 = OpLoad %uint %index
+         %58 = OpLoad %uint %acc
+         %59 = OpConvertUToF %float %58
+         %61 = OpAccessChain %_ptr_Uniform_float %outbuf %int_0 %57
+               OpStore %61 %59
+               OpReturn
+               OpFunctionEnd
+%narrow_u8_u1_ = OpFunction %uint None %8
+          %x = OpFunctionParameter %_ptr_Function_uint
+         %11 = OpLabel
+         %12 = OpLoad %uint %x
+         %14 = OpBitwiseAnd %uint %12 %uint_255
+               OpReturnValue %14
+               OpFunctionEnd

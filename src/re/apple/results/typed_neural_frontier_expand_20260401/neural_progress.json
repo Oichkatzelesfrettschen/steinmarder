@@ -1,0 +1,14 @@
+{
+  "completed_groups": [
+    "torch",
+    "mlx",
+    "coreml"
+  ],
+  "completed_rows": 62,
+  "expected_rows": 128,
+  "last_backend": "coreml_all",
+  "last_format": "float32",
+  "last_group": "coreml",
+  "last_workload": "environment",
+  "status": "completed"
+}

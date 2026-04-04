@@ -1,0 +1,2 @@
+format,bit_width,kernel_name,classification_mode,support_tier,metallib
+float32,32,probe_float32_surface,native_surface,native,/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/typed_metal_suite_20260401_apple_sync/metal_type_surface_build/probe_float32_surface.metallib

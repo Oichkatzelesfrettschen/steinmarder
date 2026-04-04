@@ -1,0 +1,5 @@
+{
+  "models": ["tiny_linear", "tiny_mlp", "tiny_conv"],
+  "batch_sizes": [1, 4, 16],
+  "dtypes": ["float32", "float16"]
+}

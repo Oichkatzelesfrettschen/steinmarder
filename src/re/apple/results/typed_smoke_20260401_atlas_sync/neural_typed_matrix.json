@@ -1,0 +1,690 @@
+{
+  "measured_runs": 1,
+  "python": {
+    "executable": "/Users/eirikr/Documents/GitHub/steinmarder/.venv/bin/python",
+    "version": "3.12.13"
+  },
+  "rows": {
+    "coreml": [
+      {
+        "backend": "coreml_cpu_only",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_ONLY present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_ONLY present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_AND_GPU present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_AND_GPU present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "float16",
+        "notes": "ComputeUnit.CPU_AND_NE present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "float32",
+        "notes": "ComputeUnit.CPU_AND_NE present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "float16",
+        "notes": "ComputeUnit.ALL present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "float32",
+        "notes": "ComputeUnit.ALL present in coremltools 9.0.",
+        "status": "availability_only",
+        "support_tier": "placement_only",
+        "workload": "tiny_linear"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "int8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "bfloat16",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "tf32",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp6",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxfp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "mxint8",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "nf4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_only",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_gpu",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_cpu_and_ne",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      },
+      {
+        "backend": "coreml_all",
+        "format": "fp4",
+        "notes": "Keep frontier family visible for placement-only Core ML sweeps.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "typed_proxy"
+      }
+    ],
+    "mlx": [
+      {
+        "backend": "mlx_gpu",
+        "checksum": 33.625,
+        "format": "float16",
+        "measured_runs": 1,
+        "median_ms": 0.34820901055354625,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.34820901055354625,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_gpu",
+        "checksum": -24.69001579284668,
+        "format": "float32",
+        "measured_runs": 1,
+        "median_ms": 0.3222499944968149,
+        "notes": "default_device=Device(gpu, 0)",
+        "p90_ms": 0.3222499944968149,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "bfloat16",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "int8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "uint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "tf32",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp6",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxfp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "mxint8",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "nf4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "mlx_proxy",
+        "format": "fp4",
+        "notes": "Reserved frontier row for future MLX coverage.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      }
+    ],
+    "torch": [
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -9.40625,
+        "format": "float16",
+        "measured_runs": 1,
+        "median_ms": 6.202416989253834,
+        "notes": "device=cpu",
+        "p90_ms": 6.202416989253834,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 34.54998779296875,
+        "format": "float32",
+        "measured_runs": 1,
+        "median_ms": 0.036999990697950125,
+        "notes": "device=cpu",
+        "p90_ms": 0.036999990697950125,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -17.129300903712114,
+        "format": "float64",
+        "measured_runs": 1,
+        "median_ms": 0.12041701120324433,
+        "notes": "device=cpu",
+        "p90_ms": 0.12041701120324433,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -15.625,
+        "format": "bfloat16",
+        "measured_runs": 1,
+        "median_ms": 6.020540997269563,
+        "notes": "device=cpu",
+        "p90_ms": 6.020540997269563,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 90.0,
+        "format": "int8",
+        "measured_runs": 1,
+        "median_ms": 0.6894160032970831,
+        "notes": "device=cpu",
+        "p90_ms": 0.6894160032970831,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 24.0,
+        "format": "uint8",
+        "measured_runs": 1,
+        "median_ms": 0.6651250005234033,
+        "notes": "device=cpu",
+        "p90_ms": 0.6651250005234033,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 30.4375,
+        "format": "float16",
+        "measured_runs": 1,
+        "median_ms": 0.5305410013534129,
+        "notes": "device=mps",
+        "p90_ms": 0.5305410013534129,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -28.949499130249023,
+        "format": "float32",
+        "measured_runs": 1,
+        "median_ms": 0.4604999994626269,
+        "notes": "device=mps",
+        "p90_ms": 0.4604999994626269,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -14.0625,
+        "format": "bfloat16",
+        "measured_runs": 1,
+        "median_ms": 0.5638750008074567,
+        "notes": "device=mps",
+        "p90_ms": 0.5638750008074567,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -71.0,
+        "format": "int8",
+        "measured_runs": 1,
+        "median_ms": 0.7908749976195395,
+        "notes": "device=mps",
+        "p90_ms": 0.7908749976195395,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 185.0,
+        "format": "uint8",
+        "measured_runs": 1,
+        "median_ms": 0.7650830084457994,
+        "notes": "device=mps",
+        "p90_ms": 0.7650830084457994,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 1,
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "tf32",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp6",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxfp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "mxint8",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "nf4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      },
+      {
+        "backend": "pytorch_proxy",
+        "format": "fp4",
+        "notes": "Frontier family kept visible even without a direct PyTorch dtype.",
+        "status": "planned",
+        "support_tier": "framework_proxy",
+        "workload": "gemm_256"
+      }
+    ]
+  },
+  "warmup_runs": 1,
+  "workloads": [
+    {
+      "id": "gemm_256",
+      "k": 256,
+      "kind": "gemm",
+      "m": 256,
+      "n": 256
+    }
+  ]
+}

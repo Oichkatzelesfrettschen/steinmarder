@@ -1,0 +1,25 @@
+backend,format,workload,status,support_tier,median_ms,p90_ms,warmup_runs,measured_runs,checksum,notes
+pytorch_cpu,float16,gemm_2048,measured,native,9853.166729499208,10007.992066699444,3,10,1.3837890625,device=cpu
+pytorch_cpu,float32,gemm_2048,measured,native,19.542479499250476,20.287345800170442,3,10,39.89613723754883,device=cpu
+pytorch_cpu,float64,gemm_2048,measured,native,73.58929149904725,77.74932120028097,3,10,31.32202073173181,device=cpu
+pytorch_cpu,bfloat16,gemm_2048,measured,native_or_proxy,9556.229083500511,9701.8843130998,3,10,-57.5,device=cpu
+pytorch_cpu,int8,gemm_2048,measured,native_or_proxy,311.26106249939767,314.06303720086726,3,10,21.0,device=cpu
+pytorch_cpu,uint8,gemm_2048,measured,native_or_proxy,312.21754150010383,314.94654640009685,3,10,248.0,device=cpu
+pytorch_cpu,int16,gemm_2048,measured,native_or_proxy,626.2710415003312,634.6941794998202,3,10,28900.0,device=cpu
+pytorch_cpu,int32,gemm_2048,measured,native,1353.2742914994742,1379.0487003003363,3,10,8004.0,device=cpu
+pytorch_cpu,int64,gemm_2048,measured,native,5208.258917000421,5406.050766699991,3,10,49563.0,device=cpu
+pytorch_cpu,uint16,gemm_2048,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt16'"
+pytorch_cpu,uint32,gemm_2048,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt32'"
+pytorch_cpu,uint64,gemm_2048,error,unsupported_or_proxy,,,,,,"NotImplementedError: ""addmm_impl_cpu_"" not implemented for 'UInt64'"
+pytorch_mps,float16,gemm_2048,measured,native,9.11050000013347,9.287750300609332,3,10,-25.09375,device=mps
+pytorch_mps,float32,gemm_2048,measured,native,10.970812501000182,11.475554700518842,3,10,10.259212493896484,device=mps
+pytorch_mps,float64,gemm_2048,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,bfloat16,gemm_2048,measured,native_or_proxy,18.630208500326262,20.94191699907241,3,10,-32.25,device=mps
+pytorch_mps,int8,gemm_2048,measured,native_or_proxy,63.54518750049465,64.13132910001877,3,10,86.0,device=mps
+pytorch_mps,uint8,gemm_2048,measured,native_or_proxy,63.622374999795284,66.01181249916408,3,10,171.0,device=mps
+pytorch_mps,int16,gemm_2048,measured,native_or_proxy,68.60018700081127,70.35077110012935,3,10,23712.0,device=mps
+pytorch_mps,int32,gemm_2048,measured,native,100.01972900045075,100.94552920018032,3,10,22074.0,device=mps
+pytorch_mps,int64,gemm_2048,measured,native,216.11441649929475,217.55983340044622,3,10,40180.0,device=mps
+pytorch_mps,uint16,gemm_2048,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ushort
+pytorch_mps,uint32,gemm_2048,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_uint
+pytorch_mps,uint64,gemm_2048,error,unsupported_or_proxy,,,,,,RuntimeError: Failed to create function state object for: matmul_ulong

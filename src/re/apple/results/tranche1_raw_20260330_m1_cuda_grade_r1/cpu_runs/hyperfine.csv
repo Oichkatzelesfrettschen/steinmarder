@@ -1,0 +1,2 @@
+command,mean,stddev,median,user,system,min,max
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r1/cpu_bins/sm_apple_cpu_latency_O3 --iters 500000 --csv,0.05715169004,0.0014713955644109786,0.05718299864,0.055018199999999996,0.0012594399999999997,0.05526779064,0.05899899764

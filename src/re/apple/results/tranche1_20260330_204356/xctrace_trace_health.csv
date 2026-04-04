@@ -1,0 +1,6 @@
+trace,template_name,duration_s,end_reason,target_process_name,target_pid,target_exit_status,target_termination_reason,schema_count
+gpu_baseline.trace,Metal System Trace,1.140155,Target app exited,sm_apple_metal_probe_host,36873,0,exit(0),114
+gpu_occupancy_heavy.trace,Metal System Trace,0.937964,Target app exited,sm_apple_metal_probe_host,36945,0,exit(0),114
+gpu_register_pressure.trace,Metal System Trace,1.017037,Target app exited,sm_apple_metal_probe_host,36966,0,exit(0),114
+gpu_threadgroup_heavy.trace,Metal System Trace,0.996273,Target app exited,sm_apple_metal_probe_host,36899,0,exit(0),114
+gpu_threadgroup_minimal.trace,Metal System Trace,0.923274,Target app exited,sm_apple_metal_probe_host,36924,0,exit(0),114

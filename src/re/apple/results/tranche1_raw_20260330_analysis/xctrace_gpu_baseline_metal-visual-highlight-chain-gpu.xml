@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[47]'><schema name="metal-visual-highlight-chain-gpu"><col><mnemonic>timestamp</mnemonic><name>Timestamp</name><engineering-type>start-time</engineering-type></col><col><mnemonic>root-id</mnemonic><name>Root ID</name><engineering-type>uint64</engineering-type></col><col><mnemonic>block-id</mnemonic><name>Block ID</name><engineering-type>uint64</engineering-type></col></schema><row><start-time id="1" fmt="00:00.408.986">408986083</start-time><uint64 id="2" fmt="169,000,758">169000758</uint64><uint64 id="3" fmt="1">1</uint64></row>
+<row><start-time id="4" fmt="00:00.409.111">409111000</start-time><uint64 ref="2"/><uint64 id="5" fmt="3">3</uint64></row>
+<row><start-time id="6" fmt="00:00.409.589">409589333</start-time><uint64 id="7" fmt="80,791,667">80791667</uint64><uint64 id="8" fmt="5">5</uint64></row>
+<row><start-time id="9" fmt="00:00.409.643">409643208</start-time><uint64 ref="7"/><uint64 id="10" fmt="6">6</uint64></row>
+<row><start-time id="11" fmt="00:00.409.723">409723333</start-time><uint64 ref="7"/><uint64 id="12" fmt="7">7</uint64></row>
+<row><start-time id="13" fmt="00:00.409.766">409766125</start-time><uint64 ref="7"/><uint64 id="14" fmt="8">8</uint64></row>
+<row><start-time id="15" fmt="00:00.443.574">443574208</start-time><uint64 id="16" fmt="169,000,760">169000760</uint64><uint64 id="17" fmt="9">9</uint64></row>
+<row><start-time id="18" fmt="00:00.443.686">443686625</start-time><uint64 ref="16"/><uint64 id="19" fmt="10">10</uint64></row>
+<row><start-time id="20" fmt="00:00.458.893">458893541</start-time><uint64 id="21" fmt="169,000,762">169000762</uint64><uint64 id="22" fmt="14">14</uint64></row>
+<row><start-time id="23" fmt="00:00.459.025">459025250</start-time><uint64 ref="21"/><uint64 id="24" fmt="15">15</uint64></row>
+<row><start-time id="25" fmt="00:00.459.499">459499166</start-time><uint64 id="26" fmt="80,791,671">80791671</uint64><uint64 id="27" fmt="17">17</uint64></row>
+<row><start-time id="28" fmt="00:00.459.556">459556916</start-time><uint64 ref="26"/><uint64 id="29" fmt="18">18</uint64></row>
+<row><start-time id="30" fmt="00:00.459.634">459634250</start-time><uint64 ref="26"/><uint64 id="31" fmt="19">19</uint64></row>
+<row><start-time id="32" fmt="00:00.459.675">459675208</start-time><uint64 ref="26"/><uint64 id="33" fmt="21">21</uint64></row>
+<row><start-time id="34" fmt="00:00.493.389">493389166</start-time><uint64 id="35" fmt="80,791,675">80791675</uint64><uint64 id="36" fmt="25">25</uint64></row>
+<row><start-time id="37" fmt="00:00.493.420">493420083</start-time><uint64 ref="35"/><uint64 id="38" fmt="26">26</uint64></row>
+<row><start-time id="39" fmt="00:00.493.470">493470416</start-time><uint64 ref="35"/><uint64 id="40" fmt="27">27</uint64></row>
+<row><start-time id="41" fmt="00:00.493.498">493498958</start-time><uint64 ref="35"/><uint64 id="42" fmt="29">29</uint64></row>
+<row><start-time id="43" fmt="00:00.529.291">529291958</start-time><uint64 id="44" fmt="169,000,764">169000764</uint64><uint64 id="45" fmt="33">33</uint64></row>
+<row><start-time id="46" fmt="00:00.529.666">529666500</start-time><uint64 ref="44"/><uint64 id="47" fmt="34">34</uint64></row>
+<row><start-time id="48" fmt="00:00.543.416">543416916</start-time><uint64 id="49" fmt="80,791,679">80791679</uint64><uint64 id="50" fmt="36">36</uint64></row>
+<row><start-time id="51" fmt="00:00.543.422">543422833</start-time><uint64 ref="49"/><uint64 id="52" fmt="37">37</uint64></row>
+<row><start-time id="53" fmt="00:00.543.582">543582833</start-time><uint64 id="54" fmt="169,000,766">169000766</uint64><uint64 id="55" fmt="38">38</uint64></row>
+<row><start-time id="56" fmt="00:00.543.749">543749791</start-time><uint64 ref="49"/><uint64 id="57" fmt="39">39</uint64></row>
+<row><start-time id="58" fmt="00:00.543.813">543813083</start-time><uint64 ref="49"/><uint64 id="59" fmt="40">40</uint64></row>
+<row><start-time id="60" fmt="00:00.543.816">543816291</start-time><uint64 ref="54"/><uint64 id="61" fmt="41">41</uint64></row>
+<row><start-time id="62" fmt="00:00.559.811">559811416</start-time><uint64 id="63" fmt="80,791,683">80791683</uint64><uint64 id="64" fmt="42">42</uint64></row>
+<row><start-time id="65" fmt="00:00.559.847">559847875</start-time><uint64 ref="63"/><uint64 id="66" fmt="43">43</uint64></row>
+<row><start-time id="67" fmt="00:00.559.898">559898875</start-time><uint64 ref="63"/><uint64 id="68" fmt="44">44</uint64></row>
+<row><start-time id="69" fmt="00:00.560.034">560034166</start-time><uint64 ref="63"/><uint64 id="70" fmt="45">45</uint64></row>
+<row><start-time id="71" fmt="00:00.575.607">575607791</start-time><uint64 id="72" fmt="169,000,768">169000768</uint64><uint64 id="73" fmt="46">46</uint64></row>
+<row><start-time id="74" fmt="00:00.575.715">575715750</start-time><uint64 ref="72"/><uint64 id="75" fmt="47">47</uint64></row>
+<row><start-time id="76" fmt="00:00.609.631">609631333</start-time><uint64 id="77" fmt="80,791,687">80791687</uint64><uint64 id="78" fmt="48">48</uint64></row>
+<row><start-time id="79" fmt="00:00.609.661">609661416</start-time><uint64 ref="77"/><uint64 id="80" fmt="49">49</uint64></row>
+<row><start-time id="81" fmt="00:00.609.710">609710416</start-time><uint64 ref="77"/><uint64 id="82" fmt="50">50</uint64></row>
+<row><start-time id="83" fmt="00:00.609.739">609739625</start-time><uint64 ref="77"/><uint64 id="84" fmt="51">51</uint64></row>
+<row><start-time id="85" fmt="00:00.610.092">610092166</start-time><uint64 id="86" fmt="169,000,770">169000770</uint64><uint64 id="87" fmt="52">52</uint64></row>
+<row><start-time id="88" fmt="00:00.610.567">610567625</start-time><uint64 ref="86"/><uint64 id="89" fmt="53">53</uint64></row>
+<row><start-time id="90" fmt="00:00.626.425">626425791</start-time><uint64 id="91" fmt="80,791,691">80791691</uint64><uint64 id="92" fmt="54">54</uint64></row>
+<row><start-time id="93" fmt="00:00.626.431">626431708</start-time><uint64 ref="91"/><uint64 id="94" fmt="55">55</uint64></row>
+<row><start-time id="95" fmt="00:00.626.669">626669916</start-time><uint64 ref="91"/><uint64 id="96" fmt="56">56</uint64></row>
+<row><start-time id="97" fmt="00:00.626.721">626721875</start-time><uint64 ref="91"/><uint64 id="98" fmt="57">57</uint64></row>
+<row><start-time id="99" fmt="00:00.643.118">643118333</start-time><uint64 id="100" fmt="169,000,772">169000772</uint64><uint64 id="101" fmt="58">58</uint64></row>
+<row><start-time id="102" fmt="00:00.643.219">643219625</start-time><uint64 ref="100"/><uint64 id="103" fmt="59">59</uint64></row>
+<row><start-time id="104" fmt="00:00.660.203">660203458</start-time><uint64 id="105" fmt="80,791,695">80791695</uint64><uint64 id="106" fmt="64">64</uint64></row>
+<row><start-time id="107" fmt="00:00.660.236">660236291</start-time><uint64 ref="105"/><uint64 id="108" fmt="65">65</uint64></row>
+<row><start-time id="109" fmt="00:00.660.286">660286333</start-time><uint64 ref="105"/><uint64 id="110" fmt="66">66</uint64></row>
+<row><start-time id="111" fmt="00:00.660.370">660370833</start-time><uint64 id="112" fmt="169,000,774">169000774</uint64><uint64 id="113" fmt="68">68</uint64></row>
+<row><start-time id="114" fmt="00:00.660.383">660383500</start-time><uint64 ref="105"/><uint64 id="115" fmt="69">69</uint64></row>
+<row><start-time id="116" fmt="00:00.660.572">660572333</start-time><uint64 ref="112"/><uint64 id="117" fmt="70">70</uint64></row>
+<row><start-time id="118" fmt="00:00.675.418">675418166</start-time><uint64 id="119" fmt="169,000,776">169000776</uint64><uint64 id="120" fmt="71">71</uint64></row>
+<row><start-time id="121" fmt="00:00.675.528">675528708</start-time><uint64 ref="119"/><uint64 id="122" fmt="72">72</uint64></row>
+<row><start-time id="123" fmt="00:00.676.270">676270625</start-time><uint64 id="124" fmt="80,791,699">80791699</uint64><uint64 id="125" fmt="73">73</uint64></row>
+<row><start-time id="126" fmt="00:00.676.366">676366250</start-time><uint64 ref="124"/><uint64 id="127" fmt="74">74</uint64></row>
+<row><start-time id="128" fmt="00:00.676.494">676494541</start-time><uint64 ref="124"/><uint64 id="129" fmt="75">75</uint64></row>
+<row><start-time id="130" fmt="00:00.676.539">676539500</start-time><uint64 ref="124"/><uint64 id="131" fmt="76">76</uint64></row>
+<row><start-time id="132" fmt="00:00.710.970">710970916</start-time><uint64 id="133" fmt="80,791,703">80791703</uint64><uint64 id="134" fmt="78">78</uint64></row>
+<row><start-time id="135" fmt="00:00.711.005">711005875</start-time><uint64 ref="133"/><uint64 id="136" fmt="79">79</uint64></row>
+<row><start-time id="137" fmt="00:00.711.056">711056708</start-time><uint64 ref="133"/><uint64 id="138" fmt="80">80</uint64></row>
+<row><start-time id="139" fmt="00:00.711.159">711159833</start-time><uint64 ref="133"/><uint64 id="140" fmt="81">81</uint64></row>
+</node></trace-query-result>

@@ -1,0 +1,161 @@
+counter,variant,n_samples,min_pct,p50_pct,p90_pct,p99_pct,max_pct,avg_pct
+ALU Limiter,baseline,31317,0.000,0.023,0.025,7.306,92.602,0.438
+ALU Utilization,baseline,31317,0.000,0.023,0.024,6.645,81.387,0.388
+Buffer Load Utilization,baseline,31317,0.000,0.003,0.003,0.042,0.941,0.004
+Buffer Read Limiter,baseline,31317,0.000,0.003,0.003,0.042,0.947,0.004
+Buffer Store Utilization,baseline,31317,0.000,0.018,0.018,0.018,0.387,0.015
+Buffer Write Limiter,baseline,31317,0.000,0.018,0.018,0.018,0.388,0.015
+Compute Occupancy,baseline,31317,0.000,0.023,0.029,0.046,5.342,0.026
+F16 Utilization,baseline,31317,0.000,0.000,0.000,1.386,25.639,0.107
+F32 Utilization,baseline,31317,0.000,0.000,0.000,1.363,23.593,0.070
+Fragment Interp Limiter,baseline,31317,0.000,0.000,0.000,0.844,26.178,0.091
+Fragment Interp Utilization,baseline,31317,0.000,0.000,0.000,0.525,18.640,0.055
+Fragment Occupancy,baseline,31317,0.000,0.000,0.000,20.486,100.000,0.639
+GPU Read Bandwidth,baseline,31317,0.000,0.020,0.020,2.016,33.679,0.157
+GPU Write Bandwidth,baseline,31317,0.000,0.049,0.049,2.056,25.548,0.126
+LLC Limiter,baseline,31317,0.000,0.096,0.098,4.642,45.169,0.238
+LLC Utilization,baseline,31317,0.000,0.096,0.098,4.630,26.368,0.219
+MMU Limiter,baseline,31317,0.000,0.034,0.034,2.619,27.783,0.147
+MMU Utilization,baseline,31317,0.000,0.034,0.034,2.599,25.317,0.141
+Partial Renders,baseline,31317,0.000,0.000,0.000,0.000,0.000,0.000
+TG/IB Load Limiter,baseline,31317,0.000,0.000,0.000,0.735,9.979,0.035
+TG/IB Load Utilization,baseline,31317,0.000,0.000,0.000,0.626,9.324,0.031
+TG/IB Store Limiter,baseline,31317,0.000,0.000,0.000,0.735,9.979,0.035
+TG/IB Store Utilization,baseline,31317,0.000,0.000,0.000,2.672,14.277,0.088
+Texture Cache Limiter,baseline,31317,0.000,0.000,0.000,4.934,79.537,0.171
+Texture Filtering Limiter,baseline,31317,0.000,0.000,0.000,5.432,50.029,0.227
+Texture Sample Limiter,baseline,31317,0.000,0.000,0.000,7.288,99.896,0.293
+Texture Sample Utilization,baseline,31317,0.000,0.000,0.000,5.340,50.019,0.224
+Texture Write Limiter,baseline,31317,0.000,0.006,0.006,10.258,100.000,0.384
+Texture Write Utilization,baseline,31317,0.000,0.006,0.006,9.380,100.000,0.369
+Top Performance Limiter,baseline,31314,0.000,0.096,0.098,19.751,100.000,0.704
+Total Occupancy,baseline,26064,0.000,0.026,0.029,31.631,100.009,0.799
+Vertex Occupancy,baseline,31317,0.000,0.000,0.000,0.009,0.217,0.001
+ALU Limiter,occupancy_heavy,32509,0.000,0.512,0.514,11.764,93.133,0.846
+ALU Utilization,occupancy_heavy,32509,0.000,0.468,0.470,10.621,81.862,0.753
+Buffer Load Utilization,occupancy_heavy,32509,0.000,0.006,0.006,0.099,7.194,0.009
+Buffer Read Limiter,occupancy_heavy,32509,0.000,0.006,0.006,0.099,7.194,0.009
+Buffer Store Utilization,occupancy_heavy,32509,0.000,0.018,0.018,0.018,0.405,0.012
+Buffer Write Limiter,occupancy_heavy,32509,0.000,0.018,0.018,0.018,0.405,0.012
+Compute Occupancy,occupancy_heavy,32509,0.000,0.115,0.147,0.298,97.099,0.130
+F16 Utilization,occupancy_heavy,32509,0.000,0.000,0.000,3.697,25.639,0.125
+F32 Utilization,occupancy_heavy,32509,0.000,0.000,0.000,2.426,38.620,0.091
+Fragment Interp Limiter,occupancy_heavy,32509,0.000,0.000,0.000,1.971,27.349,0.106
+Fragment Interp Utilization,occupancy_heavy,32509,0.000,0.000,0.000,0.824,18.607,0.064
+Fragment Occupancy,occupancy_heavy,32509,0.000,0.000,0.000,29.207,100.000,0.805
+GPU Read Bandwidth,occupancy_heavy,32509,0.000,0.032,0.032,7.558,50.191,0.235
+GPU Write Bandwidth,occupancy_heavy,32509,0.000,0.049,0.049,3.025,38.466,0.148
+LLC Limiter,occupancy_heavy,32509,0.000,0.141,0.145,7.342,52.845,0.321
+LLC Utilization,occupancy_heavy,32509,0.000,0.141,0.145,6.791,34.607,0.279
+MMU Limiter,occupancy_heavy,32509,0.000,0.025,0.040,5.367,47.583,0.209
+MMU Utilization,occupancy_heavy,32509,0.000,0.025,0.040,4.815,33.293,0.175
+Partial Renders,occupancy_heavy,32509,0.000,0.000,0.000,0.000,2.000,0.001
+TG/IB Load Limiter,occupancy_heavy,32509,0.000,0.000,0.000,1.099,9.902,0.043
+TG/IB Load Utilization,occupancy_heavy,32509,0.000,0.000,0.000,1.037,9.299,0.038
+TG/IB Store Limiter,occupancy_heavy,32509,0.000,0.000,0.000,1.099,9.902,0.043
+TG/IB Store Utilization,occupancy_heavy,32509,0.000,0.000,0.000,2.911,23.931,0.105
+Texture Cache Limiter,occupancy_heavy,32509,0.000,0.000,0.000,8.188,79.692,0.228
+Texture Filtering Limiter,occupancy_heavy,32509,0.000,0.000,0.000,7.636,50.018,0.266
+Texture Sample Limiter,occupancy_heavy,32509,0.000,0.000,0.000,11.775,99.751,0.365
+Texture Sample Utilization,occupancy_heavy,32509,0.000,0.000,0.000,7.358,50.007,0.263
+Texture Write Limiter,occupancy_heavy,32509,0.000,0.006,0.006,13.344,100.000,0.461
+Texture Write Utilization,occupancy_heavy,32509,0.000,0.006,0.006,11.667,100.000,0.434
+Top Performance Limiter,occupancy_heavy,32506,0.000,0.512,0.514,28.196,100.000,1.094
+Total Occupancy,occupancy_heavy,22853,0.000,0.132,0.158,54.285,100.001,1.331
+Vertex Occupancy,occupancy_heavy,32509,0.000,0.000,0.000,0.025,4.184,0.001
+ALU Limiter,register_pressure,31382,0.000,0.483,0.484,22.216,97.434,1.066
+ALU Utilization,register_pressure,31382,0.000,0.475,0.475,19.571,82.459,0.927
+Buffer Load Utilization,register_pressure,31382,0.000,0.005,0.005,0.126,1.623,0.008
+Buffer Read Limiter,register_pressure,31382,0.000,0.005,0.005,0.126,1.624,0.008
+Buffer Store Utilization,register_pressure,31382,0.000,0.018,0.018,0.018,0.405,0.013
+Buffer Write Limiter,register_pressure,31382,0.000,0.018,0.018,0.018,0.406,0.013
+Compute Occupancy,register_pressure,31382,0.000,0.112,0.138,0.285,6.643,0.095
+F16 Utilization,register_pressure,31382,0.000,0.000,0.000,5.387,19.205,0.126
+F32 Utilization,register_pressure,31382,0.000,0.005,0.005,3.939,29.768,0.185
+Fragment Interp Limiter,register_pressure,31382,0.000,0.000,0.000,5.970,27.814,0.150
+Fragment Interp Utilization,register_pressure,31382,0.000,0.000,0.000,2.925,11.911,0.071
+Fragment Occupancy,register_pressure,31382,0.000,0.000,0.000,43.153,100.000,1.001
+GPU Read Bandwidth,register_pressure,31382,0.000,0.032,0.032,4.658,27.144,0.170
+GPU Write Bandwidth,register_pressure,31382,0.000,0.049,0.049,2.629,25.762,0.143
+LLC Limiter,register_pressure,31382,0.000,0.141,0.143,7.309,42.301,0.299
+LLC Utilization,register_pressure,31382,0.000,0.141,0.143,6.995,27.380,0.277
+MMU Limiter,register_pressure,31382,0.000,0.039,0.040,4.240,27.258,0.161
+MMU Utilization,register_pressure,31382,0.000,0.039,0.040,4.214,26.024,0.156
+Partial Renders,register_pressure,31382,0.000,0.000,0.000,0.000,0.000,0.000
+TG/IB Load Limiter,register_pressure,31382,0.000,0.000,0.000,1.947,7.951,0.047
+TG/IB Load Utilization,register_pressure,31382,0.000,0.000,0.000,1.712,6.937,0.041
+TG/IB Store Limiter,register_pressure,31382,0.000,0.000,0.000,1.947,7.951,0.047
+TG/IB Store Utilization,register_pressure,31382,0.000,0.000,0.000,5.921,13.414,0.127
+Texture Cache Limiter,register_pressure,31382,0.000,0.000,0.000,6.883,79.035,0.232
+Texture Filtering Limiter,register_pressure,31382,0.000,0.000,0.000,12.082,50.019,0.274
+Texture Sample Limiter,register_pressure,31382,0.000,0.000,0.000,12.559,99.825,0.373
+Texture Sample Utilization,register_pressure,31382,0.000,0.000,0.000,12.085,50.021,0.272
+Texture Write Limiter,register_pressure,31382,0.000,0.006,0.006,18.963,100.000,0.515
+Texture Write Utilization,register_pressure,31382,0.000,0.006,0.006,17.997,100.000,0.500
+Top Performance Limiter,register_pressure,31379,0.000,0.483,0.484,39.628,100.000,1.340
+Total Occupancy,register_pressure,24495,0.000,0.117,0.141,60.113,100.016,1.406
+Vertex Occupancy,register_pressure,31382,0.000,0.000,0.000,0.026,0.453,0.002
+ALU Limiter,threadgroup_heavy,31624,0.000,0.106,0.107,15.759,92.345,0.569
+ALU Utilization,threadgroup_heavy,31624,0.000,0.105,0.106,14.953,81.170,0.514
+Buffer Load Utilization,threadgroup_heavy,31624,0.000,0.003,0.003,0.113,1.648,0.006
+Buffer Read Limiter,threadgroup_heavy,31624,0.000,0.003,0.003,0.113,1.648,0.006
+Buffer Store Utilization,threadgroup_heavy,31624,0.000,0.018,0.018,0.018,0.387,0.012
+Buffer Write Limiter,threadgroup_heavy,31624,0.000,0.018,0.018,0.018,0.387,0.012
+Compute Occupancy,threadgroup_heavy,31624,0.000,0.216,0.234,0.392,5.606,0.167
+F16 Utilization,threadgroup_heavy,31624,0.000,0.000,0.000,2.777,25.632,0.126
+F32 Utilization,threadgroup_heavy,31624,0.000,0.000,0.000,2.745,23.325,0.081
+Fragment Interp Limiter,threadgroup_heavy,31624,0.000,0.000,0.000,2.799,25.516,0.112
+Fragment Interp Utilization,threadgroup_heavy,31624,0.000,0.000,0.000,1.723,18.684,0.071
+Fragment Occupancy,threadgroup_heavy,31624,0.000,0.000,0.000,34.046,100.000,0.862
+GPU Read Bandwidth,threadgroup_heavy,31624,0.000,0.024,0.024,6.497,39.574,0.249
+GPU Write Bandwidth,threadgroup_heavy,31624,0.000,0.049,0.049,4.322,33.511,0.184
+LLC Limiter,threadgroup_heavy,31624,0.000,0.188,0.192,8.158,53.176,0.420
+LLC Utilization,threadgroup_heavy,31624,0.000,0.188,0.192,7.595,35.910,0.354
+MMU Limiter,threadgroup_heavy,31624,0.000,0.025,0.036,5.457,42.240,0.240
+MMU Utilization,threadgroup_heavy,31624,0.000,0.025,0.036,5.286,33.910,0.216
+Partial Renders,threadgroup_heavy,31624,0.000,0.000,0.000,0.000,0.000,0.000
+TG/IB Load Limiter,threadgroup_heavy,31624,0.000,0.032,0.032,1.461,9.951,0.069
+TG/IB Load Utilization,threadgroup_heavy,31624,0.000,0.032,0.032,1.115,9.315,0.062
+TG/IB Store Limiter,threadgroup_heavy,31624,0.000,0.032,0.032,1.461,9.951,0.069
+TG/IB Store Utilization,threadgroup_heavy,31624,0.000,0.018,0.018,4.827,17.694,0.130
+Texture Cache Limiter,threadgroup_heavy,31624,0.000,0.000,0.000,8.034,96.262,0.295
+Texture Filtering Limiter,threadgroup_heavy,31624,0.000,0.000,0.000,11.623,50.016,0.289
+Texture Sample Limiter,threadgroup_heavy,31624,0.000,0.000,0.000,13.924,98.997,0.434
+Texture Sample Utilization,threadgroup_heavy,31624,0.000,0.000,0.000,11.208,50.014,0.286
+Texture Write Limiter,threadgroup_heavy,31624,0.000,0.006,0.006,18.885,100.000,0.490
+Texture Write Utilization,threadgroup_heavy,31624,0.000,0.006,0.006,16.871,99.938,0.441
+Top Performance Limiter,threadgroup_heavy,31621,0.000,0.188,0.192,31.112,100.000,0.932
+Total Occupancy,threadgroup_heavy,23159,0.000,0.222,0.367,52.189,100.058,1.407
+Vertex Occupancy,threadgroup_heavy,31624,0.000,0.000,0.000,0.023,0.870,0.001
+ALU Limiter,threadgroup_minimal,31055,0.000,0.285,0.286,0.559,92.173,0.423
+ALU Utilization,threadgroup_minimal,31055,0.000,0.274,0.274,0.513,81.138,0.392
+Buffer Load Utilization,threadgroup_minimal,31055,0.000,0.005,0.005,0.034,1.065,0.006
+Buffer Read Limiter,threadgroup_minimal,31055,0.000,0.005,0.005,0.034,1.072,0.006
+Buffer Store Utilization,threadgroup_minimal,31055,0.000,0.018,0.018,0.018,0.387,0.014
+Buffer Write Limiter,threadgroup_minimal,31055,0.000,0.018,0.018,0.018,0.388,0.014
+Compute Occupancy,threadgroup_minimal,31055,0.000,0.080,0.098,0.251,5.373,0.074
+F16 Utilization,threadgroup_minimal,31055,0.000,0.000,0.000,0.063,25.549,0.056
+F32 Utilization,threadgroup_minimal,31055,0.000,0.000,0.000,0.141,23.010,0.032
+Fragment Interp Limiter,threadgroup_minimal,31055,0.000,0.000,0.000,0.084,25.074,0.049
+Fragment Interp Utilization,threadgroup_minimal,31055,0.000,0.000,0.000,0.022,18.569,0.032
+Fragment Occupancy,threadgroup_minimal,31055,0.000,0.000,0.000,0.760,98.486,0.296
+GPU Read Bandwidth,threadgroup_minimal,31055,0.000,0.027,0.027,0.549,33.466,0.111
+GPU Write Bandwidth,threadgroup_minimal,31055,0.000,0.049,0.049,0.714,26.117,0.097
+LLC Limiter,threadgroup_minimal,31055,0.000,0.120,0.122,0.913,40.531,0.197
+LLC Utilization,threadgroup_minimal,31055,0.000,0.120,0.122,0.913,27.097,0.180
+MMU Limiter,threadgroup_minimal,31055,0.000,0.034,0.037,0.724,27.437,0.108
+MMU Utilization,threadgroup_minimal,31055,0.000,0.034,0.037,0.721,25.671,0.103
+Partial Renders,threadgroup_minimal,31055,0.000,0.000,0.000,0.000,0.000,0.000
+TG/IB Load Limiter,threadgroup_minimal,31055,0.000,0.009,0.009,0.023,9.774,0.029
+TG/IB Load Utilization,threadgroup_minimal,31055,0.000,0.009,0.009,0.020,9.280,0.026
+TG/IB Store Limiter,threadgroup_minimal,31055,0.000,0.009,0.009,0.023,9.774,0.029
+TG/IB Store Utilization,threadgroup_minimal,31055,0.000,0.005,0.005,0.113,14.117,0.050
+Texture Cache Limiter,threadgroup_minimal,31055,0.000,0.000,0.000,0.377,75.243,0.079
+Texture Filtering Limiter,threadgroup_minimal,31055,0.000,0.000,0.000,0.335,49.722,0.113
+Texture Sample Limiter,threadgroup_minimal,31055,0.000,0.000,0.000,0.597,97.968,0.138
+Texture Sample Utilization,threadgroup_minimal,31055,0.000,0.000,0.000,0.364,49.799,0.111
+Texture Write Limiter,threadgroup_minimal,31055,0.000,0.006,0.006,0.718,99.243,0.169
+Texture Write Utilization,threadgroup_minimal,31055,0.000,0.006,0.006,0.687,99.243,0.157
+Top Performance Limiter,threadgroup_minimal,31052,0.000,0.285,0.286,1.128,99.243,0.493
+Total Occupancy,threadgroup_minimal,23755,0.000,0.086,0.099,9.944,98.494,0.484
+Vertex Occupancy,threadgroup_minimal,31055,0.000,0.000,0.000,0.002,0.308,0.001

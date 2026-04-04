@@ -1,0 +1,497 @@
+{
+  "run_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856",
+  "total_steps": 61,
+  "ok": 17,
+  "fail": 1,
+  "skipped_phase": 43,
+  "steps": [
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "1",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "sudo_prime",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/01_sudo_prime"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "2",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "sudo_keepalive_start",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/02_sudo_keepalive_start"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "3",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "machine_stamp",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/03_machine_stamp"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "4",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "tool_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/04_tool_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "5",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "package_inventory",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/05_package_inventory"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "6",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "capabilities_json",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/06_capabilities_json"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "7",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cpu_family_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/07_cpu_family_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "8",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cpu_probe_inventory",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/08_cpu_probe_inventory"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "9",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "compile_matrix_define",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/09_compile_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "10",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "build_cpu_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/10_build_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "11",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "disassemble_cpu_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/11_disassemble_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "12",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "llvm_mca_cpu_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/12_llvm_mca_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "13",
+      "status": "ok",
+      "phase": "C",
+      "name": "cpu_baseline_timing",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/13_cpu_baseline_timing"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:48:56Z",
+      "step": "14",
+      "status": "fail",
+      "phase": "C",
+      "name": "hyperfine_cpu_timing",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/14_hyperfine_cpu_timing"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:00Z",
+      "step": "15",
+      "status": "ok",
+      "phase": "C",
+      "name": "xctrace_cpu_profile",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/15_xctrace_cpu_profile"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:02Z",
+      "step": "16",
+      "status": "ok",
+      "phase": "C",
+      "name": "dtrace_dtruss_cpu",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/16_dtrace_dtruss_cpu"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:08Z",
+      "step": "17",
+      "status": "ok",
+      "phase": "C",
+      "name": "powermetrics_cpu",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/17_powermetrics_cpu"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:09Z",
+      "step": "18",
+      "status": "ok",
+      "phase": "C",
+      "name": "cpu_diagnostics",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/18_cpu_diagnostics"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:10Z",
+      "step": "19",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_host_harness_build",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/19_metal_host_harness_build"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:10Z",
+      "step": "20",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_variant_matrix_define",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/20_metal_variant_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:13Z",
+      "step": "21",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_compile_variants",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/21_metal_compile_variants"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:13Z",
+      "step": "22",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_correctness",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/22_metal_correctness"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:14Z",
+      "step": "23",
+      "status": "ok",
+      "phase": "D",
+      "name": "metal_timing_sweep",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/23_metal_timing_sweep"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:14Z",
+      "step": "24",
+      "status": "ok",
+      "phase": "D",
+      "name": "publish_metal_matrix",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/24_publish_metal_matrix"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:49:30Z",
+      "step": "25",
+      "status": "ok",
+      "phase": "E",
+      "name": "xctrace_gpu_baseline",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/25_xctrace_gpu_baseline"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:50:27Z",
+      "step": "26",
+      "status": "ok",
+      "phase": "E",
+      "name": "xctrace_gpu_compare",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/26_xctrace_gpu_compare"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:52:45Z",
+      "step": "27",
+      "status": "ok",
+      "phase": "E",
+      "name": "extract_xctrace_metrics",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/27_extract_xctrace_metrics"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:20Z",
+      "step": "28",
+      "status": "ok",
+      "phase": "E",
+      "name": "host_overhead_capture",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/28_host_overhead_capture"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:25Z",
+      "step": "29",
+      "status": "ok",
+      "phase": "E",
+      "name": "powermetrics_gpu",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/29_powermetrics_gpu"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "30",
+      "status": "ok",
+      "phase": "E",
+      "name": "counter_latency_report",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/30_counter_latency_report"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "31",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "venv_rebuild",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/31_venv_rebuild"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "32",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "neural_probe_all",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/32_neural_probe_all"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "33",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "model_family_define",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/33_model_family_define"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "34",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "coreml_placement_sweep",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/34_coreml_placement_sweep"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "35",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "torch_cpu_vs_mps",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/35_torch_cpu_vs_mps"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "36",
+      "status": "skipped_phase",
+      "phase": "F",
+      "name": "mlx_jax_checks",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/36_mlx_jax_checks"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "37",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "consolidate_manifest",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/37_consolidate_manifest"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "38",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "quality_gates",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/38_quality_gates"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "39",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "rerun_failed_snapshot",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/39_rerun_failed_snapshot"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "40",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "synthesis_report",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/40_synthesis_report"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "41",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "linkage_notes",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/41_linkage_notes"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "42",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "sudo_teardown",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/42_sudo_teardown"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "43",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "postrun_refresh_metrics",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/43_postrun_refresh_metrics"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "44",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "compare_density_prev_bundle",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/44_compare_density_prev_bundle"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "45",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "rank_metal_variants",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/45_rank_metal_variants"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "46",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "fs_usage_signal_summary",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/46_fs_usage_signal_summary"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "47",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "host_capture_summary",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/47_host_capture_summary"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "48",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "leaks_vmmap_summary",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/48_leaks_vmmap_summary"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "49",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "threadgroup_minimal_summary",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/49_threadgroup_minimal_summary"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "50",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "counter_latency_report_refresh",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/50_counter_latency_report_refresh"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "51",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "run_summary_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/51_run_summary_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "52",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "keepalive_summary_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/52_keepalive_summary_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "53",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "analysis_next_steps_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/53_analysis_next_steps_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "54",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "bundle_index_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/54_bundle_index_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "55",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "bundle_sha256",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/55_bundle_sha256"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "56",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "create_bundle_tarball",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/56_create_bundle_tarball"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "57",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "promotion_notes_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/57_promotion_notes_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "58",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "linkage_notes_write",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/58_linkage_notes_write"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "59",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "quality_gates_refresh",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/59_quality_gates_refresh"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "60",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "summary_refresh",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/60_summary_refresh"
+    },
+    {
+      "timestamp_utc": "2026-03-31T03:53:26Z",
+      "step": "61",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "phase_h_wrapup",
+      "artifact_dir": "/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260330_204856/steps/61_phase_h_wrapup"
+    }
+  ]
+}

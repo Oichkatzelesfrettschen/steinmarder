@@ -1,0 +1,2 @@
+command,mean,stddev,median,user,system,min,max
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_cachecheck_20260330_142148/cpu_bins/sm_apple_cpu_latency_O3 --iters 10000 --csv,0.003706011759999999,0.0008689885281041978,0.00351362896,0.00231354,0.0009273200000000006,0.002934835959999999,0.00517404496

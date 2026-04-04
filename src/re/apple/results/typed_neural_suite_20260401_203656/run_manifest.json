@@ -1,0 +1,529 @@
+{
+  "run_dir": "src/apple_re/results/typed_neural_suite_20260401_203656",
+  "total_steps": 65,
+  "ok": 7,
+  "fail": 0,
+  "skipped_phase": 58,
+  "steps": [
+    {
+      "timestamp_utc": "2026-04-02T03:37:10Z",
+      "step": "1",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "sudo_prime",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/01_sudo_prime"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:10Z",
+      "step": "2",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "sudo_keepalive_start",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/02_sudo_keepalive_start"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "3",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "machine_stamp",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/03_machine_stamp"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "4",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "tool_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/04_tool_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "5",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "package_inventory",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/05_package_inventory"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "6",
+      "status": "skipped_phase",
+      "phase": "A",
+      "name": "capabilities_json",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/06_capabilities_json"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "7",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cpu_family_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/07_cpu_family_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "8",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cpu_probe_inventory",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/08_cpu_probe_inventory"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "9",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "compile_matrix_define",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/09_compile_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "10",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "build_cpu_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/10_build_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "11",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "disassemble_cpu_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/11_disassemble_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "12",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "llvm_mca_cpu_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/12_llvm_mca_cpu_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "13",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cache_pressure_family_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/13_cache_pressure_family_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "14",
+      "status": "skipped_phase",
+      "phase": "B",
+      "name": "cache_pressure_artifacts",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/14_cache_pressure_artifacts"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "15",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "cpu_baseline_timing",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/15_cpu_baseline_timing"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "16",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "hyperfine_cpu_timing",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/16_hyperfine_cpu_timing"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "17",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "xctrace_cpu_profile",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/17_xctrace_cpu_profile"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "18",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "dtrace_dtruss_cpu",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/18_dtrace_dtruss_cpu"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "19",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "powermetrics_cpu",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/19_powermetrics_cpu"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "20",
+      "status": "skipped_phase",
+      "phase": "C",
+      "name": "cpu_diagnostics",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/20_cpu_diagnostics"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "21",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "metal_host_harness_build",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/21_metal_host_harness_build"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "22",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "metal_variant_matrix_define",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/22_metal_variant_matrix_define"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "23",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "metal_compile_variants",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/23_metal_compile_variants"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "24",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "metal_correctness",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/24_metal_correctness"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "25",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "metal_timing_sweep",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/25_metal_timing_sweep"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "26",
+      "status": "skipped_phase",
+      "phase": "D",
+      "name": "publish_metal_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/26_publish_metal_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "27",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "xctrace_gpu_baseline",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/27_xctrace_gpu_baseline"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "28",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "xctrace_gpu_compare",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/28_xctrace_gpu_compare"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "29",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "extract_xctrace_metrics",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/29_extract_xctrace_metrics"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "30",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "host_overhead_capture",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/30_host_overhead_capture"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "31",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "powermetrics_gpu",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/31_powermetrics_gpu"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:11Z",
+      "step": "32",
+      "status": "skipped_phase",
+      "phase": "E",
+      "name": "counter_latency_report",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/32_counter_latency_report"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:37:39Z",
+      "step": "33",
+      "status": "ok",
+      "phase": "F",
+      "name": "venv_rebuild",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/33_venv_rebuild"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:38:04Z",
+      "step": "34",
+      "status": "ok",
+      "phase": "F",
+      "name": "neural_probe_all",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/34_neural_probe_all"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:38:04Z",
+      "step": "35",
+      "status": "ok",
+      "phase": "F",
+      "name": "model_family_define",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/35_model_family_define"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:52:48Z",
+      "step": "36",
+      "status": "ok",
+      "phase": "F",
+      "name": "neural_typed_matrix",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/36_neural_typed_matrix"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:01Z",
+      "step": "37",
+      "status": "ok",
+      "phase": "F",
+      "name": "coreml_placement_sweep",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/37_coreml_placement_sweep"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "38",
+      "status": "ok",
+      "phase": "F",
+      "name": "torch_cpu_vs_mps",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/38_torch_cpu_vs_mps"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "39",
+      "status": "ok",
+      "phase": "F",
+      "name": "mlx_jax_checks",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/39_mlx_jax_checks"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "40",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "consolidate_manifest",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/40_consolidate_manifest"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "41",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "quality_gates",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/41_quality_gates"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "42",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "rerun_failed_snapshot",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/42_rerun_failed_snapshot"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "43",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "synthesis_report",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/43_synthesis_report"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "44",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "linkage_notes",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/44_linkage_notes"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "45",
+      "status": "skipped_phase",
+      "phase": "G",
+      "name": "sudo_teardown",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/45_sudo_teardown"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "46",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "postrun_refresh_metrics",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/46_postrun_refresh_metrics"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "47",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "mnemonic_synthesis",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/47_mnemonic_synthesis"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "48",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "compare_density_prev_bundle",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/48_compare_density_prev_bundle"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "49",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "rank_metal_variants",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/49_rank_metal_variants"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "50",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "fs_usage_signal_summary",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/50_fs_usage_signal_summary"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "51",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "host_capture_summary",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/51_host_capture_summary"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "52",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "leaks_vmmap_summary",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/52_leaks_vmmap_summary"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "53",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "threadgroup_minimal_summary",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/53_threadgroup_minimal_summary"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "54",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "counter_latency_report_refresh",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/54_counter_latency_report_refresh"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "55",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "run_summary_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/55_run_summary_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "56",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "keepalive_summary_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/56_keepalive_summary_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "57",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "analysis_next_steps_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/57_analysis_next_steps_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "58",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "bundle_index_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/58_bundle_index_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "59",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "bundle_sha256",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/59_bundle_sha256"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "60",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "create_bundle_tarball",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/60_create_bundle_tarball"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "61",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "promotion_notes_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/61_promotion_notes_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "62",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "linkage_notes_write",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/62_linkage_notes_write"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "63",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "quality_gates_refresh",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/63_quality_gates_refresh"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:02Z",
+      "step": "64",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "summary_refresh",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/64_summary_refresh"
+    },
+    {
+      "timestamp_utc": "2026-04-02T03:53:03Z",
+      "step": "65",
+      "status": "skipped_phase",
+      "phase": "H",
+      "name": "phase_h_wrapup",
+      "artifact_dir": "src/apple_re/results/typed_neural_suite_20260401_203656/steps/65_phase_h_wrapup"
+    }
+  ]
+}

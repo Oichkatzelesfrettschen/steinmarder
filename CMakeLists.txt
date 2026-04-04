@@ -219,8 +219,28 @@ if(Vulkan_FOUND)
     target_include_directories(test_reactor_thermal PRIVATE ${SM_INCLUDE_DIRS})
     target_link_libraries(test_reactor_thermal PRIVATE sm_core Vulkan::Vulkan ${PLATFORM_LIBS})
 
+    # TeraScale Vulkan probe host
+    add_executable(terascale_vk_probe_host
+        src/re/r600/host/terascale_vk_probe_host.c
+    )
+    target_link_libraries(terascale_vk_probe_host PRIVATE Vulkan::Vulkan ${PLATFORM_LIBS})
+
 else()
     message(STATUS "Vulkan NOT found — skipping GPU targets")
+endif()
+
+# ════════════════════════════════════════════════════════════════
+# OpenCL probe host (only if OpenCL is found)
+# ════════════════════════════════════════════════════════════════
+find_package(OpenCL QUIET)
+if(OpenCL_FOUND)
+    message(STATUS "OpenCL found — building TeraScale OpenCL probe host")
+    add_executable(terascale_opencl_probe_host
+        src/re/r600/host/terascale_opencl_probe_host.c
+    )
+    target_link_libraries(terascale_opencl_probe_host PRIVATE OpenCL::OpenCL ${PLATFORM_LIBS})
+else()
+    message(STATUS "OpenCL NOT found — skipping TeraScale OpenCL probe host")
 endif()
 
 # ════════════════════════════════════════════════════════════════
@@ -271,7 +291,7 @@ endif()
 # ════════════════════════════════════════════════════════════════
 option(SM_ENABLE_APPLE_RE "Build Apple Silicon reverse-engineering helpers" ON)
 if(APPLE AND SM_ENABLE_APPLE_RE)
-    add_subdirectory(src/apple_re)
+    add_subdirectory(src/re/apple)
 else()
     message(STATUS "Apple RE helpers skipped")
 endif()

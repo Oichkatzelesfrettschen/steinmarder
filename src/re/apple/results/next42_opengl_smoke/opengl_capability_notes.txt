@@ -1,0 +1,2 @@
+legacy_api=yes
+notes=macOS OpenGL remains a legacy API; use this lane mainly for fragment/texture-pressure analogues, not compute claims.

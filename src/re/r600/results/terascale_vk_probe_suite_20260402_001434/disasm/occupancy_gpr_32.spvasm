@@ -1,0 +1,709 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 11
+; Bound: 542
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
+               OpExecutionMode %main LocalSize 64 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %index "index"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %seed "seed"
+               OpName %a0 "a0"
+               OpName %a1 "a1"
+               OpName %a2 "a2"
+               OpName %a3 "a3"
+               OpName %a4 "a4"
+               OpName %a5 "a5"
+               OpName %a6 "a6"
+               OpName %a7 "a7"
+               OpName %a8 "a8"
+               OpName %a9 "a9"
+               OpName %a10 "a10"
+               OpName %a11 "a11"
+               OpName %a12 "a12"
+               OpName %a13 "a13"
+               OpName %a14 "a14"
+               OpName %a15 "a15"
+               OpName %a16 "a16"
+               OpName %a17 "a17"
+               OpName %a18 "a18"
+               OpName %a19 "a19"
+               OpName %a20 "a20"
+               OpName %a21 "a21"
+               OpName %a22 "a22"
+               OpName %a23 "a23"
+               OpName %a24 "a24"
+               OpName %a25 "a25"
+               OpName %a26 "a26"
+               OpName %a27 "a27"
+               OpName %a28 "a28"
+               OpName %a29 "a29"
+               OpName %a30 "a30"
+               OpName %a31 "a31"
+               OpName %iter "iter"
+               OpName %sum "sum"
+               OpName %OutputBuffer "OutputBuffer"
+               OpMemberName %OutputBuffer 0 "values"
+               OpName %outbuf "outbuf"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpDecorate %_runtimearr_float ArrayStride 4
+               OpDecorate %OutputBuffer BufferBlock
+               OpMemberDecorate %OutputBuffer 0 Offset 0
+               OpDecorate %outbuf Binding 0
+               OpDecorate %outbuf DescriptorSet 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+      %float = OpTypeFloat 32
+%_ptr_Function_float = OpTypePointer Function %float
+    %float_1 = OpConstant %float 1
+%float_9_99999975en05 = OpConstant %float 9.99999975e-05
+    %float_2 = OpConstant %float 2
+%float_0_000199999995 = OpConstant %float 0.000199999995
+    %float_3 = OpConstant %float 3
+%float_0_000300000014 = OpConstant %float 0.000300000014
+    %float_4 = OpConstant %float 4
+%float_0_00039999999 = OpConstant %float 0.00039999999
+    %float_5 = OpConstant %float 5
+%float_0_000500000024 = OpConstant %float 0.000500000024
+    %float_6 = OpConstant %float 6
+%float_0_000600000028 = OpConstant %float 0.000600000028
+    %float_7 = OpConstant %float 7
+%float_0_000699999975 = OpConstant %float 0.000699999975
+    %float_8 = OpConstant %float 8
+%float_0_00079999998 = OpConstant %float 0.00079999998
+    %float_9 = OpConstant %float 9
+%float_0_000899999985 = OpConstant %float 0.000899999985
+   %float_10 = OpConstant %float 10
+%float_0_00100000005 = OpConstant %float 0.00100000005
+   %float_11 = OpConstant %float 11
+%float_0_00109999999 = OpConstant %float 0.00109999999
+   %float_12 = OpConstant %float 12
+%float_0_00120000006 = OpConstant %float 0.00120000006
+   %float_13 = OpConstant %float 13
+%float_0_0013 = OpConstant %float 0.0013
+   %float_14 = OpConstant %float 14
+%float_0_00139999995 = OpConstant %float 0.00139999995
+   %float_15 = OpConstant %float 15
+%float_0_00150000001 = OpConstant %float 0.00150000001
+   %float_16 = OpConstant %float 16
+%float_0_00159999996 = OpConstant %float 0.00159999996
+   %float_17 = OpConstant %float 17
+%float_0_00170000002 = OpConstant %float 0.00170000002
+   %float_18 = OpConstant %float 18
+%float_0_00179999997 = OpConstant %float 0.00179999997
+   %float_19 = OpConstant %float 19
+%float_0_00190000003 = OpConstant %float 0.00190000003
+   %float_20 = OpConstant %float 20
+%float_0_00200000009 = OpConstant %float 0.00200000009
+   %float_21 = OpConstant %float 21
+%float_0_00209999993 = OpConstant %float 0.00209999993
+   %float_22 = OpConstant %float 22
+%float_0_00219999999 = OpConstant %float 0.00219999999
+   %float_23 = OpConstant %float 23
+%float_0_00230000005 = OpConstant %float 0.00230000005
+   %float_24 = OpConstant %float 24
+%float_0_00240000011 = OpConstant %float 0.00240000011
+   %float_25 = OpConstant %float 25
+%float_0_00249999994 = OpConstant %float 0.00249999994
+   %float_26 = OpConstant %float 26
+%float_0_00260000001 = OpConstant %float 0.00260000001
+   %float_27 = OpConstant %float 27
+%float_0_00270000007 = OpConstant %float 0.00270000007
+   %float_28 = OpConstant %float 28
+%float_0_0027999999 = OpConstant %float 0.0027999999
+   %float_29 = OpConstant %float 29
+%float_0_00289999996 = OpConstant %float 0.00289999996
+   %float_30 = OpConstant %float 30
+%float_0_00300000003 = OpConstant %float 0.00300000003
+   %float_31 = OpConstant %float 31
+%float_0_00310000009 = OpConstant %float 0.00310000009
+   %float_32 = OpConstant %float 32
+%float_0_00319999992 = OpConstant %float 0.00319999992
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+    %int_256 = OpConstant %int 256
+       %bool = OpTypeBool
+%float_0_125 = OpConstant %float 0.125
+%float_0_0009765625 = OpConstant %float 0.0009765625
+%float_1_03125 = OpConstant %float 1.03125
+%float_0_140625 = OpConstant %float 0.140625
+%float_1_0625 = OpConstant %float 1.0625
+%float_0_15625 = OpConstant %float 0.15625
+%float_1_09375 = OpConstant %float 1.09375
+%float_0_171875 = OpConstant %float 0.171875
+%float_1_125 = OpConstant %float 1.125
+%float_0_1875 = OpConstant %float 0.1875
+%float_1_15625 = OpConstant %float 1.15625
+%float_1_1875 = OpConstant %float 1.1875
+      %int_1 = OpConstant %int 1
+    %float_0 = OpConstant %float 0
+%_runtimearr_float = OpTypeRuntimeArray %float
+%OutputBuffer = OpTypeStruct %_runtimearr_float
+%_ptr_Uniform_OutputBuffer = OpTypePointer Uniform %OutputBuffer
+     %outbuf = OpVariable %_ptr_Uniform_OutputBuffer Uniform
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+    %uint_64 = OpConstant %uint 64
+     %uint_1 = OpConstant %uint 1
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_64 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_uint Function
+       %seed = OpVariable %_ptr_Function_float Function
+         %a0 = OpVariable %_ptr_Function_float Function
+         %a1 = OpVariable %_ptr_Function_float Function
+         %a2 = OpVariable %_ptr_Function_float Function
+         %a3 = OpVariable %_ptr_Function_float Function
+         %a4 = OpVariable %_ptr_Function_float Function
+         %a5 = OpVariable %_ptr_Function_float Function
+         %a6 = OpVariable %_ptr_Function_float Function
+         %a7 = OpVariable %_ptr_Function_float Function
+         %a8 = OpVariable %_ptr_Function_float Function
+         %a9 = OpVariable %_ptr_Function_float Function
+        %a10 = OpVariable %_ptr_Function_float Function
+        %a11 = OpVariable %_ptr_Function_float Function
+        %a12 = OpVariable %_ptr_Function_float Function
+        %a13 = OpVariable %_ptr_Function_float Function
+        %a14 = OpVariable %_ptr_Function_float Function
+        %a15 = OpVariable %_ptr_Function_float Function
+        %a16 = OpVariable %_ptr_Function_float Function
+        %a17 = OpVariable %_ptr_Function_float Function
+        %a18 = OpVariable %_ptr_Function_float Function
+        %a19 = OpVariable %_ptr_Function_float Function
+        %a20 = OpVariable %_ptr_Function_float Function
+        %a21 = OpVariable %_ptr_Function_float Function
+        %a22 = OpVariable %_ptr_Function_float Function
+        %a23 = OpVariable %_ptr_Function_float Function
+        %a24 = OpVariable %_ptr_Function_float Function
+        %a25 = OpVariable %_ptr_Function_float Function
+        %a26 = OpVariable %_ptr_Function_float Function
+        %a27 = OpVariable %_ptr_Function_float Function
+        %a28 = OpVariable %_ptr_Function_float Function
+        %a29 = OpVariable %_ptr_Function_float Function
+        %a30 = OpVariable %_ptr_Function_float Function
+        %a31 = OpVariable %_ptr_Function_float Function
+       %iter = OpVariable %_ptr_Function_int Function
+        %sum = OpVariable %_ptr_Function_float Function
+         %14 = OpAccessChain %_ptr_Input_uint %gl_GlobalInvocationID %uint_0
+         %15 = OpLoad %uint %14
+               OpStore %index %15
+         %19 = OpLoad %uint %index
+         %20 = OpConvertUToF %float %19
+               OpStore %seed %20
+         %23 = OpLoad %float %seed
+         %25 = OpFMul %float %23 %float_9_99999975en05
+         %26 = OpFAdd %float %float_1 %25
+               OpStore %a0 %26
+         %29 = OpLoad %float %seed
+         %31 = OpFMul %float %29 %float_0_000199999995
+         %32 = OpFAdd %float %float_2 %31
+               OpStore %a1 %32
+         %35 = OpLoad %float %seed
+         %37 = OpFMul %float %35 %float_0_000300000014
+         %38 = OpFAdd %float %float_3 %37
+               OpStore %a2 %38
+         %41 = OpLoad %float %seed
+         %43 = OpFMul %float %41 %float_0_00039999999
+         %44 = OpFAdd %float %float_4 %43
+               OpStore %a3 %44
+         %47 = OpLoad %float %seed
+         %49 = OpFMul %float %47 %float_0_000500000024
+         %50 = OpFAdd %float %float_5 %49
+               OpStore %a4 %50
+         %53 = OpLoad %float %seed
+         %55 = OpFMul %float %53 %float_0_000600000028
+         %56 = OpFAdd %float %float_6 %55
+               OpStore %a5 %56
+         %59 = OpLoad %float %seed
+         %61 = OpFMul %float %59 %float_0_000699999975
+         %62 = OpFAdd %float %float_7 %61
+               OpStore %a6 %62
+         %65 = OpLoad %float %seed
+         %67 = OpFMul %float %65 %float_0_00079999998
+         %68 = OpFAdd %float %float_8 %67
+               OpStore %a7 %68
+         %71 = OpLoad %float %seed
+         %73 = OpFMul %float %71 %float_0_000899999985
+         %74 = OpFAdd %float %float_9 %73
+               OpStore %a8 %74
+         %77 = OpLoad %float %seed
+         %79 = OpFMul %float %77 %float_0_00100000005
+         %80 = OpFAdd %float %float_10 %79
+               OpStore %a9 %80
+         %83 = OpLoad %float %seed
+         %85 = OpFMul %float %83 %float_0_00109999999
+         %86 = OpFAdd %float %float_11 %85
+               OpStore %a10 %86
+         %89 = OpLoad %float %seed
+         %91 = OpFMul %float %89 %float_0_00120000006
+         %92 = OpFAdd %float %float_12 %91
+               OpStore %a11 %92
+         %95 = OpLoad %float %seed
+         %97 = OpFMul %float %95 %float_0_0013
+         %98 = OpFAdd %float %float_13 %97
+               OpStore %a12 %98
+        %101 = OpLoad %float %seed
+        %103 = OpFMul %float %101 %float_0_00139999995
+        %104 = OpFAdd %float %float_14 %103
+               OpStore %a13 %104
+        %107 = OpLoad %float %seed
+        %109 = OpFMul %float %107 %float_0_00150000001
+        %110 = OpFAdd %float %float_15 %109
+               OpStore %a14 %110
+        %113 = OpLoad %float %seed
+        %115 = OpFMul %float %113 %float_0_00159999996
+        %116 = OpFAdd %float %float_16 %115
+               OpStore %a15 %116
+        %119 = OpLoad %float %seed
+        %121 = OpFMul %float %119 %float_0_00170000002
+        %122 = OpFAdd %float %float_17 %121
+               OpStore %a16 %122
+        %125 = OpLoad %float %seed
+        %127 = OpFMul %float %125 %float_0_00179999997
+        %128 = OpFAdd %float %float_18 %127
+               OpStore %a17 %128
+        %131 = OpLoad %float %seed
+        %133 = OpFMul %float %131 %float_0_00190000003
+        %134 = OpFAdd %float %float_19 %133
+               OpStore %a18 %134
+        %137 = OpLoad %float %seed
+        %139 = OpFMul %float %137 %float_0_00200000009
+        %140 = OpFAdd %float %float_20 %139
+               OpStore %a19 %140
+        %143 = OpLoad %float %seed
+        %145 = OpFMul %float %143 %float_0_00209999993
+        %146 = OpFAdd %float %float_21 %145
+               OpStore %a20 %146
+        %149 = OpLoad %float %seed
+        %151 = OpFMul %float %149 %float_0_00219999999
+        %152 = OpFAdd %float %float_22 %151
+               OpStore %a21 %152
+        %155 = OpLoad %float %seed
+        %157 = OpFMul %float %155 %float_0_00230000005
+        %158 = OpFAdd %float %float_23 %157
+               OpStore %a22 %158
+        %161 = OpLoad %float %seed
+        %163 = OpFMul %float %161 %float_0_00240000011
+        %164 = OpFAdd %float %float_24 %163
+               OpStore %a23 %164
+        %167 = OpLoad %float %seed
+        %169 = OpFMul %float %167 %float_0_00249999994
+        %170 = OpFAdd %float %float_25 %169
+               OpStore %a24 %170
+        %173 = OpLoad %float %seed
+        %175 = OpFMul %float %173 %float_0_00260000001
+        %176 = OpFAdd %float %float_26 %175
+               OpStore %a25 %176
+        %179 = OpLoad %float %seed
+        %181 = OpFMul %float %179 %float_0_00270000007
+        %182 = OpFAdd %float %float_27 %181
+               OpStore %a26 %182
+        %185 = OpLoad %float %seed
+        %187 = OpFMul %float %185 %float_0_0027999999
+        %188 = OpFAdd %float %float_28 %187
+               OpStore %a27 %188
+        %191 = OpLoad %float %seed
+        %193 = OpFMul %float %191 %float_0_00289999996
+        %194 = OpFAdd %float %float_29 %193
+               OpStore %a28 %194
+        %197 = OpLoad %float %seed
+        %199 = OpFMul %float %197 %float_0_00300000003
+        %200 = OpFAdd %float %float_30 %199
+               OpStore %a29 %200
+        %203 = OpLoad %float %seed
+        %205 = OpFMul %float %203 %float_0_00310000009
+        %206 = OpFAdd %float %float_31 %205
+               OpStore %a30 %206
+        %209 = OpLoad %float %seed
+        %211 = OpFMul %float %209 %float_0_00319999992
+        %212 = OpFAdd %float %float_32 %211
+               OpStore %a31 %212
+               OpStore %iter %int_0
+               OpBranch %217
+        %217 = OpLabel
+               OpLoopMerge %219 %220 None
+               OpBranch %221
+        %221 = OpLabel
+        %222 = OpLoad %int %iter
+        %225 = OpSLessThan %bool %222 %int_256
+               OpBranchConditional %225 %218 %219
+        %218 = OpLabel
+        %226 = OpLoad %float %a0
+        %227 = OpFMul %float %226 %float_1
+        %229 = OpFAdd %float %227 %float_0_125
+        %230 = OpLoad %float %a1
+        %232 = OpFMul %float %230 %float_0_0009765625
+        %233 = OpFAdd %float %229 %232
+               OpStore %a0 %233
+        %234 = OpLoad %float %a1
+        %236 = OpFMul %float %234 %float_1_03125
+        %238 = OpFAdd %float %236 %float_0_140625
+        %239 = OpLoad %float %a2
+        %240 = OpFMul %float %239 %float_0_0009765625
+        %241 = OpFAdd %float %238 %240
+               OpStore %a1 %241
+        %242 = OpLoad %float %a2
+        %244 = OpFMul %float %242 %float_1_0625
+        %246 = OpFAdd %float %244 %float_0_15625
+        %247 = OpLoad %float %a3
+        %248 = OpFMul %float %247 %float_0_0009765625
+        %249 = OpFAdd %float %246 %248
+               OpStore %a2 %249
+        %250 = OpLoad %float %a3
+        %252 = OpFMul %float %250 %float_1_09375
+        %254 = OpFAdd %float %252 %float_0_171875
+        %255 = OpLoad %float %a4
+        %256 = OpFMul %float %255 %float_0_0009765625
+        %257 = OpFAdd %float %254 %256
+               OpStore %a3 %257
+        %258 = OpLoad %float %a4
+        %260 = OpFMul %float %258 %float_1_125
+        %262 = OpFAdd %float %260 %float_0_1875
+        %263 = OpLoad %float %a5
+        %264 = OpFMul %float %263 %float_0_0009765625
+        %265 = OpFAdd %float %262 %264
+               OpStore %a4 %265
+        %266 = OpLoad %float %a5
+        %268 = OpFMul %float %266 %float_1_15625
+        %269 = OpFAdd %float %268 %float_0_125
+        %270 = OpLoad %float %a6
+        %271 = OpFMul %float %270 %float_0_0009765625
+        %272 = OpFAdd %float %269 %271
+               OpStore %a5 %272
+        %273 = OpLoad %float %a6
+        %275 = OpFMul %float %273 %float_1_1875
+        %276 = OpFAdd %float %275 %float_0_140625
+        %277 = OpLoad %float %a7
+        %278 = OpFMul %float %277 %float_0_0009765625
+        %279 = OpFAdd %float %276 %278
+               OpStore %a6 %279
+        %280 = OpLoad %float %a7
+        %281 = OpFMul %float %280 %float_1
+        %282 = OpFAdd %float %281 %float_0_15625
+        %283 = OpLoad %float %a8
+        %284 = OpFMul %float %283 %float_0_0009765625
+        %285 = OpFAdd %float %282 %284
+               OpStore %a7 %285
+        %286 = OpLoad %float %a8
+        %287 = OpFMul %float %286 %float_1_03125
+        %288 = OpFAdd %float %287 %float_0_171875
+        %289 = OpLoad %float %a9
+        %290 = OpFMul %float %289 %float_0_0009765625
+        %291 = OpFAdd %float %288 %290
+               OpStore %a8 %291
+        %292 = OpLoad %float %a9
+        %293 = OpFMul %float %292 %float_1_0625
+        %294 = OpFAdd %float %293 %float_0_1875
+        %295 = OpLoad %float %a10
+        %296 = OpFMul %float %295 %float_0_0009765625
+        %297 = OpFAdd %float %294 %296
+               OpStore %a9 %297
+        %298 = OpLoad %float %a10
+        %299 = OpFMul %float %298 %float_1_09375
+        %300 = OpFAdd %float %299 %float_0_125
+        %301 = OpLoad %float %a11
+        %302 = OpFMul %float %301 %float_0_0009765625
+        %303 = OpFAdd %float %300 %302
+               OpStore %a10 %303
+        %304 = OpLoad %float %a11
+        %305 = OpFMul %float %304 %float_1_125
+        %306 = OpFAdd %float %305 %float_0_140625
+        %307 = OpLoad %float %a12
+        %308 = OpFMul %float %307 %float_0_0009765625
+        %309 = OpFAdd %float %306 %308
+               OpStore %a11 %309
+        %310 = OpLoad %float %a12
+        %311 = OpFMul %float %310 %float_1_15625
+        %312 = OpFAdd %float %311 %float_0_15625
+        %313 = OpLoad %float %a13
+        %314 = OpFMul %float %313 %float_0_0009765625
+        %315 = OpFAdd %float %312 %314
+               OpStore %a12 %315
+        %316 = OpLoad %float %a13
+        %317 = OpFMul %float %316 %float_1_1875
+        %318 = OpFAdd %float %317 %float_0_171875
+        %319 = OpLoad %float %a14
+        %320 = OpFMul %float %319 %float_0_0009765625
+        %321 = OpFAdd %float %318 %320
+               OpStore %a13 %321
+        %322 = OpLoad %float %a14
+        %323 = OpFMul %float %322 %float_1
+        %324 = OpFAdd %float %323 %float_0_1875
+        %325 = OpLoad %float %a15
+        %326 = OpFMul %float %325 %float_0_0009765625
+        %327 = OpFAdd %float %324 %326
+               OpStore %a14 %327
+        %328 = OpLoad %float %a15
+        %329 = OpFMul %float %328 %float_1_03125
+        %330 = OpFAdd %float %329 %float_0_125
+        %331 = OpLoad %float %a16
+        %332 = OpFMul %float %331 %float_0_0009765625
+        %333 = OpFAdd %float %330 %332
+               OpStore %a15 %333
+        %334 = OpLoad %float %a16
+        %335 = OpFMul %float %334 %float_1_0625
+        %336 = OpFAdd %float %335 %float_0_140625
+        %337 = OpLoad %float %a17
+        %338 = OpFMul %float %337 %float_0_0009765625
+        %339 = OpFAdd %float %336 %338
+               OpStore %a16 %339
+        %340 = OpLoad %float %a17
+        %341 = OpFMul %float %340 %float_1_09375
+        %342 = OpFAdd %float %341 %float_0_15625
+        %343 = OpLoad %float %a18
+        %344 = OpFMul %float %343 %float_0_0009765625
+        %345 = OpFAdd %float %342 %344
+               OpStore %a17 %345
+        %346 = OpLoad %float %a18
+        %347 = OpFMul %float %346 %float_1_125
+        %348 = OpFAdd %float %347 %float_0_171875
+        %349 = OpLoad %float %a19
+        %350 = OpFMul %float %349 %float_0_0009765625
+        %351 = OpFAdd %float %348 %350
+               OpStore %a18 %351
+        %352 = OpLoad %float %a19
+        %353 = OpFMul %float %352 %float_1_15625
+        %354 = OpFAdd %float %353 %float_0_1875
+        %355 = OpLoad %float %a20
+        %356 = OpFMul %float %355 %float_0_0009765625
+        %357 = OpFAdd %float %354 %356
+               OpStore %a19 %357
+        %358 = OpLoad %float %a20
+        %359 = OpFMul %float %358 %float_1_1875
+        %360 = OpFAdd %float %359 %float_0_125
+        %361 = OpLoad %float %a21
+        %362 = OpFMul %float %361 %float_0_0009765625
+        %363 = OpFAdd %float %360 %362
+               OpStore %a20 %363
+        %364 = OpLoad %float %a21
+        %365 = OpFMul %float %364 %float_1
+        %366 = OpFAdd %float %365 %float_0_140625
+        %367 = OpLoad %float %a22
+        %368 = OpFMul %float %367 %float_0_0009765625
+        %369 = OpFAdd %float %366 %368
+               OpStore %a21 %369
+        %370 = OpLoad %float %a22
+        %371 = OpFMul %float %370 %float_1_03125
+        %372 = OpFAdd %float %371 %float_0_15625
+        %373 = OpLoad %float %a23
+        %374 = OpFMul %float %373 %float_0_0009765625
+        %375 = OpFAdd %float %372 %374
+               OpStore %a22 %375
+        %376 = OpLoad %float %a23
+        %377 = OpFMul %float %376 %float_1_0625
+        %378 = OpFAdd %float %377 %float_0_171875
+        %379 = OpLoad %float %a24
+        %380 = OpFMul %float %379 %float_0_0009765625
+        %381 = OpFAdd %float %378 %380
+               OpStore %a23 %381
+        %382 = OpLoad %float %a24
+        %383 = OpFMul %float %382 %float_1_09375
+        %384 = OpFAdd %float %383 %float_0_1875
+        %385 = OpLoad %float %a25
+        %386 = OpFMul %float %385 %float_0_0009765625
+        %387 = OpFAdd %float %384 %386
+               OpStore %a24 %387
+        %388 = OpLoad %float %a25
+        %389 = OpFMul %float %388 %float_1_125
+        %390 = OpFAdd %float %389 %float_0_125
+        %391 = OpLoad %float %a26
+        %392 = OpFMul %float %391 %float_0_0009765625
+        %393 = OpFAdd %float %390 %392
+               OpStore %a25 %393
+        %394 = OpLoad %float %a26
+        %395 = OpFMul %float %394 %float_1_15625
+        %396 = OpFAdd %float %395 %float_0_140625
+        %397 = OpLoad %float %a27
+        %398 = OpFMul %float %397 %float_0_0009765625
+        %399 = OpFAdd %float %396 %398
+               OpStore %a26 %399
+        %400 = OpLoad %float %a27
+        %401 = OpFMul %float %400 %float_1_1875
+        %402 = OpFAdd %float %401 %float_0_15625
+        %403 = OpLoad %float %a28
+        %404 = OpFMul %float %403 %float_0_0009765625
+        %405 = OpFAdd %float %402 %404
+               OpStore %a27 %405
+        %406 = OpLoad %float %a28
+        %407 = OpFMul %float %406 %float_1
+        %408 = OpFAdd %float %407 %float_0_171875
+        %409 = OpLoad %float %a29
+        %410 = OpFMul %float %409 %float_0_0009765625
+        %411 = OpFAdd %float %408 %410
+               OpStore %a28 %411
+        %412 = OpLoad %float %a29
+        %413 = OpFMul %float %412 %float_1_03125
+        %414 = OpFAdd %float %413 %float_0_1875
+        %415 = OpLoad %float %a30
+        %416 = OpFMul %float %415 %float_0_0009765625
+        %417 = OpFAdd %float %414 %416
+               OpStore %a29 %417
+        %418 = OpLoad %float %a30
+        %419 = OpFMul %float %418 %float_1_0625
+        %420 = OpFAdd %float %419 %float_0_125
+        %421 = OpLoad %float %a31
+        %422 = OpFMul %float %421 %float_0_0009765625
+        %423 = OpFAdd %float %420 %422
+               OpStore %a30 %423
+        %424 = OpLoad %float %a31
+        %425 = OpFMul %float %424 %float_1_09375
+        %426 = OpFAdd %float %425 %float_0_140625
+        %427 = OpLoad %float %a0
+        %428 = OpFMul %float %427 %float_0_0009765625
+        %429 = OpFAdd %float %426 %428
+               OpStore %a31 %429
+               OpBranch %220
+        %220 = OpLabel
+        %430 = OpLoad %int %iter
+        %432 = OpIAdd %int %430 %int_1
+               OpStore %iter %432
+               OpBranch %217
+        %219 = OpLabel
+               OpStore %sum %float_0
+        %435 = OpLoad %float %a0
+        %436 = OpLoad %float %sum
+        %437 = OpFAdd %float %436 %435
+               OpStore %sum %437
+        %438 = OpLoad %float %a1
+        %439 = OpLoad %float %sum
+        %440 = OpFAdd %float %439 %438
+               OpStore %sum %440
+        %441 = OpLoad %float %a2
+        %442 = OpLoad %float %sum
+        %443 = OpFAdd %float %442 %441
+               OpStore %sum %443
+        %444 = OpLoad %float %a3
+        %445 = OpLoad %float %sum
+        %446 = OpFAdd %float %445 %444
+               OpStore %sum %446
+        %447 = OpLoad %float %a4
+        %448 = OpLoad %float %sum
+        %449 = OpFAdd %float %448 %447
+               OpStore %sum %449
+        %450 = OpLoad %float %a5
+        %451 = OpLoad %float %sum
+        %452 = OpFAdd %float %451 %450
+               OpStore %sum %452
+        %453 = OpLoad %float %a6
+        %454 = OpLoad %float %sum
+        %455 = OpFAdd %float %454 %453
+               OpStore %sum %455
+        %456 = OpLoad %float %a7
+        %457 = OpLoad %float %sum
+        %458 = OpFAdd %float %457 %456
+               OpStore %sum %458
+        %459 = OpLoad %float %a8
+        %460 = OpLoad %float %sum
+        %461 = OpFAdd %float %460 %459
+               OpStore %sum %461
+        %462 = OpLoad %float %a9
+        %463 = OpLoad %float %sum
+        %464 = OpFAdd %float %463 %462
+               OpStore %sum %464
+        %465 = OpLoad %float %a10
+        %466 = OpLoad %float %sum
+        %467 = OpFAdd %float %466 %465
+               OpStore %sum %467
+        %468 = OpLoad %float %a11
+        %469 = OpLoad %float %sum
+        %470 = OpFAdd %float %469 %468
+               OpStore %sum %470
+        %471 = OpLoad %float %a12
+        %472 = OpLoad %float %sum
+        %473 = OpFAdd %float %472 %471
+               OpStore %sum %473
+        %474 = OpLoad %float %a13
+        %475 = OpLoad %float %sum
+        %476 = OpFAdd %float %475 %474
+               OpStore %sum %476
+        %477 = OpLoad %float %a14
+        %478 = OpLoad %float %sum
+        %479 = OpFAdd %float %478 %477
+               OpStore %sum %479
+        %480 = OpLoad %float %a15
+        %481 = OpLoad %float %sum
+        %482 = OpFAdd %float %481 %480
+               OpStore %sum %482
+        %483 = OpLoad %float %a16
+        %484 = OpLoad %float %sum
+        %485 = OpFAdd %float %484 %483
+               OpStore %sum %485
+        %486 = OpLoad %float %a17
+        %487 = OpLoad %float %sum
+        %488 = OpFAdd %float %487 %486
+               OpStore %sum %488
+        %489 = OpLoad %float %a18
+        %490 = OpLoad %float %sum
+        %491 = OpFAdd %float %490 %489
+               OpStore %sum %491
+        %492 = OpLoad %float %a19
+        %493 = OpLoad %float %sum
+        %494 = OpFAdd %float %493 %492
+               OpStore %sum %494
+        %495 = OpLoad %float %a20
+        %496 = OpLoad %float %sum
+        %497 = OpFAdd %float %496 %495
+               OpStore %sum %497
+        %498 = OpLoad %float %a21
+        %499 = OpLoad %float %sum
+        %500 = OpFAdd %float %499 %498
+               OpStore %sum %500
+        %501 = OpLoad %float %a22
+        %502 = OpLoad %float %sum
+        %503 = OpFAdd %float %502 %501
+               OpStore %sum %503
+        %504 = OpLoad %float %a23
+        %505 = OpLoad %float %sum
+        %506 = OpFAdd %float %505 %504
+               OpStore %sum %506
+        %507 = OpLoad %float %a24
+        %508 = OpLoad %float %sum
+        %509 = OpFAdd %float %508 %507
+               OpStore %sum %509
+        %510 = OpLoad %float %a25
+        %511 = OpLoad %float %sum
+        %512 = OpFAdd %float %511 %510
+               OpStore %sum %512
+        %513 = OpLoad %float %a26
+        %514 = OpLoad %float %sum
+        %515 = OpFAdd %float %514 %513
+               OpStore %sum %515
+        %516 = OpLoad %float %a27
+        %517 = OpLoad %float %sum
+        %518 = OpFAdd %float %517 %516
+               OpStore %sum %518
+        %519 = OpLoad %float %a28
+        %520 = OpLoad %float %sum
+        %521 = OpFAdd %float %520 %519
+               OpStore %sum %521
+        %522 = OpLoad %float %a29
+        %523 = OpLoad %float %sum
+        %524 = OpFAdd %float %523 %522
+               OpStore %sum %524
+        %525 = OpLoad %float %a30
+        %526 = OpLoad %float %sum
+        %527 = OpFAdd %float %526 %525
+               OpStore %sum %527
+        %528 = OpLoad %float %a31
+        %529 = OpLoad %float %sum
+        %530 = OpFAdd %float %529 %528
+               OpStore %sum %530
+        %535 = OpLoad %uint %index
+        %536 = OpLoad %float %sum
+        %538 = OpAccessChain %_ptr_Uniform_float %outbuf %int_0 %535
+               OpStore %538 %536
+               OpReturn
+               OpFunctionEnd

@@ -1,0 +1,31 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    vec4 values[];
+} outbuf;
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    uint packed = index * 0x01020408u + 0x11223344u;
+    const uvec4 a = uvec4(3u, 5u, 7u, 11u);
+    const uvec4 b = uvec4(1u, 2u, 3u, 4u);
+
+    for (int i = 0; i < 256; ++i) {
+        uvec4 lanes = uvec4(bitfieldExtract(packed, 0, 8),
+                            bitfieldExtract(packed, 8, 8),
+                            bitfieldExtract(packed, 16, 8),
+                            bitfieldExtract(packed, 24, 8));
+        lanes = ((lanes * a) + b) & uvec4(0xffu);
+        packed = (lanes.x & 0xffu) |
+                 ((lanes.y & 0xffu) << 8) |
+                 ((lanes.z & 0xffu) << 16) |
+                 ((lanes.w & 0xffu) << 24);
+    }
+
+    outbuf.values[index] = vec4(bitfieldExtract(packed, 0, 8),
+                                bitfieldExtract(packed, 8, 8),
+                                bitfieldExtract(packed, 16, 8),
+                                bitfieldExtract(packed, 24, 8)) * (1.0 / 255.0);
+}

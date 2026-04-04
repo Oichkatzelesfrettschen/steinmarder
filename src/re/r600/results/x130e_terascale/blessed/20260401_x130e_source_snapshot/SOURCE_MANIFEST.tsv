@@ -1,0 +1,21 @@
+kind	relative_path	sha256	remote_source
+inventory	inventory/remote_mesa_head.txt	343b12c8b0e4416ff4e36867425cd04ad32c647baa2fb42df57ae4fc15fe8e24	cd /home/nick/mesa-26-debug && printf 'HEAD ' && git rev-parse HEAD && printf '\nBRANCH ' && (git symbolic-ref --short -q HEAD || echo detached)
+inventory	inventory/remote_mesa_status.txt	ed25e497e713e2143c9e418ba0db3fff41cf65ad7cd4959c9c522f2be65f07a2	cd /home/nick/mesa-26-debug && git status --short
+inventory	inventory/remote_terakan_tree.txt	3eb3de02ffb903532c55d6defba9e0196dc0c75f8e0b4528419dd33f1aa0c081	find /home/nick/mesa-26-debug/src/amd/terascale -maxdepth 4 -type f 2>/dev/null | sort
+inventory	inventory/remote_findings_inventory.txt	f92e2bbe70652d053c5419e6426f2386b7aa9bc12da90159ec08ea22bad83a10	find /home/nick/eric/TerakanMesa/findings -maxdepth 2 -type f | sort
+inventory	inventory/remote_findings_hashes.txt	60afe7e947f9c344b3bb23c23e2391317a44de85771a0d853fe49dd5d652ab1c	find /home/nick/eric/TerakanMesa/findings -maxdepth 2 -type f -exec sha256sum {} + 2>/dev/null | sort
+finding	findings/COMPREHENSIVE_SCOPE.md	a941d95cdf87a05da850469265699f88e82397446df2787f375d204fb705a0b9	/home/nick/eric/TerakanMesa/findings/COMPREHENSIVE_SCOPE.md
+finding	findings/FULL_STACK_PROFILE_MESA26.md	807fb5ca7b8b2814d67cf689151da1e861120d68df1df72095203446cd029d06	/home/nick/eric/TerakanMesa/findings/FULL_STACK_PROFILE_MESA26.md
+finding	findings/HW_BOUNDARY_MEASUREMENTS.md	51547b0747886bc576e9eec34dc1e1957a634b744c7b23bd3ea7afec937037e3	/home/nick/eric/TerakanMesa/findings/HW_BOUNDARY_MEASUREMENTS.md
+finding	findings/HW_CAPABILITIES.md	19c878b8db7f763f26ecaa8e7db0324a8ddbf45d08bf110657090ba1466bf121	/home/nick/eric/TerakanMesa/findings/HW_CAPABILITIES.md
+finding	findings/ISA_SLOT_ANALYSIS.md	8993fa3e6bf54f8f997a178b27c8f0c7aa43370e5d9a90539753701c6a8f1313	/home/nick/eric/TerakanMesa/findings/ISA_SLOT_ANALYSIS.md
+finding	findings/LATENCY_PROBE_RESULTS.md	b4c7df8feb3f79a008483632d31f14117123a70c8e559e4a9a480afdcf291be4	/home/nick/eric/TerakanMesa/findings/LATENCY_PROBE_RESULTS.md
+finding	findings/NOVEL_VLIW_PACKING.md	4cc0ae061a4b86dfb79656d16e9909d4bbb8627eb9f9ef51311ee3aaff7d2d43	/home/nick/eric/TerakanMesa/findings/NOVEL_VLIW_PACKING.md
+finding	findings/NUMERIC_PACKING_RESEARCH.md	26a75bbaefe2a4bb1cca23f3f10e2eb4576dd979e8294838cf80c70d10e3ebe9	/home/nick/eric/TerakanMesa/findings/NUMERIC_PACKING_RESEARCH.md
+finding	findings/RUSTICL_BASELINE.md	185f26b98eff45bbf042546758e1c74f33d9390623560c894a0f5357eab036e4	/home/nick/eric/TerakanMesa/findings/RUSTICL_BASELINE.md
+finding	findings/STUTTER_RCA_AND_FIX.md	562829468e01fe1c4fcd8fdd5bcf9ae7ccd4758a271ea7b9e697b04262ad8e7e	/home/nick/eric/TerakanMesa/findings/STUTTER_RCA_AND_FIX.md
+finding	findings/TERAKAN_CONFORMANCE_PLAN.md	b3124335da4b1938e04c0b24896da2b3c10f2f618c2875e9632b07213d3d238b	/home/nick/eric/TerakanMesa/findings/TERAKAN_CONFORMANCE_PLAN.md
+finding	findings/TERAKAN_DRIVER_MANIFEST.txt	13340c75fdce37fe0c783912634b1e6e73d9de40b5a3d2d50a9c6263a40f1a80	/home/nick/eric/TerakanMesa/findings/TERAKAN_DRIVER_MANIFEST.txt
+finding	findings/TERAKAN_PORT_STATUS.md	1de2923038ce54632931ea9842297cfd80ed4414aeecc3e9a6beac8acb69b384	/home/nick/eric/TerakanMesa/findings/TERAKAN_PORT_STATUS.md
+tooling	tooling/re-toolkit_README.md	98528e2ec20c4656fc25664116584b632a1f48e11153afa2cdcd51361a082b55	/home/nick/eric/TerakanMesa/re-toolkit/README.md
+tooling	tooling/NOVEL_VLIW_PACKING_root.md	4cc0ae061a4b86dfb79656d16e9909d4bbb8627eb9f9ef51311ee3aaff7d2d43	/home/nick/eric/TerakanMesa/NOVEL_VLIW_PACKING.md

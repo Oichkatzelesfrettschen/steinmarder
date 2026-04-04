@@ -1,0 +1,2 @@
+preferred_solution=MoltenVK
+notes=Use MoltenVK as the Vulkan-on-Metal bridge unless a stronger native Vulkan translation path appears on this machine.

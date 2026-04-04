@@ -1,0 +1,2 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+atomic_add_relaxed_u64,200000,32,12482709,1.950423,0.512709

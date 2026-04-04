@@ -1,0 +1,7 @@
+{
+  "host": "x130e",
+  "remote_work": "/tmp/terascale_vk_probe_19851",
+  "remote_icd": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc/src/amd/terascale/vulkan/terascale_devenv_icd.x86_64.json",
+  "build_log": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_vk_probe_suite_20260401_231240/build_host.log",
+  "summary_csv": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_vk_probe_suite_20260401_231240/suite_results.csv"
+}

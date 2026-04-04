@@ -1,0 +1,275 @@
+# H1c: AGX Integer Multiply Dep-Chain Latency Probes
+# Platform: Apple M1, Metal AGX GPU, macOS 26 (SDK target: air64_v28-apple-macosx26.0.0)
+# Date: 2026-04-03
+# Host: metal_probe_host (--width 1024 --iters 200 --shader-iters 100000 --interleave)
+# Shader: probe_imul_combined.metallib
+#         (merged: probe_sfu_dep_chain.air + probe_imul_dep_chain.air)
+
+# =====================================================================
+# METHODOLOGY
+# =====================================================================
+#
+# Probes: 4-op unrolled dep-chain, 100K outer iters per dispatch.
+# Steps:  400K per dispatch (4 unrolled × 100K iters)
+# Mode:   --interleave (all kernels in same batch — same clock state per kernel)
+#
+# Clock calibration: EXP2 dep-chain step = 6.76 cycles (FMA 2.20 + EXP2 4.56),
+#   established in H1b (1.6% agreement with Philip Turner). Per-trial clock from:
+#     clock = 6.76 / (net_EXP2_ns / 400K)
+#
+# Delta method: for Δ(v2 − imul32), loop overhead cancels exactly (identical loop
+#   structure). Raw ns difference is clock-independent; multiply by clock for cycles.
+#   This is the most reliable measurement for closely-matched kernels.
+
+# =====================================================================
+# PROBE DESIGN NOTES
+# =====================================================================
+#
+# probe_imul32_dep4: 32×32→32 truncated multiply. Both operands runtime-variable.
+#   acc = acc * ((acc >> 16u) | 1u)  ×4 unrolled
+#   AIR: lshr i32 16 → or → mul i32.
+#   Pre_cost: lshr+or fused (AGX barrel-shifter) → 1 cycle.
+#   Expected step: 1_pre + 4_IMUL32 = 5 cycles.
+#
+# probe_imul32x64_dep4 (v1 — CONFIRMED EMITS IMUL64):
+#   acc = ulong(uint(acc)) * ulong(uint(acc >> 16u) | 1u)  ×4
+#   acc is typed ulong throughout. LLVM emits trunc i64→i32 before each zext,
+#   which the AGX backend does NOT recognize as widening. Emits IMUL(64×64=64).
+#   Expected step: 2_pre + 16_IMUL64 = 18 cycles.
+#
+# probe_imul32x64_v2_dep4 (v2 — native uint operands):
+#   uint a, b; ulong r = ulong(a) * ulong(b | 1u); a = uint(r); b = uint(r >> 32u);
+#   a and b are typed uint (i32) throughout. LLVM emits:
+#     zext i32 %a to i64          ← no trunc before zext (loop-entry phi)
+#     or i32 %b, 1 → zext to i64
+#     mul nuw i64 (zext a)(zext b|1)
+#     lshr i64 r, 32 → trunc → new b (i32 phi)
+#     and i64 r, 0xFFFF... → new a (or free via lo-half register read)
+#   The dep chain runs through the HI32 path (b = uint(r >> 32)):
+#     b-pre: lshr(hi32 read, 0 cyc) + or(1 cyc) = 1 cycle total
+#   This should trigger IMUL(32×32=64) or IMUL32+IMULHI32.
+
+# =====================================================================
+# RAW DATA
+# =====================================================================
+#
+# 5-kernel interleave batch (original run + 3 trials), all N=200 dispatches:
+
+# Original run:
+probe_loop_only:          ns_per_iter=3382170   loop baseline
+probe_exp2_dep4:          ns_per_iter=5553700   net=2171530  step=5.429 ns  clock=1.245 GHz
+probe_imul32_dep4:        ns_per_iter=5060130   net=1677960  step=4.195 ns  cyc=5.22
+probe_imul32x64_dep4 v1:  ns_per_iter=9072655   net=5690485  step=14.226 ns cyc=17.71
+probe_imul32x64_v2_dep4:  ns_per_iter=5699235   net=2317065  step=5.793 ns  cyc=7.21
+
+# Trial 1 (4-kernel, loop_only+exp2+imul32+v2):
+probe_loop_only:          ns_per_iter=3514700
+probe_exp2_dep4:          ns_per_iter=5477970   net=1963270  step=4.908 ns  clock=1.377 GHz
+probe_imul32_dep4:        ns_per_iter=5041080   net=1526380  step=3.816 ns  cyc=5.25
+probe_imul32x64_v2_dep4:  ns_per_iter=5687410   net=2172710  step=5.432 ns  cyc=7.48
+
+# Trial 2:
+probe_loop_only:          ns_per_iter=3372070
+probe_exp2_dep4:          ns_per_iter=5470175   net=2098105  step=5.245 ns  clock=1.289 GHz
+probe_imul32_dep4:        ns_per_iter=5023850   net=1651780  step=4.129 ns  cyc=5.32
+probe_imul32x64_v2_dep4:  ns_per_iter=5732115   net=2360045  step=5.900 ns  cyc=7.60
+
+# Trial 3 (low-clock state, GPU throttled to ~1.14 GHz):
+probe_loop_only:          ns_per_iter=3344950
+probe_exp2_dep4:          ns_per_iter=5715495   net=2370545  step=5.926 ns  clock=1.141 GHz
+probe_imul32_dep4:        ns_per_iter=5057080   net=1712130  step=4.280 ns  cyc=4.88
+probe_imul32x64_v2_dep4:  ns_per_iter=5707500   net=2362550  step=5.906 ns  cyc=6.74
+
+# =====================================================================
+# DELTA ANALYSIS (clock-independent)
+# =====================================================================
+#
+# Δ(v2 − imul32) raw ns/step — loop overhead cancels in interleaved mode:
+#   original: (5699235 - 5060130) / 400000 = 1.598 ns/step
+#   trial 1:  (5687410 - 5041080) / 400000 = 1.616 ns/step
+#   trial 2:  (5732115 - 5023850) / 400000 = 1.771 ns/step
+#   trial 3:  (5707500 - 5057080) / 400000 = 1.626 ns/step
+#   Average:  1.653 ns/step  (std: ±0.07 ns, excluding trial-2 outlier ±0.09)
+#
+# At M1 GPU nominal range 1.25–1.30 GHz:
+#   Δ(v2 − imul32) = 1.653 × 1.25 = 2.07 cycles  (lower bound)
+#   Δ(v2 − imul32) = 1.653 × 1.30 = 2.15 cycles  (upper bound)
+#   → Δ ≈ 2.1 cycles  (robust across 4 runs, 3 different clock states)
+#
+# Δ(v1 − imul32) from original run: (9072655 - 5060130) / 400000 = 10.031 ns/step
+#   At 1.245 GHz: 10.031 × 1.245 = 12.49 cycles
+#   → v1 step = 5.22 + 12.49 = 17.71 cycles  (2_pre + 16_IMUL64 ≈ 18 ✓)
+#
+# Δ(v1 − v2): 10.031 - 1.653 = 8.378 ns/step → at 1.245 GHz: 10.43 cycles
+#   Consistent with IMUL64(16 cyc) − IMULHI32(6 cyc) path difference.
+
+# =====================================================================
+# DERIVED LATENCIES
+# =====================================================================
+#
+# Op                  step (cyc)  pre_cost  adj_lat (inferred)  Philip  Status
+# ------------------  ----------  --------  ------------------  ------  ------
+# IMUL32              5.2         1         4.2 ≈ 4              4.03   ✓ (<5%)
+# IMUL(64×64=64) v1   17.7        2         15.7 ≈ 16            16.06  ✓ (~1%)
+# IMUL(32×32=64) v2   7.2         1         6.2                  8.01   ✗ SEE BELOW
+
+# =====================================================================
+# FINDING: v2 PROBE GIVES ~7 CYCLES — NOT THE 8-CYCLE WIDENING PATH
+# =====================================================================
+#
+# Expected for hardware IMUL(32×32=64) (Philip: 8.01 cyc adj_lat):
+#   v2 step = 1_pre + 8 = 9 cycles   [NOT observed]
+#
+# Observed: v2 step ≈ 7.2 cycles → implied adj_lat ≈ 6.2 cycles.
+#
+# HYPOTHESIS: AGX backend does NOT emit a single hardware IMUL(32×32=64)
+#   instruction for `mul nuw i64 (and i64 r, 0xFFFF...)(zext i32)`. Instead it
+#   emits IMUL32 (lo32, 4 cyc) + IMULHI32 (hi32, 6 cyc) issued in parallel.
+#   The dep chain runs through the IMULHI32 path (needed for b = uint(r >> 32)):
+#     step = 1_pre (OR only; lshr is free as hi-reg read) + 6_IMULHI32 = 7 cycles.
+#
+# Why this differs from Philip's 8-cycle IMUL(32×32=64) measurement:
+#   Philip likely measures a dep chain where both lo32 and hi32 are used as a
+#   combined ulong (the full 64-bit product in one register). This may force the
+#   hardware widening instruction at 8 cycles, or Philip's probe goes through the
+#   hi32 path including the architectural lshr (1 cycle), giving 7_IMULHI32 + 1 = 8.
+#
+# Under the second interpretation:
+#   IMULHI32 hardware adj_lat = 6 cycles
+#   Philip's "8-cycle" IMUL(32×32=64) = 6 (IMULHI32) + 1 (lshr included) + 1 (OR) = 8
+#   In our v2: the lshr is free (hi-reg read), so we see 6 + 1 (OR only) = 7 cycles.
+#
+# CONCLUSION: The critical-path multiplier in the v2 dep chain has adj_lat ≈ 6 cycles.
+#   This is NOT the 8-cycle hardware widening path measured by Philip.
+#   Whether this is a separate IMULHI32 instruction or an early-output stage of the
+#   widening multiply requires AIR-to-ISA disassembly (not yet available).
+
+# =====================================================================
+# AIR VERIFICATION (key kernels)
+# =====================================================================
+#
+# probe_imul32_dep4 loop body:
+#   mul i32 %acc, %acc_shifted   ← IMUL32 confirmed (no widening)
+#
+# probe_imul32x64_dep4 v1 loop body:
+#   (phi i32 %a, i32 %b from loop-carried truncates)
+#   zext i32 %a to i64
+#   or i32 %b, 1 → zext to i64
+#   mul nuw i64 ...              ← 64-bit mul
+#   (BUT inputs trace back through trunc i64→i32 at loop entry → IMUL64 path)
+#
+# probe_imul32x64_v2_dep4 loop body:
+#   (phi i32 %a, i32 %b — native i32, no trunc before loop entry)
+#   zext i32 %a to i64           ← DIRECT zext of native i32 phi ✓ (step 0)
+#   or i32 %b, 1 → zext to i64  ← direct zext of native i32 phi ✓
+#   mul nuw i64 ...              ← widening-eligible step 0
+#   lshr i64 r, 32 → trunc → new b (i32) ← loop-carried dep chain
+#   and i64 r, 0xFFFF... → new a (i64, but i32-ranged) ← steps 1-3 use this
+#   (steps 1-3: mul nuw i64 (and i64 r, mask)(zext i32 b|1) — AGX may lower
+#    these differently from step 0 which has clean zext i32)
+
+# =====================================================================
+# SUMMARY TABLE
+# =====================================================================
+#
+# Op                   adj_lat (this)  adj_lat (Philip)  Notes
+# ------------------   --------------  ----------------  -----
+# IMUL32               4.2 cyc         4.03              ✓ confirmed
+# IMUL(64×64=64) v1    ~15.7 cyc       16.06             ✓ (v1 probe, TRUNC path)
+# IMUL(32×32=64) v2    ~6.2 cyc        8.01              ✗ see analysis above
+#
+# Δ(v2 − imul32)       ≈ 2.1 cycles   (robust, clock-independent)
+# Interpretation: dep chain through hi32 of mul → IMULHI32 adj_lat ≈ 6 cyc
+#   OR: early hi32 availability of hardware widening multiply at 6 cyc (not 8)
+
+# =====================================================================
+# PROBE: probe_imulhi32_dep4 — hi32 feeds `a` (eliminates OR pre-cost)
+# =====================================================================
+#
+# Design: a = uint(r >> 32u)  [hi32 → first operand, zext, no OR]
+#         b = uint(r)         [lo32 → second operand, needs b|1 (OR)]
+# Loop-carried pre: a needs lshr(1 cyc), b needs OR(1 cyc) → both paths 1 cycle → pre=1
+# Within-unroll pre: a=lshr(r,32) stays i64 (free hi-reg); b=trunc(r)+OR(1 cyc) → pre=1
+# All 4 steps: pre=1 → step = 1 + L_IMULHI32
+
+# Raw data (3 trials, 5-kernel interleaved: loop_only+exp2+imul32+v2+imulhi32):
+
+# Trial 1 (clock ~1.431 GHz from EXP2):
+probe_loop_only:          ns_per_iter=3452605
+probe_exp2_dep4:          ns_per_iter=5341845   net=1889240  clock=1.431 GHz
+probe_imul32_dep4:        ns_per_iter=5156450   net=1703845  cyc=6.097
+probe_imul32x64_v2_dep4:  ns_per_iter=5760200   net=2307595  cyc=8.257
+probe_imulhi32_dep4:      ns_per_iter=5708195   net=2255590  cyc=8.071
+
+# Trial 2 (clock ~1.425 GHz):
+probe_loop_only:          ns_per_iter=3536985
+probe_exp2_dep4:          ns_per_iter=5434320   net=1897335  clock=1.425 GHz
+probe_imul32_dep4:        ns_per_iter=5162890   net=1625905  cyc=5.793
+probe_imul32x64_v2_dep4:  ns_per_iter=5754000   net=2217015  cyc=7.899
+probe_imulhi32_dep4:      ns_per_iter=5848590   net=2311605  cyc=8.236
+
+# Trial 3 (clock ~1.375 GHz):
+probe_loop_only:          ns_per_iter=3541410
+probe_exp2_dep4:          ns_per_iter=5507470   net=1966060  clock=1.375 GHz
+probe_imul32_dep4:        ns_per_iter=5235435   net=1694025  cyc=5.825
+probe_imul32x64_v2_dep4:  ns_per_iter=5848770   net=2307360  cyc=7.934
+probe_imulhi32_dep4:      ns_per_iter=5736995   net=2195585  cyc=7.549
+
+# Delta analysis (clock-independent ns/step):
+#   Δ(v2 − imul32):    avg=1.507 ns/step  std=0.028  → +2.08 cyc @ 1.38 GHz  [very stable]
+#   Δ(hi32 − imul32):  avg=1.449 ns/step  std=0.238  → +2.00 cyc @ 1.38 GHz  [noisier]
+#   Δ(hi32 − v2):      avg=-0.058 ns/step std=0.266  → -0.08 cyc              [consistent with zero]
+#
+# CONCLUSION: probe_imulhi32_dep4 and probe_imul32x64_v2_dep4 are INDISTINGUISHABLE
+#   within measurement noise (±0.38 cycles at these clock rates).
+#   Both probes measure the same hi32-path dep chain latency.
+
+# =====================================================================
+# SYNTHESIS: FORWARDING LATENCY vs ARCHITECTURAL LATENCY
+# =====================================================================
+#
+# From all H1c data (original run + 4 trials):
+#   IMUL32 dep chain:           step = 1_pre + 4 adj_lat = ~5 cyc  (Philip: 4.02 ✓)
+#   hi32 dep chain (v2/imulhi): step = 1_pre + 6 adj_lat = ~7 cyc
+#   IMUL64 dep chain (v1):      step = 2_pre + 16 adj_lat = ~18 cyc (Philip: 15.18–21.72 range ✓)
+#
+# Philip Turner's IMULHI32 adj_lat = 9.83 cycles (from metal-benchmarks for M1).
+# Our hi32 dep chain: 6 cycles adj_lat — 3.8 cycles FASTER than Philip.
+#
+# INTERPRETATION: forwarding vs register-file latency distinction.
+#   Our dep chain: one multiply's hi32 output is forwarded DIRECTLY to the next
+#   multiply's input port (bypassing the register file). AGX GPU's scheduler can
+#   issue the dependent multiply 6 cycles after the previous multiply starts, using
+#   a pipeline bypass path.
+#
+#   Philip's adj_lat: measures latency through the REGISTER FILE — result committed
+#   to the register file (9.83 cycles), then read by the next instruction's register
+#   read stage. This is ~4 cycles longer than our forwarding path.
+#
+#   This 4-cycle forwarding advantage is consistent with a pipelined register file
+#   with ~4 cycle write-to-read latency when bypassed. The forwarding path allows
+#   dep chains to run 37% faster than the register-file path for IMULHI32.
+#
+#   NOTE: Our IMUL32 dep chain (4 cyc) matches Philip's adj_lat (4.02) exactly —
+#   no forwarding advantage for IMUL32. This suggests either:
+#   (a) IMUL32 has no forwarding bypass (register-file write = forwarding latency), OR
+#   (b) Philip's IMUL32 adj_lat IS the forwarding latency for IMUL32
+#   Implication: IMUL32 result is committed to register file in 4 cycles (no bypass savings).
+#   IMULHI32 result is committed in 9.83 cycles but available for forwarding at 6 cycles.
+#   The 3.83-cycle gap is the forwarding depth for the widening multiply unit.
+
+# =====================================================================
+# NEXT STEPS
+# =====================================================================
+#
+# 1. Design probe_imulhi32_dep4: explicit IMULHI32 dep chain using Metal's
+#    umulhi(a, b) builtin. If adj_lat = 6 cycles, confirms IMULHI32 hypothesis.
+#    Use: uint b_next = umulhi(a, b | 1u); uint a_next = a * (b | 1u);
+#    dep chain goes through b_next (hi32 path), a_next (lo32 path).
+#
+# 2. Design probe_imul32x64_v3_dep4: force full 64-bit product storage by keeping
+#    acc as ulong and extracting halves differently — OR just use
+#    `ulong acc = (ulong)a * (ulong)b;` without any intermediate truncation/and,
+#    to see if the backend emits the single hardware widening instruction.
+#
+# 3. C4 texture sample dep-chain (task 5, still unmeasured).

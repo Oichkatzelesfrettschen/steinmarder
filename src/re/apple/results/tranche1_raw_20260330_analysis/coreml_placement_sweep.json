@@ -1,0 +1,61 @@
+WARNING:2026-03-30 13:04:20,531:jax._src.xla_bridge:1000: Platform 'METAL' is experimental and not all JAX functionality may be correctly supported!
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1774901060.531625 1479922 mps_client.cc:510] WARNING: JAX Apple GPU support is experimental and not all JAX functionality is correctly supported!
+Metal device set to: Apple M1
+I0000 00:00:1774901060.531832 1479922 service.cc:145] XLA service 0xa1b312700 initialized for platform METAL (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1774901060.531841 1479922 service.cc:153]   StreamExecutor device (0): Metal, <undefined>
+I0000 00:00:1774901060.532721 1479922 mps_client.cc:406] Using Simple allocator.
+I0000 00:00:1774901060.532730 1479922 mps_client.cc:384] XLA backend will use up to 12694863872 bytes on device 0 for SimpleAllocator.
+Converting PyTorch Frontend ==> MIL Ops:   0%|          | 0/2 [00:00<?, ? ops/s]Converting PyTorch Frontend ==> MIL Ops:  50%|█████     | 1/2 [00:00<00:00, 856.85 ops/s]
+Running MIL frontend_pytorch pipeline:   0%|          | 0/5 [00:00<?, ? passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 11268.95 passes/s]
+Running MIL default pipeline:   0%|          | 0/95 [00:00<?, ? passes/s]/Users/eirikr/Documents/GitHub/steinmarder/.venv/lib/python3.12/site-packages/coremltools/converters/mil/mil/passes/defs/preprocess.py:273: UserWarning: Output, '6', of the source model, has been renamed to 'var_6' in the Core ML model.
+  warnings.warn(msg.format(var.name, new_name))
+Running MIL default pipeline: 100%|██████████| 95/95 [00:00<00:00, 7079.56 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 13755.57 passes/s]
+{
+  "coremltools": {
+    "details": {
+      "model_type": "mlProgram",
+      "saved_mlpackage": true,
+      "version": "9.0"
+    },
+    "ok": true
+  },
+  "jax": {
+    "details": {
+      "devices": [
+        "METAL:0"
+      ],
+      "enable_pjrt_compatibility": "1",
+      "sum": 3680.0,
+      "version": "0.4.38"
+    },
+    "ok": true
+  },
+  "mlx": {
+    "details": {
+      "default_device": "Device(gpu, 0)",
+      "sum": 3680.0,
+      "version": "0.31.1"
+    },
+    "ok": true
+  },
+  "python": {
+    "executable": "/Users/eirikr/Documents/GitHub/steinmarder/.venv/bin/python",
+    "version": "3.12.13"
+  },
+  "torch": {
+    "details": {
+      "cpu_sum": 3680.0,
+      "mps_available": true,
+      "mps_sum": 3680.0,
+      "version": "2.7.0"
+    },
+    "ok": true
+  }
+}
+
+systemMemory: 16.00 GB
+maxCacheSize: 5.92 GB
+
+I0000 00:00:1774901062.000403 1479922 mps_client.h:209] MetalClient destroyed.

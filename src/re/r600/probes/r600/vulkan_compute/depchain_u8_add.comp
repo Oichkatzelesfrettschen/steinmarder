@@ -1,0 +1,17 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    float values[];
+} outbuf;
+uint narrow_u8(uint x) { return x & 0xffu; }
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    uint acc = narrow_u8(index + 1u);
+    for (int i = 0; i < 512; ++i) {
+        acc = narrow_u8(acc + 3u);
+    }
+    outbuf.values[index] = float(acc);
+}

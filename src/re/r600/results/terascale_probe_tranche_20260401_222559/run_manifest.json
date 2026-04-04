@@ -1,0 +1,10 @@
+{
+  "host": "eirikr@x130e.local",
+  "phase": "all",
+  "remote_mesa": "/home/eirikr/workspaces/mesa/mesa-26-debug",
+  "remote_build": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc",
+  "remote_icd": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc/src/amd/terascale/vulkan/terascale_devenv_icd.x86_64.json",
+  "status_csv": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/step_status.csv",
+  "commands_log": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/commands.log",
+  "local_probe_manifest": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/local_probe_manifest.json"
+}

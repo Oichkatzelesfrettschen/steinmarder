@@ -1,0 +1,1 @@
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/tranche1_20260331_003058_cache_pressure/gpu_cache_time_profiler.trace

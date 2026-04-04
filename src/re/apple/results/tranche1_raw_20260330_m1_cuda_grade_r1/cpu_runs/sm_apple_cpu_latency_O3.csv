@@ -1,0 +1,4 @@
+probe,iters,unroll,elapsed_ns,ns_per_op,approx_gops
+add_dep_u64,500000,32,7339625,0.458727,2.179948
+fadd_dep_f64,500000,32,23443666,1.465229,0.682487
+fmadd_dep_f64,500000,32,29612625,1.850789,0.540310

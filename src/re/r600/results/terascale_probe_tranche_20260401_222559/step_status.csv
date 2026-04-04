@@ -1,0 +1,11 @@
+timestamp_utc,step,status,phase,name,artifact_dir
+2026-04-02T05:25:59Z,1,ok,inventory,emit_local_probe_manifest,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/01_emit_local_probe_manifest
+2026-04-02T05:25:59Z,2,ok,inventory,count_probe_families,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/02_count_probe_families
+2026-04-02T05:26:00Z,3,ok,remote,remote_machine_stamp,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/03_remote_machine_stamp
+2026-04-02T05:26:00Z,4,ok,opengl,probe_tree_inventory,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/04_probe_tree_inventory
+2026-04-02T05:26:01Z,5,ok,opengl,gl_probe_tooling,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/05_gl_probe_tooling
+2026-04-02T05:26:02Z,6,ok,vulkan,vulkaninfo_summary,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/06_vulkaninfo_summary
+2026-04-02T05:26:02Z,7,ok,vulkan,vkmark_list_scenes,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/07_vkmark_list_scenes
+2026-04-02T05:26:03Z,8,fail,vulkan,vkmark_list_devices,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/08_vkmark_list_devices
+2026-04-02T05:26:24Z,9,ok,opencl,opencl_inventory,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/09_opencl_inventory
+2026-04-02T05:26:24Z,10,ok,system,trace_tool_inventory,/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_probe_tranche_20260401_222559/steps/10_trace_tool_inventory

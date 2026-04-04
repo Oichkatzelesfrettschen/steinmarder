@@ -1,0 +1,16 @@
+variant_trace,schema,baseline_density_rps,variant_density_rps,delta_density_rps
+gpu_occupancy_heavy.trace,metal-application-encoders-list,885.8458361691655,762.7874569795532,-123.05837918961231
+gpu_occupancy_heavy.trace,metal-command-buffer-completed,955.1497230510059,867.1084517233063,-88.04127132769963
+gpu_occupancy_heavy.trace,metal-driver-intervals,2143.977936485653,2163.9428359231742,19.964899437521126
+gpu_occupancy_heavy.trace,metal-gpu-intervals,1470.4863178134092,1774.4139839900772,303.927666176668
+gpu_occupancy_heavy.trace,metal-gpu-state-intervals,2754.385247868017,3311.473778104459,557.0885302364422
+gpu_register_pressure.trace,metal-application-encoders-list,885.8458361691655,879.5007074483815,-6.345128720784032
+gpu_register_pressure.trace,metal-command-buffer-completed,955.1497230510059,963.0532746559777,7.903551604971767
+gpu_register_pressure.trace,metal-driver-intervals,2143.977936485653,1962.3859534942012,-181.5919829914519
+gpu_register_pressure.trace,metal-gpu-intervals,1470.4863178134092,1110.3696431535816,-360.1166746598276
+gpu_register_pressure.trace,metal-gpu-state-intervals,2754.385247868017,2170.1679956288813,-584.2172522391356
+gpu_threadgroup_heavy.trace,metal-application-encoders-list,885.8458361691655,889.0360737499875,3.190237580821986
+gpu_threadgroup_heavy.trace,metal-command-buffer-completed,955.1497230510059,969.0493203874864,13.899597336480497
+gpu_threadgroup_heavy.trace,metal-driver-intervals,2143.977936485653,2000.331165937472,-143.64677054818117
+gpu_threadgroup_heavy.trace,metal-gpu-intervals,1470.4863178134092,1159.0807811515463,-311.4055366618629
+gpu_threadgroup_heavy.trace,metal-gpu-state-intervals,2754.385247868017,2234.8144303890313,-519.5708174789856

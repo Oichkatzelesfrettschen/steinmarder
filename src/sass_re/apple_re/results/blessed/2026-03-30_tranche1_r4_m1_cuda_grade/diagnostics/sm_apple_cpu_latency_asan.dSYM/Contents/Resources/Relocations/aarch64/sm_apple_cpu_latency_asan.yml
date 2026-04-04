@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     'src/apple_re/results/tranche1_raw_20260330_m1_cuda_grade_r4/diagnostics/sm_apple_cpu_latency_asan'
-relocations:     []
-...

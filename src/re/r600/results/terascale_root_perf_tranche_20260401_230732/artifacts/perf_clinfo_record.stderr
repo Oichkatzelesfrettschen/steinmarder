@@ -1,0 +1,60 @@
+COMPUTE_TRACE: r600_pipe_shader_create type=4
+GFX_FLUSH_TRACE: cdw=279 prev_dw=0 initial=273 emitted=1
+WINSYS_TRACE: CS_SUBMIT cdw=296 relocs=2 ring=0
+COMPUTE_TRACE: r600_pipe_shader_create type=4
+r600 device_uuid output is based on invalid pci bus info.
+r600 device_uuid output is based on invalid pci bus info.
+COMPUTE_TRACE: r600_pipe_shader_create type=5
+COMPUTE_TRACE: kernel ISA (50 dwords):
+bytecode 50 dw -- 5 gprs -- 0 nstack -------------
+shader 0 -- E
+0000 40000006 A0040000  ALU 2 @12 KC0[CB0:0-16] 
+ 0012 000000F8 00400C90     1 x:     MOV                    R2.x,  0
+ 0014 80104001 20401A10       y:     ADD_INT                R2.y,  R1.x, KC0[2].x
+0002 00000008 80800000  VTX 1 @16 
+ 0016 40020F40 989FF002 00080000   VFETCH         R2.x___, R2.x,  RID:15  MFC:16 UCF:0 FMT(DTA:34 NUM:1 COMP:0 MODE:1)
+0004 4000000A A0240000  ALU 10 @20 KC0[CB0:0-16] 
+ 0020 80004402 40004780     2 t:     MULLO_INT              __.z,  R2.y, R2.x
+ 0022 800000FF 60001A00     3 w:     ADD_INT                __.w,  PS, R0.x
+ 0024 80102CFE 20001A00     4 y:     ADD_INT                __.y,  PV.w, KC0[1].x
+ 0026 801FA4FE 40000B80     5 z:     LSHL_INT               __.z,  PV.y, [0x00000002 0.000000]
+ 0028 00000002                                               0.000000 (2)
+ 0030 011FC480 00401A10     6 x:     ADD_INT                R2.x,  KC0[0].y, PV.z
+ 0032 011FC080 20001A00       y:     ADD_INT                __.y,  KC0[0].x, PV.z
+ 0034 811FC880 40401A10       z:     ADD_INT                R2.z,  KC0[0].z, PV.z
+ 0036 801FA4FE 00800B10     7 x:     LSHR_INT               R4.x,  PV.y, [0x00000002 0.000000]
+ 0038 00000002                                               0.000000 (2)
+0006 00000014 80800400  VTX 2 @40 
+ 0040 10020140 135FF003 00080000   VFETCH         R3.x___, R2.x,  RID:1  MFC:4 UCF:0 FMT(DTA:13 NUM:1 COMP:0 MODE:0)
+ 0044 12020140 135FF002 00080000   VFETCH         R2.x___, R2.z,  RID:1  MFC:4 UCF:0 FMT(DTA:13 NUM:1 COMP:0 MODE:0)
+0008 00000018 A0000000  ALU 1 @48 
+ 0048 80004003 00400010     8 x:     ADD                    R2.x,  R3.x, R2.x
+0010 02012020 95E01000  MEM_RAT_NOCACHE    WRITE_IND RAT0 STORE_RAW 0 R2.x___ R4.xyz ES:0 AS:0 EOP 
+--------------------------------------
+COMPUTE_TRACE: r600_pipe_shader_create type=5
+COMPUTE_TRACE: kernel ISA (50 dwords):
+bytecode 50 dw -- 5 gprs -- 0 nstack -------------
+shader 1 -- E
+0000 00000006 A0000000  ALU 1 @12 
+ 0012 800000F8 00400C90     1 x:     MOV                    R2.x,  0
+0002 00000008 80800000  VTX 1 @16 
+ 0016 40020F40 989FF002 00080000   VFETCH         R2.x___, R2.x,  RID:15  MFC:16 UCF:0 FMT(DTA:34 NUM:1 COMP:0 MODE:1)
+0004 4000000A A0200000  ALU 9 @20 KC0[CB0:0-16] 
+ 0020 80004001 60004780     2 t:     MULLO_INT              __.w,  R1.x, R2.x
+ 0022 800000FF 60001A00     3 w:     ADD_INT                __.w,  PS, R0.x
+ 0024 801FACFE 40000B80     4 z:     LSHL_INT               __.z,  PV.w, [0x00000002 0.000000]
+ 0026 00000002                                               0.000000 (2)
+ 0028 011FC480 20401A10     5 y:     ADD_INT                R2.y,  KC0[0].y, PV.z
+ 0030 011FC080 40001A00       z:     ADD_INT                __.z,  KC0[0].x, PV.z
+ 0032 811FC880 60001A10       w:     ADD_INT                R0.w,  KC0[0].z, PV.z
+ 0034 801FA8FE 00800B10     6 x:     LSHR_INT               R4.x,  PV.z, [0x00000002 0.000000]
+ 0036 00000002                                               0.000000 (2)
+0006 00000014 80800400  VTX 2 @40 
+ 0040 11020140 135FF003 00080000   VFETCH         R3.x___, R2.y,  RID:1  MFC:4 UCF:0 FMT(DTA:13 NUM:1 COMP:0 MODE:0)
+ 0044 13000140 135FF002 00080000   VFETCH         R2.x___, R0.w,  RID:1  MFC:4 UCF:0 FMT(DTA:13 NUM:1 COMP:0 MODE:0)
+0008 00000018 A0000000  ALU 1 @48 
+ 0048 80004003 00400010     7 x:     ADD                    R2.x,  R3.x, R2.x
+0010 02012020 95E01000  MEM_RAT_NOCACHE    WRITE_IND RAT0 STORE_RAW 0 R2.x___ R4.xyz ES:0 AS:0 EOP 
+--------------------------------------
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.197 MB /tmp/terascale_root_perf_18931/perf_clinfo.data (1348 samples) ]

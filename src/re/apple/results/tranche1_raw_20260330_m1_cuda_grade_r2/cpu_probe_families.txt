@@ -1,0 +1,6 @@
+integer_add_sub
+floating_add_mul_fma
+load_store_chain
+shuffle_lane_cross
+atomics
+transcendentals

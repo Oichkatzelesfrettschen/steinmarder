@@ -1,0 +1,4 @@
+O0:-O0
+O2:-O2
+O3:-O3
+Ofast:-Ofast

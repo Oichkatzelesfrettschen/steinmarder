@@ -1,0 +1,2921 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 283  of event 'cycles:P'
+# Event count (approx.): 67056595
+#
+# Children      Self  Command     Shared Object                                   Symbol                                                                                                                                                                                                                                                                     
+# ........  ........  ..........  ..............................................  ...........................................................................................................................................................................................................................................................................
+#
+    33.09%     0.00%  vulkaninfo  [unknown]                                       [.] 0000000000000000
+            |
+            ---0
+               |          
+               |--13.96%--0x10aded010110aded
+               |          |          
+               |           --13.16%--__strcmp_sse2
+               |          
+               |--3.20%--_int_malloc
+               |          
+               |--2.57%--0x7fb8ddf3abc8
+               |          |          
+               |          |--1.23%--_dl_map_object
+               |          |          |          
+               |          |           --0.57%--_dl_map_object_from_fd
+               |          |          
+               |           --0.98%--0x7fb8ddef9790
+               |                     0xc
+               |                     0
+               |                     do_lookup_x
+               |          
+               |--1.74%--0x5584ca31e640
+               |          _dl_map_object
+               |          |          
+               |          |--0.72%--memset
+               |          |          asm_exc_page_fault
+               |          |          exc_page_fault
+               |          |          do_user_addr_fault
+               |          |          handle_mm_fault
+               |          |          do_pte_missing
+               |          |          
+               |           --0.69%--_dl_map_object_from_fd
+               |                     asm_exc_page_fault
+               |                     exc_page_fault
+               |                     do_user_addr_fault
+               |                     handle_mm_fault
+               |                     do_pte_missing
+               |          
+               |--1.47%--__internal_syscall_cancel
+               |          entry_SYSCALL_64_after_hwframe
+               |          do_syscall_64
+               |          |          
+               |           --0.73%--do_writev
+               |                     vfs_writev
+               |                     do_iter_readv_writev
+               |                     sock_write_iter
+               |                     __sock_sendmsg
+               |                     inet6_sendmsg
+               |                     tcp_sendmsg_locked
+               |                     __tcp_push_pending_frames
+               |                     tcp_write_xmit
+               |          
+               |--1.44%--0x7fb8ddcb3152
+               |          |          
+               |           --1.02%--__GI___access
+               |                     entry_SYSCALL_64_after_hwframe
+               |                     do_syscall_64
+               |                     __x64_sys_access
+               |                     do_faccessat
+               |                     user_path_at
+               |                     |          
+               |                      --0.70%--filename_lookup
+               |                                path_lookupat
+               |          
+               |--1.00%--__GI___shutdown
+               |          entry_SYSCALL_64_after_hwframe
+               |          do_syscall_64
+               |          __x64_sys_shutdown
+               |          inet_shutdown
+               |          __tcp_push_pending_frames
+               |          tcp_write_xmit
+               |          __tcp_transmit_skb
+               |          |          
+               |           --0.66%--inet6_csk_xmit
+               |                     ip6_xmit
+               |                     ip6_output
+               |                     ip6_finish_output
+               |                     ip6_finish_output2
+               |                     __dev_queue_xmit
+               |          
+               |--0.98%--__open64_nocancel
+               |          entry_SYSCALL_64_after_hwframe
+               |          do_syscall_64
+               |          __x64_sys_openat
+               |          do_sys_openat2
+               |          |          
+               |           --0.62%--do_filp_open
+               |                     path_openat
+               |          
+               |--0.77%--__strncmp_sse2
+               |          
+               |--0.75%--__libc_calloc
+               |          
+               |--0.75%--__GI___getdents64
+               |          entry_SYSCALL_64_after_hwframe
+               |          do_syscall_64
+               |          __se_sys_getdents64
+               |          iterate_dir
+               |          ext4_readdir.llvm.6365273095590756112
+               |          
+               |--0.71%--getaddrinfo
+               |          __internal_syscall_cancel
+               |          entry_SYSCALL_64_after_hwframe
+               |          do_syscall_64
+               |          
+               |--0.67%--0x7fb8ddc8b3a5
+               |          
+                --0.67%--__close_nocancel
+
+    30.44%     0.33%  vulkaninfo  [kernel.kallsyms]                               [k] do_syscall_64
+            |          
+             --30.10%--do_syscall_64
+                       |          
+                       |--6.04%--ksys_mmap_pgoff
+                       |          vm_mmap_pgoff
+                       |          do_mmap
+                       |          |          
+                       |          |--5.17%--mmap_region
+                       |          |          |          
+                       |          |          |--1.39%--perf_event_mmap
+                       |          |          |          |          
+                       |          |          |           --0.69%--d_path
+                       |          |          |                     prepend_path
+                       |          |          |          
+                       |          |          |--1.04%--vms_gather_munmap_vmas
+                       |          |          |          __split_vma
+                       |          |          |          
+                       |          |          |--0.97%--vma_merge_new_range
+                       |          |          |          |          
+                       |          |          |           --0.72%--vma_expand
+                       |          |          |                     commit_merge
+                       |          |          |                     mas_store_prealloc
+                       |          |          |                     mas_wr_store_entry
+                       |          |          |          
+                       |          |           --0.70%--vms_clear_ptes
+                       |          |          
+                       |           --0.87%--__get_unmapped_area
+                       |                     |          
+                       |                      --0.61%--thp_get_unmapped_area_vmflags
+                       |                                arch_get_unmapped_area_topdown
+                       |          
+                       |--5.74%--__x64_sys_openat
+                       |          do_sys_openat2
+                       |          |          
+                       |           --5.10%--do_filp_open
+                       |                     path_openat
+                       |                     |          
+                       |                     |--2.22%--link_path_walk
+                       |                     |          
+                       |                     |--0.80%--alloc_empty_file
+                       |                     |          init_file
+                       |                     |          
+                       |                     |--0.75%--vfs_open
+                       |                     |          do_dentry_open
+                       |                     |          
+                       |                      --0.59%--terminate_walk
+                       |          
+                       |--2.24%--__x64_sys_munmap
+                       |          __vm_munmap
+                       |          do_vmi_munmap
+                       |          |          
+                       |           --1.92%--do_vmi_align_munmap
+                       |                     |          
+                       |                      --1.30%--vms_complete_munmap_vmas
+                       |                                |          
+                       |                                 --0.97%--vms_clear_ptes
+                       |                                           |          
+                       |                                            --0.59%--tlb_finish_mmu
+                       |                                                      tlb_flush_mmu
+                       |          
+                       |--1.87%--__se_sys_getdents64
+                       |          iterate_dir
+                       |          ext4_readdir.llvm.6365273095590756112
+                       |          |          
+                       |           --0.71%--ext4_htree_fill_tree
+                       |                     htree_dirblock_to_tree
+                       |          
+                       |--1.77%--__x64_sys_access
+                       |          do_faccessat
+                       |          user_path_at
+                       |          |          
+                       |           --1.04%--filename_lookup
+                       |                     path_lookupat
+                       |          
+                       |--1.73%--__x64_sys_mprotect
+                       |          do_mprotect_pkey
+                       |          |          
+                       |           --1.38%--mprotect_fixup
+                       |                     |          
+                       |                      --0.99%--vma_modify_flags
+                       |                                vma_modify
+                       |                                __split_vma
+                       |          
+                       |--1.46%--exit_to_user_mode_loop
+                       |          |          
+                       |           --1.09%--schedule
+                       |                     __sched_text_start
+                       |                     |          
+                       |                      --0.72%--finish_task_switch
+                       |          
+                       |--1.14%--__x64_sys_execve
+                       |          do_execveat_common
+                       |          bprm_execve
+                       |          load_elf_binary
+                       |          
+                       |--1.09%--__x64_sys_socket
+                       |          __sys_socket
+                       |          |          
+                       |           --0.70%--__sock_create
+                       |          
+                       |--1.04%--__se_sys_close.llvm.1449755887150175705
+                       |          __fput
+                       |          
+                       |--1.00%--__x64_sys_shutdown
+                       |          inet_shutdown
+                       |          __tcp_push_pending_frames
+                       |          tcp_write_xmit
+                       |          __tcp_transmit_skb
+                       |          |          
+                       |           --0.66%--inet6_csk_xmit
+                       |                     ip6_xmit
+                       |                     ip6_output
+                       |                     ip6_finish_output
+                       |                     ip6_finish_output2
+                       |                     __dev_queue_xmit
+                       |          
+                       |--0.98%--vm_mmap_pgoff
+                       |          do_mmap
+                       |          mmap_region
+                       |          
+                       |--0.73%--do_writev
+                       |          vfs_writev
+                       |          do_iter_readv_writev
+                       |          sock_write_iter
+                       |          __sock_sendmsg
+                       |          inet6_sendmsg
+                       |          tcp_sendmsg_locked
+                       |          __tcp_push_pending_frames
+                       |          tcp_write_xmit
+                       |          
+                       |--0.71%--__se_sys_brk.llvm.18143676888038457574
+                       |          do_brk_flags
+                       |          
+                        --0.68%--__x64_sys_connect
+                                  __sys_connect
+                                  inet_stream_connect
+                                  __inet_stream_connect
+
+    30.10%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] entry_SYSCALL_64_after_hwframe
+            |
+            ---entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               |          
+               |--6.04%--ksys_mmap_pgoff
+               |          vm_mmap_pgoff
+               |          do_mmap
+               |          |          
+               |          |--5.17%--mmap_region
+               |          |          |          
+               |          |          |--1.39%--perf_event_mmap
+               |          |          |          |          
+               |          |          |           --0.69%--d_path
+               |          |          |                     prepend_path
+               |          |          |          
+               |          |          |--1.04%--vms_gather_munmap_vmas
+               |          |          |          __split_vma
+               |          |          |          
+               |          |          |--0.97%--vma_merge_new_range
+               |          |          |          |          
+               |          |          |           --0.72%--vma_expand
+               |          |          |                     commit_merge
+               |          |          |                     mas_store_prealloc
+               |          |          |                     mas_wr_store_entry
+               |          |          |          
+               |          |           --0.70%--vms_clear_ptes
+               |          |          
+               |           --0.87%--__get_unmapped_area
+               |                     |          
+               |                      --0.61%--thp_get_unmapped_area_vmflags
+               |                                arch_get_unmapped_area_topdown
+               |          
+               |--5.74%--__x64_sys_openat
+               |          do_sys_openat2
+               |          |          
+               |           --5.10%--do_filp_open
+               |                     path_openat
+               |                     |          
+               |                     |--2.22%--link_path_walk
+               |                     |          
+               |                     |--0.80%--alloc_empty_file
+               |                     |          init_file
+               |                     |          
+               |                     |--0.75%--vfs_open
+               |                     |          do_dentry_open
+               |                     |          
+               |                      --0.59%--terminate_walk
+               |          
+               |--2.24%--__x64_sys_munmap
+               |          __vm_munmap
+               |          do_vmi_munmap
+               |          |          
+               |           --1.92%--do_vmi_align_munmap
+               |                     |          
+               |                      --1.30%--vms_complete_munmap_vmas
+               |                                |          
+               |                                 --0.97%--vms_clear_ptes
+               |                                           |          
+               |                                            --0.59%--tlb_finish_mmu
+               |                                                      tlb_flush_mmu
+               |          
+               |--1.87%--__se_sys_getdents64
+               |          iterate_dir
+               |          ext4_readdir.llvm.6365273095590756112
+               |          |          
+               |           --0.71%--ext4_htree_fill_tree
+               |                     htree_dirblock_to_tree
+               |          
+               |--1.77%--__x64_sys_access
+               |          do_faccessat
+               |          user_path_at
+               |          |          
+               |           --1.04%--filename_lookup
+               |                     path_lookupat
+               |          
+               |--1.73%--__x64_sys_mprotect
+               |          do_mprotect_pkey
+               |          |          
+               |           --1.38%--mprotect_fixup
+               |                     |          
+               |                      --0.99%--vma_modify_flags
+               |                                vma_modify
+               |                                __split_vma
+               |          
+               |--1.46%--exit_to_user_mode_loop
+               |          |          
+               |           --1.09%--schedule
+               |                     __sched_text_start
+               |                     |          
+               |                      --0.72%--finish_task_switch
+               |          
+               |--1.14%--__x64_sys_execve
+               |          do_execveat_common
+               |          bprm_execve
+               |          load_elf_binary
+               |          
+               |--1.09%--__x64_sys_socket
+               |          __sys_socket
+               |          |          
+               |           --0.70%--__sock_create
+               |          
+               |--1.04%--__se_sys_close.llvm.1449755887150175705
+               |          __fput
+               |          
+               |--1.00%--__x64_sys_shutdown
+               |          inet_shutdown
+               |          __tcp_push_pending_frames
+               |          tcp_write_xmit
+               |          __tcp_transmit_skb
+               |          |          
+               |           --0.66%--inet6_csk_xmit
+               |                     ip6_xmit
+               |                     ip6_output
+               |                     ip6_finish_output
+               |                     ip6_finish_output2
+               |                     __dev_queue_xmit
+               |          
+               |--0.98%--vm_mmap_pgoff
+               |          do_mmap
+               |          mmap_region
+               |          
+               |--0.73%--do_writev
+               |          vfs_writev
+               |          do_iter_readv_writev
+               |          sock_write_iter
+               |          __sock_sendmsg
+               |          inet6_sendmsg
+               |          tcp_sendmsg_locked
+               |          __tcp_push_pending_frames
+               |          tcp_write_xmit
+               |          
+               |--0.71%--__se_sys_brk.llvm.18143676888038457574
+               |          do_brk_flags
+               |          
+                --0.68%--__x64_sys_connect
+                          __sys_connect
+                          inet_stream_connect
+                          __inet_stream_connect
+
+    23.53%    19.72%  vulkaninfo  libc.so.6                                       [.] __strcmp_sse2
+            |          
+            |--11.45%--0
+            |          0x10aded010110aded
+            |          |          
+            |           --10.65%--__strcmp_sse2
+            |          
+            |--7.52%--0x63ac098dd33cd800
+            |          |          
+            |           --7.10%--__strcmp_sse2
+            |          
+             --3.81%--__strcmp_sse2
+
+    13.96%     0.00%  vulkaninfo  [unknown]                                       [k] 0x10aded010110aded
+            |
+            ---0x10aded010110aded
+               |          
+                --13.16%--__strcmp_sse2
+
+    12.17%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] asm_exc_page_fault
+            |
+            ---asm_exc_page_fault
+               |          
+                --11.57%--exc_page_fault
+                          do_user_addr_fault
+                          |          
+                          |--10.06%--handle_mm_fault
+                          |          |          
+                          |          |--7.27%--do_pte_missing
+                          |          |          |          
+                          |          |          |--1.93%--finish_fault
+                          |          |          |          |          
+                          |          |          |           --1.23%--set_pte_range
+                          |          |          |          
+                          |          |          |--1.66%--filemap_map_pages
+                          |          |          |          
+                          |          |           --1.64%--vma_alloc_folio_noprof
+                          |          |                     alloc_pages_mpol
+                          |          |                     __alloc_frozen_pages_noprof
+                          |          |                     get_page_from_freelist
+                          |          |                     |          
+                          |          |                      --1.02%--prep_new_page
+                          |          |                                clear_page_rep
+                          |          |          
+                          |           --1.27%--do_wp_page
+                          |          
+                           --0.79%--lock_vma_under_rcu
+                                     mas_walk
+                                     mas_state_walk
+
+    11.57%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] exc_page_fault
+            |
+            ---exc_page_fault
+               do_user_addr_fault
+               |          
+               |--10.06%--handle_mm_fault
+               |          |          
+               |          |--7.27%--do_pte_missing
+               |          |          |          
+               |          |          |--1.93%--finish_fault
+               |          |          |          |          
+               |          |          |           --1.23%--set_pte_range
+               |          |          |          
+               |          |          |--1.66%--filemap_map_pages
+               |          |          |          
+               |          |           --1.64%--vma_alloc_folio_noprof
+               |          |                     alloc_pages_mpol
+               |          |                     __alloc_frozen_pages_noprof
+               |          |                     get_page_from_freelist
+               |          |                     |          
+               |          |                      --1.02%--prep_new_page
+               |          |                                clear_page_rep
+               |          |          
+               |           --1.27%--do_wp_page
+               |          
+                --0.79%--lock_vma_under_rcu
+                          mas_walk
+                          mas_state_walk
+
+    11.57%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_user_addr_fault
+            |
+            ---do_user_addr_fault
+               |          
+               |--10.06%--handle_mm_fault
+               |          |          
+               |          |--7.27%--do_pte_missing
+               |          |          |          
+               |          |          |--1.93%--finish_fault
+               |          |          |          |          
+               |          |          |           --1.23%--set_pte_range
+               |          |          |          
+               |          |          |--1.66%--filemap_map_pages
+               |          |          |          
+               |          |           --1.64%--vma_alloc_folio_noprof
+               |          |                     alloc_pages_mpol
+               |          |                     __alloc_frozen_pages_noprof
+               |          |                     get_page_from_freelist
+               |          |                     |          
+               |          |                      --1.02%--prep_new_page
+               |          |                                clear_page_rep
+               |          |          
+               |           --1.27%--do_wp_page
+               |          
+                --0.79%--lock_vma_under_rcu
+                          mas_walk
+                          mas_state_walk
+
+    10.06%     1.19%  vulkaninfo  [kernel.kallsyms]                               [k] handle_mm_fault
+            |          
+            |--8.86%--handle_mm_fault
+            |          |          
+            |          |--7.27%--do_pte_missing
+            |          |          |          
+            |          |          |--1.93%--finish_fault
+            |          |          |          |          
+            |          |          |           --1.23%--set_pte_range
+            |          |          |          
+            |          |          |--1.66%--filemap_map_pages
+            |          |          |          
+            |          |           --1.64%--vma_alloc_folio_noprof
+            |          |                     alloc_pages_mpol
+            |          |                     __alloc_frozen_pages_noprof
+            |          |                     get_page_from_freelist
+            |          |                     |          
+            |          |                      --1.02%--prep_new_page
+            |          |                                clear_page_rep
+            |          |          
+            |           --1.27%--do_wp_page
+            |          
+             --0.53%--0x726f772f726b6972
+                       0x73656d2f80000001
+                       _dl_relocate_object
+                       _dl_relocate_object_no_relro
+                       asm_exc_page_fault
+                       exc_page_fault
+                       do_user_addr_fault
+                       handle_mm_fault
+
+     9.26%     0.00%  vulkaninfo  [unknown]                                       [.] 0x63ac098dd33cd800
+            |
+            ---0x63ac098dd33cd800
+               |          
+                --8.39%--__strcmp_sse2
+
+     7.74%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] mmap64
+            |
+            ---mmap64
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               |          
+               |--6.04%--ksys_mmap_pgoff
+               |          vm_mmap_pgoff
+               |          do_mmap
+               |          |          
+               |          |--5.17%--mmap_region
+               |          |          |          
+               |          |          |--1.39%--perf_event_mmap
+               |          |          |          |          
+               |          |          |           --0.69%--d_path
+               |          |          |                     prepend_path
+               |          |          |          
+               |          |          |--1.04%--vms_gather_munmap_vmas
+               |          |          |          __split_vma
+               |          |          |          
+               |          |          |--0.97%--vma_merge_new_range
+               |          |          |          |          
+               |          |          |           --0.72%--vma_expand
+               |          |          |                     commit_merge
+               |          |          |                     mas_store_prealloc
+               |          |          |                     mas_wr_store_entry
+               |          |          |          
+               |          |           --0.70%--vms_clear_ptes
+               |          |          
+               |           --0.87%--__get_unmapped_area
+               |                     |          
+               |                      --0.61%--thp_get_unmapped_area_vmflags
+               |                                arch_get_unmapped_area_topdown
+               |          
+               |--0.98%--vm_mmap_pgoff
+               |          do_mmap
+               |          mmap_region
+               |          
+                --0.72%--exit_to_user_mode_loop
+                          schedule
+                          __sched_text_start
+
+     7.27%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] do_pte_missing
+            |          
+             --6.90%--do_pte_missing
+                       |          
+                       |--1.93%--finish_fault
+                       |          |          
+                       |           --1.23%--set_pte_range
+                       |          
+                       |--1.66%--filemap_map_pages
+                       |          
+                        --1.64%--vma_alloc_folio_noprof
+                                  alloc_pages_mpol
+                                  __alloc_frozen_pages_noprof
+                                  get_page_from_freelist
+                                  |          
+                                   --1.02%--prep_new_page
+                                             clear_page_rep
+
+     7.03%     0.00%  vulkaninfo  libc.so.6                                       [.] __internal_syscall_cancel
+            |
+            ---__internal_syscall_cancel
+               |          
+                --6.60%--entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          |          
+                          |--2.63%--__x64_sys_openat
+                          |          do_sys_openat2
+                          |          do_filp_open
+                          |          path_openat
+                          |          |          
+                          |           --0.80%--alloc_empty_file
+                          |                     init_file
+                          |          
+                          |--0.73%--do_writev
+                          |          vfs_writev
+                          |          do_iter_readv_writev
+                          |          sock_write_iter
+                          |          __sock_sendmsg
+                          |          inet6_sendmsg
+                          |          tcp_sendmsg_locked
+                          |          __tcp_push_pending_frames
+                          |          tcp_write_xmit
+                          |          
+                          |--0.70%--__se_sys_close.llvm.1449755887150175705
+                          |          __fput
+                          |          
+                           --0.68%--__x64_sys_connect
+                                     __sys_connect
+                                     inet_stream_connect
+                                     __inet_stream_connect
+
+     7.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vm_mmap_pgoff
+            |
+            ---vm_mmap_pgoff
+               do_mmap
+               |          
+               |--6.15%--mmap_region
+               |          |          
+               |          |--1.39%--perf_event_mmap
+               |          |          |          
+               |          |           --0.69%--d_path
+               |          |                     prepend_path
+               |          |          
+               |          |--1.04%--vms_gather_munmap_vmas
+               |          |          __split_vma
+               |          |          
+               |          |--0.97%--vma_merge_new_range
+               |          |          |          
+               |          |           --0.72%--vma_expand
+               |          |                     commit_merge
+               |          |                     mas_store_prealloc
+               |          |                     mas_wr_store_entry
+               |          |          
+               |          |--0.72%--security_vm_enough_memory_mm
+               |          |          
+               |           --0.70%--vms_clear_ptes
+               |          
+                --0.87%--__get_unmapped_area
+                          |          
+                           --0.61%--thp_get_unmapped_area_vmflags
+                                     arch_get_unmapped_area_topdown
+
+     7.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_mmap
+            |
+            ---do_mmap
+               |          
+               |--6.15%--mmap_region
+               |          |          
+               |          |--1.39%--perf_event_mmap
+               |          |          |          
+               |          |           --0.69%--d_path
+               |          |                     prepend_path
+               |          |          
+               |          |--1.04%--vms_gather_munmap_vmas
+               |          |          __split_vma
+               |          |          
+               |          |--0.97%--vma_merge_new_range
+               |          |          |          
+               |          |           --0.72%--vma_expand
+               |          |                     commit_merge
+               |          |                     mas_store_prealloc
+               |          |                     mas_wr_store_entry
+               |          |          
+               |          |--0.72%--security_vm_enough_memory_mm
+               |          |          
+               |           --0.70%--vms_clear_ptes
+               |          
+                --0.87%--__get_unmapped_area
+                          |          
+                           --0.61%--thp_get_unmapped_area_vmflags
+                                     arch_get_unmapped_area_topdown
+
+     6.82%     2.89%  vulkaninfo  libc.so.6                                       [.] _int_malloc
+            |          
+            |--4.28%--_int_malloc
+            |          |          
+            |           --1.12%--asm_exc_page_fault
+            |                     exc_page_fault
+            |                     do_user_addr_fault
+            |                     handle_mm_fault
+            |                     |          
+            |                      --0.76%--do_pte_missing
+            |          
+             --1.39%--0
+                       |          
+                        --0.75%--__libc_calloc
+
+     6.15%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] mmap_region
+            |          
+             --5.78%--mmap_region
+                       |          
+                       |--1.39%--perf_event_mmap
+                       |          |          
+                       |           --0.69%--d_path
+                       |                     prepend_path
+                       |          
+                       |--1.04%--vms_gather_munmap_vmas
+                       |          __split_vma
+                       |          
+                       |--0.97%--vma_merge_new_range
+                       |          |          
+                       |           --0.72%--vma_expand
+                       |                     commit_merge
+                       |                     mas_store_prealloc
+                       |                     mas_wr_store_entry
+                       |          
+                        --0.70%--vms_clear_ptes
+
+     6.12%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_openat
+            |          
+             --5.74%--__x64_sys_openat
+                       do_sys_openat2
+                       |          
+                        --5.10%--do_filp_open
+                                  path_openat
+                                  |          
+                                  |--2.22%--link_path_walk
+                                  |          
+                                  |--0.80%--alloc_empty_file
+                                  |          init_file
+                                  |          
+                                  |--0.75%--vfs_open
+                                  |          do_dentry_open
+                                  |          
+                                   --0.59%--terminate_walk
+
+     6.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ksys_mmap_pgoff
+            |
+            ---ksys_mmap_pgoff
+               vm_mmap_pgoff
+               do_mmap
+               |          
+               |--5.17%--mmap_region
+               |          |          
+               |          |--1.39%--perf_event_mmap
+               |          |          |          
+               |          |           --0.69%--d_path
+               |          |                     prepend_path
+               |          |          
+               |          |--1.04%--vms_gather_munmap_vmas
+               |          |          __split_vma
+               |          |          
+               |          |--0.97%--vma_merge_new_range
+               |          |          |          
+               |          |           --0.72%--vma_expand
+               |          |                     commit_merge
+               |          |                     mas_store_prealloc
+               |          |                     mas_wr_store_entry
+               |          |          
+               |           --0.70%--vms_clear_ptes
+               |          
+                --0.87%--__get_unmapped_area
+                          |          
+                           --0.61%--thp_get_unmapped_area_vmflags
+                                     arch_get_unmapped_area_topdown
+
+     5.74%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_sys_openat2
+            |
+            ---do_sys_openat2
+               |          
+                --5.10%--do_filp_open
+                          path_openat
+                          |          
+                          |--2.22%--link_path_walk
+                          |          
+                          |--0.80%--alloc_empty_file
+                          |          init_file
+                          |          
+                          |--0.75%--vfs_open
+                          |          do_dentry_open
+                          |          
+                           --0.59%--terminate_walk
+
+     5.10%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_filp_open
+            |
+            ---do_filp_open
+               path_openat
+               |          
+               |--2.22%--link_path_walk
+               |          
+               |--0.80%--alloc_empty_file
+               |          init_file
+               |          
+               |--0.75%--vfs_open
+               |          do_dentry_open
+               |          
+                --0.59%--terminate_walk
+
+     5.10%     0.44%  vulkaninfo  [kernel.kallsyms]                               [k] path_openat
+            |          
+             --4.66%--path_openat
+                       |          
+                       |--2.22%--link_path_walk
+                       |          
+                       |--0.80%--alloc_empty_file
+                       |          init_file
+                       |          
+                       |--0.75%--vfs_open
+                       |          do_dentry_open
+                       |          
+                        --0.59%--terminate_walk
+
+     4.48%     0.36%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_map_object
+            |          
+             --4.12%--_dl_map_object
+                       |          
+                       |--1.62%--_dl_map_object_from_fd
+                       |          |          
+                       |           --1.36%--asm_exc_page_fault
+                       |                     exc_page_fault
+                       |                     do_user_addr_fault
+                       |                     handle_mm_fault
+                       |                     |          
+                       |                      --1.04%--do_pte_missing
+                       |                                |          
+                       |                                 --0.68%--filemap_map_pages
+                       |          
+                       |--1.45%--memset
+                       |          asm_exc_page_fault
+                       |          exc_page_fault
+                       |          do_user_addr_fault
+                       |          handle_mm_fault
+                       |          do_pte_missing
+                       |          |          
+                       |           --1.09%--finish_fault
+                       |                     |          
+                       |                      --0.66%--set_pte_range
+                       |          
+                        --1.06%--__GI___open64_nocancel
+                                  entry_SYSCALL_64_after_hwframe
+                                  do_syscall_64
+                                  __x64_sys_openat
+                                  do_sys_openat2
+                                  do_filp_open
+                                  path_openat
+                                  |          
+                                   --0.71%--link_path_walk
+
+     4.36%     2.86%  vulkaninfo  libc.so.6                                       [.] __libc_calloc
+            |          
+            |--1.90%--__libc_calloc
+            |          
+             --1.04%--0
+                       _int_malloc
+
+     4.32%     0.00%  vulkaninfo  [unknown]                                       [.] 0x726f772f726b6972
+            |
+            ---0x726f772f726b6972
+               |          
+                --3.59%--0x73656d2f80000001
+                          |          
+                          |--2.83%--_dl_relocate_object
+                          |          _dl_relocate_object_no_relro
+                          |          asm_exc_page_fault
+                          |          |          
+                          |           --2.55%--exc_page_fault
+                          |                     do_user_addr_fault
+                          |                     handle_mm_fault
+                          |                     |          
+                          |                      --1.74%--do_pte_missing
+                          |                                |          
+                          |                                |--0.84%--finish_fault
+                          |                                |          |          
+                          |                                |           --0.56%--set_pte_range
+                          |                                |          
+                          |                                 --0.60%--vma_alloc_folio_noprof
+                          |                                           alloc_pages_mpol
+                          |                                           __alloc_frozen_pages_noprof
+                          |                                           get_page_from_freelist
+                          |          
+                           --0.76%--mprotect
+                                     entry_SYSCALL_64_after_hwframe
+                                     do_syscall_64
+                                     __x64_sys_mprotect
+                                     do_mprotect_pkey
+                                     mprotect_fixup
+
+     4.19%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] asm_sysvec_apic_timer_interrupt
+            |
+            ---asm_sysvec_apic_timer_interrupt
+               |          
+                --3.43%--sysvec_apic_timer_interrupt
+                          |          
+                           --3.04%--__sysvec_apic_timer_interrupt
+                                     hrtimer_interrupt
+                                     __hrtimer_run_queues
+                                     |          
+                                     |--1.51%--tick_nohz_handler
+                                     |          |          
+                                     |           --1.15%--update_process_times
+                                     |          
+                                      --0.80%--hrtimer_wakeup
+                                                try_to_wake_up
+
+     4.15%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_relocate_object
+            |
+            ---_dl_relocate_object
+               _dl_relocate_object_no_relro
+               |          
+                --3.18%--asm_exc_page_fault
+                          |          
+                           --2.90%--exc_page_fault
+                                     do_user_addr_fault
+                                     handle_mm_fault
+                                     |          
+                                      --2.09%--do_pte_missing
+                                                |          
+                                                |--0.95%--vma_alloc_folio_noprof
+                                                |          alloc_pages_mpol
+                                                |          __alloc_frozen_pages_noprof
+                                                |          get_page_from_freelist
+                                                |          
+                                                 --0.84%--finish_fault
+                                                           |          
+                                                            --0.56%--set_pte_range
+
+     4.15%     0.66%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_relocate_object_no_relro
+            |          
+            |--3.49%--_dl_relocate_object_no_relro
+            |          |          
+            |           --3.18%--asm_exc_page_fault
+            |                     |          
+            |                      --2.90%--exc_page_fault
+            |                                do_user_addr_fault
+            |                                handle_mm_fault
+            |                                |          
+            |                                 --2.09%--do_pte_missing
+            |                                           |          
+            |                                           |--0.95%--vma_alloc_folio_noprof
+            |                                           |          alloc_pages_mpol
+            |                                           |          __alloc_frozen_pages_noprof
+            |                                           |          get_page_from_freelist
+            |                                           |          
+            |                                            --0.84%--finish_fault
+            |                                                      |          
+            |                                                       --0.56%--set_pte_range
+            |          
+             --0.66%--_dl_start_user
+                       _dl_sysdep_start
+                       _dl_relocate_object
+                       _dl_relocate_object_no_relro
+
+     3.70%     2.01%  vulkaninfo  ld-linux-x86-64.so.2                            [.] do_lookup_x
+            |          
+             --2.70%--do_lookup_x
+                       |          
+                        --0.67%--asm_exc_page_fault
+                                  exc_page_fault
+                                  do_user_addr_fault
+                                  handle_mm_fault
+                                  do_wp_page
+
+     3.59%     0.00%  vulkaninfo  [unknown]                                       [k] 0x73656d2f80000001
+            |
+            ---0x73656d2f80000001
+               |          
+               |--2.83%--_dl_relocate_object
+               |          _dl_relocate_object_no_relro
+               |          asm_exc_page_fault
+               |          |          
+               |           --2.55%--exc_page_fault
+               |                     do_user_addr_fault
+               |                     handle_mm_fault
+               |                     |          
+               |                      --1.74%--do_pte_missing
+               |                                |          
+               |                                |--0.84%--finish_fault
+               |                                |          |          
+               |                                |           --0.56%--set_pte_range
+               |                                |          
+               |                                 --0.60%--vma_alloc_folio_noprof
+               |                                           alloc_pages_mpol
+               |                                           __alloc_frozen_pages_noprof
+               |                                           get_page_from_freelist
+               |          
+                --0.76%--mprotect
+                          entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          __x64_sys_mprotect
+                          do_mprotect_pkey
+                          mprotect_fixup
+
+     3.43%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sysvec_apic_timer_interrupt
+            |
+            ---sysvec_apic_timer_interrupt
+               |          
+                --3.04%--__sysvec_apic_timer_interrupt
+                          hrtimer_interrupt
+                          __hrtimer_run_queues
+                          |          
+                          |--1.51%--tick_nohz_handler
+                          |          |          
+                          |           --1.15%--update_process_times
+                          |          
+                           --0.80%--hrtimer_wakeup
+                                     try_to_wake_up
+
+     3.04%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] __hrtimer_run_queues
+            |          
+             --2.72%--__hrtimer_run_queues
+                       |          
+                       |--1.51%--tick_nohz_handler
+                       |          |          
+                       |           --1.15%--update_process_times
+                       |          
+                        --0.80%--hrtimer_wakeup
+                                  try_to_wake_up
+
+     3.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sysvec_apic_timer_interrupt
+            |
+            ---__sysvec_apic_timer_interrupt
+               hrtimer_interrupt
+               __hrtimer_run_queues
+               |          
+               |--1.51%--tick_nohz_handler
+               |          |          
+               |           --1.15%--update_process_times
+               |          
+                --0.80%--hrtimer_wakeup
+                          try_to_wake_up
+
+     3.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] hrtimer_interrupt
+            |
+            ---hrtimer_interrupt
+               __hrtimer_run_queues
+               |          
+               |--1.51%--tick_nohz_handler
+               |          |          
+               |           --1.15%--update_process_times
+               |          
+                --0.80%--hrtimer_wakeup
+                          try_to_wake_up
+
+     2.98%     0.70%  vulkaninfo  [kernel.kallsyms]                               [k] link_path_walk
+            |          
+            |--2.28%--link_path_walk
+            |          
+             --0.70%--0
+
+     2.70%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __vm_munmap
+            |
+            ---__vm_munmap
+               do_vmi_munmap
+               |          
+                --2.39%--do_vmi_align_munmap
+                          |          
+                           --1.77%--vms_complete_munmap_vmas
+                                     |          
+                                      --1.23%--vms_clear_ptes
+                                                |          
+                                                 --0.59%--tlb_finish_mmu
+                                                           tlb_flush_mmu
+
+     2.70%     0.31%  vulkaninfo  [kernel.kallsyms]                               [k] do_vmi_munmap
+            |          
+             --2.39%--do_vmi_munmap
+                       do_vmi_align_munmap
+                       |          
+                        --1.77%--vms_complete_munmap_vmas
+                                  |          
+                                   --1.23%--vms_clear_ptes
+                                             |          
+                                              --0.59%--tlb_finish_mmu
+                                                        tlb_flush_mmu
+
+     2.60%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] munmap
+            |
+            ---munmap
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               |          
+                --2.24%--__x64_sys_munmap
+                          __vm_munmap
+                          do_vmi_munmap
+                          |          
+                           --1.92%--do_vmi_align_munmap
+                                     |          
+                                      --1.30%--vms_complete_munmap_vmas
+                                                |          
+                                                 --0.97%--vms_clear_ptes
+                                                           |          
+                                                            --0.59%--tlb_finish_mmu
+                                                                      tlb_flush_mmu
+
+     2.60%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_start_user
+            |
+            ---_dl_start_user
+               _dl_sysdep_start
+               |          
+               |--1.31%--_dl_relocate_object
+               |          _dl_relocate_object_no_relro
+               |          
+                --0.98%--mprotect
+                          entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          __x64_sys_mprotect
+                          do_mprotect_pkey
+                          |          
+                           --0.62%--mprotect_fixup
+                                     vma_modify_flags
+                                     vma_modify
+                                     __split_vma
+
+     2.60%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_sysdep_start
+            |
+            ---_dl_sysdep_start
+               |          
+               |--1.31%--_dl_relocate_object
+               |          _dl_relocate_object_no_relro
+               |          
+                --0.98%--mprotect
+                          entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          __x64_sys_mprotect
+                          do_mprotect_pkey
+                          |          
+                           --0.62%--mprotect_fixup
+                                     vma_modify_flags
+                                     vma_modify
+                                     __split_vma
+
+     2.57%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00007fb8ddf3abc8
+            |
+            ---0x7fb8ddf3abc8
+               |          
+               |--1.23%--_dl_map_object
+               |          |          
+               |           --0.57%--_dl_map_object_from_fd
+               |          
+                --0.98%--0x7fb8ddef9790
+                          0xc
+                          0
+                          do_lookup_x
+
+     2.53%     2.12%  vulkaninfo  libvulkan.so.1.4.309                            [.] strcmp@plt
+            |          
+            |--1.29%--0x63ac098dd33cd800
+            |          __strcmp_sse2
+            |          
+             --0.82%--0
+                       0x10aded010110aded
+                       __strcmp_sse2
+
+     2.51%     2.10%  vulkaninfo  libc.so.6                                       [.] __strncmp_sse2
+            |          
+             --1.04%--0
+                       |          
+                        --0.67%--0x7fb8ddc8b3a5
+
+     2.49%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sched_text_start
+            |
+            ---__sched_text_start
+               |          
+               |--1.10%--finish_task_switch
+               |          |          
+               |           --0.74%--__perf_event_task_sched_in
+               |                     ctx_sched_in
+               |                     __pmu_ctx_sched_in
+               |                     visit_groups_merge
+               |          
+                --1.01%--__pick_next_task
+                          |          
+                           --0.66%--pick_next_task_fair
+
+     2.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_vmi_align_munmap
+            |
+            ---do_vmi_align_munmap
+               |          
+                --1.77%--vms_complete_munmap_vmas
+                          |          
+                           --1.23%--vms_clear_ptes
+                                     |          
+                                      --0.59%--tlb_finish_mmu
+                                                tlb_flush_mmu
+
+     2.34%     1.68%  vulkaninfo  [kernel.kallsyms]                               [k] filemap_map_pages
+            |          
+            |--0.69%--0
+            |          0x5584ca31e640
+            |          _dl_map_object
+            |          _dl_map_object_from_fd
+            |          asm_exc_page_fault
+            |          exc_page_fault
+            |          do_user_addr_fault
+            |          handle_mm_fault
+            |          do_pte_missing
+            |          
+             --0.65%--filemap_map_pages
+
+     2.29%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] vma_alloc_folio_noprof
+            |          
+             --1.92%--vma_alloc_folio_noprof
+                       alloc_pages_mpol
+                       __alloc_frozen_pages_noprof
+                       get_page_from_freelist
+                       |          
+                        --1.02%--prep_new_page
+                                  clear_page_rep
+
+     2.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_munmap
+            |
+            ---__x64_sys_munmap
+               __vm_munmap
+               do_vmi_munmap
+               |          
+                --1.92%--do_vmi_align_munmap
+                          |          
+                           --1.30%--vms_complete_munmap_vmas
+                                     |          
+                                      --0.97%--vms_clear_ptes
+                                                |          
+                                                 --0.59%--tlb_finish_mmu
+                                                           tlb_flush_mmu
+
+     2.05%     0.00%  vulkaninfo  libc.so.6                                       [.] __open64_nocancel
+            |
+            ---__open64_nocancel
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_openat
+               do_sys_openat2
+               |          
+                --1.41%--do_filp_open
+                          path_openat
+                          |          
+                           --1.12%--link_path_walk
+
+     2.05%     0.12%  vulkaninfo  [kernel.kallsyms]                               [k] alloc_pages_mpol
+            |          
+             --1.92%--alloc_pages_mpol
+                       __alloc_frozen_pages_noprof
+                       get_page_from_freelist
+                       |          
+                        --1.02%--prep_new_page
+                                  clear_page_rep
+
+     2.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vms_complete_munmap_vmas
+            |
+            ---vms_complete_munmap_vmas
+               |          
+                --1.23%--vms_clear_ptes
+                          |          
+                           --0.59%--tlb_finish_mmu
+                                     tlb_flush_mmu
+
+     2.03%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __split_vma
+            |
+            ---__split_vma
+               |          
+                --0.65%--vma_complete
+                          mas_store_prealloc
+
+     1.96%     1.58%  vulkaninfo  libc.so.6                                       [.] cfree@GLIBC_2.2.5
+     1.93%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vms_clear_ptes
+            |
+            ---vms_clear_ptes
+               |          
+               |--0.92%--tlb_finish_mmu
+               |          tlb_flush_mmu
+               |          
+                --0.75%--unmap_vmas
+                          unmap_page_range
+
+     1.93%     0.30%  vulkaninfo  [kernel.kallsyms]                               [k] finish_fault
+            |          
+             --1.63%--finish_fault
+                       |          
+                        --0.93%--set_pte_range
+
+     1.92%     1.21%  vulkaninfo  [kernel.kallsyms]                               [k] get_page_from_freelist
+            |          
+            |--0.71%--get_page_from_freelist
+            |          prep_new_page
+            |          clear_page_rep
+            |          
+             --0.56%--0x726f772f726b6972
+                       0x73656d2f80000001
+                       _dl_relocate_object
+                       _dl_relocate_object_no_relro
+                       asm_exc_page_fault
+                       exc_page_fault
+                       do_user_addr_fault
+                       handle_mm_fault
+
+     1.92%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __alloc_frozen_pages_noprof
+            |
+            ---__alloc_frozen_pages_noprof
+               get_page_from_freelist
+               |          
+                --1.02%--prep_new_page
+                          clear_page_rep
+
+     1.87%     0.00%  vulkaninfo  libc.so.6                                       [.] __GI___getdents64
+            |
+            ---__GI___getdents64
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __se_sys_getdents64
+               iterate_dir
+               ext4_readdir.llvm.6365273095590756112
+               |          
+                --0.71%--ext4_htree_fill_tree
+                          htree_dirblock_to_tree
+
+     1.87%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __se_sys_getdents64
+            |
+            ---__se_sys_getdents64
+               iterate_dir
+               ext4_readdir.llvm.6365273095590756112
+               |          
+                --0.71%--ext4_htree_fill_tree
+                          htree_dirblock_to_tree
+
+     1.87%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] iterate_dir
+            |
+            ---iterate_dir
+               ext4_readdir.llvm.6365273095590756112
+               |          
+                --0.71%--ext4_htree_fill_tree
+                          htree_dirblock_to_tree
+
+     1.87%     0.79%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_readdir.llvm.6365273095590756112
+            |          
+             --1.08%--ext4_readdir.llvm.6365273095590756112
+                       |          
+                        --0.71%--ext4_htree_fill_tree
+                                  htree_dirblock_to_tree
+
+     1.85%     1.14%  vulkaninfo  libc.so.6                                       [.] malloc_consolidate
+            |          
+             --1.51%--malloc_consolidate
+
+     1.84%     0.36%  vulkaninfo  libc.so.6                                       [.] __memset_sse2_unaligned_erms
+            |          
+             --1.48%--__memset_sse2_unaligned_erms
+                       |          
+                       |--0.74%--asm_sysvec_apic_timer_interrupt
+                       |          sysvec_apic_timer_interrupt
+                       |          
+                        --0.73%--asm_exc_page_fault
+                                  exc_page_fault
+                                  do_user_addr_fault
+
+     1.83%     1.08%  vulkaninfo  libc.so.6                                       [.] _int_free_chunk
+            |          
+             --0.75%--_int_free_chunk
+
+     1.77%     0.00%  vulkaninfo  libc.so.6                                       [.] __GI___access
+            |
+            ---__GI___access
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_access
+               do_faccessat
+               user_path_at
+               |          
+                --1.04%--filename_lookup
+                          path_lookupat
+
+     1.77%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_access
+            |
+            ---__x64_sys_access
+               do_faccessat
+               user_path_at
+               |          
+                --1.04%--filename_lookup
+                          path_lookupat
+
+     1.77%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_faccessat
+            |
+            ---do_faccessat
+               user_path_at
+               |          
+                --1.04%--filename_lookup
+                          path_lookupat
+
+     1.77%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] user_path_at
+            |
+            ---user_path_at
+               |          
+                --1.04%--filename_lookup
+                          path_lookupat
+
+     1.76%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] schedule
+            |
+            ---schedule
+               __sched_text_start
+               |          
+               |--0.72%--finish_task_switch
+               |          
+                --0.66%--__pick_next_task
+                          pick_next_task_fair
+
+     1.74%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00005584ca31e640
+            |
+            ---0x5584ca31e640
+               _dl_map_object
+               |          
+               |--0.72%--memset
+               |          asm_exc_page_fault
+               |          exc_page_fault
+               |          do_user_addr_fault
+               |          handle_mm_fault
+               |          do_pte_missing
+               |          
+                --0.69%--_dl_map_object_from_fd
+                          asm_exc_page_fault
+                          exc_page_fault
+                          do_user_addr_fault
+                          handle_mm_fault
+                          do_pte_missing
+
+     1.73%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] mprotect
+            |
+            ---mprotect
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_mprotect
+               do_mprotect_pkey
+               |          
+                --1.38%--mprotect_fixup
+                          |          
+                           --0.99%--vma_modify_flags
+                                     vma_modify
+                                     __split_vma
+
+     1.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_mprotect
+            |
+            ---__x64_sys_mprotect
+               do_mprotect_pkey
+               |          
+                --1.38%--mprotect_fixup
+                          |          
+                           --0.99%--vma_modify_flags
+                                     vma_modify
+                                     __split_vma
+
+     1.73%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] do_mprotect_pkey
+            |          
+             --1.38%--do_mprotect_pkey
+                       mprotect_fixup
+                       |          
+                        --0.99%--vma_modify_flags
+                                  vma_modify
+                                  __split_vma
+
+     1.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __tcp_push_pending_frames
+            |
+            ---__tcp_push_pending_frames
+               tcp_write_xmit
+               |          
+                --1.38%--__tcp_transmit_skb
+                          |          
+                           --1.04%--inet6_csk_xmit
+                                     ip6_xmit
+                                     ip6_output
+                                     ip6_finish_output
+                                     ip6_finish_output2
+                                     __dev_queue_xmit
+                                     |          
+                                      --0.70%--__local_bh_enable_ip
+                                                do_softirq
+                                                handle_softirqs
+                                                net_rx_action
+                                                __napi_poll
+                                                process_backlog
+                                                __netif_receive_skb
+                                                ipv6_rcv
+                                                ip6_input
+                                                ip6_input_finish
+                                                ip6_protocol_deliver_rcu
+                                                tcp_v6_rcv
+
+     1.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_write_xmit
+            |
+            ---tcp_write_xmit
+               |          
+                --1.38%--__tcp_transmit_skb
+                          |          
+                           --1.04%--inet6_csk_xmit
+                                     ip6_xmit
+                                     ip6_output
+                                     ip6_finish_output
+                                     ip6_finish_output2
+                                     __dev_queue_xmit
+                                     |          
+                                      --0.70%--__local_bh_enable_ip
+                                                do_softirq
+                                                handle_softirqs
+                                                net_rx_action
+                                                __napi_poll
+                                                process_backlog
+                                                __netif_receive_skb
+                                                ipv6_rcv
+                                                ip6_input
+                                                ip6_input_finish
+                                                ip6_protocol_deliver_rcu
+                                                tcp_v6_rcv
+
+     1.71%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mas_store_prealloc
+            |
+            ---mas_store_prealloc
+               |          
+                --1.39%--mas_wr_store_entry
+
+     1.70%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __tcp_transmit_skb
+            |
+            ---__tcp_transmit_skb
+               |          
+                --1.36%--inet6_csk_xmit
+                          ip6_xmit
+                          ip6_output
+                          ip6_finish_output
+                          ip6_finish_output2
+                          __dev_queue_xmit
+                          |          
+                           --1.02%--__local_bh_enable_ip
+                                     do_softirq
+                                     handle_softirqs
+                                     net_rx_action
+                                     __napi_poll
+                                     process_backlog
+                                     __netif_receive_skb
+                                     ipv6_rcv
+                                     ip6_input
+                                     ip6_input_finish
+                                     ip6_protocol_deliver_rcu
+                                     tcp_v6_rcv
+                                     |          
+                                      --0.70%--tcp_v6_do_rcv
+
+     1.64%     0.00%  vulkaninfo  [unknown]                                       [k] 0x0000000100136cf4
+            |
+            ---0x100136cf4
+               _dl_close
+               munmap
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_munmap
+               __vm_munmap
+               do_vmi_munmap
+               do_vmi_align_munmap
+               |          
+                --1.02%--vms_complete_munmap_vmas
+                          |          
+                           --0.69%--vms_clear_ptes
+
+     1.64%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_close
+            |
+            ---_dl_close
+               munmap
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_munmap
+               __vm_munmap
+               do_vmi_munmap
+               do_vmi_align_munmap
+               |          
+                --1.02%--vms_complete_munmap_vmas
+                          |          
+                           --0.69%--vms_clear_ptes
+
+     1.62%     0.25%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_map_object_from_fd
+            |          
+             --1.36%--_dl_map_object_from_fd
+                       asm_exc_page_fault
+                       exc_page_fault
+                       do_user_addr_fault
+                       handle_mm_fault
+                       |          
+                        --1.04%--do_pte_missing
+                                  |          
+                                   --0.68%--filemap_map_pages
+
+     1.51%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tick_nohz_handler
+            |
+            ---tick_nohz_handler
+               |          
+                --1.15%--update_process_times
+
+     1.46%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] exit_to_user_mode_loop
+            |
+            ---exit_to_user_mode_loop
+               |          
+                --1.09%--schedule
+                          __sched_text_start
+                          |          
+                           --0.72%--finish_task_switch
+
+     1.45%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] memset
+            |
+            ---memset
+               asm_exc_page_fault
+               exc_page_fault
+               do_user_addr_fault
+               handle_mm_fault
+               do_pte_missing
+               |          
+                --1.09%--finish_fault
+                          |          
+                           --0.66%--set_pte_range
+
+     1.44%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] filename_lookup
+            |
+            ---filename_lookup
+               path_lookupat
+               |          
+                --0.76%--link_path_walk
+
+     1.44%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] path_lookupat
+            |
+            ---path_lookupat
+               |          
+                --0.76%--link_path_walk
+
+     1.44%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddcb3152
+            |
+            ---0x7fb8ddcb3152
+               |          
+                --1.02%--__GI___access
+                          entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          __x64_sys_access
+                          do_faccessat
+                          user_path_at
+                          |          
+                           --0.70%--filename_lookup
+                                     path_lookupat
+
+     1.42%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mprotect_fixup
+            |
+            ---mprotect_fixup
+               |          
+                --0.99%--vma_modify_flags
+                          vma_modify
+                          __split_vma
+
+     1.42%     0.66%  vulkaninfo  [kernel.kallsyms]                               [k] memset_orig
+            |          
+             --0.76%--memset_orig
+
+     1.40%     0.68%  vulkaninfo  libc.so.6                                       [.] __memmove_ssse3
+            |          
+             --1.09%--__memmove_ssse3
+
+     1.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] perf_event_mmap
+            |
+            ---perf_event_mmap
+               |          
+                --0.69%--d_path
+                          prepend_path
+
+     1.39%     0.72%  vulkaninfo  [kernel.kallsyms]                               [k] __pick_next_task
+            |          
+             --0.66%--__pick_next_task
+                       pick_next_task_fair
+
+     1.39%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] mas_wr_store_entry
+            |          
+             --1.06%--mas_wr_store_entry
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vms_gather_munmap_vmas
+            |
+            ---vms_gather_munmap_vmas
+               |          
+                --1.04%--__split_vma
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet6_csk_xmit
+            |
+            ---inet6_csk_xmit
+               ip6_xmit
+               ip6_output
+               ip6_finish_output
+               ip6_finish_output2
+               __dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_xmit
+            |
+            ---ip6_xmit
+               ip6_output
+               ip6_finish_output
+               ip6_finish_output2
+               __dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_output
+            |
+            ---ip6_output
+               ip6_finish_output
+               ip6_finish_output2
+               __dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_finish_output
+            |
+            ---ip6_finish_output
+               ip6_finish_output2
+               __dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_finish_output2
+            |
+            ---ip6_finish_output2
+               __dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __dev_queue_xmit
+            |
+            ---__dev_queue_xmit
+               |          
+                --1.02%--__local_bh_enable_ip
+                          do_softirq
+                          handle_softirqs
+                          net_rx_action
+                          __napi_poll
+                          process_backlog
+                          __netif_receive_skb
+                          ipv6_rcv
+                          ip6_input
+                          ip6_input_finish
+                          ip6_protocol_deliver_rcu
+                          tcp_v6_rcv
+                          |          
+                           --0.70%--tcp_v6_do_rcv
+
+     1.33%     0.24%  vulkaninfo  [kernel.kallsyms]                               [k] vma_merge_new_range
+            |          
+             --1.09%--vma_merge_new_range
+                       vma_expand
+                       commit_merge
+                       |          
+                        --0.72%--mas_store_prealloc
+                                  mas_wr_store_entry
+
+     1.27%     0.67%  vulkaninfo  [kernel.kallsyms]                               [k] do_wp_page
+            |          
+            |--0.67%--do_lookup_x
+            |          asm_exc_page_fault
+            |          exc_page_fault
+            |          do_user_addr_fault
+            |          handle_mm_fault
+            |          do_wp_page
+            |          
+             --0.60%--do_wp_page
+
+     1.26%     0.97%  vulkaninfo  [kernel.kallsyms]                               [k] __memcg_slab_post_alloc_hook
+     1.25%     0.63%  vulkaninfo  [kernel.kallsyms]                               [k] __rcu_read_unlock
+            |          
+             --0.61%--__rcu_read_unlock
+
+     1.24%     0.41%  vulkaninfo  [kernel.kallsyms]                               [k] kmem_cache_free
+            |          
+             --0.82%--kmem_cache_free
+
+     1.23%     0.62%  vulkaninfo  [kernel.kallsyms]                               [k] set_pte_range
+            |          
+             --0.61%--set_pte_range
+
+     1.19%     0.83%  vulkaninfo  ld-linux-x86-64.so.2                            [.] strcmp
+     1.19%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] try_to_wake_up
+            |
+            ---try_to_wake_up
+               |          
+                --0.80%--ttwu_do_activate
+
+     1.17%     0.41%  vulkaninfo  [kernel.kallsyms]                               [k] __d_lookup_rcu
+            |          
+             --0.76%--__d_lookup_rcu
+
+     1.15%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] update_process_times
+            |
+            ---update_process_times
+
+     1.14%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00007f01a14e9e17
+            |
+            ---0x7f01a14e9e17
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_execve
+               do_execveat_common
+               bprm_execve
+               load_elf_binary
+
+     1.14%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_execve
+            |
+            ---__x64_sys_execve
+               do_execveat_common
+               bprm_execve
+               load_elf_binary
+
+     1.14%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_execveat_common
+            |
+            ---do_execveat_common
+               bprm_execve
+               load_elf_binary
+
+     1.14%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] bprm_execve
+            |
+            ---bprm_execve
+               load_elf_binary
+
+     1.14%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] load_elf_binary
+            |
+            ---load_elf_binary
+
+     1.10%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] finish_task_switch
+            |
+            ---finish_task_switch
+               |          
+                --0.74%--__perf_event_task_sched_in
+                          ctx_sched_in
+                          __pmu_ctx_sched_in
+                          visit_groups_merge
+
+     1.09%     0.68%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_lookup_symbol_x
+     1.09%     0.00%  vulkaninfo  libc.so.6                                       [.] __socket
+            |
+            ---__socket
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_socket
+               __sys_socket
+               |          
+                --0.70%--__sock_create
+
+     1.09%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_socket
+            |
+            ---__x64_sys_socket
+               __sys_socket
+               |          
+                --0.70%--__sock_create
+
+     1.09%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sys_socket
+            |
+            ---__sys_socket
+               |          
+                --0.70%--__sock_create
+
+     1.09%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vma_expand
+            |
+            ---vma_expand
+               commit_merge
+               |          
+                --0.72%--mas_store_prealloc
+                          mas_wr_store_entry
+
+     1.09%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] commit_merge
+            |
+            ---commit_merge
+               |          
+                --0.72%--mas_store_prealloc
+                          mas_wr_store_entry
+
+     1.07%     0.00%  vulkaninfo  [unknown]                                       [k] 0x75762f6769666e6f
+            |
+            ---0x75762f6769666e6f
+               __open64_nocancel
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_openat
+               do_sys_openat2
+               |          
+                --0.79%--do_filp_open
+                          path_openat
+                          link_path_walk
+
+     1.06%     0.69%  vulkaninfo  [kernel.kallsyms]                               [k] security_vm_enough_memory_mm
+     1.06%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_v6_do_rcv
+            |
+            ---tcp_v6_do_rcv
+               |          
+                --0.68%--tcp_rcv_state_process
+
+     1.06%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] __GI___open64_nocancel
+            |
+            ---__GI___open64_nocancel
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_openat
+               do_sys_openat2
+               do_filp_open
+               path_openat
+               |          
+                --0.71%--link_path_walk
+
+     1.06%     0.72%  vulkaninfo  libc.so.6                                       [.] unlink_chunk.isra.0
+            |          
+             --0.72%--malloc_consolidate
+
+     1.05%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sock_sendmsg
+            |
+            ---__sock_sendmsg
+               |          
+                --0.73%--inet6_sendmsg
+                          tcp_sendmsg_locked
+                          __tcp_push_pending_frames
+                          tcp_write_xmit
+
+     1.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __se_sys_close.llvm.1449755887150175705
+            |
+            ---__se_sys_close.llvm.1449755887150175705
+               __fput
+
+     1.04%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __fput
+            |
+            ---__fput
+
+     1.03%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a847
+            |
+            ---0x7fb8ddc8a847
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __local_bh_enable_ip
+            |
+            ---__local_bh_enable_ip
+               do_softirq
+               handle_softirqs
+               net_rx_action
+               __napi_poll
+               process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_softirq
+            |
+            ---do_softirq
+               handle_softirqs
+               net_rx_action
+               __napi_poll
+               process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] handle_softirqs
+            |
+            ---handle_softirqs
+               net_rx_action
+               __napi_poll
+               process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] net_rx_action
+            |
+            ---net_rx_action
+               __napi_poll
+               process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __napi_poll
+            |
+            ---__napi_poll
+               process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] process_backlog
+            |
+            ---process_backlog
+               __netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __netif_receive_skb
+            |
+            ---__netif_receive_skb
+               ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ipv6_rcv
+            |
+            ---ipv6_rcv
+               ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_input
+            |
+            ---ip6_input
+               ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_input_finish
+            |
+            ---ip6_input_finish
+               ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ip6_protocol_deliver_rcu
+            |
+            ---ip6_protocol_deliver_rcu
+               tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_v6_rcv
+            |
+            ---tcp_v6_rcv
+               |          
+                --0.70%--tcp_v6_do_rcv
+
+     1.02%     0.33%  vulkaninfo  [kernel.kallsyms]                               [k] clear_page_rep
+            |          
+             --0.69%--clear_page_rep
+
+     1.02%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] prep_new_page
+            |
+            ---prep_new_page
+               clear_page_rep
+
+     1.01%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] vma_complete
+            |          
+             --0.65%--vma_complete
+                       mas_store_prealloc
+
+     1.00%     0.00%  vulkaninfo  libc.so.6                                       [.] __GI___shutdown
+            |
+            ---__GI___shutdown
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __x64_sys_shutdown
+               inet_shutdown
+               __tcp_push_pending_frames
+               tcp_write_xmit
+               __tcp_transmit_skb
+               |          
+                --0.66%--inet6_csk_xmit
+                          ip6_xmit
+                          ip6_output
+                          ip6_finish_output
+                          ip6_finish_output2
+                          __dev_queue_xmit
+
+     1.00%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_shutdown
+            |
+            ---__x64_sys_shutdown
+               inet_shutdown
+               __tcp_push_pending_frames
+               tcp_write_xmit
+               __tcp_transmit_skb
+               |          
+                --0.66%--inet6_csk_xmit
+                          ip6_xmit
+                          ip6_output
+                          ip6_finish_output
+                          ip6_finish_output2
+                          __dev_queue_xmit
+
+     1.00%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet_shutdown
+            |
+            ---inet_shutdown
+               __tcp_push_pending_frames
+               tcp_write_xmit
+               __tcp_transmit_skb
+               |          
+                --0.66%--inet6_csk_xmit
+                          ip6_xmit
+                          ip6_output
+                          ip6_finish_output
+                          ip6_finish_output2
+                          __dev_queue_xmit
+
+     0.99%     0.99%  vulkaninfo  [kernel.kallsyms]                               [k] step_into
+            |
+            ---0
+               |          
+                --0.62%--__open64_nocancel
+                          entry_SYSCALL_64_after_hwframe
+                          do_syscall_64
+                          __x64_sys_openat
+                          do_sys_openat2
+                          do_filp_open
+                          path_openat
+
+     0.99%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vma_modify_flags
+            |
+            ---vma_modify_flags
+               vma_modify
+               __split_vma
+
+     0.99%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vma_modify
+            |
+            ---vma_modify
+               __split_vma
+
+     0.98%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00007fb8ddef9790
+            |
+            ---0x7fb8ddef9790
+               0xc
+               0
+               do_lookup_x
+
+     0.98%     0.00%  vulkaninfo  [unknown]                                       [.] 0x000000000000000c
+            |
+            ---0xc
+               0
+               do_lookup_x
+
+     0.97%     0.28%  vulkaninfo  [kernel.kallsyms]                               [k] __pte_offset_map_lock
+            |          
+             --0.69%--__pte_offset_map_lock
+
+     0.93%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] terminate_walk
+            |          
+             --0.59%--terminate_walk
+
+     0.92%     0.33%  vulkaninfo  [kernel.kallsyms]                               [k] tlb_flush_mmu
+            |          
+             --0.59%--tlb_flush_mmu
+
+     0.92%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tlb_finish_mmu
+            |
+            ---tlb_finish_mmu
+               tlb_flush_mmu
+
+     0.87%     0.52%  vulkaninfo  [kernel.kallsyms]                               [k] thp_get_unmapped_area_vmflags
+            |          
+             --0.52%--mmap64
+                       entry_SYSCALL_64_after_hwframe
+                       do_syscall_64
+                       ksys_mmap_pgoff
+                       vm_mmap_pgoff
+                       do_mmap
+                       __get_unmapped_area
+
+     0.87%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __get_unmapped_area
+            |
+            ---__get_unmapped_area
+               |          
+                --0.61%--thp_get_unmapped_area_vmflags
+                          arch_get_unmapped_area_topdown
+
+     0.86%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] kmem_cache_alloc_noprof
+            |
+            ---kmem_cache_alloc_noprof
+               __memcg_slab_post_alloc_hook
+
+     0.80%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] hrtimer_wakeup
+            |
+            ---hrtimer_wakeup
+               try_to_wake_up
+
+     0.80%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] ttwu_do_activate
+     0.80%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] alloc_empty_file
+            |
+            ---alloc_empty_file
+               init_file
+
+     0.80%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] init_file
+            |
+            ---init_file
+
+     0.79%     0.79%  vulkaninfo  [kernel.kallsyms]                               [k] mas_state_walk
+     0.79%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] lock_vma_under_rcu
+            |
+            ---lock_vma_under_rcu
+               mas_walk
+               mas_state_walk
+
+     0.79%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mas_walk
+            |
+            ---mas_walk
+               mas_state_walk
+
+     0.78%     0.00%  vulkaninfo  [unknown]                                       [.] 0x616b6c75762f6572
+            |
+            ---0x616b6c75762f6572
+
+     0.77%     0.44%  vulkaninfo  [kernel.kallsyms]                               [k] entry_SYSRETQ_unsafe_stack
+     0.77%     0.00%  vulkaninfo  [unknown]                                       [k] 0x0000000c00404135
+            |
+            ---0xc00404135
+
+     0.76%     0.40%  vulkaninfo  [kernel.kallsyms]                               [k] lookup_fast
+     0.75%     0.75%  vulkaninfo  [kernel.kallsyms]                               [k] unmap_page_range
+     0.75%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] unmap_vmas
+            |
+            ---unmap_vmas
+               unmap_page_range
+
+     0.75%     0.00%  vulkaninfo  [unknown]                                       [k] 0x3cf7cd33aa06d110
+            |
+            ---0x3cf7cd33aa06d110
+               __GI___getdents64
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __se_sys_getdents64
+               iterate_dir
+               ext4_readdir.llvm.6365273095590756112
+
+     0.75%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vfs_open
+            |
+            ---vfs_open
+               do_dentry_open
+
+     0.75%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_dentry_open
+            |
+            ---do_dentry_open
+
+     0.74%     0.42%  vulkaninfo  libc.so.6                                       [.] __strlen_sse2
+     0.74%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] visit_groups_merge
+     0.74%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __perf_event_task_sched_in
+            |
+            ---__perf_event_task_sched_in
+               ctx_sched_in
+               __pmu_ctx_sched_in
+               visit_groups_merge
+
+     0.74%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ctx_sched_in
+            |
+            ---ctx_sched_in
+               __pmu_ctx_sched_in
+               visit_groups_merge
+
+     0.74%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __pmu_ctx_sched_in
+            |
+            ---__pmu_ctx_sched_in
+               visit_groups_merge
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] kfree
+            |
+            ---kfree
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] elf_load
+            |
+            ---elf_load
+
+     0.73%     0.42%  vulkaninfo  libc.so.6                                       [.] __printf_buffer
+     0.73%     0.36%  vulkaninfo  ld-linux-x86-64.so.2                            [.] check_match
+     0.73%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a8dc
+            |
+            ---0x7fb8ddc8a8dc
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_writev
+            |
+            ---do_writev
+               vfs_writev
+               do_iter_readv_writev
+               sock_write_iter
+               __sock_sendmsg
+               inet6_sendmsg
+               tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vfs_writev
+            |
+            ---vfs_writev
+               do_iter_readv_writev
+               sock_write_iter
+               __sock_sendmsg
+               inet6_sendmsg
+               tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_iter_readv_writev
+            |
+            ---do_iter_readv_writev
+               sock_write_iter
+               __sock_sendmsg
+               inet6_sendmsg
+               tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sock_write_iter
+            |
+            ---sock_write_iter
+               __sock_sendmsg
+               inet6_sendmsg
+               tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet6_sendmsg
+            |
+            ---inet6_sendmsg
+               tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.73%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_sendmsg_locked
+            |
+            ---tcp_sendmsg_locked
+               __tcp_push_pending_frames
+               tcp_write_xmit
+
+     0.72%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a8d3
+            |
+            ---0x7fb8ddc8a8d3
+
+     0.72%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] dev_hard_start_xmit
+     0.71%     0.71%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00000000000098d6
+     0.71%     0.00%  vulkaninfo  libc.so.6                                       [.] getaddrinfo
+            |
+            ---getaddrinfo
+               __internal_syscall_cancel
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+
+     0.71%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_htree_fill_tree
+            |
+            ---ext4_htree_fill_tree
+               htree_dirblock_to_tree
+
+     0.71%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] htree_dirblock_to_tree
+            |
+            ---htree_dirblock_to_tree
+
+     0.71%     0.00%  vulkaninfo  libc.so.6                                       [.] __brk
+            |
+            ---__brk
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               __se_sys_brk.llvm.18143676888038457574
+               do_brk_flags
+
+     0.71%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __se_sys_brk.llvm.18143676888038457574
+            |
+            ---__se_sys_brk.llvm.18143676888038457574
+               do_brk_flags
+
+     0.71%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_brk_flags
+            |
+            ---do_brk_flags
+
+     0.70%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sock_create
+            |
+            ---__sock_create
+
+     0.70%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b12b
+            |
+            ---0x7fb8ddc8b12b
+
+     0.69%     0.69%  vulkaninfo  [kernel.kallsyms]                               [k] prepend_path
+            |
+            ---mmap64
+               entry_SYSCALL_64_after_hwframe
+               do_syscall_64
+               ksys_mmap_pgoff
+               vm_mmap_pgoff
+               do_mmap
+               mmap_region
+               perf_event_mmap
+               d_path
+               prepend_path
+
+     0.69%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] d_path
+            |
+            ---d_path
+               prepend_path
+
+     0.68%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_connect
+            |
+            ---__x64_sys_connect
+               __sys_connect
+               inet_stream_connect
+               __inet_stream_connect
+
+     0.68%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sys_connect
+            |
+            ---__sys_connect
+               inet_stream_connect
+               __inet_stream_connect
+
+     0.68%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet_stream_connect
+            |
+            ---inet_stream_connect
+               __inet_stream_connect
+
+     0.68%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __inet_stream_connect
+            |
+            ---__inet_stream_connect
+
+     0.68%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_rcv_state_process
+     0.67%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b3a5
+            |
+            ---0x7fb8ddc8b3a5
+
+     0.67%     0.00%  vulkaninfo  libc.so.6                                       [.] __close_nocancel
+            |
+            ---__close_nocancel
+
+     0.67%     0.67%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000984d
+     0.66%     0.28%  vulkaninfo  [kernel.kallsyms]                               [k] pick_next_task_fair
+     0.66%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] irqentry_exit_to_user_mode
+            |
+            ---irqentry_exit_to_user_mode
+               schedule
+               __sched_text_start
+               __pick_next_task
+               pick_next_task_fair
+
+     0.66%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a857
+            |
+            ---0x7fb8ddc8a857
+
+     0.65%     0.29%  vulkaninfo  [kernel.kallsyms]                               [k] next_uptodate_folio
+     0.65%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] _raw_spin_lock
+            |
+            ---_raw_spin_lock
+
+     0.62%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] mas_store_gfp
+     0.61%     0.61%  vulkaninfo  [kernel.kallsyms]                               [k] vm_area_free
+     0.61%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] arch_get_unmapped_area_topdown
+            |
+            ---arch_get_unmapped_area_topdown
+
+     0.60%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] flush_tlb_mm_range
+     0.60%     0.28%  vulkaninfo  [kernel.kallsyms]                               [k] flush_tlb_func
+     0.60%     0.28%  vulkaninfo  [kernel.kallsyms]                               [k] strncpy_from_user
+     0.60%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] getname_flags
+            |
+            ---getname_flags
+
+     0.45%     0.45%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000026ae8
+     0.45%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddca7af9
+     0.44%     0.44%  vulkaninfo  libc.so.6                                       [.] __GI___pthread_mutex_unlock_usercnt
+     0.43%     0.43%  vulkaninfo  libdrm.so.2.124.0                               [.] drmGetDevices2
+     0.43%     0.00%  vulkaninfo  libdrm.so.2.124.0                               [.] opendir@plt
+     0.43%     0.00%  vulkaninfo  [unknown]                                       [.] 0x2e34362d3638782d
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x005584ca319ee063
+     0.42%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc896f4
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca2db210
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca307040
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca306fd0
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca306f60
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca306ed0
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca306e00
+     0.42%     0.42%  vulkaninfo  [kernel.kallsyms]                               [k] acct_account_cputime
+     0.42%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddca700c
+     0.42%     0.42%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000ed3f
+     0.42%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rb_first
+     0.42%     0.42%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000b324
+     0.42%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc89f22
+     0.42%     0.42%  vulkaninfo  [kernel.kallsyms]                               [k] __pi_memset
+     0.42%     0.42%  vulkaninfo  libvulkan_terascale.so                          [.] vk_instance_dispatch_table_get
+     0.42%     0.00%  vulkaninfo  [unknown]                                       [.] 0x48397501087f8306
+     0.42%     0.00%  vulkaninfo  libc.so.6                                       [.] __strchrnul_sse2
+     0.41%     0.00%  vulkaninfo  [unknown]                                       [k] 0x524f575f45544f4d
+     0.41%     0.41%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00000000000360be
+     0.41%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] vkCreateInstance
+     0.41%     0.00%  vulkaninfo  libc.so.6                                       [.] dlopen@GLIBC_2.2.5
+     0.41%     0.41%  vulkaninfo  [kernel.kallsyms]                               [k] check_preempt_wakeup_fair.llvm.1082362133743927455
+     0.41%     0.00%  vulkaninfo  [unknown]                                       [k] 0x65746c69665f6469
+     0.41%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a850
+     0.41%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca31e1d0
+     0.41%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8af39
+     0.41%     0.41%  vulkaninfo  [kernel.kallsyms]                               [k] __send_signal_locked
+     0.41%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] it_real_fn
+     0.41%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] kill_pid_info_type.llvm.15898450833592269065
+     0.41%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_send_sig_info
+     0.40%     0.40%  vulkaninfo  libc.so.6                                       [.] pthread_condattr_init
+     0.40%     0.00%  vulkaninfo  libvulkan_terascale.so                          [.] pthread_condattr_setclock@plt
+     0.40%     0.40%  vulkaninfo  [kernel.kallsyms]                               [k] fdget_pos
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ksys_read
+     0.40%     0.40%  vulkaninfo  [kernel.kallsyms]                               [k] kfree_link
+     0.40%     0.00%  vulkaninfo  libc.so.6                                       [.] __readlink
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_readlink
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] do_readlinkat
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] walk_component
+     0.40%     0.40%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008540
+     0.40%     0.40%  vulkaninfo  [kernel.kallsyms]                               [k] drm_file_alloc
+     0.40%     0.00%  vulkaninfo  [unknown]                                       [k] 0x000030647261632f
+     0.40%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00005584ca2fd170
+     0.40%     0.00%  vulkaninfo  [unknown]                                       [k] 0x0000000000000005
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] chrdev_open.llvm.11244038043283283570
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_stub_open
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_open
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_open_helper
+     0.40%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_gem_open
+     0.40%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca315c70
+     0.40%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8ae2d
+     0.39%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] kmem_cache_alloc_lru_noprof
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] alloc_inode
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sock_alloc_inode
+     0.39%     0.39%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008d9a
+     0.39%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6c65732065636976
+     0.39%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] security_file_alloc
+     0.39%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] scx_allow_ttwu_queue
+     0.39%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00005584ca31e220
+     0.39%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc89580
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ttwu_queue_wakelist
+     0.39%     0.39%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000a428
+     0.39%     0.00%  vulkaninfo  [unknown]                                       [.] 0x746e656d75727473
+     0.39%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] netlink_recvmsg
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_recvmsg
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ___sys_recvmsg
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ____sys_recvmsg.llvm.9533548732884954992
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sock_recvmsg
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __irq_exit_rcu.llvm.11536738252279480182
+     0.39%     0.39%  vulkaninfo  [kernel.kallsyms]                               [k] change_protection
+     0.39%     0.39%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008f24
+     0.39%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6964646165720044
+     0.39%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc89f5e
+     0.39%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] preempt_schedule_irq
+     0.39%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca2eb410
+     0.39%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] vkGetInstanceProcAddr
+     0.38%     0.38%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008594
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] fd_install
+     0.38%     0.00%  vulkaninfo  libc.so.6                                       [.] __nscd_open_socket
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca3180c0
+     0.38%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b159
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] __pick_eevdf
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [k] 0x4d20646574616369
+     0.38%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a8c4
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] pick_task_fair.llvm.1082362133743927455
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] generic_permission
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca2fa560
+     0.38%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b223
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x0000000000000051
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] str2hashbuf_signed
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ext4fs_dirhash
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __ext4fs_dirhash
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] eth_type_trans
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] loopback_xmit
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6372756f73657220
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] folio_remove_rmap_ptes
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tick_nohz_user_enter_prepare
+     0.38%     0.38%  vulkaninfo  [kernel.kallsyms]                               [k] mt_find
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [k] 0x1ba26e239ee22e2c
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] filldir64
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] lock_mm_and_find_vma
+     0.38%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] find_vma
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca313720
+     0.38%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b1bb
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca3112c0
+     0.38%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca311230
+     0.37%     0.37%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008da2
+     0.37%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc89d9a
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca31dcf0
+     0.37%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8b4eb
+     0.37%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] ___pte_offset_map
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00007fb8ddefa200
+     0.37%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] pick_link
+     0.37%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] irqtime_account_process_tick
+     0.37%     0.37%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000031e1c
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6c7078652f6e616b
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [.] 0x61636f6c2e2f0f70
+     0.37%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddcb2e71
+     0.37%     0.37%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000a12b
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca2cdea0
+     0.37%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] down_write
+     0.37%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] anon_vma_clone
+     0.37%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] anon_vma_interval_tree_insert
+     0.37%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rb_first_postorder
+     0.37%     0.37%  vulkaninfo  libvulkan_terascale.so                          [.] operator delete(void*, unsigned long)@plt
+     0.37%     0.37%  vulkaninfo  [kernel.kallsyms]                               [k] task_work_run
+     0.37%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] _raw_spin_lock_irq
+     0.37%     0.37%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000984a
+     0.37%     0.00%  vulkaninfo  [unknown]                                       [.] 0x2d7976616568202c
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] mas_update_gap
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] up_write
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] release_sock
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] vma_interval_tree_remove
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vma_prepare
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __mem_cgroup_charge
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] get_mem_cgroup_from_mm
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca2e9170
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [.] 0x20656372756f7365
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] get_unused_fd_flags
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] alloc_fd.llvm.17228762070955546697
+     0.36%     0.36%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000009fde
+     0.36%     0.36%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_name_match_p
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6e696c2d646c0036
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] down_write_killable
+     0.36%     0.36%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000008544
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] timekeeping_update_from_shadow
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00007fb8ddef9760
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] update_wall_time
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __timekeeping_advance
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] update_vsyscall
+     0.36%     0.36%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000030d07
+     0.36%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddcb1d07
+     0.36%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_cache_libcmp
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [.] 0x0000000000000021
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] mas_wr_store_type
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mas_preallocate
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca3052a0
+     0.36%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] cache_rpath
+     0.36%     0.36%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000003a33f
+     0.36%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddcbb392
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] memcpy_orig
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __pi_memcpy
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] sched_tick
+     0.36%     0.36%  vulkaninfo  [kernel.kallsyms]                               [k] set_normalized_timespec64
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00005584ca31e0d0
+     0.36%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00005584ca310b40
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_release
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] drm_file_free
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] debugfs_remove
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __simple_recursive_removal.llvm.6664053756706355731
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inode_set_ctime_current
+     0.36%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inode_set_ctime_to_ts
+     0.35%     0.00%  vulkaninfo  [unknown]                                       [.] 0x200a2c224c41424f
+     0.35%     0.35%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00000000000097f7
+     0.35%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6e6e7572206e6568
+     0.35%     0.35%  vulkaninfo  [kernel.kallsyms]                               [k] perf_iterate_sb
+     0.35%     0.35%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000009897
+     0.35%     0.35%  vulkaninfo  bpf_prog_1e1fb3494d0509f5_restrict_filesystems  [k] bpf_prog_1e1fb3494d0509f5_restrict_filesystems
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] security_file_open
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] bpf_lsm_file_open
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] bpf_trampoline_6442525481
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] bpf_probe_read_kernel
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] copy_from_kernel_nofault
+     0.35%     0.35%  vulkaninfo  libc.so.6                                       [.] _IO_file_open
+     0.35%     0.00%  vulkaninfo  libc.so.6                                       [.] _IO_link_in
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sched_text_end
+     0.35%     0.35%  vulkaninfo  [kernel.kallsyms]                               [k] event_sched_in
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_event_new_data_sent
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sk_reset_timer
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __mod_timer.llvm.11314090312773126183
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] _raw_spin_unlock_irqrestore
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] preempt_schedule_thunk
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] preempt_schedule_common
+     0.35%     0.35%  vulkaninfo  [kernel.kallsyms]                               [k] lock_for_kill
+     0.35%     0.00%  vulkaninfo  [unknown]                                       [k] 0x4810c08348001aac
+     0.35%     0.00%  vulkaninfo  libstdc++.so.6.0.33                             [.] __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+     0.35%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584c01ebe80
+     0.35%     0.00%  vulkaninfo  libgcc_s.so.1                                   [.] _Unwind_RaiseException
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] dput
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __dentry_kill
+     0.35%     0.35%  vulkaninfo  [kernel.kallsyms]                               [k] mas_empty_area_rev
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vm_unmapped_area
+     0.35%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] unmapped_area_topdown
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x000000000014b870
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00007fb8dda7cbe8
+     0.34%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __kmalloc_cache_noprof
+     0.34%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] skb_clone
+     0.34%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __skb_clone
+     0.34%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] _raw_spin_unlock
+     0.34%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] kmem_cache_alloc_from_sheaf_noprof
+     0.34%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] complete_walk
+     0.34%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] try_to_unlazy
+     0.34%     0.34%  vulkaninfo  [kernel.kallsyms]                               [k] bpf_lsm_file_free_security
+     0.34%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] cache_from_obj
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca313fb0
+     0.34%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8ade0
+     0.34%     0.34%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000003abd4
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x73726579616c5f74
+     0.34%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddcb22a7
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6564616873207461
+     0.34%     0.34%  vulkaninfo  libc.so.6                                       [.] __GI_____strtoll_l_internal
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x554c5f524559414c
+     0.34%     0.00%  vulkaninfo  libc.so.6                                       [.] __strspn_generic
+     0.34%     0.34%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x000000000000a12d
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [.] 0x22203a2268746170
+     0.34%     0.00%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00007fb8ddc8a852
+     0.34%     0.00%  vulkaninfo  [unknown]                                       [k] 0x7469726f68747561
+     0.33%     0.33%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_sysdep_read_whole_file
+     0.33%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00007fb8dded9000
+     0.33%     0.00%  vulkaninfo  ld-linux-x86-64.so.2                            [.] fstat64
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tlb_table_flush
+     0.33%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00005584ca311360
+     0.33%     0.33%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_inode_block_valid
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __ext4_read_dirblock
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_bread
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_getblk
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ext4_map_blocks
+     0.33%     0.33%  vulkaninfo  [kernel.kallsyms]                               [k] count_memcg_events
+     0.33%     0.00%  vulkaninfo  libstdc++.so.6.0.33                             [.] std::__timepunct<char>::__timepunct(std::__timepunct_cache<char>*, unsigned long)
+     0.33%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] css_rstat_updated
+     0.33%     0.33%  vulkaninfo  libstdc++.so.6.0.33                             [.] std::ios_base_library_init()
+     0.33%     0.00%  vulkaninfo  libstdc++.so.6.0.33                             [.] 0x00007fb8ddaafcf0
+     0.32%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] __rb_insert_augmented
+     0.32%     0.00%  vulkaninfo  [unknown]                                       [k] 0x0000000063ac098d
+     0.32%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] fl6_free_socklist
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sk_destruct
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp6_destruct_sock
+     0.32%     0.00%  vulkaninfo  [unknown]                                       [.] 0x000000000000725f
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet6_cleanup_sock
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] security_inode_permission
+     0.32%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] xas_find
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __x64_sys_sendto
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __sys_sendto
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] netlink_sendmsg
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] netlink_unicast
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] netlink_rcv_skb
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rtnetlink_rcv_msg
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __netlink_dump_start
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] netlink_dump
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rtnl_dumpit
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rtnl_dump_all
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet_dump_addr
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] xa_find
+     0.32%     0.32%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_v6_route_req.llvm.14033806608100185442
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_v6_connect
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_connect
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] tcp_conn_request
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __ipv6_addr_type
+     0.32%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] ptep_clear_flush
+     0.31%     0.00%  vulkaninfo  [unknown]                                       [k] 0x6d75732d2d006f66
+     0.31%     0.00%  vulkaninfo  [unknown]                                       [k] 0x00007ffc4bde8c6e
+     0.31%     0.31%  vulkaninfo  ld-linux-x86-64.so.2                            [.] _dl_runtime_resolve_fxsave
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mas_find
+     0.31%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6e6f697372657620
+     0.31%     0.31%  vulkaninfo  [kernel.kallsyms]                               [k] folio_add_lru
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] inet6_create
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sk_alloc
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] sk_prot_alloc
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] obj_cgroup_charge_account.llvm.15899781696895181552
+     0.31%     0.31%  vulkaninfo  [kernel.kallsyms]                               [k] __page_cache_release
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] free_pages_and_swap_cache
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] folios_put_refs
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __mod_lruvec_state
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __mod_node_page_state
+     0.31%     0.31%  vulkaninfo  [kernel.kallsyms]                               [k] mas_spanning_rebalance
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mas_wr_spanning_store
+     0.31%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mab_mas_cp
+     0.31%     0.31%  vulkaninfo  [kernel.kallsyms]                               [k] path_init
+     0.30%     0.00%  vulkaninfo  libvulkan_terascale.so                          [.] std::map<r600::EAluOp, int, std::less<r600::EAluOp>, std::allocator<std::pair<r600::EAluOp const, int> > >::map(std::initializer_list<std::pair<r600::EAluOp const, int> >, std::less<r600::EAluOp> const&, std::allocator<std::pair<r600::EAluOp const, int> > const&)
+     0.30%     0.30%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x00000000000097d7
+     0.30%     0.00%  vulkaninfo  [unknown]                                       [.] 0x4522203a226e6f69
+     0.30%     0.30%  vulkaninfo  [kernel.kallsyms]                               [k] mntput
+     0.30%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] mntput_no_expire
+     0.30%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __rcu_read_lock
+     0.30%     0.30%  vulkaninfo  [kernel.kallsyms]                               [k] vma_adjust_trans_huge
+     0.30%     0.00%  vulkaninfo  libc.so.6                                       [.] sysmalloc
+     0.29%     0.29%  vulkaninfo  libvulkan.so.1.4.309                            [.] 0x0000000000009f69
+     0.29%     0.00%  vulkaninfo  [unknown]                                       [.] 0x6564616f4c657461
+     0.29%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vm_area_alloc
+     0.29%     0.00%  vulkaninfo  [unknown]                                       [.] 0x706d742f3d4b524f
+     0.29%     0.00%  vulkaninfo  [unknown]                                       [.] 0x00007ffc4bde8cda
+     0.28%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] put_prev_entity
+     0.28%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] update_curr
+     0.28%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] update_se.llvm.1082362133743927455
+     0.28%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] cond_accept_memory
+     0.28%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __rmqueue_pcplist
+     0.26%     0.00%  vulkaninfo  libc.so.6                                       [.] alloc_perturb
+     0.26%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] folio_add_new_anon_rmap
+     0.26%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] rep_stos_alternative
+     0.26%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __anon_vma_prepare
+     0.26%     0.26%  vulkaninfo  [kernel.kallsyms]                               [k] free_pgtables
+     0.26%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] load_elf_interp
+     0.26%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] security_mmap_addr
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] can_vma_merge_left
+     0.24%     0.24%  vulkaninfo  [kernel.kallsyms]                               [k] kmem_cache_prefill_sheaf
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] map_vdso
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] _install_special_mapping
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] insert_vm_struct
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] vma_link
+     0.24%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __vma_start_write
+     0.21%     0.21%  vulkaninfo  [kernel.kallsyms]                               [k] __memcg_slab_free_hook
+     0.17%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] setup_arg_pages
+     0.12%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] relocate_vma_down
+     0.12%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] move_page_tables
+     0.12%     0.00%  vulkaninfo  [kernel.kallsyms]                               [k] __pmd_alloc
+     0.05%     0.05%  vulkaninfo  [kernel.kallsyms]                               [k] may_expand_vm
+     0.02%     0.00%  perf-exec   [unknown]                                       [k] 0x00007f01a14e9e17
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] entry_SYSCALL_64_after_hwframe
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] do_syscall_64
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] __x64_sys_execve
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] do_execveat_common
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] bprm_execve
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] load_elf_binary
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] begin_new_exec
+     0.02%     0.02%  perf-exec   [kernel.kallsyms]                               [k] __set_task_comm
+     0.02%     0.00%  perf-exec   [kernel.kallsyms]                               [k] strlen
+     0.01%     0.00%  perf-exec   [kernel.kallsyms]                               [k] visit_groups_merge
+     0.01%     0.00%  perf-exec   [kernel.kallsyms]                               [k] perf_event_exec
+     0.01%     0.00%  perf-exec   [kernel.kallsyms]                               [k] ctx_resched
+     0.01%     0.00%  perf-exec   [kernel.kallsyms]                               [k] ctx_sched_in
+     0.01%     0.00%  perf-exec   [kernel.kallsyms]                               [k] __pmu_ctx_sched_in
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] perf_pmu_nop_int
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] perf_event_update_userpage
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] event_sched_in
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] perf_ibs_add
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] local_clock
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] perf_sample_event_took
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] local_clock_noinstr
+     0.00%     0.00%  perf-exec   [kernel.kallsyms]                               [k] native_sched_clock
+
+
+#
+# (Tip: To not accumulate CPU time of children symbols add --no-children)
+#

@@ -60,6 +60,12 @@ src/apple_re/results/tranche1_*/
 !src/apple_re/results/blessed/
 !src/apple_re/results/blessed/**
 
+# x130e / TeraScale imported and generated run artifacts (keep blessed snapshots)
+src/sass_re/results/x130e_terascale/imports/
+src/sass_re/results/x130e_terascale/workspace/
+!src/sass_re/results/x130e_terascale/blessed/
+!src/sass_re/results/x130e_terascale/blessed/**
+
 # CUDA compiled intermediates
 *.cubin
 *.ptx

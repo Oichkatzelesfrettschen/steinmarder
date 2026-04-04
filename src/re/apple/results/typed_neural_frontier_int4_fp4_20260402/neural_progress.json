@@ -1,0 +1,13 @@
+{
+  "completed_groups": [
+    "torch",
+    "mlx"
+  ],
+  "completed_rows": 45,
+  "expected_rows": 76,
+  "last_backend": "mlx_gpu",
+  "last_format": "float32",
+  "last_group": "mlx",
+  "last_workload": "environment",
+  "status": "completed"
+}

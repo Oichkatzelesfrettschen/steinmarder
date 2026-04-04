@@ -1,0 +1,35 @@
+__kernel void occupancy_gpr_08(__global float *out)
+{
+    const uint gid = get_global_id(0);
+    const float seed = (float)gid;
+    float a0 = (float)(1) + seed * 0.0001000f;
+    float a1 = (float)(2) + seed * 0.0002000f;
+    float a2 = (float)(3) + seed * 0.0003000f;
+    float a3 = (float)(4) + seed * 0.0004000f;
+    float a4 = (float)(5) + seed * 0.0005000f;
+    float a5 = (float)(6) + seed * 0.0006000f;
+    float a6 = (float)(7) + seed * 0.0007000f;
+    float a7 = (float)(8) + seed * 0.0008000f;
+
+    for (int iter = 0; iter < 256; ++iter) {
+        a0 = a0 * 1.00000000f + 0.12500000f + a1 * 0.0009765625f;
+        a1 = a1 * 1.03125000f + 0.14062500f + a2 * 0.0009765625f;
+        a2 = a2 * 1.06250000f + 0.15625000f + a3 * 0.0009765625f;
+        a3 = a3 * 1.09375000f + 0.17187500f + a4 * 0.0009765625f;
+        a4 = a4 * 1.12500000f + 0.18750000f + a5 * 0.0009765625f;
+        a5 = a5 * 1.15625000f + 0.12500000f + a6 * 0.0009765625f;
+        a6 = a6 * 1.18750000f + 0.14062500f + a7 * 0.0009765625f;
+        a7 = a7 * 1.00000000f + 0.15625000f + a0 * 0.0009765625f;
+    }
+
+    float sum = 0.0f;
+    sum += a0;
+    sum += a1;
+    sum += a2;
+    sum += a3;
+    sum += a4;
+    sum += a5;
+    sum += a6;
+    sum += a7;
+    out[gid] = sum;
+}

@@ -1,0 +1,6 @@
+TERAKAN ICD: vkCreateWaylandSurfaceKHR = NULL
+TERAKAN ICD: vkGetPhysicalDeviceWaylandPresentationSupportKHR = NULL
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+WARNING: terakan is not a conformant Vulkan implementation, testing use only.
+XCB failed to connect to the X server due to error:1.
+ERROR at ./vulkaninfo/./vulkaninfo.h:744: AppCreateXcbSurface failed to establish connection

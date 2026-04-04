@@ -1,0 +1,312 @@
+{
+  "measured_runs": 10,
+  "progress": {
+    "completed_groups": [
+      "torch"
+    ],
+    "completed_rows": 24,
+    "expected_rows": 24,
+    "last_backend": "pytorch_mps",
+    "last_format": "uint64",
+    "last_group": "torch",
+    "last_workload": "gemm_2048",
+    "status": "completed"
+  },
+  "python": {
+    "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "version": "3.14.3"
+  },
+  "rows": {
+    "coreml": [],
+    "mlx": [],
+    "torch": [
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 1.3837890625,
+        "format": "float16",
+        "measured_runs": 10,
+        "median_ms": 9853.166729499208,
+        "notes": "device=cpu",
+        "p90_ms": 10007.992066699444,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 39.89613723754883,
+        "format": "float32",
+        "measured_runs": 10,
+        "median_ms": 19.542479499250476,
+        "notes": "device=cpu",
+        "p90_ms": 20.287345800170442,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 31.32202073173181,
+        "format": "float64",
+        "measured_runs": 10,
+        "median_ms": 73.58929149904725,
+        "notes": "device=cpu",
+        "p90_ms": 77.74932120028097,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": -57.5,
+        "format": "bfloat16",
+        "measured_runs": 10,
+        "median_ms": 9556.229083500511,
+        "notes": "device=cpu",
+        "p90_ms": 9701.8843130998,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 21.0,
+        "format": "int8",
+        "measured_runs": 10,
+        "median_ms": 311.26106249939767,
+        "notes": "device=cpu",
+        "p90_ms": 314.06303720086726,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 248.0,
+        "format": "uint8",
+        "measured_runs": 10,
+        "median_ms": 312.21754150010383,
+        "notes": "device=cpu",
+        "p90_ms": 314.94654640009685,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 28900.0,
+        "format": "int16",
+        "measured_runs": 10,
+        "median_ms": 626.2710415003312,
+        "notes": "device=cpu",
+        "p90_ms": 634.6941794998202,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 8004.0,
+        "format": "int32",
+        "measured_runs": 10,
+        "median_ms": 1353.2742914994742,
+        "notes": "device=cpu",
+        "p90_ms": 1379.0487003003363,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "checksum": 49563.0,
+        "format": "int64",
+        "measured_runs": 10,
+        "median_ms": 5208.258917000421,
+        "notes": "device=cpu",
+        "p90_ms": 5406.050766699991,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "format": "uint16",
+        "notes": "NotImplementedError: \"addmm_impl_cpu_\" not implemented for 'UInt16'",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "format": "uint32",
+        "notes": "NotImplementedError: \"addmm_impl_cpu_\" not implemented for 'UInt32'",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_cpu",
+        "format": "uint64",
+        "notes": "NotImplementedError: \"addmm_impl_cpu_\" not implemented for 'UInt64'",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -25.09375,
+        "format": "float16",
+        "measured_runs": 10,
+        "median_ms": 9.11050000013347,
+        "notes": "device=mps",
+        "p90_ms": 9.287750300609332,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 10.259212493896484,
+        "format": "float32",
+        "measured_runs": 10,
+        "median_ms": 10.970812501000182,
+        "notes": "device=mps",
+        "p90_ms": 11.475554700518842,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "float64",
+        "notes": "TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": -32.25,
+        "format": "bfloat16",
+        "measured_runs": 10,
+        "median_ms": 18.630208500326262,
+        "notes": "device=mps",
+        "p90_ms": 20.94191699907241,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 86.0,
+        "format": "int8",
+        "measured_runs": 10,
+        "median_ms": 63.54518750049465,
+        "notes": "device=mps",
+        "p90_ms": 64.13132910001877,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 171.0,
+        "format": "uint8",
+        "measured_runs": 10,
+        "median_ms": 63.622374999795284,
+        "notes": "device=mps",
+        "p90_ms": 66.01181249916408,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 23712.0,
+        "format": "int16",
+        "measured_runs": 10,
+        "median_ms": 68.60018700081127,
+        "notes": "device=mps",
+        "p90_ms": 70.35077110012935,
+        "status": "measured",
+        "support_tier": "native_or_proxy",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 22074.0,
+        "format": "int32",
+        "measured_runs": 10,
+        "median_ms": 100.01972900045075,
+        "notes": "device=mps",
+        "p90_ms": 100.94552920018032,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "checksum": 40180.0,
+        "format": "int64",
+        "measured_runs": 10,
+        "median_ms": 216.11441649929475,
+        "notes": "device=mps",
+        "p90_ms": 217.55983340044622,
+        "status": "measured",
+        "support_tier": "native",
+        "warmup_runs": 3,
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "uint16",
+        "notes": "RuntimeError: Failed to create function state object for: matmul_ushort",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "uint32",
+        "notes": "RuntimeError: Failed to create function state object for: matmul_uint",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      },
+      {
+        "backend": "pytorch_mps",
+        "format": "uint64",
+        "notes": "RuntimeError: Failed to create function state object for: matmul_ulong",
+        "status": "error",
+        "support_tier": "unsupported_or_proxy",
+        "workload": "gemm_2048"
+      }
+    ]
+  },
+  "warmup_runs": 3,
+  "workloads": [
+    {
+      "id": "gemm_2048",
+      "k": 2048,
+      "kind": "gemm",
+      "m": 2048,
+      "n": 2048
+    }
+  ]
+}

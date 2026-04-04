@@ -1,0 +1,82 @@
+[
+  {
+    "format": "float32",
+    "bit_width": 32,
+    "msl_type": "float",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "float16",
+    "bit_width": 16,
+    "msl_type": "half",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "int32",
+    "bit_width": 32,
+    "msl_type": "int",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "uint32",
+    "bit_width": 32,
+    "msl_type": "uint",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "int8",
+    "bit_width": 8,
+    "msl_type": "char",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "uint8",
+    "bit_width": 8,
+    "msl_type": "uchar",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "bfloat16",
+    "bit_width": 16,
+    "msl_type": "bfloat",
+    "compile_status": "compiled",
+    "support_tier": "native_or_lowered",
+    "notes": "MSL surface compiled; inspect AIR/disassembly later to split native from lowered."
+  },
+  {
+    "format": "tf32",
+    "bit_width": 19,
+    "msl_type": "",
+    "compile_status": "not_attempted",
+    "support_tier": "unsupported_or_proxy",
+    "notes": "No public MSL scalar type for TF32."
+  },
+  {
+    "format": "fp8_e4m3",
+    "bit_width": 8,
+    "msl_type": "",
+    "compile_status": "not_attempted",
+    "support_tier": "unsupported_or_proxy",
+    "notes": "No public MSL scalar type for FP8 e4m3."
+  },
+  {
+    "format": "mxfp8",
+    "bit_width": 8,
+    "msl_type": "",
+    "compile_status": "not_attempted",
+    "support_tier": "unsupported_or_proxy",
+    "notes": "No public MSL scalar type for MXFP8."
+  }
+]

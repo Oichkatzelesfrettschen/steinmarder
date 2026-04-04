@@ -1,0 +1,25 @@
+trace,template_name,duration_s,end_reason,target_process_name,target_pid,target_exit_status,target_termination_reason,schema_count
+gpu_bfloat16.trace,Blank,10.291833,Time limit reached,sm_apple_metal_probe_host,11416,9,SIGKILL,12
+gpu_float16.trace,Blank,10.420794,Time limit reached,sm_apple_metal_probe_host,10913,9,SIGKILL,12
+gpu_float32.trace,Blank,10.282853,Time limit reached,sm_apple_metal_probe_host,15809,9,SIGKILL,12
+gpu_fmt_bfloat16.trace,Metal System Trace,0.852653,Target app exited,sm_apple_metal_probe_host,12534,0,exit(0),114
+gpu_fmt_float16.trace,Metal System Trace,0.916784,Target app exited,sm_apple_metal_probe_host,11370,0,exit(0),114
+gpu_fmt_float32.trace,Metal System Trace,0.986077,Target app exited,sm_apple_metal_probe_host,16032,0,exit(0),114
+gpu_fmt_fp8_e4m3.trace,Metal System Trace,0.897471,Target app exited,sm_apple_metal_probe_host,14514,0,exit(0),114
+gpu_fmt_fp8_e5m2.trace,Metal System Trace,2.180122,Target app exited,sm_apple_metal_probe_host,14862,0,exit(0),114
+gpu_fmt_int8.trace,Metal System Trace,0.823071,Target app exited,sm_apple_metal_probe_host,12981,0,exit(0),114
+gpu_fmt_mxfp4.trace,Metal System Trace,0.930458,Target app exited,sm_apple_metal_probe_host,15509,0,exit(0),114
+gpu_fmt_mxfp6.trace,Metal System Trace,1.166666,Target app exited,sm_apple_metal_probe_host,15323,0,exit(0),114
+gpu_fmt_mxfp8.trace,Metal System Trace,3.427208,Target app exited,sm_apple_metal_probe_host,15030,0,exit(0),114
+gpu_fmt_mxint8.trace,Metal System Trace,1.389123,Target app exited,sm_apple_metal_probe_host,15216,0,exit(0),114
+gpu_fmt_tf32.trace,Metal System Trace,2.012499,Target app exited,sm_apple_metal_probe_host,14084,0,exit(0),114
+gpu_fmt_uint8.trace,Metal System Trace,1.006274,Target app exited,sm_apple_metal_probe_host,13529,0,exit(0),114
+gpu_fp8_e4m3.trace,Blank,10.291642,Time limit reached,sm_apple_metal_probe_host,14093,9,SIGKILL,12
+gpu_fp8_e5m2.trace,Blank,10.294585,Time limit reached,sm_apple_metal_probe_host,14537,9,SIGKILL,12
+gpu_int8.trace,Blank,10.286879,Time limit reached,sm_apple_metal_probe_host,12576,9,SIGKILL,12
+gpu_mxfp4.trace,Blank,10.290464,Time limit reached,sm_apple_metal_probe_host,15338,9,SIGKILL,12
+gpu_mxfp6.trace,Blank,10.281509,Time limit reached,sm_apple_metal_probe_host,15235,9,SIGKILL,12
+gpu_mxfp8.trace,Blank,10.295803,Time limit reached,sm_apple_metal_probe_host,14879,9,SIGKILL,12
+gpu_mxint8.trace,Blank,10.284054,Time limit reached,sm_apple_metal_probe_host,15066,9,SIGKILL,12
+gpu_tf32.trace,Blank,10.300037,Time limit reached,sm_apple_metal_probe_host,13547,9,SIGKILL,12
+gpu_uint8.trace,Blank,10.283399,Time limit reached,sm_apple_metal_probe_host,13001,9,SIGKILL,12

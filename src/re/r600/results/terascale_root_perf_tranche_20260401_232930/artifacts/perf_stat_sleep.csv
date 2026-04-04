@@ -1,0 +1,7 @@
+# started on Wed Apr  1 23:27:56 2026
+
+784560416,,cycles,1617449297,79.00,,
+94317181,,instructions,1618030499,79.00,0.12,insn per cycle
+19222137,,branches,1620929566,80.00,,
+4557596,,branch-misses,1625296275,80.00,23.71,of all branches
+6610681,,cache-misses,1621179081,80.00,,

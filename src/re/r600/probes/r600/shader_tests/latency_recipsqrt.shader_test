@@ -1,0 +1,34 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float v = abs(seed + gl_FragCoord.x * 0.001) + 1.0;
+    float bias = gl_FragCoord.y * 0.0001;
+    // 32-deep RECIPSQRT chain (trans slot only)
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    v = inversesqrt(v) + bias; v = inversesqrt(v) + bias;
+    gl_FragColor = vec4(v, v, v, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

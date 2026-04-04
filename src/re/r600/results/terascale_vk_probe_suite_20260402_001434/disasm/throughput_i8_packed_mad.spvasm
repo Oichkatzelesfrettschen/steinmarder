@@ -1,0 +1,208 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 11
+; Bound: 149
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
+               OpExecutionMode %main LocalSize 64 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %sign_extend8_u1_ "sign_extend8(u1;"
+               OpName %value "value"
+               OpName %index "index"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %packed "packed"
+               OpName %i "i"
+               OpName %lanes "lanes"
+               OpName %param "param"
+               OpName %param_0 "param"
+               OpName %param_1 "param"
+               OpName %param_2 "param"
+               OpName %OutputBuffer "OutputBuffer"
+               OpMemberName %OutputBuffer 0 "values"
+               OpName %outbuf "outbuf"
+               OpName %param_3 "param"
+               OpName %param_4 "param"
+               OpName %param_5 "param"
+               OpName %param_6 "param"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpDecorate %_runtimearr_v4float ArrayStride 16
+               OpDecorate %OutputBuffer BufferBlock
+               OpMemberDecorate %OutputBuffer 0 Offset 0
+               OpDecorate %outbuf Binding 0
+               OpDecorate %outbuf DescriptorSet 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+        %int = OpTypeInt 32 1
+          %9 = OpTypeFunction %int %_ptr_Function_uint
+     %int_24 = OpConstant %int 24
+%_ptr_Function_int = OpTypePointer Function %int
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+ %uint_66051 = OpConstant %uint 66051
+%uint_270544960 = OpConstant %uint 270544960
+      %int_0 = OpConstant %int 0
+    %int_256 = OpConstant %int 256
+       %bool = OpTypeBool
+      %v4int = OpTypeVector %int 4
+%_ptr_Function_v4int = OpTypePointer Function %v4int
+      %int_8 = OpConstant %int 8
+     %int_16 = OpConstant %int 16
+      %int_3 = OpConstant %int 3
+     %int_n5 = OpConstant %int -5
+      %int_7 = OpConstant %int 7
+    %int_n11 = OpConstant %int -11
+         %75 = OpConstantComposite %v4int %int_3 %int_n5 %int_7 %int_n11
+      %int_1 = OpConstant %int 1
+     %int_n2 = OpConstant %int -2
+     %int_n4 = OpConstant %int -4
+         %80 = OpConstantComposite %v4int %int_1 %int_n2 %int_3 %int_n4
+   %int_n128 = OpConstant %int -128
+         %83 = OpConstantComposite %v4int %int_n128 %int_n128 %int_n128 %int_n128
+    %int_127 = OpConstant %int 127
+         %85 = OpConstantComposite %v4int %int_127 %int_127 %int_127 %int_127
+    %int_255 = OpConstant %int 255
+     %uint_1 = OpConstant %uint 1
+     %uint_2 = OpConstant %uint 2
+     %uint_3 = OpConstant %uint 3
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_runtimearr_v4float = OpTypeRuntimeArray %v4float
+%OutputBuffer = OpTypeStruct %_runtimearr_v4float
+%_ptr_Uniform_OutputBuffer = OpTypePointer Uniform %OutputBuffer
+     %outbuf = OpVariable %_ptr_Uniform_OutputBuffer Uniform
+%float_0_0078125 = OpConstant %float 0.0078125
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+    %uint_64 = OpConstant %uint 64
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_64 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_int Function
+     %packed = OpVariable %_ptr_Function_uint Function
+          %i = OpVariable %_ptr_Function_int Function
+      %lanes = OpVariable %_ptr_Function_v4int Function
+      %param = OpVariable %_ptr_Function_uint Function
+    %param_0 = OpVariable %_ptr_Function_uint Function
+    %param_1 = OpVariable %_ptr_Function_uint Function
+    %param_2 = OpVariable %_ptr_Function_uint Function
+    %param_3 = OpVariable %_ptr_Function_uint Function
+    %param_4 = OpVariable %_ptr_Function_uint Function
+    %param_5 = OpVariable %_ptr_Function_uint Function
+    %param_6 = OpVariable %_ptr_Function_uint Function
+         %27 = OpAccessChain %_ptr_Input_uint %gl_GlobalInvocationID %uint_0
+         %28 = OpLoad %uint %27
+         %29 = OpBitcast %int %28
+               OpStore %index %29
+         %31 = OpLoad %int %index
+         %32 = OpBitcast %uint %31
+         %34 = OpIMul %uint %32 %uint_66051
+         %36 = OpIAdd %uint %34 %uint_270544960
+               OpStore %packed %36
+               OpStore %i %int_0
+               OpBranch %39
+         %39 = OpLabel
+               OpLoopMerge %41 %42 None
+               OpBranch %43
+         %43 = OpLabel
+         %44 = OpLoad %int %i
+         %47 = OpSLessThan %bool %44 %int_256
+               OpBranchConditional %47 %40 %41
+         %40 = OpLabel
+         %51 = OpLoad %uint %packed
+         %53 = OpBitFieldUExtract %uint %51 %int_0 %int_8
+               OpStore %param %53
+         %55 = OpFunctionCall %int %sign_extend8_u1_ %param
+         %56 = OpLoad %uint %packed
+         %57 = OpBitFieldUExtract %uint %56 %int_8 %int_8
+               OpStore %param_0 %57
+         %59 = OpFunctionCall %int %sign_extend8_u1_ %param_0
+         %60 = OpLoad %uint %packed
+         %62 = OpBitFieldUExtract %uint %60 %int_16 %int_8
+               OpStore %param_1 %62
+         %64 = OpFunctionCall %int %sign_extend8_u1_ %param_1
+         %65 = OpLoad %uint %packed
+         %66 = OpBitFieldUExtract %uint %65 %int_24 %int_8
+               OpStore %param_2 %66
+         %68 = OpFunctionCall %int %sign_extend8_u1_ %param_2
+         %69 = OpCompositeConstruct %v4int %55 %59 %64 %68
+               OpStore %lanes %69
+         %70 = OpLoad %v4int %lanes
+         %76 = OpIMul %v4int %70 %75
+         %81 = OpIAdd %v4int %76 %80
+         %86 = OpExtInst %v4int %1 SClamp %81 %83 %85
+               OpStore %lanes %86
+         %87 = OpAccessChain %_ptr_Function_int %lanes %uint_0
+         %88 = OpLoad %int %87
+         %90 = OpBitwiseAnd %int %88 %int_255
+         %91 = OpBitcast %uint %90
+         %93 = OpAccessChain %_ptr_Function_int %lanes %uint_1
+         %94 = OpLoad %int %93
+         %95 = OpBitwiseAnd %int %94 %int_255
+         %96 = OpBitcast %uint %95
+         %97 = OpShiftLeftLogical %uint %96 %int_8
+         %98 = OpBitwiseOr %uint %91 %97
+        %100 = OpAccessChain %_ptr_Function_int %lanes %uint_2
+        %101 = OpLoad %int %100
+        %102 = OpBitwiseAnd %int %101 %int_255
+        %103 = OpBitcast %uint %102
+        %104 = OpShiftLeftLogical %uint %103 %int_16
+        %105 = OpBitwiseOr %uint %98 %104
+        %107 = OpAccessChain %_ptr_Function_int %lanes %uint_3
+        %108 = OpLoad %int %107
+        %109 = OpBitwiseAnd %int %108 %int_255
+        %110 = OpBitcast %uint %109
+        %111 = OpShiftLeftLogical %uint %110 %int_24
+        %112 = OpBitwiseOr %uint %105 %111
+               OpStore %packed %112
+               OpBranch %42
+         %42 = OpLabel
+        %113 = OpLoad %int %i
+        %114 = OpIAdd %int %113 %int_1
+               OpStore %i %114
+               OpBranch %39
+         %41 = OpLabel
+        %121 = OpLoad %int %index
+        %122 = OpLoad %uint %packed
+        %123 = OpBitFieldUExtract %uint %122 %int_0 %int_8
+               OpStore %param_3 %123
+        %125 = OpFunctionCall %int %sign_extend8_u1_ %param_3
+        %126 = OpConvertSToF %float %125
+        %127 = OpLoad %uint %packed
+        %128 = OpBitFieldUExtract %uint %127 %int_8 %int_8
+               OpStore %param_4 %128
+        %130 = OpFunctionCall %int %sign_extend8_u1_ %param_4
+        %131 = OpConvertSToF %float %130
+        %132 = OpLoad %uint %packed
+        %133 = OpBitFieldUExtract %uint %132 %int_16 %int_8
+               OpStore %param_5 %133
+        %135 = OpFunctionCall %int %sign_extend8_u1_ %param_5
+        %136 = OpConvertSToF %float %135
+        %137 = OpLoad %uint %packed
+        %138 = OpBitFieldUExtract %uint %137 %int_24 %int_8
+               OpStore %param_6 %138
+        %140 = OpFunctionCall %int %sign_extend8_u1_ %param_6
+        %141 = OpConvertSToF %float %140
+        %142 = OpCompositeConstruct %v4float %126 %131 %136 %141
+        %144 = OpVectorTimesScalar %v4float %142 %float_0_0078125
+        %146 = OpAccessChain %_ptr_Uniform_v4float %outbuf %int_0 %121
+               OpStore %146 %144
+               OpReturn
+               OpFunctionEnd
+%sign_extend8_u1_ = OpFunction %int None %9
+      %value = OpFunctionParameter %_ptr_Function_uint
+         %12 = OpLabel
+         %13 = OpLoad %uint %value
+         %15 = OpShiftLeftLogical %uint %13 %int_24
+         %16 = OpBitcast %int %15
+         %17 = OpShiftRightArithmetic %int %16 %int_24
+               OpReturnValue %17
+               OpFunctionEnd

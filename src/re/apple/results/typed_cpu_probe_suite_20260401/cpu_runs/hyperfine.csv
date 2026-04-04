@@ -1,0 +1,4 @@
+command,mean,stddev,median,user,system,min,max
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/typed_cpu_probe_smoke_20260401/sm_apple_cpu_latency_O3 --iters 200000 --probe add_dep_u64 --csv >/dev/null,0.0041908224199999995,0.0003086393135716836,0.00420310542,0.0028154,0.0007868799999999997,0.0037481474199999995,0.0045061474199999995
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/typed_cpu_probe_smoke_20260401/sm_apple_cpu_latency_O3 --iters 200000 --probe load_store_chain_u64 --csv >/dev/null,0.00712466442,0.0005410763424841267,0.00740793942,0.0055826,0.0009822799999999999,0.00649110542,0.007579189419999999
+/Users/eirikr/Documents/GitHub/steinmarder/src/apple_re/results/typed_cpu_probe_smoke_20260401/sm_apple_cpu_latency_O3 --iters 200000 --probe atomic_add_relaxed_u64 --csv >/dev/null,0.015176388820000003,0.00046742541293162465,0.015242147420000001,0.013585799999999999,0.0009508799999999997,0.014646688420000002,0.01563893842

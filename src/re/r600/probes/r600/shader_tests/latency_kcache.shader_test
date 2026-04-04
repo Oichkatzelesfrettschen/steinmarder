@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform vec4 data[16];
+uniform float seed;
+void main() {
+    // Dependent kcache reads: index computed from previous value
+    float idx = seed + gl_FragCoord.x * 0.001;
+    vec4 v = data[int(mod(idx * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    v = data[int(mod(v.x * 15.0, 16.0))];
+    gl_FragColor = v;
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

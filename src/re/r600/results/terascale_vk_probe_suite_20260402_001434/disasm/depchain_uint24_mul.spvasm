@@ -1,0 +1,97 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 11
+; Bound: 59
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
+               OpExecutionMode %main LocalSize 64 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %index "index"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %acc "acc"
+               OpName %i "i"
+               OpName %OutputBuffer "OutputBuffer"
+               OpMemberName %OutputBuffer 0 "values"
+               OpName %outbuf "outbuf"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpDecorate %_runtimearr_float ArrayStride 4
+               OpDecorate %OutputBuffer BufferBlock
+               OpMemberDecorate %OutputBuffer 0 Offset 0
+               OpDecorate %outbuf Binding 0
+               OpDecorate %outbuf DescriptorSet 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+%uint_16777213 = OpConstant %uint 16777213
+     %uint_3 = OpConstant %uint 3
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+    %int_512 = OpConstant %int 512
+       %bool = OpTypeBool
+     %uint_7 = OpConstant %uint 7
+%uint_16777215 = OpConstant %uint 16777215
+      %int_1 = OpConstant %int 1
+      %float = OpTypeFloat 32
+%_runtimearr_float = OpTypeRuntimeArray %float
+%OutputBuffer = OpTypeStruct %_runtimearr_float
+%_ptr_Uniform_OutputBuffer = OpTypePointer Uniform %OutputBuffer
+     %outbuf = OpVariable %_ptr_Uniform_OutputBuffer Uniform
+%float_5_96046448en08 = OpConstant %float 5.96046448e-08
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+    %uint_64 = OpConstant %uint 64
+     %uint_1 = OpConstant %uint 1
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_64 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_uint Function
+        %acc = OpVariable %_ptr_Function_uint Function
+          %i = OpVariable %_ptr_Function_int Function
+         %14 = OpAccessChain %_ptr_Input_uint %gl_GlobalInvocationID %uint_0
+         %15 = OpLoad %uint %14
+               OpStore %index %15
+         %17 = OpLoad %uint %index
+         %19 = OpBitwiseAnd %uint %17 %uint_16777213
+         %21 = OpIAdd %uint %19 %uint_3
+               OpStore %acc %21
+               OpStore %i %int_0
+               OpBranch %26
+         %26 = OpLabel
+               OpLoopMerge %28 %29 None
+               OpBranch %30
+         %30 = OpLabel
+         %31 = OpLoad %int %i
+         %34 = OpSLessThan %bool %31 %int_512
+               OpBranchConditional %34 %27 %28
+         %27 = OpLabel
+         %35 = OpLoad %uint %acc
+         %36 = OpIMul %uint %35 %uint_3
+         %38 = OpIAdd %uint %36 %uint_7
+         %40 = OpBitwiseAnd %uint %38 %uint_16777215
+               OpStore %acc %40
+               OpBranch %29
+         %29 = OpLabel
+         %41 = OpLoad %int %i
+         %43 = OpIAdd %int %41 %int_1
+               OpStore %i %43
+               OpBranch %26
+         %28 = OpLabel
+         %49 = OpLoad %uint %index
+         %50 = OpLoad %uint %acc
+         %51 = OpConvertUToF %float %50
+         %53 = OpFMul %float %51 %float_5_96046448en08
+         %55 = OpAccessChain %_ptr_Uniform_float %outbuf %int_0 %49
+               OpStore %55 %53
+               OpReturn
+               OpFunctionEnd

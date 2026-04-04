@@ -1,0 +1,12 @@
+{
+  "completed_groups": [
+    "torch"
+  ],
+  "completed_rows": 72,
+  "expected_rows": 72,
+  "last_backend": "pytorch_mps",
+  "last_format": "uint64",
+  "last_group": "torch",
+  "last_workload": "reduce_1m",
+  "status": "completed"
+}

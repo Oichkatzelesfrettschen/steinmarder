@@ -1,0 +1,63 @@
+backend,format,workload,status,support_tier,median_ms,p90_ms,warmup_runs,measured_runs,checksum,notes
+pytorch_cpu,float16,gemm_256,measured,native,5.807333494885825,5.887566690216772,1,2,19.3125,device=cpu
+pytorch_cpu,float16,reduce_1m,measured,native,0.046478991862386465,0.05409579025581479,1,2,1186.0,device=cpu
+pytorch_cpu,float32,gemm_256,measured,native,0.03762450069189072,0.037891301326453686,1,2,8.931612968444824,device=cpu
+pytorch_cpu,float32,reduce_1m,measured,native,0.03608298720791936,0.03651658771559596,1,2,-776.9556884765625,device=cpu
+pytorch_cpu,float64,gemm_256,measured,native,0.10306299373041838,0.10327979398425668,1,2,-19.80895559678801,device=cpu
+pytorch_cpu,float64,reduce_1m,measured,native,0.059124999097548425,0.059391392278485,1,2,-216.28058819774094,device=cpu
+pytorch_cpu,bfloat16,gemm_256,measured,native_or_proxy,5.757562496000901,5.767412489512935,1,2,5.03125,device=cpu
+pytorch_cpu,bfloat16,reduce_1m,measured,native_or_proxy,0.05562450678553432,0.05665770440828055,1,2,75.0,device=cpu
+pytorch_cpu,int8,gemm_256,measured,native_or_proxy,0.7048544939607382,0.705138104967773,1,2,109.0,device=cpu
+pytorch_cpu,int8,reduce_1m,measured,native_or_proxy,0.1384170027449727,0.13861700426787138,1,2,-505423.0,device=cpu
+pytorch_cpu,uint8,gemm_256,measured,native_or_proxy,0.6949789967620745,0.6976957927690819,1,2,19.0,device=cpu
+pytorch_cpu,uint8,reduce_1m,measured,native_or_proxy,0.2586664923001081,0.2740996947977692,1,2,15496714.0,device=cpu
+pytorch_mps,float16,gemm_256,measured,native,0.6235625041881576,0.6667461042525247,1,2,-37.75,device=mps
+pytorch_mps,float16,reduce_1m,measured,native,0.6519374874187633,0.6664538843324408,1,2,258.0,device=mps
+pytorch_mps,float32,gemm_256,measured,native,0.4661665007006377,0.4825333075132221,1,2,-4.580331325531006,device=mps
+pytorch_mps,float32,reduce_1m,measured,native,0.4795205022674054,0.4992705013137311,1,2,-1536.98193359375,device=mps
+pytorch_mps,float64,gemm_256,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,float64,reduce_1m,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,bfloat16,gemm_256,measured,native_or_proxy,0.9918960131471977,1.2696464051259682,1,2,0.671875,device=mps
+pytorch_mps,bfloat16,reduce_1m,measured,native_or_proxy,0.5221875035203993,0.5409047123976052,1,2,556.0,device=mps
+pytorch_mps,int8,gemm_256,measured,native_or_proxy,0.7969374855747446,0.8057874831138179,1,2,75.0,device=mps
+pytorch_mps,int8,reduce_1m,measured,native_or_proxy,0.4864379880018532,0.4873547819443047,1,2,-491666.0,device=mps
+pytorch_mps,uint8,gemm_256,measured,native_or_proxy,0.7895000162534416,0.7900000200606883,1,2,128.0,device=mps
+pytorch_mps,uint8,reduce_1m,measured,native_or_proxy,0.4756665148306638,0.48866691649891436,1,2,15481784.0,device=mps
+pytorch_proxy_cpu,tf32,gemm_256,measured,framework_proxy,0.1356035063508898,0.137053505750373,1,2,3.1669921875,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,tf32,reduce_1m,measured,framework_proxy,0.06704199768137187,0.06944200431462377,1,2,-1046.8212890625,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e4m3,gemm_256,measured,framework_proxy,0.08537500980310142,0.08577501284889877,1,2,0.25,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e4m3,reduce_1m,measured,framework_proxy,0.03620899224188179,0.037808992783539,1,2,-326.5,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e5m2,gemm_256,measured,framework_proxy,0.08095850353129208,0.08199171279557049,1,2,-4.75,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,fp8_e5m2,reduce_1m,measured,framework_proxy,0.043729000026360154,0.045045820297673345,1,2,1424.5,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp8,gemm_256,measured,framework_proxy,0.12966648500878364,0.13009967806283385,1,2,5.2587809562683105,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp8,reduce_1m,measured,framework_proxy,0.64487500640098,0.7591414061607793,1,2,-1186.164306640625,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp6,gemm_256,measured,framework_proxy,0.14002098760101944,0.1455705874832347,1,2,-10.691516876220703,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp6,reduce_1m,measured,framework_proxy,0.6489374936791137,0.6995874835411087,1,2,-137.4525146484375,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp4,gemm_256,measured,framework_proxy,0.1429584954166785,0.1483252999605611,1,2,-37.94873046875,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxfp4,reduce_1m,measured,framework_proxy,0.583853994612582,0.594237181940116,1,2,354.67626953125,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxint8,gemm_256,measured,framework_proxy,0.12839550618082285,0.13224550057202578,1,2,-9.33743953704834,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,mxint8,reduce_1m,measured,framework_proxy,0.31377050618175417,0.3208869165973738,1,2,17.48321533203125,proxy_backend=torch_float32_cpu
+pytorch_proxy_cpu,nf4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,nf4,reduce_1m,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,fp4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_cpu,fp4,reduce_1m,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on cpu.
+pytorch_proxy_mps,tf32,gemm_256,measured,framework_proxy,0.525354000274092,0.534770789090544,1,2,-4.9931640625,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,tf32,reduce_1m,measured,framework_proxy,1.196083496324718,1.4049503020942211,1,2,-609.3740234375,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e4m3,gemm_256,measured,framework_proxy,1.418604515492916,2.1112881135195494,1,2,2.625,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e4m3,reduce_1m,measured,framework_proxy,0.5024790007155389,0.5424958129879087,1,2,-485.875,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e5m2,gemm_256,measured,framework_proxy,2.189937498769723,3.4395546856103465,1,2,-3.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,fp8_e5m2,reduce_1m,measured,framework_proxy,0.4233539948472753,0.4422372003318742,1,2,-528.5,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp8,gemm_256,measured,framework_proxy,0.7899584888946265,0.8084588858764619,1,2,-17.742835998535156,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp8,reduce_1m,measured,framework_proxy,3.485020497464575,3.7598704948322847,1,2,1367.576904296875,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp6,gemm_256,measured,framework_proxy,1.3204585120547563,1.7363917140755802,1,2,23.693151473999023,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp6,reduce_1m,measured,framework_proxy,3.20099999953527,3.3586335979634896,1,2,502.9358825683594,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp4,gemm_256,measured,framework_proxy,0.6138960015960038,0.6276456057094038,1,2,-0.0,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxfp4,reduce_1m,measured,framework_proxy,3.4090830013155937,3.6650165915489197,1,2,-884.85595703125,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxint8,gemm_256,measured,framework_proxy,0.732791522750631,0.745124724926427,1,2,-0.9101345539093018,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,mxint8,reduce_1m,measured,framework_proxy,2.723707992117852,2.831941598560661,1,2,-116.33721923828125,proxy_backend=torch_float32_mps
+pytorch_proxy_mps,nf4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,nf4,reduce_1m,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,fp4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+pytorch_proxy_mps,fp4,reduce_1m,planned,framework_proxy,,,,,,Reserved frontier row for future torch proxy coverage on mps.
+mlx_gpu,float32,environment,missing_dependency,unknown,,,,,,ModuleNotFoundError: No module named 'mlx'
+coreml_all,float32,environment,missing_dependency,unknown,,,,,,ModuleNotFoundError: No module named 'coremltools'

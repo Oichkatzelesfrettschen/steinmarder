@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[31]'><schema name="metal-object-label"><col><mnemonic>timestamp</mnemonic><name>Timestamp</name><engineering-type>start-time</engineering-type></col><col><mnemonic>object-id</mnemonic><name>object Id</name><engineering-type>uint64</engineering-type></col><col><mnemonic>frame-number</mnemonic><name>frame</name><engineering-type>uint32</engineering-type></col><col><mnemonic>label</mnemonic><name>Label</name><engineering-type>metal-object-label</engineering-type></col><col><mnemonic>object-type</mnemonic><name>Type</name><engineering-type>uint32</engineering-type></col><col><mnemonic>pid</mnemonic><name>PID</name><engineering-type>uint64</engineering-type></col></schema><row><start-time id="1" fmt="00:00.408.448">408448375</start-time><uint64 id="2" fmt="0">0</uint64><uint32 id="3" fmt="4294967295">4294967295</uint32><metal-object-label id="4" fmt="coreanimation.memoryless-texture">coreanimation.memoryless-texture</metal-object-label><uint32 id="5" fmt="5">5</uint32><uint64 id="6" fmt="643">643</uint64></row>
+<row><start-time id="7" fmt="00:00.408.455">408455875</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label id="8" fmt="coreanimation.path-buffer">coreanimation.path-buffer</metal-object-label><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="9" fmt="00:00.408.478">408478375</start-time><uint64 id="10" fmt="169,000,759">169000759</uint64><uint32 id="11" fmt="1">1</uint32><metal-object-label id="12" fmt="coreanimation.assembly-encoder">coreanimation.assembly-encoder</metal-object-label><uint32 id="13" fmt="11">11</uint32><uint64 ref="6"/></row>
+<row><start-time ref="9"/><uint64 id="14" fmt="169,000,758">169000758</uint64><uint32 ref="11"/><metal-object-label id="15" fmt="coreanimation.command-buffer">coreanimation.command-buffer</metal-object-label><uint32 id="16" fmt="10">10</uint32><uint64 ref="6"/></row>
+<row><start-time id="17" fmt="00:00.408.975">408975541</start-time><uint64 id="18" fmt="80,791,667">80791667</uint64><uint32 ref="11"/><metal-object-label id="19" fmt="Command Buffer 0">Command Buffer 0</metal-object-label><uint32 ref="16"/><uint64 id="20" fmt="420">420</uint64></row>
+<row><start-time ref="17"/><uint64 id="21" fmt="80,791,668">80791668</uint64><uint32 ref="11"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="17"/><uint64 id="22" fmt="80,791,669">80791669</uint64><uint32 ref="11"/><metal-object-label id="23" fmt="Render Command 1">Render Command 1</metal-object-label><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="24" fmt="00:00.409.179">409179583</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label id="25" fmt="coreanimation.surface">coreanimation.surface</metal-object-label><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="26" fmt="00:00.409.194">409194875</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label id="27" fmt="coreanimation.ImageOffscreen">coreanimation.ImageOffscreen</metal-object-label><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="28" fmt="00:00.409.590">409590083</start-time><uint64 id="29" fmt="80,791,670">80791670</uint64><uint32 id="30" fmt="2">2</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="31" fmt="00:00.443.001">443001458</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="32" fmt="00:00.443.008">443008208</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="33" fmt="00:00.443.032">443032375</start-time><uint64 id="34" fmt="169,000,761">169000761</uint64><uint32 ref="30"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="33"/><uint64 id="35" fmt="169,000,760">169000760</uint64><uint32 ref="30"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="36" fmt="00:00.458.361">458361708</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="37" fmt="00:00.458.368">458368791</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="38" fmt="00:00.458.392">458392041</start-time><uint64 id="39" fmt="169,000,763">169000763</uint64><uint32 id="40" fmt="3">3</uint32><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="38"/><uint64 id="41" fmt="169,000,762">169000762</uint64><uint32 ref="40"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="42" fmt="00:00.458.848">458848791</start-time><uint64 id="43" fmt="80,791,671">80791671</uint64><uint32 ref="40"/><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="42"/><uint64 id="44" fmt="80,791,672">80791672</uint64><uint32 ref="40"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="42"/><uint64 id="45" fmt="80,791,673">80791673</uint64><uint32 ref="40"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="46" fmt="00:00.459.074">459074125</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="47" fmt="00:00.459.088">459088958</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="48" fmt="00:00.459.508">459508458</start-time><uint64 id="49" fmt="80,791,674">80791674</uint64><uint32 id="50" fmt="4">4</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="51" fmt="00:00.492.444">492444375</start-time><uint64 id="52" fmt="80,791,675">80791675</uint64><uint32 ref="5"/><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="51"/><uint64 id="53" fmt="80,791,676">80791676</uint64><uint32 ref="5"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="51"/><uint64 id="54" fmt="80,791,677">80791677</uint64><uint32 ref="5"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="55" fmt="00:00.492.692">492692208</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="56" fmt="00:00.492.715">492715375</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="57" fmt="00:00.493.298">493298125</start-time><uint64 id="58" fmt="80,791,678">80791678</uint64><uint32 id="59" fmt="6">6</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="60" fmt="00:00.528.533">528533333</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="61" fmt="00:00.528.540">528540500</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="62" fmt="00:00.528.565">528565625</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="63" fmt="00:00.528.575">528575958</start-time><uint64 id="64" fmt="169,000,765">169000765</uint64><uint32 ref="50"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="63"/><uint64 id="65" fmt="169,000,764">169000764</uint64><uint32 ref="50"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="66" fmt="00:00.542.395">542395333</start-time><uint64 id="67" fmt="80,791,679">80791679</uint64><uint32 id="68" fmt="7">7</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="66"/><uint64 id="69" fmt="80,791,680">80791680</uint64><uint32 ref="68"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="66"/><uint64 id="70" fmt="80,791,681">80791681</uint64><uint32 ref="68"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="71" fmt="00:00.542.746">542746000</start-time><uint64 id="72" fmt="100,690,901">100690901</uint64><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="73" fmt="00:00.542.763">542763458</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="74" fmt="00:00.542.793">542793000</start-time><uint64 ref="72"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="75" fmt="00:00.542.809">542809000</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="76" fmt="00:00.543.159">543159541</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="77" fmt="00:00.543.166">543166958</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="78" fmt="00:00.543.189">543189958</start-time><uint64 id="79" fmt="169,000,767">169000767</uint64><uint32 ref="5"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="78"/><uint64 id="80" fmt="169,000,766">169000766</uint64><uint32 ref="5"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="81" fmt="00:00.543.320">543320166</start-time><uint64 id="82" fmt="80,791,682">80791682</uint64><uint32 id="83" fmt="8">8</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="84" fmt="00:00.558.937">558937083</start-time><uint64 id="85" fmt="80,791,683">80791683</uint64><uint32 id="86" fmt="9">9</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="84"/><uint64 id="87" fmt="80,791,684">80791684</uint64><uint32 ref="86"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="84"/><uint64 id="88" fmt="80,791,685">80791685</uint64><uint32 ref="86"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="89" fmt="00:00.559.168">559168041</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="90" fmt="00:00.559.186">559186000</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="91" fmt="00:00.559.711">559711750</start-time><uint64 id="92" fmt="80,791,686">80791686</uint64><uint32 ref="16"/><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="93" fmt="00:00.575.045">575045458</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="94" fmt="00:00.575.052">575052541</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="95" fmt="00:00.575.077">575077625</start-time><uint64 id="96" fmt="169,000,769">169000769</uint64><uint32 ref="59"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="95"/><uint64 id="97" fmt="169,000,768">169000768</uint64><uint32 ref="59"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="98" fmt="00:00.608.831">608831833</start-time><uint64 id="99" fmt="80,791,687">80791687</uint64><uint32 ref="13"/><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="98"/><uint64 id="100" fmt="80,791,688">80791688</uint64><uint32 ref="13"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="98"/><uint64 id="101" fmt="80,791,689">80791689</uint64><uint32 ref="13"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="102" fmt="00:00.609.043">609043958</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="103" fmt="00:00.609.057">609057125</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="104" fmt="00:00.609.497">609497541</start-time><uint64 id="105" fmt="80,791,690">80791690</uint64><uint32 id="106" fmt="12">12</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="107" fmt="00:00.609.675">609675375</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="108" fmt="00:00.609.682">609682000</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="109" fmt="00:00.609.742">609742458</start-time><uint64 id="110" fmt="1,526,452,054">1526452054</uint64><uint32 ref="3"/><metal-object-label id="111" fmt="coreanimation.Surface">coreanimation.Surface</metal-object-label><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="112" fmt="00:00.609.755">609755333</start-time><uint64 id="113" fmt="169,000,771">169000771</uint64><uint32 ref="68"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="112"/><uint64 id="114" fmt="169,000,770">169000770</uint64><uint32 ref="68"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="115" fmt="00:00.609.804">609804500</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="116" fmt="00:00.625.540">625540958</start-time><uint64 id="117" fmt="80,791,691">80791691</uint64><uint32 id="118" fmt="13">13</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="116"/><uint64 id="119" fmt="80,791,692">80791692</uint64><uint32 ref="118"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="116"/><uint64 id="120" fmt="80,791,693">80791693</uint64><uint32 ref="118"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="121" fmt="00:00.625.845">625845416</start-time><uint64 ref="72"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="122" fmt="00:00.625.862">625862500</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="123" fmt="00:00.625.890">625890041</start-time><uint64 ref="72"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="124" fmt="00:00.625.906">625906000</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="125" fmt="00:00.626.312">626312000</start-time><uint64 id="126" fmt="80,791,694">80791694</uint64><uint32 id="127" fmt="14">14</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="128" fmt="00:00.642.599">642599083</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="129" fmt="00:00.642.605">642605833</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="130" fmt="00:00.642.628">642628375</start-time><uint64 id="131" fmt="169,000,773">169000773</uint64><uint32 ref="83"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="130"/><uint64 id="132" fmt="169,000,772">169000772</uint64><uint32 ref="83"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="133" fmt="00:00.659.361">659361000</start-time><uint64 id="134" fmt="80,791,695">80791695</uint64><uint32 id="135" fmt="15">15</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="133"/><uint64 id="136" fmt="80,791,696">80791696</uint64><uint32 ref="135"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="133"/><uint64 id="137" fmt="80,791,697">80791697</uint64><uint32 ref="135"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="138" fmt="00:00.659.599">659599750</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="139" fmt="00:00.659.617">659617083</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="140" fmt="00:00.659.648">659648750</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="141" fmt="00:00.659.655">659655291</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="142" fmt="00:00.659.680">659680375</start-time><uint64 id="143" fmt="169,000,775">169000775</uint64><uint32 ref="86"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="142"/><uint64 id="144" fmt="169,000,774">169000774</uint64><uint32 ref="86"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="145" fmt="00:00.660.086">660086666</start-time><uint64 id="146" fmt="80,791,698">80791698</uint64><uint32 id="147" fmt="16">16</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="148" fmt="00:00.674.924">674924958</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="149" fmt="00:00.674.933">674933291</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="8"/><uint32 ref="5"/><uint64 ref="6"/></row>
+<row><start-time id="150" fmt="00:00.674.950">674950625</start-time><uint64 id="151" fmt="169,000,777">169000777</uint64><uint32 ref="16"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="6"/></row>
+<row><start-time ref="150"/><uint64 id="152" fmt="169,000,776">169000776</uint64><uint32 ref="16"/><metal-object-label ref="15"/><uint32 ref="16"/><uint64 ref="6"/></row>
+<row><start-time id="153" fmt="00:00.675.494">675494916</start-time><uint64 id="154" fmt="80,791,699">80791699</uint64><uint32 id="155" fmt="17">17</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="153"/><uint64 id="156" fmt="80,791,700">80791700</uint64><uint32 ref="155"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="153"/><uint64 id="157" fmt="80,791,701">80791701</uint64><uint32 ref="155"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="158" fmt="00:00.675.831">675831291</start-time><uint64 ref="72"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="159" fmt="00:00.675.848">675848291</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="160" fmt="00:00.675.876">675876458</start-time><uint64 ref="72"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="161" fmt="00:00.675.892">675892666</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="4"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="162" fmt="00:00.676.275">676275666</start-time><uint64 id="163" fmt="80,791,702">80791702</uint64><uint32 id="164" fmt="18">18</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="165" fmt="00:00.709.783">709783750</start-time><uint64 id="166" fmt="80,791,703">80791703</uint64><uint32 id="167" fmt="19">19</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time ref="165"/><uint64 id="168" fmt="80,791,704">80791704</uint64><uint32 ref="167"/><metal-object-label ref="12"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time ref="165"/><uint64 id="169" fmt="80,791,705">80791705</uint64><uint32 ref="167"/><metal-object-label ref="23"/><uint32 ref="13"/><uint64 ref="20"/></row>
+<row><start-time id="170" fmt="00:00.710.110">710110416</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="25"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="171" fmt="00:00.710.135">710135958</start-time><uint64 ref="2"/><uint32 ref="3"/><metal-object-label ref="27"/><uint32 ref="5"/><uint64 ref="20"/></row>
+<row><start-time id="172" fmt="00:00.710.980">710980375</start-time><uint64 id="173" fmt="80,791,706">80791706</uint64><uint32 id="174" fmt="20">20</uint32><metal-object-label ref="19"/><uint32 ref="16"/><uint64 ref="20"/></row>
+<row><start-time id="175" fmt="00:00.744.902">744902041</start-time><uint64 id="176" fmt="1,526,452,093">1526452093</uint64><uint32 ref="3"/><metal-object-label id="177" fmt="AGXHeap with guard">AGXHeap with guard</metal-object-label><uint32 ref="5"/><uint64 id="178" fmt="58,052">58052</uint64></row>
+</node></trace-query-result>

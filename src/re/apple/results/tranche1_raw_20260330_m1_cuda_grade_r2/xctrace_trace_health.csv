@@ -1,0 +1,4 @@
+trace,template_name,duration_s,end_reason,target_process_name,target_pid,target_exit_status,target_termination_reason,schema_count
+cpu_time_profiler.trace,Time Profiler,0.845194,Target app exited,sm_apple_cpu_latency_O3,70742,0,exit(0),40
+gpu_baseline.trace,Metal System Trace,0.955943,Target app exited,sm_apple_metal_probe_host,71185,0,exit(0),114
+gpu_compare.trace,Time Profiler,3.902667,Target app exited,sm_apple_metal_probe_host,71245,0,exit(0),40

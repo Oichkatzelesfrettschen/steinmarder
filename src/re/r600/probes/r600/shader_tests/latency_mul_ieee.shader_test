@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float px = gl_FragCoord.x * 0.001;
+    float py = gl_FragCoord.y * 0.001 + 1.0;
+    float v = seed + px;
+    // 64-deep chain: each MUL depends on prev. py varies → no folding.
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    gl_FragColor = vec4(v, v, v, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

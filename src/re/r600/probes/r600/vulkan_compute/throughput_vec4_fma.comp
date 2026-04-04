@@ -1,0 +1,21 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    vec4 values[];
+} outbuf;
+
+void main(void) {
+    uint index = gl_GlobalInvocationID.x;
+    vec4 acc = vec4(1.0, 2.0, 3.0, 4.0) + vec4(index) * 0.001;
+    vec4 a = vec4(1.0001, 0.9999, 1.0002, 0.9998);
+    vec4 b = vec4(0.5, 0.25, 0.125, 0.0625);
+
+    // Independent vec4 FMAs are the compute-lane analog of packed bundle probes.
+    for (int i = 0; i < 256; ++i) {
+        acc = fma(acc, a, b);
+    }
+
+    outbuf.values[index] = acc;
+}

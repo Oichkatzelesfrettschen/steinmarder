@@ -1,0 +1,28 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform int iseed;
+void main() {
+    int px = int(gl_FragCoord.x);
+    int py = int(gl_FragCoord.y) + 3;
+    int v = iseed + px;
+    // 32-deep MULLO_INT chain (trans slot, expected multi-cycle)
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    v = v * py; v = v * py; v = v * py; v = v * py;
+    float f = float(v) * 0.0000001;
+    gl_FragColor = vec4(f, f, f, 1.0);
+}
+
+[test]
+uniform int iseed 42
+draw rect -1 -1 2 2

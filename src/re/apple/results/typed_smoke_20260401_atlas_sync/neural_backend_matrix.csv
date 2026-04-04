@@ -1,0 +1,76 @@
+backend,format,workload,status,support_tier,median_ms,p90_ms,warmup_runs,measured_runs,checksum,notes
+pytorch_cpu,float16,gemm_256,measured,native,6.202416989253834,6.202416989253834,1,1,-9.40625,device=cpu
+pytorch_cpu,float32,gemm_256,measured,native,0.036999990697950125,0.036999990697950125,1,1,34.54998779296875,device=cpu
+pytorch_cpu,float64,gemm_256,measured,native,0.12041701120324433,0.12041701120324433,1,1,-17.129300903712114,device=cpu
+pytorch_cpu,bfloat16,gemm_256,measured,native_or_proxy,6.020540997269563,6.020540997269563,1,1,-15.625,device=cpu
+pytorch_cpu,int8,gemm_256,measured,native_or_proxy,0.6894160032970831,0.6894160032970831,1,1,90.0,device=cpu
+pytorch_cpu,uint8,gemm_256,measured,native_or_proxy,0.6651250005234033,0.6651250005234033,1,1,24.0,device=cpu
+pytorch_mps,float16,gemm_256,measured,native,0.5305410013534129,0.5305410013534129,1,1,30.4375,device=mps
+pytorch_mps,float32,gemm_256,measured,native,0.4604999994626269,0.4604999994626269,1,1,-28.949499130249023,device=mps
+pytorch_mps,float64,gemm_256,error,unsupported_or_proxy,,,,,,TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+pytorch_mps,bfloat16,gemm_256,measured,native_or_proxy,0.5638750008074567,0.5638750008074567,1,1,-14.0625,device=mps
+pytorch_mps,int8,gemm_256,measured,native_or_proxy,0.7908749976195395,0.7908749976195395,1,1,-71.0,device=mps
+pytorch_mps,uint8,gemm_256,measured,native_or_proxy,0.7650830084457994,0.7650830084457994,1,1,185.0,device=mps
+pytorch_proxy,tf32,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,mxfp8,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,mxfp6,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,mxfp4,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,mxint8,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,nf4,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+pytorch_proxy,fp4,gemm_256,planned,framework_proxy,,,,,,Frontier family kept visible even without a direct PyTorch dtype.
+mlx_gpu,float16,gemm_256,measured,native,0.34820901055354625,0.34820901055354625,1,1,33.625,"default_device=Device(gpu, 0)"
+mlx_gpu,float32,gemm_256,measured,native,0.3222499944968149,0.3222499944968149,1,1,-24.69001579284668,"default_device=Device(gpu, 0)"
+mlx_proxy,bfloat16,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,int8,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,uint8,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,tf32,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,mxfp8,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,mxfp6,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,mxfp4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,mxint8,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,nf4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+mlx_proxy,fp4,gemm_256,planned,framework_proxy,,,,,,Reserved frontier row for future MLX coverage.
+coreml_cpu_only,float16,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_ONLY present in coremltools 9.0.
+coreml_cpu_only,float32,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_ONLY present in coremltools 9.0.
+coreml_cpu_and_gpu,float16,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_AND_GPU present in coremltools 9.0.
+coreml_cpu_and_gpu,float32,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_AND_GPU present in coremltools 9.0.
+coreml_cpu_and_ne,float16,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_AND_NE present in coremltools 9.0.
+coreml_cpu_and_ne,float32,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.CPU_AND_NE present in coremltools 9.0.
+coreml_all,float16,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.ALL present in coremltools 9.0.
+coreml_all,float32,tiny_linear,availability_only,placement_only,,,,,,ComputeUnit.ALL present in coremltools 9.0.
+coreml_cpu_only,int8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,int8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,int8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,int8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,bfloat16,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,bfloat16,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,bfloat16,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,bfloat16,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,tf32,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,tf32,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,tf32,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,tf32,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,mxfp8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,mxfp8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,mxfp8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,mxfp8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,mxfp6,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,mxfp6,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,mxfp6,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,mxfp6,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,mxfp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,mxfp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,mxfp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,mxfp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,mxint8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,mxint8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,mxint8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,mxint8,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,nf4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,nf4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,nf4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,nf4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_only,fp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_gpu,fp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_cpu_and_ne,fp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.
+coreml_all,fp4,typed_proxy,planned,framework_proxy,,,,,,Keep frontier family visible for placement-only Core ML sweeps.

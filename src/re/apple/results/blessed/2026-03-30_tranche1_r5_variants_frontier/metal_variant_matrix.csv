@@ -1,0 +1,4 @@
+variant,shader,iters_correctness,iters_timing,iters_trace,notes
+baseline,probe_simdgroup_reduce.metal,1,200,1000,starter variant
+threadgroup_heavy,probe_threadgroup_heavy.metal,1,160,800,threadgroup memory pressure
+occupancy_heavy,probe_occupancy_heavy.metal,1,160,800,arithmetic occupancy pressure

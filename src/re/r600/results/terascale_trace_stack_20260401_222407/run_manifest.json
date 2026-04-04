@@ -1,0 +1,7 @@
+{
+  "host": "x130e",
+  "remote_mesa": "/home/eirikr/workspaces/mesa/mesa-26-debug",
+  "remote_build": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc",
+  "remote_icd": "/home/eirikr/workspaces/mesa/mesa-26-debug/build-terakan-distcc/src/amd/terascale/vulkan/terascale_devenv_icd.x86_64.json",
+  "status_csv": "/Users/eirikr/Documents/GitHub/steinmarder/src/sass_re/results/terascale_trace_stack_20260401_222407/step_status.csv"
+}

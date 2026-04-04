@@ -1,0 +1,38 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float seed;
+void main() {
+    float px = gl_FragCoord.x * 0.001;
+    float py = gl_FragCoord.y * 0.001 + 1.0;
+    float a = seed + px;
+    float b = seed + px + 0.1;
+    float c = seed + px + 0.2;
+    float d = seed + px + 0.3;
+    // 4 independent 16-deep chains (64 total, all independent)
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    a=a*py; b=b*py; c=c*py; d=d*py;
+    gl_FragColor = vec4(a, b, c+d, 1.0);
+}
+
+[test]
+uniform float seed 0.5
+draw rect -1 -1 2 2

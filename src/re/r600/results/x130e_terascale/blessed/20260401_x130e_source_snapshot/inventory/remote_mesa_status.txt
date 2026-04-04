@@ -1,0 +1,72 @@
+ M clippy.toml
+ M meson.build
+ M meson.options
+ M rustfmt.toml
+ M src/amd/meson.build
+ M src/compiler/nir/nir_divergence_analysis.c
+ M src/compiler/nir/nir_intrinsics.py
+ M src/compiler/rust/meson.build
+ M src/etnaviv/isa/meson.build
+ M src/gallium/drivers/r600/compute_memory_pool.c
+ M src/gallium/drivers/r600/evergreen_compute.c
+ M src/gallium/drivers/r600/evergreen_state.c
+ M src/gallium/drivers/r600/r600_blit.c
+ M src/gallium/drivers/r600/r600_hw_context.c
+ M src/gallium/drivers/r600/r600_shader.c
+ M src/gallium/drivers/r600/r600_state_common.c
+ M src/gallium/drivers/r600/sfn/sfn_assembler.cpp
+ M src/gallium/drivers/r600/sfn/sfn_instr_alu.cpp
+ M src/gallium/drivers/r600/sfn/sfn_nir.cpp
+ M src/gallium/drivers/r600/sfn/sfn_nir_lower_tex.cpp
+ M src/gallium/drivers/r600/sfn/sfn_nir_lower_tex.h
+ M src/gallium/drivers/r600/sfn/sfn_shader.cpp
+ M src/gallium/drivers/r600/sfn/sfn_shader.h
+ M src/gallium/drivers/zink/zink_screen.c
+ M src/gallium/frontends/rusticl/mesa/pipe/device.rs
+ M src/gallium/frontends/rusticl/meson.build
+ M src/gallium/frontends/rusticl/util/conversion.rs
+ M src/gallium/winsys/radeon/drm/radeon_drm_cs.c
+ M src/gallium/winsys/radeon/drm/radeon_drm_cs.h
+ M src/gallium/winsys/radeon/drm/radeon_drm_winsys.c
+ M src/nouveau/compiler/meson.build
+ M src/nouveau/nil/meson.build
+ M src/util/list.h
+ M src/util/rust/meson.build
+ M src/virtio/virtgpu_kumquat_ffi/meson.build
+ M src/vulkan/runtime/vk_instance.c
+ M src/vulkan/runtime/vk_sync_binary.c
+ M subprojects/bitflags-2-rs.wrap
+ M subprojects/cfg-if-1-rs.wrap
+ M subprojects/equivalent-1-rs.wrap
+ M subprojects/errno-0.3-rs.wrap
+ M subprojects/hashbrown-0.14-rs.wrap
+ M subprojects/indexmap-2-rs.wrap
+ M subprojects/libc-0.2-rs.wrap
+ M subprojects/log-0.4-rs.wrap
+ M subprojects/once_cell-1-rs.wrap
+ M subprojects/paste-1-rs.wrap
+ M subprojects/pest-2-rs.wrap
+ M subprojects/pest_derive-2-rs.wrap
+ M subprojects/pest_generator-2-rs.wrap
+ M subprojects/pest_meta-2-rs.wrap
+ M subprojects/proc-macro2-1-rs.wrap
+ M subprojects/quote-1-rs.wrap
+ M subprojects/remain-0.2-rs.wrap
+ M subprojects/roxmltree-0.20-rs.wrap
+ M subprojects/rustc-hash-2-rs.wrap
+ M subprojects/rustix-1-rs.wrap
+ M subprojects/syn-2-rs.wrap
+ M subprojects/thiserror-2-rs.wrap
+ M subprojects/thiserror-impl-2-rs.wrap
+ M subprojects/ucd-trie-0.1-rs.wrap
+ M subprojects/unicode-ident-1-rs.wrap
+ M subprojects/windows-link-0.2-rs.wrap
+ M subprojects/windows-sys-0.6-rs.wrap
+ M subprojects/zerocopy-0.8-rs.wrap
+ M subprojects/zerocopy-derive-0.8-rs.wrap
+?? clang19-distcc.ini
+?? distcc-clang19.ini
+?? native.ini
+?? rust-toolchain.toml
+?? src/amd/terascale/
+?? src/gallium/drivers/r600/evergreen_compute.c.bak

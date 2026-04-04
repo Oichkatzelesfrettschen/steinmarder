@@ -1,0 +1,35 @@
+#version 450
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputBuffer {
+    vec4 values[];
+} outbuf;
+
+int sign_extend8(uint value) {
+    return int(value << 24) >> 24;
+}
+
+void main(void) {
+    int index = int(gl_GlobalInvocationID.x);
+    uint packed = uint(index) * 0x00010203u + 0x10203040u;
+    const ivec4 a = ivec4(3, -5, 7, -11);
+    const ivec4 b = ivec4(1, -2, 3, -4);
+
+    for (int i = 0; i < 256; ++i) {
+        ivec4 lanes = ivec4(sign_extend8(bitfieldExtract(packed, 0, 8)),
+                            sign_extend8(bitfieldExtract(packed, 8, 8)),
+                            sign_extend8(bitfieldExtract(packed, 16, 8)),
+                            sign_extend8(bitfieldExtract(packed, 24, 8)));
+        lanes = clamp((lanes * a) + b, ivec4(-128), ivec4(127));
+        packed = uint(lanes.x & 0xff) |
+                 (uint(lanes.y & 0xff) << 8) |
+                 (uint(lanes.z & 0xff) << 16) |
+                 (uint(lanes.w & 0xff) << 24);
+    }
+
+    outbuf.values[index] = vec4(sign_extend8(bitfieldExtract(packed, 0, 8)),
+                                sign_extend8(bitfieldExtract(packed, 8, 8)),
+                                sign_extend8(bitfieldExtract(packed, 16, 8)),
+                                sign_extend8(bitfieldExtract(packed, 24, 8))) * (1.0 / 128.0);
+}
