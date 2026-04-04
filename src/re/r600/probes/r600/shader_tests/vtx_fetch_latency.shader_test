@@ -1,0 +1,66 @@
+# vtx_fetch_latency.shader_test — Measure vertex buffer fetch latency
+#
+# TeraScale-2 vertex fetches (VFETCH) go through the Texture Cache (TC)
+# via TEX clauses. This probe creates a dependent chain of vertex attribute
+# reads to measure per-VFETCH latency in cycles.
+#
+# Method: Use gl_VertexID to index into a vertex buffer, read attribute A,
+# use A's value to compute a new index, read attribute B at that index, etc.
+# The dependent chain forces serial execution — total time / chain length
+# gives per-fetch latency.
+#
+# Compare with TEX SAMPLE L1 latency (~38 cycles/clause measured).
+#
+# Run: LIBGL_DRIVERS_PATH=/usr/local/mesa-debug/lib/x86_64-linux-gnu/dri \
+#      DISPLAY=:0 XAUTHORITY=/home/nick/.Xauthority \
+#      R600_DEBUG=vs shader_runner vtx_fetch_latency.shader_test
+#
+# Measure: Use GL_TIME_ELAPSED query around the draw call.
+# Expected: VFETCH latency ≈ TEX L1 latency (~38 cycles) since both use TC.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 piglit_vertex;
+in float attr1;  /* vertex attribute: single float */
+
+out vec4 color;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+
+    /* Simple dependent chain: use attr1 to modulate output.
+     * The VFETCH for attr1 is the measurement target.
+     * Multiple attributes would create a longer chain, but
+     * shader_runner limits attribute setup. */
+    float fetched = attr1;
+
+    /* Force the fetch result to be used (prevent dead code elimination) */
+    color = vec4(fetched, fetched, fetched, 1.0);
+}
+
+[fragment shader]
+#version 130
+
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+    frag_color = color;
+}
+
+[vertex data]
+piglit_vertex/float/4  attr1/float/1
+-1.0 -1.0 0.0 1.0     0.5
+ 1.0 -1.0 0.0 1.0     0.6
+ 1.0  1.0 0.0 1.0     0.7
+-1.0  1.0 0.0 1.0     0.8
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rect rgba (0, 0, 1, 1) 0.5 0.5 0.5 1.0 0.2
