@@ -192,6 +192,99 @@ static void sm_nerf_prepare_mlp_prepack(NeRFData *data) {
     data->mlp_prepacked_ready = 1;
 }
 
+#ifdef __AVX512BF16__
+/* Convert IEEE 754 float to BF16 by truncating the lower 16 mantissa bits. */
+static inline uint16_t sm_float_to_bf16(float value) {
+    uint32_t bits;
+    memcpy(&bits, &value, sizeof(bits));
+    return (uint16_t)(bits >> 16);
+}
+
+/* Prepare pair-interleaved BF16 weight arrays for vdpbf16ps inference.
+ *
+ * Weight layout for vdpbf16ps: each 512-bit ZMM holds 16 FP32 accumulators.
+ * The instruction multiplies 16 BF16 *pairs* (32 BF16 values packed as 16 x
+ * uint32) against a broadcast pair, accumulating into the 16 FP32 lanes.
+ *
+ * For W1 [64 inputs -> 64 outputs] we iterate inputs in pairs (hp, hp+1).
+ * Each pair-row stores, for 64 outputs:
+ *   bf16(w[hp][0]), bf16(w[hp+1][0]),  bf16(w[hp][1]), bf16(w[hp+1][1]), ...
+ * That is: low 16 bits = w[hp][h], high 16 bits = w[hp+1][h] for each output h.
+ *
+ * For W0 [27 inputs -> 64 outputs] we pad to 28 inputs (14 pairs) with zeros.
+ */
+static void sm_nerf_prepare_mlp_bf16(NeRFData *data) {
+    uint32_t in_dim = data->config.mlp_in_dim;
+    uint32_t hidden_dim = data->config.mlp_hidden_dim;
+    uint32_t out_dim = data->config.mlp_out_dim;
+
+    data->mlp_bf16_ready = 0;
+
+    if (in_dim != 27 || hidden_dim != 64 || out_dim != 4 || data->config.mlp_num_layers != 2) {
+        return;
+    }
+    if (!data->mlp_prepacked_ready) {
+        return;
+    }
+
+    /* W0: 27 inputs padded to 28 -> 14 pairs, each pair has 64 outputs.
+     * Storage: 14 pairs * 64 outputs * 2 bf16 per pair = 14 * 128 uint16_t = 1792 uint16_t.
+     * Byte layout per pair-row: [bf16(w[hp][0]), bf16(w[hp+1][0]), bf16(w[hp][1]), ...] */
+    uint32_t w0_padded_inputs = 28;
+    uint32_t w0_num_pairs = w0_padded_inputs / 2;  /* 14 */
+    size_t w0_bf16_elems = (size_t)w0_num_pairs * hidden_dim * 2;
+    data->mlp_w0_bf16 = (uint16_t*)sm_aligned_calloc(64u, w0_bf16_elems, sizeof(uint16_t));
+
+    /* W1: 64 inputs -> 32 pairs, each pair has 64 outputs.
+     * Storage: 32 * 64 * 2 = 4096 uint16_t. */
+    uint32_t w1_num_pairs = hidden_dim / 2;  /* 32 */
+    size_t w1_bf16_elems = (size_t)w1_num_pairs * hidden_dim * 2;
+    data->mlp_w1_bf16 = (uint16_t*)sm_aligned_calloc(64u, w1_bf16_elems, sizeof(uint16_t));
+
+    if (!data->mlp_w0_bf16 || !data->mlp_w1_bf16) {
+        free(data->mlp_w0_bf16);
+        free(data->mlp_w1_bf16);
+        data->mlp_w0_bf16 = NULL;
+        data->mlp_w1_bf16 = NULL;
+        return;
+    }
+
+    /* Pack W0 into pair-interleaved BF16.
+     * Source layout (mlp_w0_aligned): [input_idx][hidden_idx], row-major.
+     * For pair p (inputs 2p and 2p+1), output h:
+     *   offset = p * (hidden_dim * 2) + h * 2
+     *   [offset+0] = bf16(w0[2p][h])
+     *   [offset+1] = bf16(w0[2p+1][h]) */
+    for (uint32_t pair_idx = 0; pair_idx < w0_num_pairs; pair_idx++) {
+        uint32_t input_a = pair_idx * 2;
+        uint32_t input_b = pair_idx * 2 + 1;
+        for (uint32_t h = 0; h < hidden_dim; h++) {
+            size_t dst_offset = (size_t)pair_idx * hidden_dim * 2 + (size_t)h * 2;
+            float val_a = (input_a < in_dim) ? data->mlp_w0_aligned[input_a * hidden_dim + h] : 0.0f;
+            float val_b = (input_b < in_dim) ? data->mlp_w0_aligned[input_b * hidden_dim + h] : 0.0f;
+            data->mlp_w0_bf16[dst_offset + 0] = sm_float_to_bf16(val_a);
+            data->mlp_w0_bf16[dst_offset + 1] = sm_float_to_bf16(val_b);
+        }
+    }
+
+    /* Pack W1 into pair-interleaved BF16.
+     * Source layout (mlp_w1_aligned): [input_idx][hidden_idx], row-major. */
+    for (uint32_t pair_idx = 0; pair_idx < w1_num_pairs; pair_idx++) {
+        uint32_t input_a = pair_idx * 2;
+        uint32_t input_b = pair_idx * 2 + 1;
+        for (uint32_t h = 0; h < hidden_dim; h++) {
+            size_t dst_offset = (size_t)pair_idx * hidden_dim * 2 + (size_t)h * 2;
+            data->mlp_w1_bf16[dst_offset + 0] = sm_float_to_bf16(data->mlp_w1_aligned[input_a * hidden_dim + h]);
+            data->mlp_w1_bf16[dst_offset + 1] = sm_float_to_bf16(data->mlp_w1_aligned[input_b * hidden_dim + h]);
+        }
+    }
+
+    data->mlp_bf16_ready = 1;
+    fprintf(stderr, "[NeRF] BF16 pair-interleaved weights ready (W0: %u pairs, W1: %u pairs)\n",
+            w0_num_pairs, w1_num_pairs);
+}
+#endif /* __AVX512BF16__ */
+
 SMNeRFMLPVariant sm_nerf_mlp_variant(void) {
     static int cached = -1;
     const char *env;
@@ -201,6 +294,8 @@ SMNeRFMLPVariant sm_nerf_mlp_variant(void) {
     if (!env || !env[0]) return (SMNeRFMLPVariant)cached;
     if (strcmp(env, "prepacked") == 0 || strcmp(env, "1") == 0) {
         cached = SM_NERF_MLP_VARIANT_PREPACKED;
+    } else if (strcmp(env, "bf16") == 0 || strcmp(env, "2") == 0) {
+        cached = SM_NERF_MLP_VARIANT_BF16;
     }
     return (SMNeRFMLPVariant)cached;
 }
@@ -209,6 +304,8 @@ const char *sm_nerf_mlp_variant_name(SMNeRFMLPVariant variant) {
     switch (variant) {
         case SM_NERF_MLP_VARIANT_PREPACKED:
             return "prepacked";
+        case SM_NERF_MLP_VARIANT_BF16:
+            return "bf16";
         case SM_NERF_MLP_VARIANT_GENERIC:
         default:
             return "generic";
@@ -580,6 +677,9 @@ NeRFData* sm_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
            total_weight_elems, total_bias_elems, occ_dim, occ_threshold);
 
     sm_nerf_prepare_mlp_prepack(data);
+#ifdef __AVX512BF16__
+    sm_nerf_prepare_mlp_bf16(data);
+#endif
 
     return data;
 
@@ -602,6 +702,10 @@ void sm_nerf_data_free(NeRFData *data) {
     free(data->mlp_b0_aligned);
     free(data->mlp_b1_aligned);
     free(data->mlp_bout_aligned);
+#ifdef __AVX512BF16__
+    free(data->mlp_w0_bf16);
+    free(data->mlp_w1_bf16);
+#endif
     free(data->occupancy_grid);
     free(data);
 }

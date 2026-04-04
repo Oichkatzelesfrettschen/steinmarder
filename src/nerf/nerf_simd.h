@@ -14,7 +14,8 @@ typedef struct {
 
 typedef enum {
     SM_NERF_MLP_VARIANT_GENERIC = 0,
-    SM_NERF_MLP_VARIANT_PREPACKED = 1
+    SM_NERF_MLP_VARIANT_PREPACKED = 1,
+    SM_NERF_MLP_VARIANT_BF16 = 2
 } SMNeRFMLPVariant;
 
 /* Get CPU capabilities at runtime */
@@ -76,6 +77,11 @@ typedef struct {
     float *mlp_b1_aligned;       // Optional aligned copy of second hidden bias
     float *mlp_bout_aligned;     // Optional aligned copy of output bias
     int mlp_prepacked_ready;     // 1 when aligned/transposed single-ray data is ready
+#ifdef __AVX512BF16__
+    uint16_t *mlp_w0_bf16;      // Pair-interleaved BF16, [14 pairs][64 outputs] (28 inputs padded from 27)
+    uint16_t *mlp_w1_bf16;      // Pair-interleaved BF16, [32 pairs][64 outputs]
+    int mlp_bf16_ready;          // 1 when BF16 pair-interleaved weights are ready
+#endif
     uint8_t *occupancy_grid;     // 64^3 occupancy grid
     NeRFConfig config;
 } NeRFData;
