@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <time.h>
 #include <cpuid.h>
+#ifdef __AVX2__
+#include <immintrin.h>
+#endif
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -114,6 +118,184 @@ static bool sm_read_half_block(FILE *f, float *dst, uint32_t count) {
     free(tmp);
     return true;
 }
+
+static void *sm_aligned_calloc(size_t alignment, size_t count, size_t elem_size) {
+    void *ptr = NULL;
+    size_t size = count * elem_size;
+    size_t padded_size = ((size + alignment - 1u) / alignment) * alignment;
+#if defined(_ISOC11_SOURCE)
+    ptr = aligned_alloc(alignment, padded_size);
+    if (ptr) memset(ptr, 0, padded_size);
+#else
+    if (posix_memalign(&ptr, alignment, padded_size) != 0) {
+        ptr = NULL;
+    } else {
+        memset(ptr, 0, padded_size);
+    }
+#endif
+    return ptr;
+}
+
+static void sm_nerf_prepare_mlp_prepack(NeRFData *data) {
+    uint32_t in_dim = data->config.mlp_in_dim;
+    uint32_t hidden_dim = data->config.mlp_hidden_dim;
+    uint32_t out_dim = data->config.mlp_out_dim;
+    const float *w0 = data->mlp_weights;
+    const float *b0 = data->mlp_biases;
+    const float *w1 = w0 + (size_t)hidden_dim * in_dim;
+    const float *b1 = b0 + hidden_dim;
+    const float *w_out = w1 + (size_t)hidden_dim * hidden_dim;
+    const float *b_out = b1 + hidden_dim;
+    size_t w0_elems = (size_t)in_dim * hidden_dim;
+    size_t w1_elems = (size_t)hidden_dim * hidden_dim;
+    size_t wout_t_elems = (size_t)out_dim * hidden_dim;
+
+    data->mlp_prepacked_ready = 0;
+    if (in_dim != 27 || hidden_dim != 64 || out_dim != 4 || data->config.mlp_num_layers != 2) {
+        return;
+    }
+
+    data->mlp_w0_aligned = (float*)sm_aligned_calloc(32u, w0_elems, sizeof(float));
+    data->mlp_w1_aligned = (float*)sm_aligned_calloc(32u, w1_elems, sizeof(float));
+    data->mlp_wout_t_aligned = (float*)sm_aligned_calloc(32u, wout_t_elems, sizeof(float));
+    data->mlp_b0_aligned = (float*)sm_aligned_calloc(32u, hidden_dim, sizeof(float));
+    data->mlp_b1_aligned = (float*)sm_aligned_calloc(32u, hidden_dim, sizeof(float));
+    data->mlp_bout_aligned = (float*)sm_aligned_calloc(32u, out_dim, sizeof(float));
+    if (!data->mlp_w0_aligned || !data->mlp_w1_aligned || !data->mlp_wout_t_aligned ||
+        !data->mlp_b0_aligned || !data->mlp_b1_aligned || !data->mlp_bout_aligned) {
+        free(data->mlp_w0_aligned);
+        free(data->mlp_w1_aligned);
+        free(data->mlp_wout_t_aligned);
+        free(data->mlp_b0_aligned);
+        free(data->mlp_b1_aligned);
+        free(data->mlp_bout_aligned);
+        data->mlp_w0_aligned = NULL;
+        data->mlp_w1_aligned = NULL;
+        data->mlp_wout_t_aligned = NULL;
+        data->mlp_b0_aligned = NULL;
+        data->mlp_b1_aligned = NULL;
+        data->mlp_bout_aligned = NULL;
+        return;
+    }
+
+    memcpy(data->mlp_w0_aligned, w0, w0_elems * sizeof(float));
+    memcpy(data->mlp_w1_aligned, w1, w1_elems * sizeof(float));
+    memcpy(data->mlp_b0_aligned, b0, hidden_dim * sizeof(float));
+    memcpy(data->mlp_b1_aligned, b1, hidden_dim * sizeof(float));
+    memcpy(data->mlp_bout_aligned, b_out, out_dim * sizeof(float));
+    for (uint32_t h = 0; h < hidden_dim; h++) {
+        for (uint32_t o = 0; o < out_dim; o++) {
+            data->mlp_wout_t_aligned[(size_t)o * hidden_dim + h] =
+                w_out[(size_t)h * out_dim + o];
+        }
+    }
+    data->mlp_prepacked_ready = 1;
+}
+
+SMNeRFMLPVariant sm_nerf_mlp_variant(void) {
+    static int cached = -1;
+    const char *env;
+    if (cached != -1) return (SMNeRFMLPVariant)cached;
+    cached = SM_NERF_MLP_VARIANT_GENERIC;
+    env = getenv("SM_NERF_MLP_VARIANT");
+    if (!env || !env[0]) return (SMNeRFMLPVariant)cached;
+    if (strcmp(env, "prepacked") == 0 || strcmp(env, "1") == 0) {
+        cached = SM_NERF_MLP_VARIANT_PREPACKED;
+    }
+    return (SMNeRFMLPVariant)cached;
+}
+
+const char *sm_nerf_mlp_variant_name(SMNeRFMLPVariant variant) {
+    switch (variant) {
+        case SM_NERF_MLP_VARIANT_PREPACKED:
+            return "prepacked";
+        case SM_NERF_MLP_VARIANT_GENERIC:
+        default:
+            return "generic";
+    }
+}
+
+#ifdef __AVX2__
+static float sm_hsum256_ps(__m256 v) {
+    float lanes[8];
+    _mm256_storeu_ps(lanes, v);
+    return lanes[0] + lanes[1] + lanes[2] + lanes[3] +
+           lanes[4] + lanes[5] + lanes[6] + lanes[7];
+}
+
+static void sm_mlp_inference_single_prepacked_data(
+    const float features_in[27],
+    const NeRFData *nerf_data,
+    float rgb_out[3],
+    float *sigma_out
+) {
+    float hidden[64];
+    float hidden2[64];
+    float out_acc[4];
+    int h;
+
+    for (h = 0; h < 64; h += 8) {
+        _mm256_store_ps(&hidden[h], _mm256_load_ps(&nerf_data->mlp_b0_aligned[h]));
+    }
+    for (int i = 0; i < 27; i++) {
+        __m256 fvec = _mm256_set1_ps(features_in[i]);
+        const float *w0_row = &nerf_data->mlp_w0_aligned[(size_t)i * 64];
+        for (h = 0; h < 64; h += 8) {
+            __m256 acc = _mm256_load_ps(&hidden[h]);
+            __m256 wvec = _mm256_load_ps(&w0_row[h]);
+            acc = _mm256_fmadd_ps(wvec, fvec, acc);
+            _mm256_store_ps(&hidden[h], acc);
+        }
+    }
+    {
+        __m256 zero = _mm256_setzero_ps();
+        for (h = 0; h < 64; h += 8) {
+            __m256 v = _mm256_load_ps(&hidden[h]);
+            _mm256_store_ps(&hidden[h], _mm256_max_ps(v, zero));
+        }
+    }
+
+    for (h = 0; h < 64; h += 8) {
+        _mm256_store_ps(&hidden2[h], _mm256_load_ps(&nerf_data->mlp_b1_aligned[h]));
+    }
+    for (int hp = 0; hp < 64; hp++) {
+        __m256 fvec = _mm256_set1_ps(hidden[hp]);
+        const float *w1_row = &nerf_data->mlp_w1_aligned[(size_t)hp * 64];
+        for (h = 0; h < 64; h += 8) {
+            __m256 acc = _mm256_load_ps(&hidden2[h]);
+            __m256 wvec = _mm256_load_ps(&w1_row[h]);
+            acc = _mm256_fmadd_ps(wvec, fvec, acc);
+            _mm256_store_ps(&hidden2[h], acc);
+        }
+    }
+    {
+        __m256 zero = _mm256_setzero_ps();
+        for (h = 0; h < 64; h += 8) {
+            __m256 v = _mm256_load_ps(&hidden2[h]);
+            _mm256_store_ps(&hidden2[h], _mm256_max_ps(v, zero));
+        }
+    }
+
+    for (int o = 0; o < 4; o++) {
+        __m256 acc0 = _mm256_setzero_ps();
+        const float *wcol = &nerf_data->mlp_wout_t_aligned[(size_t)o * 64];
+        for (h = 0; h < 64; h += 8) {
+            __m256 hv = _mm256_load_ps(&hidden2[h]);
+            __m256 wv = _mm256_load_ps(&wcol[h]);
+            acc0 = _mm256_fmadd_ps(hv, wv, acc0);
+        }
+        out_acc[o] = nerf_data->mlp_bout_aligned[o] + sm_hsum256_ps(acc0);
+    }
+
+    rgb_out[0] = 1.0f / (1.0f + expf(-out_acc[0]));
+    rgb_out[1] = 1.0f / (1.0f + expf(-out_acc[1]));
+    rgb_out[2] = 1.0f / (1.0f + expf(-out_acc[2]));
+    if (out_acc[3] > 20.0f) *sigma_out = out_acc[3];
+    else if (out_acc[3] < -20.0f) *sigma_out = 0.0f;
+    else *sigma_out = logf(1.0f + expf(out_acc[3]));
+}
+#endif
+
 
 /* ===== SIMD Utilities ===== */
 
@@ -397,6 +579,8 @@ NeRFData* sm_nerf_data_load(const char *hashgrid_path, const char *occ_path) {
            (double)(grid_elems * sizeof(float)) / 1024.0,
            total_weight_elems, total_bias_elems, occ_dim, occ_threshold);
 
+    sm_nerf_prepare_mlp_prepack(data);
+
     return data;
 
 load_fail:
@@ -412,6 +596,12 @@ void sm_nerf_data_free(NeRFData *data) {
     free(data->hashgrid_fp16);
     free(data->mlp_weights);
     free(data->mlp_biases);
+    free(data->mlp_w0_aligned);
+    free(data->mlp_w1_aligned);
+    free(data->mlp_wout_t_aligned);
+    free(data->mlp_b0_aligned);
+    free(data->mlp_b1_aligned);
+    free(data->mlp_bout_aligned);
     free(data->occupancy_grid);
     free(data);
 }
@@ -428,6 +618,53 @@ static inline float hashgrid_read(
 ) {
     if (hashgrid_f32) return hashgrid_f32[index];
     return sm_half_to_float(hashgrid_fp16[index]);
+}
+
+enum {
+    SM_HASHGRID_PREFETCH_OFF = 0,
+    SM_HASHGRID_PREFETCH_IMMEDIATE = 1,
+    SM_HASHGRID_PREFETCH_NEXT_RAY = 2,
+    SM_HASHGRID_PREFETCH_IMMEDIATE_4 = 3
+};
+
+static int sm_hashgrid_prefetch_mode(void) {
+    static int cached_mode = -1;
+    if (cached_mode >= 0) {
+        return cached_mode;
+    }
+
+    cached_mode = SM_HASHGRID_PREFETCH_IMMEDIATE;
+    {
+        const char *env = getenv("SM_NERF_HASHGRID_PREFETCH");
+        if (env) {
+            if (strcmp(env, "0") == 0 ||
+                strcmp(env, "off") == 0 ||
+                strcmp(env, "OFF") == 0 ||
+                strcmp(env, "none") == 0 ||
+                strcmp(env, "NONE") == 0) {
+                cached_mode = SM_HASHGRID_PREFETCH_OFF;
+            } else if (strcmp(env, "1") == 0 ||
+                       strcmp(env, "on") == 0 ||
+                       strcmp(env, "ON") == 0 ||
+                       strcmp(env, "immediate") == 0 ||
+                       strcmp(env, "IMMEDIATE") == 0) {
+                cached_mode = SM_HASHGRID_PREFETCH_IMMEDIATE;
+            } else if (strcmp(env, "2") == 0 ||
+                       strcmp(env, "ahead") == 0 ||
+                       strcmp(env, "AHEAD") == 0 ||
+                       strcmp(env, "next") == 0 ||
+                       strcmp(env, "NEXT") == 0) {
+                cached_mode = SM_HASHGRID_PREFETCH_NEXT_RAY;
+            } else if (strcmp(env, "3") == 0 ||
+                       strcmp(env, "corners4") == 0 ||
+                       strcmp(env, "CORNERS4") == 0 ||
+                       strcmp(env, "half") == 0 ||
+                       strcmp(env, "HALF") == 0) {
+                cached_mode = SM_HASHGRID_PREFETCH_IMMEDIATE_4;
+            }
+        }
+    }
+    return cached_mode;
 }
 
 /* ===== Batched Hashgrid Lookup with Trilinear Interpolation ===== */
@@ -491,15 +728,52 @@ void sm_hashgrid_lookup_batch(
             uint32_t base110 = level_offset + h110 * fpe;
             uint32_t base111 = level_offset + h111 * fpe;
 
-            /* Prefetch all 8 corners (covers all features since fpe is typically 2) */
-            SM_PREFETCH(&hashgrid_data[base000]);
-            SM_PREFETCH(&hashgrid_data[base001]);
-            SM_PREFETCH(&hashgrid_data[base010]);
-            SM_PREFETCH(&hashgrid_data[base011]);
-            SM_PREFETCH(&hashgrid_data[base100]);
-            SM_PREFETCH(&hashgrid_data[base101]);
-            SM_PREFETCH(&hashgrid_data[base110]);
-            SM_PREFETCH(&hashgrid_data[base111]);
+            {
+                int prefetch_mode = sm_hashgrid_prefetch_mode();
+                if (prefetch_mode == SM_HASHGRID_PREFETCH_IMMEDIATE) {
+                    /* Baseline behavior: prefetch the same ray's 8 corners. */
+                    SM_PREFETCH(&hashgrid_data[base000]);
+                    SM_PREFETCH(&hashgrid_data[base001]);
+                    SM_PREFETCH(&hashgrid_data[base010]);
+                    SM_PREFETCH(&hashgrid_data[base011]);
+                    SM_PREFETCH(&hashgrid_data[base100]);
+                    SM_PREFETCH(&hashgrid_data[base101]);
+                    SM_PREFETCH(&hashgrid_data[base110]);
+                    SM_PREFETCH(&hashgrid_data[base111]);
+                } else if (prefetch_mode == SM_HASHGRID_PREFETCH_IMMEDIATE_4) {
+                    /* Reduced variant: only touch the 4 base corners first. */
+                    SM_PREFETCH(&hashgrid_data[base000]);
+                    SM_PREFETCH(&hashgrid_data[base001]);
+                    SM_PREFETCH(&hashgrid_data[base010]);
+                    SM_PREFETCH(&hashgrid_data[base011]);
+                } else if (prefetch_mode == SM_HASHGRID_PREFETCH_NEXT_RAY && ray + 1 < SIMD_BATCH_SIZE) {
+                    /* Probe whether moving the prefetch earlier helps Zen more
+                     * than the current same-iteration placement. */
+                    Vec3 next_p = positions[ray + 1];
+                    float next_gx = next_p.x * res;
+                    float next_gy = next_p.y * res;
+                    float next_gz = next_p.z * res;
+                    int32_t next_i0 = (int32_t)floorf(next_gx);
+                    int32_t next_j0 = (int32_t)floorf(next_gy);
+                    int32_t next_k0 = (int32_t)floorf(next_gz);
+                    uint32_t next_h000 = sm_hash_ijk(next_i0,   next_j0,   next_k0,   config->hashmap_size);
+                    uint32_t next_h001 = sm_hash_ijk(next_i0,   next_j0,   next_k0+1, config->hashmap_size);
+                    uint32_t next_h010 = sm_hash_ijk(next_i0,   next_j0+1, next_k0,   config->hashmap_size);
+                    uint32_t next_h011 = sm_hash_ijk(next_i0,   next_j0+1, next_k0+1, config->hashmap_size);
+                    uint32_t next_h100 = sm_hash_ijk(next_i0+1, next_j0,   next_k0,   config->hashmap_size);
+                    uint32_t next_h101 = sm_hash_ijk(next_i0+1, next_j0,   next_k0+1, config->hashmap_size);
+                    uint32_t next_h110 = sm_hash_ijk(next_i0+1, next_j0+1, next_k0,   config->hashmap_size);
+                    uint32_t next_h111 = sm_hash_ijk(next_i0+1, next_j0+1, next_k0+1, config->hashmap_size);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h000 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h001 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h010 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h011 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h100 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h101 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h110 * fpe]);
+                    SM_PREFETCH(&hashgrid_data[level_offset + next_h111 * fpe]);
+                }
+            }
 
             /* For each feature, do trilinear interpolation over 8 corners */
             for (uint32_t f = 0; f < fpe; f++) {
@@ -908,6 +1182,110 @@ bool sm_ray_should_terminate(float accumulated_alpha) {
     return false;
 }
 
+typedef struct {
+    uint64_t rays_started;
+    uint64_t steps_attempted;
+    uint64_t steps_completed;
+    uint64_t rays_terminated_early;
+    uint64_t ns_adaptive;
+    uint64_t ns_hashgrid;
+    uint64_t ns_mlp;
+    uint64_t ns_composite;
+    uint64_t ns_writeback;
+    uint64_t ns_other;
+} NeRFPhaseTimingSlot;
+
+#define SM_PHASE_TIMING_SLOTS 256
+
+static NeRFPhaseTimingSlot g_nerf_phase_timing[SM_PHASE_TIMING_SLOTS];
+static int g_nerf_phase_timing_enabled = -1;
+
+static uint64_t sm_now_ns_monotonic(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+
+static int sm_nerf_phase_timing_enabled(void) {
+    if (g_nerf_phase_timing_enabled >= 0) {
+        return g_nerf_phase_timing_enabled;
+    }
+    g_nerf_phase_timing_enabled = 0;
+    {
+        const char *env = getenv("SM_NERF_PHASE_TIMING");
+        if (env && env[0] && strcmp(env, "0") != 0) {
+            g_nerf_phase_timing_enabled = 1;
+        }
+    }
+    return g_nerf_phase_timing_enabled;
+}
+
+static NeRFPhaseTimingSlot *sm_nerf_phase_slot(void) {
+    unsigned int slot = 0;
+#ifdef _OPENMP
+    if (omp_in_parallel()) {
+        slot = (unsigned int)omp_get_thread_num();
+    }
+#endif
+    if (slot >= SM_PHASE_TIMING_SLOTS) {
+        slot = SM_PHASE_TIMING_SLOTS - 1;
+    }
+    return &g_nerf_phase_timing[slot];
+}
+
+void sm_nerf_phase_timing_reset(void) {
+    memset(g_nerf_phase_timing, 0, sizeof(g_nerf_phase_timing));
+}
+
+NeRFPhaseTiming sm_nerf_phase_timing_snapshot(void) {
+    NeRFPhaseTiming total = {0};
+    int i;
+    for (i = 0; i < SM_PHASE_TIMING_SLOTS; i++) {
+        total.rays_started += g_nerf_phase_timing[i].rays_started;
+        total.steps_attempted += g_nerf_phase_timing[i].steps_attempted;
+        total.steps_completed += g_nerf_phase_timing[i].steps_completed;
+        total.rays_terminated_early += g_nerf_phase_timing[i].rays_terminated_early;
+        total.ns_adaptive += g_nerf_phase_timing[i].ns_adaptive;
+        total.ns_hashgrid += g_nerf_phase_timing[i].ns_hashgrid;
+        total.ns_mlp += g_nerf_phase_timing[i].ns_mlp;
+        total.ns_composite += g_nerf_phase_timing[i].ns_composite;
+        total.ns_writeback += g_nerf_phase_timing[i].ns_writeback;
+        total.ns_other += g_nerf_phase_timing[i].ns_other;
+    }
+    return total;
+}
+
+void sm_nerf_phase_timing_report(const char *label) {
+    NeRFPhaseTiming total = sm_nerf_phase_timing_snapshot();
+    double total_ms = (double)(total.ns_adaptive + total.ns_hashgrid + total.ns_mlp +
+                               total.ns_composite + total.ns_writeback + total.ns_other) / 1000000.0;
+    double step_count = total.steps_completed ? (double)total.steps_completed : 1.0;
+    const char *tag = label ? label : "phase";
+    printf("[PHASE] %s rays=%" PRIu64 " attempted_steps=%" PRIu64 " completed_steps=%" PRIu64
+           " early_terminated=%" PRIu64 " total_ms=%.3f\n",
+           tag,
+           total.rays_started,
+           total.steps_attempted,
+           total.steps_completed,
+           total.rays_terminated_early,
+           total_ms);
+    printf("[PHASE] %s adaptive_ms=%.3f hashgrid_ms=%.3f mlp_ms=%.3f composite_ms=%.3f writeback_ms=%.3f other_ms=%.3f\n",
+           tag,
+           (double)total.ns_adaptive / 1000000.0,
+           (double)total.ns_hashgrid / 1000000.0,
+           (double)total.ns_mlp / 1000000.0,
+           (double)total.ns_composite / 1000000.0,
+           (double)total.ns_writeback / 1000000.0,
+           (double)total.ns_other / 1000000.0);
+    printf("[PHASE] %s adaptive_ns_per_step=%.2f hashgrid_ns_per_step=%.2f mlp_ns_per_step=%.2f composite_ns_per_step=%.2f other_ns_per_step=%.2f\n",
+           tag,
+           (double)total.ns_adaptive / step_count,
+           (double)total.ns_hashgrid / step_count,
+           (double)total.ns_mlp / step_count,
+           (double)total.ns_composite / step_count,
+           (double)total.ns_other / step_count);
+}
+
 /* ===== Volume Integration (Main Rendering Kernel) ===== */
 
 void sm_volume_integrate_batch(
@@ -939,7 +1317,21 @@ void sm_volume_integrate_batch(
     #pragma omp parallel for schedule(dynamic, 1) if(_OPENMP)
     for (int ray_idx_signed = 0; ray_idx_signed < (int)batch->count; ray_idx_signed++) {
         uint32_t ray_idx = (uint32_t)ray_idx_signed;
+        NeRFPhaseTimingSlot *phase_slot = NULL;
+        uint64_t phase_t0 = 0;
+        uint64_t phase_t1 = 0;
+        uint64_t ray_start_ns = 0;
+        uint64_t ray_adaptive_ns = 0;
+        uint64_t ray_hashgrid_ns = 0;
+        uint64_t ray_mlp_ns = 0;
+        uint64_t ray_composite_ns = 0;
+        uint64_t ray_writeback_ns = 0;
         if (!batch->active[ray_idx]) continue;
+        if (sm_nerf_phase_timing_enabled()) {
+            phase_slot = sm_nerf_phase_slot();
+            phase_slot->rays_started++;
+            ray_start_ns = sm_now_ns_monotonic();
+        }
         
         Vec3 origin = batch->origin[ray_idx];
         Vec3 direction = batch->direction[ray_idx];
@@ -957,6 +1349,9 @@ void sm_volume_integrate_batch(
          * advances the ray position, not just the alpha weighting. */
         float t = t_min;
         for (uint32_t step = 0; step < num_steps; step++) {
+            if (phase_slot) {
+                phase_slot->steps_attempted++;
+            }
             if (t > t_max) break;
             
             Vec3 pos;
@@ -965,7 +1360,12 @@ void sm_volume_integrate_batch(
             pos.z = origin.z + direction.z * t;
             
             /* Adaptive step size — used both for alpha computation AND to advance t. */
+            if (phase_slot) phase_t0 = sm_now_ns_monotonic();
             float step_size = sm_adaptive_step_size(pos, nerf_data->occupancy_grid, config, base_step);
+            if (phase_slot) {
+                phase_t1 = sm_now_ns_monotonic();
+                ray_adaptive_ns += phase_t1 - phase_t0;
+            }
             
             /* Create feature vector for this ray step */
             float feat[27];
@@ -984,6 +1384,7 @@ void sm_volume_integrate_batch(
             pn.z = fmaxf(0.0f, fminf(1.0f, norm_pos.z * 0.5f + 0.5f));
 
             /* Hashgrid features per level with trilinear interpolation */
+            if (phase_slot) phase_t0 = sm_now_ns_monotonic();
             for (uint32_t level = 0; level < num_levels_clamped; level++) {
                 /* Use precomputed level scale */
                 float res = level_scales[level];
@@ -1019,11 +1420,23 @@ void sm_volume_integrate_batch(
                     uint32_t h110 = sm_hash_ijk(i0+1, j0+1, k0,   config->hashmap_size);
                     uint32_t h111 = sm_hash_ijk(i0+1, j0+1, k0+1, config->hashmap_size);
                     
-                    /* Prefetch hash-indexed lines before the loads */
-                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry]);
-                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h100 * config->features_per_entry]);
-                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h010 * config->features_per_entry]);
-                    SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h110 * config->features_per_entry]);
+                    {
+                        int prefetch_mode = sm_hashgrid_prefetch_mode();
+                        /* Keep the current behavior as the default and let the
+                         * benchmark lane disable it without recompiling. */
+                        if (prefetch_mode == SM_HASHGRID_PREFETCH_IMMEDIATE ||
+                            prefetch_mode == SM_HASHGRID_PREFETCH_NEXT_RAY) {
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h100 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h010 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h110 * config->features_per_entry]);
+                        } else if (prefetch_mode == SM_HASHGRID_PREFETCH_IMMEDIATE_4) {
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h001 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h010 * config->features_per_entry]);
+                            SM_PREFETCH(&nerf_data->hashgrid_data[level_offset + h011 * config->features_per_entry]);
+                        }
+                    }
 
                     /* Look up feature values at each corner */
                     float v000 = nerf_data->hashgrid_data[level_offset + h000 * config->features_per_entry + f];
@@ -1049,6 +1462,10 @@ void sm_volume_integrate_batch(
                     feat[level * config->features_per_entry + f] = val;
                 }
             }
+            if (phase_slot) {
+                phase_t1 = sm_now_ns_monotonic();
+                ray_hashgrid_ns += phase_t1 - phase_t0;
+            }
 
             /* View direction encoded */
             if (dir_len > 1e-6f) {
@@ -1061,16 +1478,35 @@ void sm_volume_integrate_batch(
             float rgb_step_scalar[3];
             float sigma_step_scalar = 0.0f;
 
-            sm_mlp_inference_single(
-                feat,
-                config,
-                nerf_data->mlp_weights,
-                nerf_data->mlp_biases,
-                rgb_step_scalar,
-                &sigma_step_scalar
-            );
+            if (phase_slot) phase_t0 = sm_now_ns_monotonic();
+#ifdef __AVX2__
+            if (sm_nerf_mlp_variant() == SM_NERF_MLP_VARIANT_PREPACKED &&
+                nerf_data->mlp_prepacked_ready) {
+                sm_mlp_inference_single_prepacked_data(
+                    feat,
+                    nerf_data,
+                    rgb_step_scalar,
+                    &sigma_step_scalar
+                );
+            } else
+#endif
+            {
+                sm_mlp_inference_single(
+                    feat,
+                    config,
+                    nerf_data->mlp_weights,
+                    nerf_data->mlp_biases,
+                    rgb_step_scalar,
+                    &sigma_step_scalar
+                );
+            }
+            if (phase_slot) {
+                phase_t1 = sm_now_ns_monotonic();
+                ray_mlp_ns += phase_t1 - phase_t0;
+            }
 
             /* Volume compositing */
+            if (phase_slot) phase_t0 = sm_now_ns_monotonic();
             float sigma = sigma_step_scalar * density_scale;
             float alpha = 1.0f - expf(-sigma * step_size);
             
@@ -1084,9 +1520,17 @@ void sm_volume_integrate_batch(
             /* Advance ray position by the adaptive step (fixes the bug where t
              * was always t_min + step*base_step, making empty-space skip ineffective). */
             t += step_size;
+            if (phase_slot) {
+                phase_t1 = sm_now_ns_monotonic();
+                ray_composite_ns += phase_t1 - phase_t0;
+                phase_slot->steps_completed++;
+            }
 
             /* Early termination */
             if (sm_ray_should_terminate(accumulated_alpha)) {
+                if (phase_slot) {
+                    phase_slot->rays_terminated_early++;
+                }
                 break;
             }
         }
@@ -1096,12 +1540,29 @@ void sm_volume_integrate_batch(
         uint32_t py = pixel_id / output_fb->width;
         
         if (px < output_fb->width && py < output_fb->height) {
+            if (phase_slot) phase_t0 = sm_now_ns_monotonic();
             uint32_t fb_idx = py * output_fb->width + px;
             /* Thread-safe write: each pixel written by one thread */
             output_fb->pixels[fb_idx].rgb.x = accumulated_rgb[0];  /* R */
             output_fb->pixels[fb_idx].rgb.y = accumulated_rgb[1];  /* G */
             output_fb->pixels[fb_idx].rgb.z = accumulated_rgb[2];  /* B */
             output_fb->pixels[fb_idx].alpha = accumulated_alpha;
+            if (phase_slot) {
+                phase_t1 = sm_now_ns_monotonic();
+                ray_writeback_ns += phase_t1 - phase_t0;
+            }
+        }
+        if (phase_slot) {
+            uint64_t ray_total_ns = sm_now_ns_monotonic() - ray_start_ns;
+            uint64_t ray_accounted_ns = ray_adaptive_ns + ray_hashgrid_ns + ray_mlp_ns + ray_composite_ns + ray_writeback_ns;
+            phase_slot->ns_adaptive += ray_adaptive_ns;
+            phase_slot->ns_hashgrid += ray_hashgrid_ns;
+            phase_slot->ns_mlp += ray_mlp_ns;
+            phase_slot->ns_composite += ray_composite_ns;
+            phase_slot->ns_writeback += ray_writeback_ns;
+            if (ray_total_ns > ray_accounted_ns) {
+                phase_slot->ns_other += ray_total_ns - ray_accounted_ns;
+            }
         }
     }  /* End of parallel region */
 }

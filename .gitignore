@@ -8,6 +8,7 @@ build/
 output/
 output*.png
 output*.ppm
+nerf_simd_test_output.ppm
 baseline_bvh.csv
 
 # Large data & training sets — WAY too big for GitHub

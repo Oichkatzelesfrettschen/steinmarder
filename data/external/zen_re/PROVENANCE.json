@@ -1,0 +1,77 @@
+{
+  "topic": "zen_re",
+  "entries": [
+    {
+      "file": "agner_instruction_tables.pdf",
+      "sha256": "6b9b58d1177884f9dcb5b88fbb4ac43135565a4295e76101464d1a5d286fe25a",
+      "bytes": 2248996,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "agner_microarchitecture.pdf",
+      "sha256": "938cb7e429f51dfded976447bf7594bf37bf511d6be163c5163a879a89400352",
+      "bytes": 2578972,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "agner_optimizing_assembly.pdf",
+      "sha256": "7d91f65300cb2d149fc972546d69e4fcbdccce6db15127fdc3466e04313f173e",
+      "bytes": 1091275,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "agner_optimizing_cpp.pdf",
+      "sha256": "a6b9e3fd990c1a3b032096b6e49d0b4effa518fdc9868294e3da89fa4d90784a",
+      "bytes": 1848238,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_apm_combined_volumes_40332_pub_4_08.html",
+      "sha256": "b5c4405585fb0c161d56eb47fe702037ae35ba4672cc3a50611dce878c7694a9",
+      "bytes": 2575,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_documentation_hub_trace.html",
+      "sha256": "6d98208f53d65054e0b750b1092ca2ae31cf221c3a1ac57d59b71e90f653197b",
+      "bytes": 203917,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_gpuopen_ryzen_software_optimization_gdc2024.pdf",
+      "sha256": "756832a7711afed7aa0d55b265be546b8ffc221c3ed71a895a50b6913d9c567c",
+      "bytes": 2501098,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_uprof_getting_started.html",
+      "sha256": "bf10c64bc3bdc79756e1b530733fd387b11c0afe27beb72d70f3f81048fdea3e",
+      "bytes": 2575,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_uprof_page.html",
+      "sha256": "cb4bd062c1c7f644f83cf33487fb868a404dacac97816df7766b5b2c70b6511c",
+      "bytes": 162031,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_uprof_quick_reference.html",
+      "sha256": "fe7d0b793d478878a820870d31b6aaac894eb0c8256ab32941406ea8b23f9eb4",
+      "bytes": 2575,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_uprof_release_notes.html",
+      "sha256": "d54262b73d2b0de2e4908ac4ae1000f3ecdf942fb9fe652326736f5c7cc1f29b",
+      "bytes": 2575,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    },
+    {
+      "file": "amd_uprof_user_guide.html",
+      "sha256": "b92c27abfd33f6718edec624b946aada2109f7f56dd9606f60d6718689156d8d",
+      "bytes": 2575,
+      "retrieved_utc": "2026-03-29T09:41:55Z"
+    }
+  ]
+}

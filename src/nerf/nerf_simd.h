@@ -12,6 +12,11 @@ typedef struct {
     bool has_avx512f;
 } CPUFeatures;
 
+typedef enum {
+    SM_NERF_MLP_VARIANT_GENERIC = 0,
+    SM_NERF_MLP_VARIANT_PREPACKED = 1
+} SMNeRFMLPVariant;
+
 /* Get CPU capabilities at runtime */
 CPUFeatures sm_detect_cpu_features(void);
 
@@ -64,6 +69,13 @@ typedef struct {
     int hashgrid_compact;        // 1 = FP16 storage (halves memory), 0 = FP32
     float *mlp_weights;          // All MLP weights concatenated
     float *mlp_biases;           // All MLP biases concatenated
+    float *mlp_w0_aligned;       // Optional 32-byte-aligned copy of W0
+    float *mlp_w1_aligned;       // Optional 32-byte-aligned copy of W1
+    float *mlp_wout_t_aligned;   // Optional transposed/aligned output weights [out][hidden]
+    float *mlp_b0_aligned;       // Optional aligned copy of first hidden bias
+    float *mlp_b1_aligned;       // Optional aligned copy of second hidden bias
+    float *mlp_bout_aligned;     // Optional aligned copy of output bias
+    int mlp_prepacked_ready;     // 1 when aligned/transposed single-ray data is ready
     uint8_t *occupancy_grid;     // 64^3 occupancy grid
     NeRFConfig config;
 } NeRFData;
@@ -148,6 +160,23 @@ void sm_perf_start(uint64_t *start_cycle);
 void sm_perf_end(uint64_t start_cycle, PerfCounter *counter);
 void sm_perf_report(const char *name, const PerfCounter *counter);
 
+typedef struct {
+    uint64_t rays_started;
+    uint64_t steps_attempted;
+    uint64_t steps_completed;
+    uint64_t rays_terminated_early;
+    uint64_t ns_adaptive;
+    uint64_t ns_hashgrid;
+    uint64_t ns_mlp;
+    uint64_t ns_composite;
+    uint64_t ns_writeback;
+    uint64_t ns_other;
+} NeRFPhaseTiming;
+
+void sm_nerf_phase_timing_reset(void);
+NeRFPhaseTiming sm_nerf_phase_timing_snapshot(void);
+void sm_nerf_phase_timing_report(const char *label);
+
 /* Accessor to the last-rendered framebuffer (owned by nerf_simd integration)
  * Returns NULL if not initialized. */
 NeRFFramebuffer* sm_nerf_get_framebuffer(void);
@@ -161,5 +190,7 @@ void sm_render_nerf_frame(const Camera *camera, uint32_t width, uint32_t height,
 uint32_t sm_nerf_get_steps(void);
 float sm_nerf_get_density(void);
 float sm_nerf_get_bounds(void);
+SMNeRFMLPVariant sm_nerf_mlp_variant(void);
+const char *sm_nerf_mlp_variant_name(SMNeRFMLPVariant variant);
 
 #endif  /* NERF_SIMD_H */

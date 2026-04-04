@@ -41,6 +41,7 @@ set(SM_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/src/render
     ${CMAKE_SOURCE_DIR}/src/denoise
     ${CMAKE_SOURCE_DIR}/src/nerf
+    ${CMAKE_SOURCE_DIR}/src/zen_re
     ${CMAKE_SOURCE_DIR}/src/vulkan
     ${CMAKE_SOURCE_DIR}/src/physics
     ${CMAKE_SOURCE_DIR}/src/editor
@@ -154,6 +155,16 @@ target_link_libraries(steinmarder PRIVATE
 add_executable(nerf_simd_test src/nerf/nerf_simd_test.c)
 target_include_directories(nerf_simd_test PRIVATE ${SM_INCLUDE_DIRS})
 target_link_libraries(nerf_simd_test PRIVATE sm_nerf sm_core ${PLATFORM_LIBS})
+
+# Focused NeRF hash-grid benchmark
+add_executable(nerf_hashgrid_bench src/nerf/nerf_hashgrid_bench.c)
+target_include_directories(nerf_hashgrid_bench PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(nerf_hashgrid_bench PRIVATE sm_nerf sm_core ${PLATFORM_LIBS})
+
+# Focused NeRF MLP benchmark
+add_executable(nerf_mlp_bench src/nerf/nerf_mlp_bench.c)
+target_include_directories(nerf_mlp_bench PRIVATE ${SM_INCLUDE_DIRS})
+target_link_libraries(nerf_mlp_bench PRIVATE sm_nerf sm_core ${PLATFORM_LIBS})
 
 # ════════════════════════════════════════════════════════════════
 # Vulkan targets (only if Vulkan SDK is found)
@@ -297,6 +308,54 @@ else()
 endif()
 
 # ════════════════════════════════════════════════════════════════
+# Zen / CPU reverse-engineering probes (optional, x86-only)
+# ════════════════════════════════════════════════════════════════
+set(SM_X86_64 FALSE)
+set(SM_ZEN_RE FALSE)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+    set(SM_X86_64 TRUE)
+endif()
+
+if(UNIX AND SM_X86_64)
+    set(SM_ZEN_RE TRUE)
+    message(STATUS "x86_64 host detected — building Zen reverse-engineering probes")
+
+    add_library(sm_zen_re_common STATIC
+        src/zen_re/common.c
+    )
+    target_include_directories(sm_zen_re_common PUBLIC
+        ${CMAKE_SOURCE_DIR}/src/zen_re
+    )
+    target_link_libraries(sm_zen_re_common PUBLIC ${PLATFORM_LIBS})
+
+    add_executable(zen_probe_fma src/zen_re/probe_fma.c)
+    add_executable(zen_probe_load_use src/zen_re/probe_load_use.c)
+    add_executable(zen_probe_permute src/zen_re/probe_permute.c)
+    add_executable(zen_probe_gather src/zen_re/probe_gather.c)
+    add_executable(zen_probe_branch src/zen_re/probe_branch.c)
+    add_executable(zen_probe_prefetch src/zen_re/probe_prefetch.c)
+
+    foreach(zen_target
+            zen_probe_fma
+            zen_probe_load_use
+            zen_probe_permute
+            zen_probe_gather
+            zen_probe_branch
+            zen_probe_prefetch)
+        target_include_directories(${zen_target} PRIVATE ${CMAKE_SOURCE_DIR}/src/zen_re)
+        target_link_libraries(${zen_target} PRIVATE sm_zen_re_common ${PLATFORM_LIBS})
+        if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+            target_compile_options(${zen_target} PRIVATE -fno-omit-frame-pointer)
+        endif()
+        if(HAS_AVX2)
+            target_compile_options(${zen_target} PRIVATE -mavx2 -mfma)
+        endif()
+    endforeach()
+else()
+    message(STATUS "Non-x86_64 or non-UNIX host — skipping Zen reverse-engineering probes")
+endif()
+
+# ════════════════════════════════════════════════════════════════
 # Standalone tools
 # ════════════════════════════════════════════════════════════════
 add_executable(inspect_ppm src/tools/inspect_ppm.c)
@@ -338,6 +397,12 @@ endif()
 add_test(NAME render_smoke COMMAND test_render_smoke)
 set_tests_properties(render_smoke PROPERTIES TIMEOUT 30)
 
+if(SM_ZEN_RE)
+    add_test(NAME zen_probe_fma_smoke COMMAND zen_probe_fma --iterations 10000 --cpu 0)
+    add_test(NAME zen_probe_branch_smoke COMMAND zen_probe_branch --iterations 10000 --size 1048576 --cpu 0)
+    set_tests_properties(zen_probe_fma_smoke zen_probe_branch_smoke PROPERTIES TIMEOUT 30)
+endif()
+
 # ════════════════════════════════════════════════════════════════
 # Summary
 # ════════════════════════════════════════════════════════════════
@@ -350,5 +415,6 @@ message(STATUS "  OpenMP:       ${OpenMP_C_FOUND}")
 message(STATUS "  Vulkan:       ${Vulkan_FOUND}")
 message(STATUS "  CUDA:         ${CUDAToolkit_FOUND}")
 message(STATUS "  Apple RE:     ${SM_ENABLE_APPLE_RE}")
+message(STATUS "  Zen RE:       ${SM_ZEN_RE}")
 message(STATUS "  raylib:       ${RAYLIB_LIB}")
 message(STATUS "================================")

@@ -119,6 +119,24 @@ Requires CUDA 13.x and an SM 7.5+ GPU.
 
 ---
 
+## Zen / Ryzen reverse engineering
+
+`src/zen_re/` is the CPU-side counterpart to the CUDA SASS work. It adds tiny
+instruction and memory probes for FMA, load-use, permute, gather, branch, and
+prefetch behavior on x86_64 hosts, plus Linux `perf` and AMD uProf-oriented
+collection wrappers. The first translation targets are the existing CPU hot
+loops in `src/nerf/nerf_simd.c`, `src/render/render.c`, `src/render/sm_mt.c`,
+and `src/render/bvh.c`.
+
+Reference docs are cached under `data/external/zen_re/` and indexed in
+`docs/external_sources/ZEN_RE_SOURCES.md`. Refresh them with:
+
+```sh
+sh src/zen_re/scripts/fetch_reference_docs.sh
+```
+
+---
+
 ## CUDA LBM fluid simulation
 
 39 CUDA kernels implementing the D3Q19 Lattice Boltzmann Method across 12
