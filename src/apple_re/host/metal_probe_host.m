@@ -187,6 +187,7 @@ int main(int argc, char **argv) {
         uint32_t fs_probe_every = 0;
         uint32_t event_latency_iters = 0;  // 0 = disabled
         uint32_t l2_chase_entries = 0;     // 0 = disabled; when set, allocates chase buffer as buffer(2)
+        uint32_t shader_iters_override = 0; // 0 = use default (100000); set via --shader-iters
         int csv = 0;
         int do_list_counters = 0;
         const char *counter_set_name = NULL;  // NULL = no counter sampling
@@ -214,6 +215,8 @@ int main(int argc, char **argv) {
                 event_latency_iters = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--l2-chase-entries") == 0 && i + 1 < argc) {
                 l2_chase_entries = (uint32_t)strtoul(argv[++i], NULL, 10);
+            } else if (strcmp(argv[i], "--shader-iters") == 0 && i + 1 < argc) {
+                shader_iters_override = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--help") == 0) {
                 fprintf(stdout,
                     "usage: %s [--metallib path] [--kernel name] [--width N] [--iters N]\n"
@@ -390,6 +393,9 @@ int main(int argc, char **argv) {
         double gpu_first_start_s = -1.0;
         double gpu_last_end_s = 0.0;
 
+        // Compute shader inner iteration count once; used in dispatch loop and output.
+        uint32_t shader_inner_iters = (shader_iters_override > 0) ? shader_iters_override : 100000u;
+
         uint64_t t0 = now_ns();
         for (uint32_t i = 0; i < iterations; ++i) {
             id<MTLCommandBuffer> commandBuffer = [queue commandBuffer];
@@ -415,8 +421,7 @@ int main(int argc, char **argv) {
             [encoder setBuffer:outBuffer offset:0 atIndex:0];
             // Pass iteration count to shaders that declare `constant uint &iters [[buffer(1)]]`.
             // Without this, the constant reads as 0 and the inner loop never executes.
-            // Use a fixed high value (100000) so GPU compute dominates command-buffer overhead.
-            uint32_t shader_inner_iters = 100000u;
+            // shader_inner_iters set before the dispatch loop (see above).
             [encoder setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
             // Bind pointer-chase buffer as buffer(2) when --l2-chase-entries is set.
             if (chaseBuffer != nil) {
@@ -474,13 +479,13 @@ int main(int argc, char **argv) {
         double ns_per_element = elapsed_ns / ((double)iterations * (double)width);
 
         if (csv) {
-            fprintf(stdout, "iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum\n");
-            fprintf(stdout, "%u,%u,%.0f,%.6f,%.9f,%" PRIu64 "\n",
-                    iterations, width, elapsed_ns, ns_per_iter, ns_per_element, hash);
+            fprintf(stdout, "iters,shader_iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum\n");
+            fprintf(stdout, "%u,%u,%u,%.0f,%.6f,%.9f,%" PRIu64 "\n",
+                    iterations, shader_inner_iters, width, elapsed_ns, ns_per_iter, ns_per_element, hash);
         } else {
             fprintf(stdout,
-                    "metal_probe elapsed_ns=%.0f ns_per_iter=%.6f ns_per_element=%.9f checksum=%" PRIu64 "\n",
-                    elapsed_ns, ns_per_iter, ns_per_element, hash);
+                    "metal_probe elapsed_ns=%.0f ns_per_iter=%.6f shader_iters=%u ns_per_element=%.9f checksum=%" PRIu64 "\n",
+                    elapsed_ns, ns_per_iter, shader_inner_iters, ns_per_element, hash);
         }
 
         // Print GPU-side timing and counter values

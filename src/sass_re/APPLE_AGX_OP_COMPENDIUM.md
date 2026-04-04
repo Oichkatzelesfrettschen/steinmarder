@@ -2,7 +2,7 @@
 
 **Purpose**: Single reference absorbing ALL known latency/throughput data for the M1 GPU  
 **Sources**: philipturner/metal-benchmarks (P), steinmarder dep-chain probes (S), dougallj/applegpu ISA (D)  
-**Clock**: ~1.28–1.33 GHz (derived: 1 cycle ≈ 0.769 ns at 1.3 GHz)  
+**Clock**: ~1.28–1.40 GHz (nominal 1.28–1.33 GHz; boost observed up to ~1.40 GHz; calibrate per batch via FMA dep-chain)  
 **Last updated**: 2026-04-03
 
 ---
@@ -31,19 +31,19 @@ steinmarder dep-chain ≈ structural stall time. Neither is wrong; they measure 
 | FADD32    | 1–2       | 2.20            | **1.695**        | **2.20** ✓        | 1.090     | 1.42       | Agree perfectly |
 | FMUL32    | 1–2       | 2.21            | **1.347**        | **1.75**          | 0.751     | 0.97       | S dep slightly lower — fmul has shorter pipeline? |
 | FFMA32    | 1–2       | 2.21            | **1.993**        | **2.59**          | 1.764     | 2.29       | S TP anomaly (reg pressure at 8 acc); P=1 cyc TP |
-| FMAX32    | 1         | 4.74            | 1.778 (invalid)  | — (DCE'd)         | —         | —          | S probe: compiler eliminated fmax(a, a*0.9999+ε)=a via fast-math; only fmul+fadd remain. P adj_lat=4.74 trusted |
+| FMAX32    | 1         | 4.74            | step=3.148 ns    | step=**4.31** cyc | —         | —          | H1b (2026-04-03): step=(FMA∥FMA)→FMAX. Pure FMAX ≈ (4.31−2.20−1.0)=**~1 cyc** (ALU tier). P adj_lat=4.74 may include more pipeline stages. AIR: `air.fast_fmax.f32`; AGX likely implements as FCMPSEL |
 | FMIN32    | 1         | 4.74            | —                | — (**gap**)       | —         | —          | same as FMAX; P adj_lat=4.74 |
-| FCMPSEL32 | 1         | 4.74            | —                | — (**gap**)       | —         | —          | conditional select |
+| FCMPSEL32 | 1         | 4.74            | step=3.047 ns    | step=**4.17** cyc | —         | —          | H1b (2026-04-03): Metal `select(y,x,x>y)` → AIR `fcmp+select i1`. Step=(FMA∥FMA)→FCMPSEL. Pure FCMPSEL ≈ (4.17−2.20−1.0)=**~1 cyc**. FMAX−SELECT=0.14 cyc (noise); same HW unit |
 | CONVERT(F→I32) | 4    | 3.66            | —                | — (**gap**)       | —         | —          | rounding/convert |
 | RINT32    | 4         | 3.66            | —                | — (**gap**)       | —         | —          |
 | FRACT32   | 4         | ~5 (seq)        | —                | — (**gap**)       | —         | —          | TRUNC+FADD sequence |
-| FSQRT32   | 8         | 8.57–11.13      | **9.846** (8-ch) | **12.80** (8-ch)  | —         | —          | S (2026-04-03): 8-chain TP probe. T_outer=102.4cyc ≈ 8×TP_sqrt=64+overhead+lat. SQRT_TP=8 confirmed; SQRT_lat ≈ 9-12 cyc from model |
+| FSQRT32   | 8         | 8.57–11.13      | **9.846** (8-ch); **8.764** (1-ch) | 8-ch: **12.80**; 1-ch dep: **10.08** | —         | —          | S (2026-04-03): 8-chain TP=8 confirmed; H1b single dep-chain: 10.08 cyc adj_lat (within Philip's 8.57–11.13 range) ✓ |
 | RECIP32 (fast) | 6    | 6.50            | **8.605**        | **11.18**         | 6.269     | 8.15       | S dep > P adj: SFU stall; P TP=6 confirmed by S TP=8 (discrepancy) |
 | RSQRT32 (fast) | 8    | 8.99            | **9.405**        | **12.23**         | 9.393     | 12.21      | T=L=12 cyc — **non-pipelineable on M1**; P TP=8 on M2? |
 | RSQRT32 precise | 8  | 8.99 (P same!)  | **29.2**         | **37.97**         | —         | —          | AIR: `air.rsqrt.f32` = Newton-Raphson multi-step. P may have older SDK that compiled precise→fast |
 | FDIV32    | 6.01      | 7.62–8.90       | —                | — (**gap**)       | —         | —          | P: = RECIP32 + FMUL32 in sequence |
-| EXP2_32   | 4         | 4.31            | 15.183 (probe design issue) | — (confounded) | —  | —          | S probe includes fract on same SFU pipeline; cannot isolate EXP2. P adj_lat=4.31 trusted |
-| LOG2_32   | 4         | 4.31            | **4.276** (8-ch) | **5.56** (8-ch)   | —         | —          | S (2026-04-03): 8-chain TP probe. T_outer=44.5cyc ≈ 8×TP_log2=32+latency. LOG2_TP=4 CONFIRMED |
+| EXP2_32   | 4         | 4.31            | **4.932** (1-ch) | **4.56 adj_lat** ✓ | —        | —          | H1b (2026-04-03): clean FMA→EXP2 dep-chain. adj_lat=(6.76−2.20)=4.56 cyc vs Philip 4.31 (Δ=6%, within noise). AIR: `air.fast_exp2.f32`. Converges to a*≈1.135, arg≈0.18 (non-trivial) |
+| LOG2_32   | 4         | 4.31            | **4.276** (8-ch); **5.784** (1-ch) | 8-ch: **5.56**; 1-ch adj_lat: **5.90** ⚠ | — | — | H1b single dep-chain: 5.90 cyc vs Philip 4.31 (Δ=37%). SUSPECT: fixed-pt arg converges to 2.0 (power-of-2 slow path?). 8-ch TP probe: LOG2_TP=4 confirmed. Needs re-probe with arg ≉ power of 2 |
 | EXPE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          | Software: base-2 change + EXP2 |
 | LOGE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          |
 | SIN32     | 14.28     | 23.04–27.35     | —                | — (**gap**)       | —         | —          | Two hardware phases: SIN_PT1+SIN_PT2 |
@@ -220,11 +220,14 @@ The following have Philip's reference data but **no steinmarder dep-chain probe*
 ### Highest priority (P has data; we should confirm or contradict)
 | Operation | P adj_lat (cyc) | Why measure |
 |-----------|-----------------|-------------|
-| FSQRT32 | 8.57–11.13 | Common op; our RSQRT≠SQRT |
-| EXP2_32 / LOG2_32 | 4.31 | Hardware transcendental unit — very fast! |
-| FMAX32 / FMIN32 | 4.74 | Often bottleneck in reduction kernels |
+| LOG2_32 (clean re-probe) | 4.31 | H1b dep-chain gave 5.90 cyc — 37% above Philip; need arg ≉ power-of-2 to rule out SFU slow path |
+| FMIN32 | 4.74 | Not yet probed; FMAX confirmed ~1 cyc ALU — FMIN expected same |
 | FMUL32 fused `(x*x)+1` pattern | ~1 cyc | Philip showed single-operand doubles TP |
-| IMUL(32x32=64) hardware | 9.84 | Our i64 mul probe was LLVM-folded; need clean measurement |
+| IMUL(32x32=64) hardware | 9.84 | Our i64 mul probe was LLVM-folded; need clean variable-operand measurement |
+| _~~FSQRT32~~_ | _~~8.57–11.13~~_ | _DONE: H1b dep-chain = 10.08 cyc ✓_ |
+| _~~EXP2_32~~_ | _~~4.31~~_ | _DONE: H1b dep-chain = 4.56 cyc ✓_ |
+| _~~FMAX32~~_ | _~~4.74~~_ | _DONE: H1b ~1 cyc ALU tier_ |
+| _~~FCMPSEL32~~_ | _~~4.74~~_ | _DONE: H1b ~1 cyc, same unit as FMAX_ |
 
 ### Medium priority (gaps with practical relevance)
 | Operation | P adj_lat (cyc) | Why measure |
@@ -269,6 +272,8 @@ The following have Philip's reference data but **no steinmarder dep-chain probe*
 | rsqrt32 fast | — | 9.405 | 12.23 | 8.99 (TP) |
 | rsqrt32 precise | — | 29.2 | 37.97 | 8.99 (??) |
 | sqrt64 CPU | 4.870 | — (gap) | — | 8.57–11.13 |
+| exp2 GPU | — | 4.932 (1-ch dep) | 4.56 adj_lat | 4.31 (Philip) |
+| log2 GPU (H1b) | — | 5.784 (1-ch dep) | 5.90 adj_lat ⚠ | 4.31 (Philip) |
 | log CPU | 14.497 (libm) | — (gap) | — | 4.31 (native!) |
 | sin CPU | 20.30 (libm) | — (gap) | — | 23–27 (similar!) |
 | L1 load | ~1.6 ns (CPU) | 10.07 ns (GPU) | 13.1 | — |

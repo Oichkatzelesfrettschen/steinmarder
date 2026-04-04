@@ -1,0 +1,128 @@
+# H1b: AGX SFU / ALU Single Dep-Chain Latency Probes
+# Platform: Apple M1, Metal AGX GPU, macOS 26 (SDK target: air64_v28-apple-macosx26.0.0)
+# Date: 2026-04-03
+# Host: metal_probe_host (--width 1024 --iters 30 --shader-iters 100000)
+# Shader: probe_sfu_dep_chain.metallib
+
+# =====================================================================
+# METHODOLOGY NOTES
+# =====================================================================
+#
+# LOOP OVERHEAD:
+#   Each shader has an inner loop: for (uint iter = 0; iter < n_iters; iter++) { ... }
+#   The loop itself (counter increment + compare + back-branch) contributes ~3 cycles/iter
+#   on AGX. This is measured via a `probe_loop_only` kernel (dummy XOR dep body).
+#   C_loop (100K iters, w1024) ≈ 3.31–3.55 M ns per dispatch (varies with power state).
+#
+# CLOCK CALIBRATION:
+#   GPU clock is inferred from FMA dep-chain within each measurement batch:
+#     clock = 2.20 cycles / measured_FMA_step_time_ns
+#   Batch 1: FMA = 1.606 ns/step → 1.370 GHz
+#   Batch 2: FMA = 1.570 ns/step → 1.401 GHz
+#   M1 nominal GPU max: 1.296 GHz. Higher observed values may reflect boost or measurement noise.
+#
+# POWER STATE WARNING:
+#   At shader_iters ≥ 1M (dispatch time > ~30 ms), M1 GPU throttles significantly (~10×).
+#   All measurements here use 100K inner iters (dispatch ~4–9 ms) — within safe window.
+#   Always run on AC power. Re-calibrate clock per batch via FMA dep-chain.
+#
+# PROBE DESIGN:
+#   4-op UNROLLED dep-chain: 4 operations per inner iteration on the critical path.
+#   Amplifies signal 4× vs single-op-per-iter, which was too noisy (signal < 6% of C_loop).
+#
+#   For SFU ops (EXP2/LOG2/SQRT): dep chain = [FMA(a, k, c) → SFU → output is new a]
+#   L(SFU adj_lat) = (T(sfu_dep4) - T(fma4_dep)) / (4 × 100K)
+#   Comparison to Philip Turner's adj_lat: the full dep-chain step (FMA + SFU) is what
+#   Philip calls "adjusted latency" = pipeline depth visible to dependent instructions.
+#
+#   For FMAX/SELECT: dep chain = [FMA_x ∥ FMA_y → op(x,y) → new a]
+#   The two FMAs are parallel (both depend on a). Critical path = FMA + op latency.
+#   NOTE: since 2 FMAs per step (issued in 2 sequential clocks on AGX's single FP EU),
+#   the total step time = L_FMA + 1_scheduling_cycle + L_op, not just L_FMA + L_op.
+#   Practical impact: ~1 cycle overhead per step baked into FMAX/SELECT measurements.
+
+# =====================================================================
+# BATCH 1 MEASUREMENTS (--iters 30, clock ≈ 1.370 GHz from FMA)
+# =====================================================================
+
+probe_fma4_dep:    ns_per_iter=3958033  loop_only=3315666  net=642367  ns/step=1.606  cyc=2.20
+probe_fma_sq4_dep: ns_per_iter=3654666  loop_only=3315666  net=339000  ns/step=0.847  CONTAMINATED (Inf FMA fast path)
+probe_fma09_dep4:  ns_per_iter=3552033  loop_only=3315666  net=236367  ns/step=0.591  CONTAMINATED (fixed-pt 1.0 optimization?)
+probe_exp2_dep4:   ns_per_iter=5288600  loop_only=3315666  net=1972934 ns/step=4.932  cyc=6.76 (FMA+EXP2)
+probe_log2_dep4:   ns_per_iter=5495133  loop_only=3315666  net=2179467 ns/step=5.449  cyc=7.47 CONTAMINATED (log2(1.0) fixed pt)
+probe_fmax_dep4:   ns_per_iter=4574800  loop_only=3315666  net=1259134 ns/step=3.148  cyc=4.31 (FMA+FMA_par+FMAX)
+probe_select_dep4: ns_per_iter=4534533  loop_only=3315666  net=1218867 ns/step=3.047  cyc=4.17 (FMA+FMA_par+SELECT)
+
+Derived latencies (Batch 1, clock 1.370 GHz):
+  L(EXP2 adj_lat) = 6.76 - 2.20 = 4.56 cycles   [Philip: 4.31 — Δ=+6%, within noise] ✓
+  L(FMAX step)    = 4.31 cycles total (FMA+par_FMA+FMAX structure, 1.606 ns/FMA portion = 2.20 cyc)
+  L(SELECT step)  = 4.17 cycles total
+  FMAX − SELECT   = 0.14 cycles (within noise; FMAX ≈ SELECT latency)
+
+# =====================================================================
+# BATCH 2 MEASUREMENTS (--iters 30, clock ≈ 1.401 GHz from FMA)
+# =====================================================================
+
+probe_fma4_dep:      ns_per_iter=4057166  loop_only=3429033  net=628133  ns/step=1.570  cyc=2.20  ← calibration
+probe_log2_v2_dep4:  ns_per_iter=5742633  loop_only=3429033  net=2313600 ns/step=5.784  cyc=8.10 (FMA+LOG2)
+probe_sqrt_dep4:     ns_per_iter=6934600  loop_only=3429033  net=3505567 ns/step=8.764  cyc=12.28 (FMA+SQRT)
+
+Derived latencies (Batch 2, clock 1.401 GHz):
+  L(LOG2 adj_lat) = 8.10 - 2.20 = 5.90 cycles   [Philip: 4.31 — Δ=+37%, SUSPECT — see below]
+  L(SQRT adj_lat) = 12.28 - 2.20 = 10.08 cycles  [Philip: 8.57–11.13 range] ✓
+
+# =====================================================================
+# SUMMARY TABLE
+# =====================================================================
+#
+# Op         Probe Design        adj_lat (cyc, this)  adj_lat (Philip)  Status
+# --------   ------------------  -------------------  ----------------  ------
+# EXP2       FMA→exp2 ×4         4.56                 4.31              ✓ 6% diff
+# LOG2       FMA→log2 ×4 (v2)    5.90                 4.31              ⚠ 37% diff — suspect
+# SQRT       FMA→sqrt ×4         10.08                8.57–11.13        ✓ within range
+# FMAX       (FMA∥FMA)→fmax ×4   ~2.1 (excl. FMA)    —                 NEW
+# FCMPSEL32  (FMA∥FMA)→sel ×4    ~2.0 (excl. FMA)    —                 NEW
+
+# =====================================================================
+# ANALYSIS
+# =====================================================================
+#
+# EXP2 (4.56 cyc): Matches Philip Turner's adj_lat=4.31 within 6%. ✓
+#   The dep chain: fma(a, -0.5, 0.75) → exp2 → new a.
+#   Converges to a* ≈ 1.135 after ~30 iters; stays stable. AIR: air.fast_exp2.f32.
+#
+# LOG2 (5.90 cyc): Suspect — 37% above Philip's 4.31. Possible causes:
+#   1. Fixed-point arg = 2.0 (log2(fma(1.0, 0.5, 1.5)) = log2(2.0) = 1.0).
+#      2.0 is a power of 2; some SFU implementations have input-specific slow paths.
+#   2. macOS 26 air.fast_log2.f32 may use a more accurate polynomial than when
+#      Philip measured. The Metal compiler target is air64_v28 (newer SDK).
+#   3. fma(1.0, 0.5, 1.5) = 2.0 exactly; AGX might treat this as a precision check.
+#   Recommendation: re-probe with arg range avoiding exact powers of 2,
+#   e.g., log2(fma(a, 0.4, 1.5)) → fixed-pt arg ≈ 1.96 (not exact power of 2).
+#
+# SQRT (10.08 cyc): Confirms Philip's SFU range 8.57–11.13. Our single dep-chain
+#   measurement (not SFU-throughput) gives 10.08 cyc — expected for dep-chain latency
+#   (SFU TP=8 from 8-chain probes; dep-chain latency > TP is normal for SQRT).
+#   The 8-chain H1a SQRT probe confirmed TP=12.80 cyc (8 chains serializing through SFU).
+#   Single-chain dep latency = 10.08 cyc < 8×TP/8 = 12.80 cyc: consistent.
+#
+# FMAX (~2.11 cyc excl. FMA step overhead): First measurement of FMAX dep-chain.
+#   dep chain: fmax(fma(a,0.9,0.1), fma(a,0.1,0.9)) — two FMAs in parallel, then fmax.
+#   The measured step has 1 extra scheduling cycle (serial FMA issue for the 2nd parallel FMA).
+#   Corrected: L(FMAX) ≈ (4.31 - 2.20 - 1.0) = 1.11 cycles ≈ 1 cycle.
+#   Consistent with FMAX being an ALU-tier op on AGX (not SFU).
+#
+# SELECT/FCMPSEL32 (~1.97 cyc excl. FMA step overhead): First measurement.
+#   Same structure as FMAX probe; Metal select(y, x, x>y) → AIR: fcmp + select i1.
+#   Corrected: L(SELECT) ≈ (4.17 - 2.20 - 1.0) = 0.97 cycles ≈ 1 cycle.
+#   FMAX and SELECT are indistinguishable in latency (within 0.14 cycles of noise).
+#   AGX likely implements FMAX as FCMPSEL: fmax(a,b) = fcmpsel_gt(a, b, a, b).
+#   Both are ALU primitives at ~1 cycle adj_lat on M1.
+#
+# AIR INTRINSICS OBSERVED:
+#   air.fast_exp2.f32 — EXP2 SFU, 4.56 cyc dep-chain adj_lat
+#   air.fast_log2.f32 — LOG2 SFU, 5.90 cyc dep-chain (suspect; Philip: 4.31)
+#   air.fma.f32       — FMA, 2.20 cyc dep-chain (calibration reference)
+#   sqrt()            — SQRT SFU, 10.08 cyc dep-chain adj_lat
+#   air.fast_fmax.f32 — FMAX ALU, ~1 cyc (implemented as FCMPSEL on AGX ISA)
+#   fcmp + select i1  — SELECT/FCMPSEL32 ALU, ~1 cyc (same tier as FMAX)
