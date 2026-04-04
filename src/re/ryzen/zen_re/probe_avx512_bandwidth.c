@@ -42,6 +42,7 @@ static double bandwidth_ymm_load(const char *buf, size_t bytes, uint64_t iterati
         for (size_t i = 0; i < n_lines; i++, p += 64) {
             acc0 = _mm256_add_ps(acc0, _mm256_load_ps((const float *)p));
             acc1 = _mm256_add_ps(acc1, _mm256_load_ps((const float *)(p + 32)));
+            __asm__ volatile("" : "+x"(acc0), "+x"(acc1));
         }
     }
     uint64_t t1 = sm_zen_tsc_end();
