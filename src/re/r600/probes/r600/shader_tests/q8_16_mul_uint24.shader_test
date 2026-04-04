@@ -1,0 +1,67 @@
+# Q8.16 fixed-point multiplication via MUL_UINT24
+#
+# TeraScale-2 has a native single-cycle 24-bit unsigned integer multiply
+# (MUL_UINT24) that executes in ANY vec slot, leaving the t-slot free.
+# This is unique among consumer GPUs — standard integer multiply (MULLO_INT)
+# is multi-cycle and trans-slot-only.
+#
+# Q8.16 format: 8 bits integer + 16 bits fraction = 24 bits total.
+# Multiplication: (a * b) >> 16 gives the Q8.16 product.
+#
+# Test: 1.5 * 2.25 = 3.375
+#   1.5 in Q8.16 = 1.5 * 65536 = 98304 (0x018000)
+#   2.25 in Q8.16 = 2.25 * 65536 = 147456 (0x024000)
+#   Product: 98304 * 147456 = 14495514624
+#   But MUL_UINT24 only gives low 32 bits of 24x24 → max input is 2^24-1
+#   So we need smaller values: use Q4.8 for the multiply, then shift.
+#
+# Simpler test using small values that definitely fit in 24 bits:
+#   a = 100, b = 200 → a * b = 20000
+#   Expected: vertex color green channel = 20000 / 65536 ≈ 0.305
+#
+# Verify with R600_DEBUG=vs that MUL_UINT24 is emitted (not MULLO_INT).
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+
+    // Q8.16 fixed-point values packed as integers
+    // MUL_UINT24 fires when one operand is a constant < 2^24
+    int a = 100;      // constant, fits in 24 bits → triggers MUL_UINT24
+    int b = 200;      // constant
+    int c = a * b;    // should emit MUL_UINT24, not MULLO_INT
+
+    // Also test with a non-constant multiplied by a constant
+    int vertex_id = gl_VertexID;
+    int scaled = vertex_id * 256;  // 256 < 2^24 → MUL_UINT24
+
+    // Convert to float for output
+    color = vec4(float(c) / 65536.0,       // 20000/65536 = 0.305
+                 float(scaled) / 65536.0,   // varies per vertex
+                 float(a * 3) / 65536.0,    // 300/65536 ≈ 0.00458
+                 1.0);
+}
+
+[fragment shader]
+#version 130
+
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+    frag_color = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rect rgba (0, 0, 1, 1) 0.305175 0.0 0.004577 1.0 0.01
