@@ -393,6 +393,124 @@ static void sm_mlp_inference_single_prepacked_data(
 }
 #endif
 
+#ifdef __AVX512BF16__
+/* BF16 single-ray MLP inference using AVX-512 vdpbf16ps.
+ *
+ * Layer 0 (W0, 27->64): 28 inputs (padded), 14 input-pairs, 64 outputs.
+ *   Each vdpbf16ps processes 1 pair across 16 outputs (one ZMM accumulator).
+ *   4 ZMM accumulators cover all 64 outputs.  14 pairs * 4 ZMMs = 56 vdpbf16ps.
+ *
+ * Layer 1 (W1, 64->64): 32 input-pairs, 64 outputs.
+ *   32 pairs * 4 ZMMs = 128 vdpbf16ps.
+ *
+ * Output layer (W_out, 64->4): kept as FP32 AVX2 (only 4% of work). */
+static void sm_mlp_inference_single_bf16(
+    const float features_in[27],
+    const NeRFData *nerf_data,
+    float rgb_out[3],
+    float *sigma_out
+) {
+    float hidden[64] __attribute__((aligned(64)));
+    float hidden2[64] __attribute__((aligned(64)));
+    float out_acc[4];
+    int h;
+
+    /* === Layer 0: Input -> Hidden (BF16 path) ===
+     * W0 is pair-interleaved BF16: [14 pairs][64 outputs][2 bf16].
+     * Pad input 27 to 28 (28th = 0.0f). */
+    float padded_input[28] __attribute__((aligned(64)));
+    memcpy(padded_input, features_in, 27 * sizeof(float));
+    padded_input[27] = 0.0f;
+
+    /* Initialize accumulators from bias */
+    __m512 acc_zmm_0 = _mm512_load_ps(&nerf_data->mlp_b0_aligned[0]);
+    __m512 acc_zmm_1 = _mm512_load_ps(&nerf_data->mlp_b0_aligned[16]);
+    __m512 acc_zmm_2 = _mm512_load_ps(&nerf_data->mlp_b0_aligned[32]);
+    __m512 acc_zmm_3 = _mm512_load_ps(&nerf_data->mlp_b0_aligned[48]);
+
+    for (int pair_idx = 0; pair_idx < 14; pair_idx++) {
+        /* Pack two consecutive activations as a BF16 pair, broadcast to all 16 positions.
+         * Low 16 bits = bf16(input[2*pair_idx]), high 16 bits = bf16(input[2*pair_idx+1]). */
+        uint16_t bf16_a = sm_float_to_bf16(padded_input[pair_idx * 2]);
+        uint16_t bf16_b = sm_float_to_bf16(padded_input[pair_idx * 2 + 1]);
+        uint32_t activation_pair = ((uint32_t)bf16_b << 16) | (uint32_t)bf16_a;
+        __m512bh act_pairs = (__m512bh)_mm512_set1_epi32((int)activation_pair);
+
+        /* Each pair-row is 64 outputs * 2 bf16 = 128 uint16_t = 256 bytes = 4 ZMM loads. */
+        const uint16_t *weight_row = &nerf_data->mlp_w0_bf16[(size_t)pair_idx * 64 * 2];
+
+        __m512bh wt_0 = (__m512bh)_mm512_load_si512(&weight_row[0]);
+        __m512bh wt_1 = (__m512bh)_mm512_load_si512(&weight_row[32]);
+        __m512bh wt_2 = (__m512bh)_mm512_load_si512(&weight_row[64]);
+        __m512bh wt_3 = (__m512bh)_mm512_load_si512(&weight_row[96]);
+
+        acc_zmm_0 = _mm512_dpbf16_ps(acc_zmm_0, act_pairs, wt_0);
+        acc_zmm_1 = _mm512_dpbf16_ps(acc_zmm_1, act_pairs, wt_1);
+        acc_zmm_2 = _mm512_dpbf16_ps(acc_zmm_2, act_pairs, wt_2);
+        acc_zmm_3 = _mm512_dpbf16_ps(acc_zmm_3, act_pairs, wt_3);
+    }
+
+    /* ReLU */
+    __m512 zero_zmm = _mm512_setzero_ps();
+    _mm512_store_ps(&hidden[0],  _mm512_max_ps(acc_zmm_0, zero_zmm));
+    _mm512_store_ps(&hidden[16], _mm512_max_ps(acc_zmm_1, zero_zmm));
+    _mm512_store_ps(&hidden[32], _mm512_max_ps(acc_zmm_2, zero_zmm));
+    _mm512_store_ps(&hidden[48], _mm512_max_ps(acc_zmm_3, zero_zmm));
+
+    /* === Layer 1: Hidden -> Hidden (BF16 path) ===
+     * W1 is pair-interleaved BF16: [32 pairs][64 outputs][2 bf16]. */
+    acc_zmm_0 = _mm512_load_ps(&nerf_data->mlp_b1_aligned[0]);
+    acc_zmm_1 = _mm512_load_ps(&nerf_data->mlp_b1_aligned[16]);
+    acc_zmm_2 = _mm512_load_ps(&nerf_data->mlp_b1_aligned[32]);
+    acc_zmm_3 = _mm512_load_ps(&nerf_data->mlp_b1_aligned[48]);
+
+    for (int pair_idx = 0; pair_idx < 32; pair_idx++) {
+        uint16_t bf16_a = sm_float_to_bf16(hidden[pair_idx * 2]);
+        uint16_t bf16_b = sm_float_to_bf16(hidden[pair_idx * 2 + 1]);
+        uint32_t activation_pair = ((uint32_t)bf16_b << 16) | (uint32_t)bf16_a;
+        __m512bh act_pairs = (__m512bh)_mm512_set1_epi32((int)activation_pair);
+
+        const uint16_t *weight_row = &nerf_data->mlp_w1_bf16[(size_t)pair_idx * 64 * 2];
+
+        __m512bh wt_0 = (__m512bh)_mm512_load_si512(&weight_row[0]);
+        __m512bh wt_1 = (__m512bh)_mm512_load_si512(&weight_row[32]);
+        __m512bh wt_2 = (__m512bh)_mm512_load_si512(&weight_row[64]);
+        __m512bh wt_3 = (__m512bh)_mm512_load_si512(&weight_row[96]);
+
+        acc_zmm_0 = _mm512_dpbf16_ps(acc_zmm_0, act_pairs, wt_0);
+        acc_zmm_1 = _mm512_dpbf16_ps(acc_zmm_1, act_pairs, wt_1);
+        acc_zmm_2 = _mm512_dpbf16_ps(acc_zmm_2, act_pairs, wt_2);
+        acc_zmm_3 = _mm512_dpbf16_ps(acc_zmm_3, act_pairs, wt_3);
+    }
+
+    /* ReLU */
+    _mm512_store_ps(&hidden2[0],  _mm512_max_ps(acc_zmm_0, zero_zmm));
+    _mm512_store_ps(&hidden2[16], _mm512_max_ps(acc_zmm_1, zero_zmm));
+    _mm512_store_ps(&hidden2[32], _mm512_max_ps(acc_zmm_2, zero_zmm));
+    _mm512_store_ps(&hidden2[48], _mm512_max_ps(acc_zmm_3, zero_zmm));
+
+    /* === Output layer: Hidden2 -> Output (FP32 AVX2, only 4 outputs) === */
+    for (int o = 0; o < 4; o++) {
+        __m256 acc256_0 = _mm256_setzero_ps();
+        const float *wcol = &nerf_data->mlp_wout_t_aligned[(size_t)o * 64];
+        for (h = 0; h < 64; h += 8) {
+            __m256 hv = _mm256_load_ps(&hidden2[h]);
+            __m256 wv = _mm256_load_ps(&wcol[h]);
+            acc256_0 = _mm256_fmadd_ps(hv, wv, acc256_0);
+        }
+        out_acc[o] = nerf_data->mlp_bout_aligned[o] + sm_hsum256_ps(acc256_0);
+    }
+
+    /* Sigmoid for RGB, softplus for sigma (matches prepacked path exactly) */
+    rgb_out[0] = 1.0f / (1.0f + expf(-out_acc[0]));
+    rgb_out[1] = 1.0f / (1.0f + expf(-out_acc[1]));
+    rgb_out[2] = 1.0f / (1.0f + expf(-out_acc[2]));
+    if (out_acc[3] > 20.0f) *sigma_out = out_acc[3];
+    else if (out_acc[3] < -20.0f) *sigma_out = 0.0f;
+    else *sigma_out = logf(1.0f + expf(out_acc[3]));
+}
+#endif /* __AVX512BF16__ */
+
 
 /* ===== SIMD Utilities ===== */
 
@@ -1583,6 +1701,17 @@ void sm_volume_integrate_batch(
             float sigma_step_scalar = 0.0f;
 
             if (phase_slot) phase_t0 = sm_now_ns_monotonic();
+#ifdef __AVX512BF16__
+            if (sm_nerf_mlp_variant() == SM_NERF_MLP_VARIANT_BF16 &&
+                nerf_data->mlp_bf16_ready) {
+                sm_mlp_inference_single_bf16(
+                    feat,
+                    nerf_data,
+                    rgb_step_scalar,
+                    &sigma_step_scalar
+                );
+            } else
+#endif
 #ifdef __AVX2__
             if (sm_nerf_mlp_variant() == SM_NERF_MLP_VARIANT_PREPACKED &&
                 nerf_data->mlp_prepacked_ready) {
