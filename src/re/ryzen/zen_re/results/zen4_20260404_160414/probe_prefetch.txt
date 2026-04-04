@@ -1,0 +1,10 @@
+probe=prefetch
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+no_prefetch_cycles_per_elem=0.4929
+prefetch_cycles_per_elem=0.7294
+prefetch_delta=0.2365
+sink=1126938528192410
+csv,probe=prefetch,no_prefetch=0.492859,prefetch=0.729370,delta=0.236511

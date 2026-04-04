@@ -1,0 +1,11 @@
+probe=avx512_port_contention
+cpu=0
+working_set_bytes=262144
+
+fma_only_cycles=1.9565
+gather_only_cycles=17.2015
+interleaved_cycles=18.9655
+theoretical_overlap=17.2015
+serial_sum=19.1580
+overlap_efficiency=9.8%
+csv,probe=avx512_port_contention,fma=1.9565,gather=17.2015,interleaved=18.9655,overlap=9.8%

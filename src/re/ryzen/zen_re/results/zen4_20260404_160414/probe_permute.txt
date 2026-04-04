@@ -1,0 +1,8 @@
+probe=permute
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+cycles_per_permute=0.0620
+sink=1.000000
+csv,probe=permute,cycles_per_permute=0.062000

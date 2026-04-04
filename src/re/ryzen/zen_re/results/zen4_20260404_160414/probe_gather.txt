@@ -1,0 +1,8 @@
+probe=gather
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+cycles_per_vector_gather=6.3855
+sink=1325906132
+csv,probe=gather,cycles_per_vector_gather=6.385500

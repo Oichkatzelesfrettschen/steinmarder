@@ -1,0 +1,8 @@
+probe=load_use
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+pointer_chase_cycles_per_load=14.5385
+sink=15168
+csv,probe=load_use,pointer_chase_cycles_per_load=14.538500

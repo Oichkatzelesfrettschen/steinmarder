@@ -1,0 +1,10 @@
+probe=avx512_vnni
+cpu=0
+avx512f=1
+
+vpdpbusd_latency_cycles=2.0626
+vpdpbusd_throughput_cycles=0.3988
+vpdpwssd_throughput_cycles=0.2450
+busd_int8_ops_per_cycle=160.5
+wssd_int16_ops_per_cycle=130.6
+csv,probe=avx512_vnni,busd_lat=2.0626,busd_tp=0.3988,wssd_tp=0.2450

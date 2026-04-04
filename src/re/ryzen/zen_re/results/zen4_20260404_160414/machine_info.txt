@@ -1,0 +1,16 @@
+=== Machine Info ===
+CPU(s):                               32
+Model name:                           AMD Ryzen 9 7945HX with Radeon Graphics
+CPU family:                           25
+Model:                                97
+Thread(s) per core:                   2
+Core(s) per socket:                   16
+Stepping:                             2
+L1d cache:                            512 KiB (16 instances)
+L1i cache:                            512 KiB (16 instances)
+L2 cache:                             16 MiB (16 instances)
+L3 cache:                             32 MiB (1 instance)
+NUMA node0 CPU(s):                    0-31
+Vulnerability L1tf:                   Not affected
+Linux DESKTOP-CKP9KB6 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+

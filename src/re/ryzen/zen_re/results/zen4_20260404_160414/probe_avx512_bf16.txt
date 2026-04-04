@@ -1,0 +1,12 @@
+probe=avx512_bf16
+cpu=0
+avx512f=1
+
+vdpbf16ps_latency_cycles=2.9577
+vdpbf16ps_throughput_cycles=0.4810
+vfmadd_fp32_throughput_cycles=0.4809
+bf16_bf16_mul_ops_per_instr=32
+bf16_vs_fp32_throughput_ratio=1.000
+bf16_mul_ops_per_cycle=66.5
+fp32_fma_ops_per_cycle=33.3
+csv,probe=avx512_bf16,lat=2.9577,bf16_tp=0.4810,fp32_tp=0.4809,ratio=1.000

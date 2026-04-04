@@ -1,0 +1,25 @@
+probe=avx512_throttle
+cpu=0
+
+=== scalar-to-zmm transition ===
+scalar_warmup_cyc_per_op=6.4378
+first_zmm_burst_cyc_per_fma=0.4912
+
+=== sustained zmm bursts ===
+burst,cyc_per_fma
+0,0.4946
+1,0.4971
+2,0.4964
+3,0.4950
+4,0.4971
+5,0.4981
+6,0.4973
+7,0.4956
+8,0.4962
+9,0.4955
+
+min_cyc=0.4946
+max_cyc=0.4981
+drift_pct=0.72%
+throttle_detected=NO
+csv,probe=avx512_throttle,min=0.4946,max=0.4981,drift=0.72%,throttle=NO

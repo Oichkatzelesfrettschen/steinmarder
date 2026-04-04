@@ -1,0 +1,11 @@
+probe=avx512_gather
+cpu=0
+avx512f=1
+working_set_bytes=1048576
+
+gather_zmm_16elem_cycles=9.0070
+gather_ymm_8elem_cycles=4.7130
+zmm_per_element=0.5629
+ymm_per_element=0.5891
+zmm_vs_ymm_ratio=1.911
+csv,probe=avx512_gather,zmm=9.0070,ymm=4.7130,ratio=1.911

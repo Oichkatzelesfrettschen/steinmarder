@@ -1,0 +1,9 @@
+probe=fma
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+latency_cycles_per_fma=2.1877
+throughput_cycles_per_fma=0.2405
+sink=5446248.000000
+csv,probe=fma,latency_cycles_per_fma=2.187750,throughput_cycles_per_fma=0.240500

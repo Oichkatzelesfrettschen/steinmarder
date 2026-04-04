@@ -1,0 +1,10 @@
+probe=branch
+iterations=50000
+working_set_bytes=1048576
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+predictable_branch_cycles=0.4820
+unpredictable_branch_cycles=2.9255
+branch_penalty_delta=2.4435
+sink=199896
+csv,probe=branch,predictable=0.482000,unpredictable=2.925500,delta=2.443500

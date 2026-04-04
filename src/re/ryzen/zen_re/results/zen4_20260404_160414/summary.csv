@@ -1,0 +1,13 @@
+=== Summary CSV ===
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_bf16.txt:csv,probe=avx512_bf16,lat=2.9577,bf16_tp=0.4810,fp32_tp=0.4809,ratio=1.000
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_fma.txt:csv,probe=avx512_fma,lat=1.4356,tp512=0.5793,tp256=0.2398,ratio=2.416
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_gather.txt:csv,probe=avx512_gather,zmm=9.0070,ymm=4.7130,ratio=1.911
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_port_contention.txt:csv,probe=avx512_port_contention,fma=1.9565,gather=17.2015,interleaved=18.9655,overlap=9.8%
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_throttle.txt:csv,probe=avx512_throttle,min=0.4946,max=0.4981,drift=0.72%,throttle=NO
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_avx512_vnni.txt:csv,probe=avx512_vnni,busd_lat=2.0626,busd_tp=0.3988,wssd_tp=0.2450
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_branch.txt:csv,probe=branch,predictable=0.482000,unpredictable=2.925500,delta=2.443500
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_fma.txt:csv,probe=fma,latency_cycles_per_fma=2.187750,throughput_cycles_per_fma=0.240500
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_gather.txt:csv,probe=gather,cycles_per_vector_gather=6.385500
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_load_use.txt:csv,probe=load_use,pointer_chase_cycles_per_load=14.538500
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_permute.txt:csv,probe=permute,cycles_per_permute=0.062000
+/home/eirikr/Documents/GitHub/steinmarder/src/re/ryzen/zen_re/results/zen4_20260404_160414/probe_prefetch.txt:csv,probe=prefetch,no_prefetch=0.492859,prefetch=0.729370,delta=0.236511

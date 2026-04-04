@@ -1,0 +1,9 @@
+probe=avx512_fma
+cpu=0
+avx512f=1
+
+avx512_fma_latency_cycles=1.4356
+avx512_fma_throughput_cycles=0.5793
+avx256_fma_throughput_cycles=0.2398
+zmm_vs_ymm_ratio=2.416
+csv,probe=avx512_fma,lat=1.4356,tp512=0.5793,tp256=0.2398,ratio=2.416
