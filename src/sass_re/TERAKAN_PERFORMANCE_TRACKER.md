@@ -11,6 +11,9 @@
 | 2026-03-31 | Mesa 26.0.3 | debugoptimized (-O2) | clang-19 | 23.0 | 187 | — | 7.2 | Same build, higher load |
 | 2026-03-31 | Mesa 26.0.3 | debugoptimized (-O2) | clang-19 | 23.0 | **385** | — | **1.35** | CLEAN: matches -O0 baseline! |
 | 2026-03-31 | Mesa 25.2.6 (system) | release (-O2) | gcc | 42.9 | 325 | — | 5.2 | At higher load than our clean run |
+| 2026-04-02 | Mesa 26.0.3 | debug (-O0) | clang-19 | 27.6 | ~148 | 859 | <1.0 | Terakan ICD, distcc build |
+| 2026-04-03 | Mesa 26.0.3 | debug (-O0) | clang-19 | 27.6 | ~148 | 791 | <1.0 | Cold-start, post compute fixes |
+| 2026-04-03 | Mesa 26.0.3 + bilinear blur | debug (-O0) | clang-19 | 27.6 | — | **906** | <1.0 | **Bilinear blur: 414→910 FPS** |
 
 ## Target: 2000 FPS vkmark (headless)
 
@@ -109,20 +112,65 @@ The `out[i] = in[i] * 3.0` kernel now produces correct output on all 16 floats.
 - `radeon_add_to_buffer_list` returns `index * 4`, matching kernel `idx / 4` —
   reloc encoding is correct
 
-### Conformance status
+### Conformance status (pre-sequential-fix)
 
 | Test | Result | Notes |
 |------|--------|-------|
 | rat_test_fixed (scale ×3.0) | **5/5 PASS** | INT8-range float arithmetic verified correct |
 | Custom 2-arg kernels | PASS | Isolated dispatches work |
 | Sequential dispatch | FAIL | Second kernel reads stale data from first kernel's output |
+
+See updated conformance table under Bug #2 below.
+
+### Bug #2: Sequential dispatch stale data — FIXED, 8/8 PASS
+
+Sequential compute dispatch produced stale data: second kernel read first
+kernel's output incorrectly. All 8 custom tests now pass sequentially in the
+same context, with 3/3 stability runs.
+
+**Root cause**: Rusticl stream uploader aligned CB (constant buffer) data to
+128 bytes (`size_of::<[u64; 16]>()`) but the Evergreen `ALU_CONST_CACHE`
+register requires 256-byte alignment (address bits are `addr >> 8`, truncating
+the low 8 bits). A non-aligned `buf_offset` (e.g. 384) silently pointed the
+ALU constant cache at the wrong data for the second dispatch.
+
+**Fix**: `256u32` alignment in `context.rs:479`.
+
+**Diagnostic trail**:
+- `strace`: 9 CS ioctls all returned success
+- `dmesg`: CS rejection from broken experimental changes (guided rollback)
+- Direct `pool_bo` dump: confirmed input data was correct in memory
+- `CB0_AT_DISPATCH` trace: `buf_offset=384` (non-aligned) vs `buf_offset=512`
+  (aligned) — proved the truncation hypothesis
+
+### Kernel CS validator and DRM tracing findings
+
+- `SHADER_TYPE` bit is invisible to opcode extraction; compute and non-compute
+  packets are processed identically by the kernel CS validator
+- `radeon_add_to_buffer_list` returns `index * 4`, matching kernel `idx / 4` —
+  reloc encoding is correct
+- DRM tracing: GFX CS events fire in `rcs0` kernel thread, not the submitting
+  process — use `strace` / `bpftrace` at syscall level instead of `trace-cmd`
+  for per-process CS tracking
+
+### Conformance status (updated)
+
+| Test | Result | Notes |
+|------|--------|-------|
+| rat_test_fixed (scale ×3.0) | **PASS** | INT8-range float arithmetic verified correct |
+| add kernel | **PASS** | 2-arg addition |
+| mad kernel | **PASS** | multiply-add |
+| sqrt kernel | **PASS** | transcendental |
+| int kernel | **PASS** | integer arithmetic |
+| abs kernel | **PASS** | absolute value |
+| sin kernel | **PASS** | trigonometric |
+| copy kernel | **PASS** | buffer copy |
+| **Total** | **8/8 PASS** | All sequential in same context, 3/3 stability runs |
 | clpeak compute | CL_INVALID_WORK_GROUP_SIZE (-54) | Work-group size exceeds HW max |
 | clpeak transfer | 1.34 GBPS write | DDR3-533 UMA bandwidth |
 
 ### Remaining bugs
 
-- Sequential dispatch: stale data between kernels (cache flush / barrier missing
-  between consecutive compute dispatches)
 - clpeak: `CL_INVALID_WORK_GROUP_SIZE` — need to clamp max work-group size to
   hardware limit (likely 64 or 128 threads per SIMD)
 
