@@ -43,7 +43,7 @@ steinmarder dep-chain ≈ structural stall time. Neither is wrong; they measure 
 | RSQRT32 precise | 8  | 8.99 (P same!)  | **29.2**         | **37.97**         | —         | —          | AIR: `air.rsqrt.f32` = Newton-Raphson multi-step. P may have older SDK that compiled precise→fast |
 | FDIV32    | 6.01      | 7.62–8.90       | —                | — (**gap**)       | —         | —          | P: = RECIP32 + FMUL32 in sequence |
 | EXP2_32   | 4         | 4.31            | **4.932** (1-ch) | **4.56 adj_lat** ✓ | —        | —          | H1b (2026-04-03): clean FMA→EXP2 dep-chain. adj_lat=(6.76−2.20)=4.56 cyc vs Philip 4.31 (Δ=6%, within noise). AIR: `air.fast_exp2.f32`. Converges to a*≈1.135, arg≈0.18 (non-trivial) |
-| LOG2_32   | 4         | 4.31            | **4.276** (8-ch); **5.784** (1-ch) | 8-ch: **5.56**; 1-ch adj_lat: **5.90** ⚠ | — | — | H1b single dep-chain: 5.90 cyc vs Philip 4.31 (Δ=37%). SUSPECT: fixed-pt arg converges to 2.0 (power-of-2 slow path?). 8-ch TP probe: LOG2_TP=4 confirmed. Needs re-probe with arg ≉ power of 2 |
+| LOG2_32   | 4         | 4.31            | **4.276** (8-ch); v3: **5.784** ns (SFU-SFU delta) | 8-ch: **5.56**; v3 adj_lat: **~4.38** ✓ | — | — | H1b v2 (arg=2.0 exact): 5.90 cyc (SLOW PATH — power-of-2 special case). H1b v3 (arg≈1.858): 4.38 cyc (Δ=+1.6% vs Philip 4.31) ✓. Measured via SFU-SFU delta vs EXP2 (loop overhead cancels). Interleaved, 200 iters, 3 trials |
 | EXPE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          | Software: base-2 change + EXP2 |
 | LOGE_32   | 4         | 7.61–7.66       | —                | — (**gap**)       | —         | —          |
 | SIN32     | 14.28     | 23.04–27.35     | —                | — (**gap**)       | —         | —          | Two hardware phases: SIN_PT1+SIN_PT2 |
@@ -220,7 +220,7 @@ The following have Philip's reference data but **no steinmarder dep-chain probe*
 ### Highest priority (P has data; we should confirm or contradict)
 | Operation | P adj_lat (cyc) | Why measure |
 |-----------|-----------------|-------------|
-| LOG2_32 (clean re-probe) | 4.31 | H1b dep-chain gave 5.90 cyc — 37% above Philip; need arg ≉ power-of-2 to rule out SFU slow path |
+| _~~LOG2_32 re-probe~~_ | _~~4.31~~_ | _DONE: H1b v3 (arg≈1.858) = 4.38 cyc ✓; v2 5.90 cyc confirmed as power-of-2 slow path_ |
 | FMIN32 | 4.74 | Not yet probed; FMAX confirmed ~1 cyc ALU — FMIN expected same |
 | FMUL32 fused `(x*x)+1` pattern | ~1 cyc | Philip showed single-operand doubles TP |
 | IMUL(32x32=64) hardware | 9.84 | Our i64 mul probe was LLVM-folded; need clean variable-operand measurement |

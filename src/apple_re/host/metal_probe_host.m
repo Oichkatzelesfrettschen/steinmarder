@@ -181,7 +181,11 @@ static void measure_event_latency(id<MTLDevice> device, uint32_t n_iters) {
 int main(int argc, char **argv) {
     @autoreleasepool {
         const char *metallib_path = NULL;
-        const char *kernel_name = "probe_simdgroup_reduce";
+        // Support multiple --kernel flags; all kernels run back-to-back in the same
+        // invocation so the GPU stays warm and clock state is consistent.
+        #define MAX_KERNELS 32
+        const char *kernel_names[MAX_KERNELS];
+        int n_kernels = 0;
         uint32_t width = 1024;
         uint32_t iterations = 100;
         uint32_t fs_probe_every = 0;
@@ -191,12 +195,18 @@ int main(int argc, char **argv) {
         int csv = 0;
         int do_list_counters = 0;
         const char *counter_set_name = NULL;  // NULL = no counter sampling
+        int interleave = 0; // if set, alternate dispatches across kernels (round-robin)
 
         for (int i = 1; i < argc; ++i) {
             if (strcmp(argv[i], "--metallib") == 0 && i + 1 < argc) {
                 metallib_path = argv[++i];
             } else if (strcmp(argv[i], "--kernel") == 0 && i + 1 < argc) {
-                kernel_name = argv[++i];
+                if (n_kernels < MAX_KERNELS) {
+                    kernel_names[n_kernels++] = argv[++i];
+                } else {
+                    fprintf(stderr, "too many --kernel flags (max %d)\n", MAX_KERNELS);
+                    return 2;
+                }
             } else if (strcmp(argv[i], "--width") == 0 && i + 1 < argc) {
                 width = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--iters") == 0 && i + 1 < argc) {
@@ -217,6 +227,8 @@ int main(int argc, char **argv) {
                 l2_chase_entries = (uint32_t)strtoul(argv[++i], NULL, 10);
             } else if (strcmp(argv[i], "--shader-iters") == 0 && i + 1 < argc) {
                 shader_iters_override = (uint32_t)strtoul(argv[++i], NULL, 10);
+            } else if (strcmp(argv[i], "--interleave") == 0) {
+                interleave = 1;
             } else if (strcmp(argv[i], "--help") == 0) {
                 fprintf(stdout,
                     "usage: %s [--metallib path] [--kernel name] [--width N] [--iters N]\n"
@@ -271,6 +283,10 @@ int main(int argc, char **argv) {
             fprintf(stderr, "missing --metallib path\n");
             return 2;
         }
+        if (n_kernels == 0) {
+            fprintf(stderr, "missing --kernel name\n");
+            return 2;
+        }
         if (width == 0 || iterations == 0) {
             fprintf(stderr, "width and iterations must be > 0\n");
             return 2;
@@ -285,17 +301,21 @@ int main(int argc, char **argv) {
             return 4;
         }
 
-        id<MTLFunction> function = [library newFunctionWithName:[NSString stringWithUTF8String:kernel_name]];
-        if (function == nil) {
-            fprintf(stderr, "missing kernel function: %s\n", kernel_name);
-            return 5;
-        }
-
-        id<MTLComputePipelineState> pipeline = [device newComputePipelineStateWithFunction:function error:&error];
-        if (pipeline == nil) {
-            fprintf(stderr, "failed to create compute pipeline: %s\n",
-                    error.localizedDescription.UTF8String ? error.localizedDescription.UTF8String : "unknown");
-            return 6;
+        // Pre-compile all pipeline states so the first kernel doesn't pay JIT overhead.
+        id<MTLComputePipelineState> pipelines[MAX_KERNELS];
+        for (int ki = 0; ki < n_kernels; ++ki) {
+            id<MTLFunction> function = [library newFunctionWithName:[NSString stringWithUTF8String:kernel_names[ki]]];
+            if (function == nil) {
+                fprintf(stderr, "missing kernel function: %s\n", kernel_names[ki]);
+                return 5;
+            }
+            pipelines[ki] = [device newComputePipelineStateWithFunction:function error:&error];
+            if (pipelines[ki] == nil) {
+                fprintf(stderr, "failed to create compute pipeline for %s: %s\n",
+                        kernel_names[ki],
+                        error.localizedDescription.UTF8String ? error.localizedDescription.UTF8String : "unknown");
+                return 6;
+            }
         }
 
         id<MTLCommandQueue> queue = [device newCommandQueue];
@@ -386,121 +406,178 @@ int main(int argc, char **argv) {
             snprintf(fs_probe_path, sizeof(fs_probe_path), "/tmp/steinmarder_fs_probe_%d.log", getpid());
         }
 
-        // Accumulate GPU-side time using commandBuffer.GPUStartTime / GPUEndTime.
-        // These are always available (no special counter set required).
-        // Units are seconds in the GPU time domain (not CPU wall time).
-        double gpu_elapsed_s = 0.0;
-        double gpu_first_start_s = -1.0;
-        double gpu_last_end_s = 0.0;
-
-        // Compute shader inner iteration count once; used in dispatch loop and output.
+        // Compute shader inner iteration count once; shared across all kernels.
         uint32_t shader_inner_iters = (shader_iters_override > 0) ? shader_iters_override : 100000u;
 
-        uint64_t t0 = now_ns();
-        for (uint32_t i = 0; i < iterations; ++i) {
-            id<MTLCommandBuffer> commandBuffer = [queue commandBuffer];
-            if (commandBuffer == nil) {
-                fprintf(stderr, "failed to allocate command buffer at iter %u\n", i);
-                return 9;
-            }
+        // Print CSV header once if needed (multi-kernel csv prints one row per kernel).
+        if (csv) {
+            fprintf(stdout, "kernel,iters,shader_iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum\n");
+        }
 
-            id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
-            if (encoder == nil) {
-                fprintf(stderr, "failed to allocate command encoder at iter %u\n", i);
-                return 10;
-            }
-
-            // Inline counter sample at start of first iteration (only if supported)
-            if (counterSampleBuf != nil && supportsDispatchSampling && i == 0) {
-                [encoder sampleCountersInBuffer:counterSampleBuf
-                                  atSampleIndex:0
-                                    withBarrier:YES];
-            }
-
-            [encoder setComputePipelineState:pipeline];
-            [encoder setBuffer:outBuffer offset:0 atIndex:0];
-            // Pass iteration count to shaders that declare `constant uint &iters [[buffer(1)]]`.
-            // Without this, the constant reads as 0 and the inner loop never executes.
-            // shader_inner_iters set before the dispatch loop (see above).
-            [encoder setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
-            // Bind pointer-chase buffer as buffer(2) when --l2-chase-entries is set.
-            if (chaseBuffer != nil) {
-                [encoder setBuffer:chaseBuffer offset:0 atIndex:2];
-            }
-
-            NSUInteger threadsPerTG = pipeline.maxTotalThreadsPerThreadgroup;
-            if (threadsPerTG > 128) {
-                threadsPerTG = 128;
-            }
-            if (threadsPerTG == 0) {
-                threadsPerTG = 1;
-            }
+        // --interleave mode: alternate dispatches across all kernels in round-robin so
+        // every kernel sees the same average GPU thermal/clock state. Each kernel's
+        // elapsed time is tracked separately; the total dispatch count per kernel is
+        // `iterations`. Output is the same format as sequential mode.
+        if (interleave && n_kernels > 1) {
+            uint64_t *k_elapsed = (uint64_t *)calloc((size_t)n_kernels, sizeof(uint64_t));
+            if (k_elapsed == NULL) { fprintf(stderr, "out of memory\n"); return 9; }
 
             MTLSize gridSize = MTLSizeMake((NSUInteger)width, 1, 1);
-            MTLSize threadgroupSize = MTLSizeMake(threadsPerTG, 1, 1);
-            [encoder dispatchThreads:gridSize threadsPerThreadgroup:threadgroupSize];
+            for (uint32_t i = 0; i < iterations; ++i) {
+                for (int ki = 0; ki < n_kernels; ++ki) {
+                    id<MTLComputePipelineState> pipeline = pipelines[ki];
+                    NSUInteger threadsPerTG = pipeline.maxTotalThreadsPerThreadgroup;
+                    if (threadsPerTG > 128) threadsPerTG = 128;
+                    if (threadsPerTG == 0)  threadsPerTG = 1;
+                    MTLSize tgSize = MTLSizeMake(threadsPerTG, 1, 1);
 
-            // Inline counter sample at end of last iteration (only if supported)
-            if (counterSampleBuf != nil && supportsDispatchSampling && i == iterations - 1) {
-                [encoder sampleCountersInBuffer:counterSampleBuf
-                                  atSampleIndex:1
-                                    withBarrier:YES];
-            }
-            [encoder endEncoding];
+                    id<MTLCommandBuffer> cb = [queue commandBuffer];
+                    id<MTLComputeCommandEncoder> enc = [cb computeCommandEncoder];
+                    [enc setComputePipelineState:pipeline];
+                    [enc setBuffer:outBuffer offset:0 atIndex:0];
+                    [enc setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
+                    if (chaseBuffer != nil) [enc setBuffer:chaseBuffer offset:0 atIndex:2];
+                    [enc dispatchThreads:gridSize threadsPerThreadgroup:tgSize];
+                    [enc endEncoding];
 
-            [commandBuffer commit];
-            [commandBuffer waitUntilCompleted];
-
-            // Accumulate GPU-side timing
-            if (counter_set_name != NULL) {
-                double start_s = commandBuffer.GPUStartTime;
-                double end_s   = commandBuffer.GPUEndTime;
-                if (start_s > 0.0) {
-                    if (gpu_first_start_s < 0.0) { gpu_first_start_s = start_s; }
-                    gpu_last_end_s = end_s;
-                    gpu_elapsed_s += (end_s - start_s);
+                    uint64_t t0 = now_ns();
+                    [cb commit];
+                    [cb waitUntilCompleted];
+                    k_elapsed[ki] += now_ns() - t0;
                 }
             }
 
-            if (fs_probe_every > 0 && (i % fs_probe_every) == 0) {
-                emit_fs_probe_event(fs_probe_path, i);
+            if (csv) {
+                fprintf(stdout, "kernel,iters,shader_iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum\n");
             }
-        }
-        uint64_t t1 = now_ns();
-
-        if (fs_probe_every > 0) {
-            emit_fs_probe_event(fs_probe_path, iterations);
-        }
-
-        const uint32_t *out = (const uint32_t *)outBuffer.contents;
-        uint64_t hash = checksum_u32(out, width);
-        double elapsed_ns = (double)(t1 - t0);
-        double ns_per_iter = elapsed_ns / (double)iterations;
-        double ns_per_element = elapsed_ns / ((double)iterations * (double)width);
-
-        if (csv) {
-            fprintf(stdout, "iters,shader_iters,width,elapsed_ns,ns_per_iter,ns_per_element,checksum\n");
-            fprintf(stdout, "%u,%u,%u,%.0f,%.6f,%.9f,%" PRIu64 "\n",
-                    iterations, shader_inner_iters, width, elapsed_ns, ns_per_iter, ns_per_element, hash);
-        } else {
-            fprintf(stdout,
-                    "metal_probe elapsed_ns=%.0f ns_per_iter=%.6f shader_iters=%u ns_per_element=%.9f checksum=%" PRIu64 "\n",
-                    elapsed_ns, ns_per_iter, shader_inner_iters, ns_per_element, hash);
-        }
-
-        // Print GPU-side timing and counter values
-        if (counter_set_name != NULL) {
-            double gpu_ns_per_iter = (gpu_elapsed_s * 1e9) / (double)iterations;
-            double gpu_ns_per_element = gpu_ns_per_iter / (double)width;
-            fprintf(stdout, "gpu_time_ns_total=%.0f gpu_ns_per_iter=%.6f gpu_ns_per_element=%.9f\n",
-                    gpu_elapsed_s * 1e9, gpu_ns_per_iter, gpu_ns_per_element);
-
-            if (counterSampleBuf != nil && counterSet != nil && supportsDispatchSampling) {
-                fprintf(stdout, "counter_set: %s\n", counter_set_name);
-                print_counter_sample(counterSampleBuf, 0, counterSet, "start");
-                print_counter_sample(counterSampleBuf, 1, counterSet, "end");
+            const uint32_t *out_data = (const uint32_t *)outBuffer.contents;
+            for (int ki = 0; ki < n_kernels; ++ki) {
+                uint64_t hash = checksum_u32(out_data, width);
+                double elapsed_ns   = (double)k_elapsed[ki];
+                double ns_per_iter  = elapsed_ns / (double)iterations;
+                double ns_per_elem  = elapsed_ns / ((double)iterations * (double)width);
+                if (csv) {
+                    fprintf(stdout, "%s,%u,%u,%u,%.0f,%.6f,%.9f,%" PRIu64 "\n",
+                            kernel_names[ki], iterations, shader_inner_iters, width,
+                            elapsed_ns, ns_per_iter, ns_per_elem, hash);
+                } else {
+                    fprintf(stdout,
+                            "metal_probe kernel=%s elapsed_ns=%.0f ns_per_iter=%.6f shader_iters=%u ns_per_element=%.9f checksum=%" PRIu64 "\n",
+                            kernel_names[ki], elapsed_ns, ns_per_iter, shader_inner_iters, ns_per_elem, hash);
+                }
             }
+            free(k_elapsed);
+            if (fs_probe_every > 0) { (void)unlink(fs_probe_path); }
+            return 0;
         }
+
+        // Run each kernel in sequence within the same process so the GPU stays
+        // warm and clock state is consistent across all measurements.
+        for (int ki = 0; ki < n_kernels; ++ki) {
+            id<MTLComputePipelineState> pipeline = pipelines[ki];
+            const char *kernel_name = kernel_names[ki];
+
+            // Accumulate GPU-side time using commandBuffer.GPUStartTime / GPUEndTime.
+            double gpu_elapsed_s = 0.0;
+            double gpu_first_start_s = -1.0;
+            double gpu_last_end_s = 0.0;
+
+            uint64_t t0 = now_ns();
+            for (uint32_t i = 0; i < iterations; ++i) {
+                id<MTLCommandBuffer> commandBuffer = [queue commandBuffer];
+                if (commandBuffer == nil) {
+                    fprintf(stderr, "failed to allocate command buffer at iter %u (kernel %s)\n", i, kernel_name);
+                    return 9;
+                }
+
+                id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+                if (encoder == nil) {
+                    fprintf(stderr, "failed to allocate command encoder at iter %u (kernel %s)\n", i, kernel_name);
+                    return 10;
+                }
+
+                // Inline counter sample at start of first iteration of first kernel (only if supported)
+                if (counterSampleBuf != nil && supportsDispatchSampling && ki == 0 && i == 0) {
+                    [encoder sampleCountersInBuffer:counterSampleBuf
+                                      atSampleIndex:0
+                                        withBarrier:YES];
+                }
+
+                [encoder setComputePipelineState:pipeline];
+                [encoder setBuffer:outBuffer offset:0 atIndex:0];
+                // Pass iteration count to shaders that declare `constant uint &iters [[buffer(1)]]`.
+                [encoder setBytes:&shader_inner_iters length:sizeof(uint32_t) atIndex:1];
+                // Bind pointer-chase buffer as buffer(2) when --l2-chase-entries is set.
+                if (chaseBuffer != nil) {
+                    [encoder setBuffer:chaseBuffer offset:0 atIndex:2];
+                }
+
+                NSUInteger threadsPerTG = pipeline.maxTotalThreadsPerThreadgroup;
+                if (threadsPerTG > 128) { threadsPerTG = 128; }
+                if (threadsPerTG == 0)  { threadsPerTG = 1; }
+
+                MTLSize gridSize = MTLSizeMake((NSUInteger)width, 1, 1);
+                MTLSize threadgroupSize = MTLSizeMake(threadsPerTG, 1, 1);
+                [encoder dispatchThreads:gridSize threadsPerThreadgroup:threadgroupSize];
+
+                // Inline counter sample at end of last iteration of last kernel (only if supported)
+                if (counterSampleBuf != nil && supportsDispatchSampling && ki == n_kernels - 1 && i == iterations - 1) {
+                    [encoder sampleCountersInBuffer:counterSampleBuf
+                                      atSampleIndex:1
+                                        withBarrier:YES];
+                }
+                [encoder endEncoding];
+
+                [commandBuffer commit];
+                [commandBuffer waitUntilCompleted];
+
+                // Accumulate GPU-side timing
+                if (counter_set_name != NULL) {
+                    double start_s = commandBuffer.GPUStartTime;
+                    double end_s   = commandBuffer.GPUEndTime;
+                    if (start_s > 0.0) {
+                        if (gpu_first_start_s < 0.0) { gpu_first_start_s = start_s; }
+                        gpu_last_end_s = end_s;
+                        gpu_elapsed_s += (end_s - start_s);
+                    }
+                }
+
+                if (fs_probe_every > 0 && (i % fs_probe_every) == 0) {
+                    emit_fs_probe_event(fs_probe_path, i);
+                }
+            }
+            uint64_t t1 = now_ns();
+
+            const uint32_t *out_data = (const uint32_t *)outBuffer.contents;
+            uint64_t hash = checksum_u32(out_data, width);
+            double elapsed_ns = (double)(t1 - t0);
+            double ns_per_iter = elapsed_ns / (double)iterations;
+            double ns_per_element = elapsed_ns / ((double)iterations * (double)width);
+
+            if (csv) {
+                fprintf(stdout, "%s,%u,%u,%u,%.0f,%.6f,%.9f,%" PRIu64 "\n",
+                        kernel_name, iterations, shader_inner_iters, width,
+                        elapsed_ns, ns_per_iter, ns_per_element, hash);
+            } else {
+                fprintf(stdout,
+                        "metal_probe kernel=%s elapsed_ns=%.0f ns_per_iter=%.6f shader_iters=%u ns_per_element=%.9f checksum=%" PRIu64 "\n",
+                        kernel_name, elapsed_ns, ns_per_iter, shader_inner_iters, ns_per_element, hash);
+            }
+
+            // Print GPU-side timing and counter values (only for single-kernel runs or last kernel)
+            if (counter_set_name != NULL && ki == n_kernels - 1) {
+                double gpu_ns_per_iter = (gpu_elapsed_s * 1e9) / (double)iterations;
+                double gpu_ns_per_element = gpu_ns_per_iter / (double)width;
+                fprintf(stdout, "gpu_time_ns_total=%.0f gpu_ns_per_iter=%.6f gpu_ns_per_element=%.9f\n",
+                        gpu_elapsed_s * 1e9, gpu_ns_per_iter, gpu_ns_per_element);
+
+                if (counterSampleBuf != nil && counterSet != nil && supportsDispatchSampling) {
+                    fprintf(stdout, "counter_set: %s\n", counter_set_name);
+                    print_counter_sample(counterSampleBuf, 0, counterSet, "start");
+                    print_counter_sample(counterSampleBuf, 1, counterSet, "end");
+                }
+            }
+        } // end per-kernel loop
 
         if (fs_probe_every > 0) {
             (void)unlink(fs_probe_path);

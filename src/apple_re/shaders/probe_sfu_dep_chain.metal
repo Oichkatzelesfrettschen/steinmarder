@@ -30,6 +30,23 @@ using namespace metal;
 //   xcrun -sdk macosx metal -c -O2 -o probe_sfu_dep_chain.air probe_sfu_dep_chain.metal
 //   xcrun -sdk macosx metallib probe_sfu_dep_chain.air -o probe_sfu_dep_chain.metallib
 
+// --- Loop-only baseline ---
+// Measures pure loop overhead (counter increment + compare + back-branch + XOR dep).
+// Subtract this from any probe's ns_per_iter to get the net compute time.
+// Run this in the SAME metal_probe_host invocation as your probe kernels to ensure
+// identical GPU clock state.
+kernel void probe_loop_only(
+    device float* out           [[buffer(0)]],
+    constant uint& n_iters      [[buffer(1)]],
+    uint gid                    [[thread_position_in_grid]])
+{
+    uint dummy = gid;
+    for (uint iter = 0u; iter < n_iters; iter++) {
+        dummy ^= iter;
+    }
+    out[gid] = float(dummy);
+}
+
 // --- EXP2 single dep-chain ---
 // Critical path: FMA(a, -0.5, 0.75) → EXP2 → back to a
 // ops_per_iter = 1 EXP2 + 1 FMA on critical path
@@ -239,6 +256,9 @@ kernel void probe_log2_dep4(
 // --- FMA dep chain × 4 per iter (baseline for EXP2/LOG2/FMAX/SELECT subtraction) ---
 // Same FMA params as EXP2 probe: fma(a, -0.5, 0.75). No SFU op.
 // Critical path: 4 × FMA(-0.5, 0.75) = a converges to 0.5 in ~50 iters.
+// CONTAMINATION WARNING: a* = 0.5 (exact power of 2); fma(0.5, -0.5, 0.75) = 0.5 exactly.
+// AGX appears to fast-path the identical-output FMA at the fixed point, producing
+// a 2-3× lower step time than the true 2.20 cyc latency. Use probe_fma4_osc_dep instead.
 kernel void probe_fma4_dep(
     device float* out           [[buffer(0)]],
     constant uint& n_iters      [[buffer(1)]],
@@ -253,6 +273,35 @@ kernel void probe_fma4_dep(
             a = fma(a, -0.5f, 0.75f);
             a = fma(a, -0.5f, 0.75f);
             a = fma(a, -0.5f, 0.75f);
+        }
+    }
+    out[gid] = a;
+}
+
+// --- FMA dep chain × 4 per iter (oscillating fixed point — clean baseline) ---
+//
+// fma(a, 0.7, 0.2): fixed point a* = 0.2 / (1-0.7) = 2/3 ≈ 0.6666...
+// 2/3 is NOT exactly representable in IEEE 754 single precision.
+// The iteration oscillates between adjacent floats:
+//   0x3F2AAAAB (0.6666666865) → 0x3F2AAAAA (0.6666666269) → 0x3F2AAAAB → ...
+// Because the result ALWAYS DIFFERS from the input by 1 ULP, AGX cannot apply
+// any same-value forwarding optimization. The dep chain always has true latency.
+//
+// Use this as the FMA baseline for all dep-chain subtraction measurements.
+kernel void probe_fma4_osc_dep(
+    device float* out           [[buffer(0)]],
+    constant uint& n_iters      [[buffer(1)]],
+    uint gid                    [[thread_position_in_grid]])
+{
+    float a = 0.5f + float(gid) * 1.0e-6f;
+
+    for (uint iter = 0u; iter < n_iters; iter++) {
+        #pragma clang fp reassociate(off)
+        {
+            a = fma(a, 0.7f, 0.2f);
+            a = fma(a, 0.7f, 0.2f);
+            a = fma(a, 0.7f, 0.2f);
+            a = fma(a, 0.7f, 0.2f);
         }
     }
     out[gid] = a;
@@ -395,6 +444,38 @@ kernel void probe_sqrt_dep4(
             a = sqrt(fma(a, 0.5f, 0.75f));
             a = sqrt(fma(a, 0.5f, 0.75f));
             a = sqrt(fma(a, 0.5f, 0.75f));
+        }
+    }
+    out[gid] = a;
+}
+
+// --- LOG2 clean dep chain × 4 per iter (v3 — arg ≉ power of 2) ---
+//
+// v2 fixed point: a*=1.0, arg=fma(1.0, 0.5, 1.5)=2.0 (exact power of 2).
+// Hypothesis for 37% discrepancy vs Philip: AGX SFU has a slow path for args that
+// are exact powers of 2 (or macOS 26 SDK polynomial is longer than Philip's SDK).
+//
+// v3 fix: use fma(a, 0.4, 1.5). Fixed point:
+//   a* = log2(0.4×a* + 1.5)  →  numerically: a*≈0.894, arg=0.4×0.894+1.5≈1.858
+//   1.858 is NOT a power of 2 (between 1.5 and 2.0). Convergence: slope≈0.311 at a*.
+//   arg stays in [1.5, 2.0] throughout iteration; valid, non-degenerate range.
+//
+// If v3 ≈ Philip (4.31 cyc), v2 discrepancy was the arg=2.0 slow path.
+// If v3 still shows ~5.9 cyc, the discrepancy is real (SDK-level algorithm change).
+kernel void probe_log2_v3_dep4(
+    device float* out           [[buffer(0)]],
+    constant uint& n_iters      [[buffer(1)]],
+    uint gid                    [[thread_position_in_grid]])
+{
+    float a = 0.5f + float(gid) * 1.0e-6f;
+
+    for (uint iter = 0u; iter < n_iters; iter++) {
+        #pragma clang fp reassociate(off)
+        {
+            a = log2(fma(a, 0.4f, 1.5f));
+            a = log2(fma(a, 0.4f, 1.5f));
+            a = log2(fma(a, 0.4f, 1.5f));
+            a = log2(fma(a, 0.4f, 1.5f));
         }
     }
     out[gid] = a;

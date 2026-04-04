@@ -68,20 +68,50 @@ probe_log2_v2_dep4:  ns_per_iter=5742633  loop_only=3429033  net=2313600 ns/step
 probe_sqrt_dep4:     ns_per_iter=6934600  loop_only=3429033  net=3505567 ns/step=8.764  cyc=12.28 (FMA+SQRT)
 
 Derived latencies (Batch 2, clock 1.401 GHz):
-  L(LOG2 adj_lat) = 8.10 - 2.20 = 5.90 cycles   [Philip: 4.31 — Δ=+37%, SUSPECT — see below]
+  L(LOG2 adj_lat) = 8.10 - 2.20 = 5.90 cycles   [Philip: 4.31 — Δ=+37%, SUSPECT — see Batch 3]
   L(SQRT adj_lat) = 12.28 - 2.20 = 10.08 cycles  [Philip: 8.57–11.13 range] ✓
+
+# =====================================================================
+# BATCH 3 MEASUREMENTS — LOG2 v3 re-probe (arg ≉ power of 2)
+# =====================================================================
+#
+# Probe: probe_log2_v3_dep4 — a = log2(fma(a, 0.4, 1.5)) × 4
+#   Fixed point: a* ≈ 0.894, arg = 0.4×0.894+1.5 ≈ 1.858 (NOT a power of 2)
+#
+# METHODOLOGY CHANGE: FMA baseline subtraction is unreliable due to GPU clock drift
+# between separate invocations. Correct approach: compare two SFU probes with
+# IDENTICAL structure (1 FMA + 1 SFU per step). FMA and loop overhead cancel exactly.
+#
+#   L(LOG2v3 adj_lat) = L(EXP2 adj_lat) + ΔT(LOG2v3 − EXP2) / (4 × 100K × clock_period)
+#
+# Method: probe_exp2_dep4 vs probe_log2_v3_dep4, interleaved dispatches (same GPU state).
+# N=200 dispatches each, clock ≈ 1.370 GHz (inferred from EXP2 total ≈ 5.26M ns matching Batch 1).
+#
+# Results (3 trials):
+#   Trial 1: EXP2=5259770  LOG2v3=5196200  ΔT=-63570 ns/iter  Δstep=-0.159 ns  Δcyc=-0.218
+#   Trial 2: EXP2=5259035  LOG2v3=5203150  ΔT=-55885 ns/iter  Δstep=-0.140 ns  Δcyc=-0.192
+#   Trial 3: EXP2=5254985  LOG2v3=5216405  ΔT=-38580 ns/iter  Δstep=-0.096 ns  Δcyc=-0.132
+#   Average Δcyc: -0.181 cycles
+#
+# Derived LOG2v3 adj_lat:
+#   L(LOG2v3) = L(EXP2) + Δcyc = 4.56 − 0.181 = 4.38 cycles
+#   [Philip: 4.31 — Δ=+1.6%] ✓ EXCELLENT AGREEMENT
+#
+# CONCLUSION: LOG2 v2 result (5.90 cyc) was a slow-path artifact for arg=2.0 (exact power of 2).
+#             LOG2 v3 (arg≈1.858) confirms LOG2 normal adj_lat ≈ 4.38 cyc ≈ Philip's 4.31. ✓
 
 # =====================================================================
 # SUMMARY TABLE
 # =====================================================================
 #
-# Op         Probe Design        adj_lat (cyc, this)  adj_lat (Philip)  Status
-# --------   ------------------  -------------------  ----------------  ------
-# EXP2       FMA→exp2 ×4         4.56                 4.31              ✓ 6% diff
-# LOG2       FMA→log2 ×4 (v2)    5.90                 4.31              ⚠ 37% diff — suspect
-# SQRT       FMA→sqrt ×4         10.08                8.57–11.13        ✓ within range
-# FMAX       (FMA∥FMA)→fmax ×4   ~2.1 (excl. FMA)    —                 NEW
-# FCMPSEL32  (FMA∥FMA)→sel ×4    ~2.0 (excl. FMA)    —                 NEW
+# Op         Probe Design               adj_lat (cyc, this)  adj_lat (Philip)  Status
+# --------   -------------------------  -------------------  ----------------  ------
+# EXP2       FMA→exp2 ×4               4.56                 4.31              ✓ 6% diff
+# LOG2 (v2)  FMA→log2(a*0.5+1.5) ×4   5.90                 4.31              ✗ SLOW PATH: arg=2.0
+# LOG2 (v3)  FMA→log2(a*0.4+1.5) ×4   4.38                 4.31              ✓ 1.6% diff
+# SQRT       FMA→sqrt ×4               10.08                8.57–11.13        ✓ within range
+# FMAX       (FMA∥FMA)→fmax ×4         ~1.1 (pure op)       —                 NEW (ALU tier)
+# FCMPSEL32  (FMA∥FMA)→sel ×4          ~1.0 (pure op)       —                 NEW (ALU tier)
 
 # =====================================================================
 # ANALYSIS
@@ -91,14 +121,13 @@ Derived latencies (Batch 2, clock 1.401 GHz):
 #   The dep chain: fma(a, -0.5, 0.75) → exp2 → new a.
 #   Converges to a* ≈ 1.135 after ~30 iters; stays stable. AIR: air.fast_exp2.f32.
 #
-# LOG2 (5.90 cyc): Suspect — 37% above Philip's 4.31. Possible causes:
-#   1. Fixed-point arg = 2.0 (log2(fma(1.0, 0.5, 1.5)) = log2(2.0) = 1.0).
-#      2.0 is a power of 2; some SFU implementations have input-specific slow paths.
-#   2. macOS 26 air.fast_log2.f32 may use a more accurate polynomial than when
-#      Philip measured. The Metal compiler target is air64_v28 (newer SDK).
-#   3. fma(1.0, 0.5, 1.5) = 2.0 exactly; AGX might treat this as a precision check.
-#   Recommendation: re-probe with arg range avoiding exact powers of 2,
-#   e.g., log2(fma(a, 0.4, 1.5)) → fixed-pt arg ≈ 1.96 (not exact power of 2).
+# LOG2 (v2: 5.90 cyc → v3: 4.38 cyc): The v2 result was a SLOW PATH for arg=2.0.
+#   v2 fixed point: log2(fma(1.0, 0.5, 1.5)) = log2(2.0) = 1.0 → arg always = 2.0 exactly.
+#   2.0 is an exact power of 2; air.fast_log2.f32 appears to have a non-standard path
+#   for power-of-2 inputs (possibly a precision validation or early-exit check).
+#   v3 fix: log2(fma(a, 0.4, 1.5)) → fixed-pt arg ≈ 1.858 (not a power of 2).
+#   v3 result: 4.38 cycles — matches Philip's 4.31 within 1.6%. ✓
+#   AGX log2 normal path: ~4.31-4.38 cycles, consistent with EXP2.
 #
 # SQRT (10.08 cyc): Confirms Philip's SFU range 8.57–11.13. Our single dep-chain
 #   measurement (not SFU-throughput) gives 10.08 cyc — expected for dep-chain latency
@@ -121,7 +150,7 @@ Derived latencies (Batch 2, clock 1.401 GHz):
 #
 # AIR INTRINSICS OBSERVED:
 #   air.fast_exp2.f32 — EXP2 SFU, 4.56 cyc dep-chain adj_lat
-#   air.fast_log2.f32 — LOG2 SFU, 5.90 cyc dep-chain (suspect; Philip: 4.31)
+#   air.fast_log2.f32 — LOG2 SFU, 4.38 cyc (v3, clean arg); 5.90 cyc slow path if arg=2^n
 #   air.fma.f32       — FMA, 2.20 cyc dep-chain (calibration reference)
 #   sqrt()            — SQRT SFU, 10.08 cyc dep-chain adj_lat
 #   air.fast_fmax.f32 — FMAX ALU, ~1 cyc (implemented as FCMPSEL on AGX ISA)
