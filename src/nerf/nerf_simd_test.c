@@ -21,6 +21,28 @@
 
 /* ===== Test Utilities ===== */
 
+static uint32_t read_env_u32(const char *name, uint32_t fallback) {
+    const char *env = getenv(name);
+    if (!env || !env[0]) return fallback;
+    {
+        char *end = NULL;
+        unsigned long value = strtoul(env, &end, 10);
+        if (end && *end == '\0' && value > 0) {
+            return (uint32_t)value;
+        }
+    }
+    return fallback;
+}
+
+static int read_env_bool(const char *name, int fallback) {
+    const char *env = getenv(name);
+    if (!env || !env[0]) return fallback;
+    if (strcmp(env, "0") == 0 || strcmp(env, "false") == 0 || strcmp(env, "FALSE") == 0) {
+        return 0;
+    }
+    return 1;
+}
+
 typedef struct {
     const char *name;
     uint64_t start_cycle;
@@ -235,7 +257,9 @@ void test_volume_integration(void) {
     }
     
     /* Create test framebuffer (small for speed) */
-    uint32_t width = 256, height = 256;
+    uint32_t width = read_env_u32("SM_NERF_TEST_W", 256);
+    uint32_t height = read_env_u32("SM_NERF_TEST_H", 256);
+    uint32_t test_steps = read_env_u32("SM_NERF_TEST_STEPS", 128);
     NeRFFramebuffer fb = {
         .width = width,
         .height = height,
@@ -261,9 +285,12 @@ void test_volume_integration(void) {
     cam.origin = cam_pos;
     
     /* Benchmark rendering */
-    printf("Rendering %u x %u = %u pixels with 128 steps per ray\n", width, height, width * height);
+    printf("Rendering %u x %u = %u pixels with %u steps per ray\n", width, height, width * height, test_steps);
     
     clock_t t0 = clock();
+    if (read_env_bool("SM_NERF_PHASE_TIMING", 0)) {
+        sm_nerf_phase_timing_reset();
+    }
     
     for (uint32_t y = 0; y < height; y++) {
         for (uint32_t x = 0; x < width; x += SIMD_BATCH_SIZE) {
@@ -286,7 +313,7 @@ void test_volume_integration(void) {
                 batch.active[i] = (x + i < width) ? 1 : 0;
             }
             
-            sm_volume_integrate_batch(&batch, &data->config, data, &fb, 128, 4.0f, 8.0f);
+            sm_volume_integrate_batch(&batch, &data->config, data, &fb, test_steps, 4.0f, 8.0f);
         }
     }
     
@@ -300,19 +327,25 @@ void test_volume_integration(void) {
            1000.0 / (elapsed_ms * (1920.0 * 1080.0 / (width * height))));
     
     /* Save output */
-    FILE *f = fopen("nerf_simd_test_output.ppm", "wb");
-    if (f) {
-        fprintf(f, "P6\n%u %u\n255\n", width, height);
-        for (uint32_t i = 0; i < width * height; i++) {
-            uint8_t r = (uint8_t)(fb.pixels[i].rgb.x * 255.0f);
-            uint8_t g = (uint8_t)(fb.pixels[i].rgb.y * 255.0f);
-            uint8_t b = (uint8_t)(fb.pixels[i].rgb.z * 255.0f);
-            fputc(r, f);
-            fputc(g, f);
-            fputc(b, f);
+    if (read_env_bool("SM_NERF_PHASE_TIMING", 0)) {
+        sm_nerf_phase_timing_report("volume_integration");
+    }
+
+    if (read_env_bool("SM_NERF_TEST_WRITE_PPM", 1)) {
+        FILE *f = fopen("nerf_simd_test_output.ppm", "wb");
+        if (f) {
+            fprintf(f, "P6\n%u %u\n255\n", width, height);
+            for (uint32_t i = 0; i < width * height; i++) {
+                uint8_t r = (uint8_t)(fb.pixels[i].rgb.x * 255.0f);
+                uint8_t g = (uint8_t)(fb.pixels[i].rgb.y * 255.0f);
+                uint8_t b = (uint8_t)(fb.pixels[i].rgb.z * 255.0f);
+                fputc(r, f);
+                fputc(g, f);
+                fputc(b, f);
+            }
+            fclose(f);
+            printf("  Wrote nerf_simd_test_output.ppm\n");
         }
-        fclose(f);
-        printf("  Wrote nerf_simd_test_output.ppm\n");
     }
     
     free(fb.pixels);
