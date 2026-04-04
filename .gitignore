@@ -43,16 +43,23 @@ temp_*/
 *.bak
 *.orig
 
-# Generated SASS RE sweep artifacts
+# Generated SASS RE sweep artifacts (both legacy and reorganized paths)
 src/sass_re/results/runs/
 src/sass_re/results/plan_impl_*/
 src/sass_re/results/ncu_full_*/
 src/sass_re/results/flag_sweep/
 src/sass_re/results/full_profile/
+src/re/sass/results/runs/
+src/re/sass/results/plan_impl_*/
+src/re/sass/results/ncu_full_*/
+src/re/sass/results/flag_sweep/
+src/re/sass/results/full_profile/
 
 # Compiled benchmark binaries (rebuild from source)
 src/sass_re/results/precision_build/benchmarks/microbench_*
 !src/sass_re/results/precision_build/benchmarks/microbench_*.txt
+src/re/sass/results/precision_build/benchmarks/microbench_*
+!src/re/sass/results/precision_build/benchmarks/microbench_*.txt
 
 # Apple RE generated run artifacts (keep promoted blessed snapshots)
 src/apple_re/results/metal_probe/
@@ -60,12 +67,32 @@ src/apple_re/results/tranche1_manual_*/
 src/apple_re/results/tranche1_*/
 !src/apple_re/results/blessed/
 !src/apple_re/results/blessed/**
+src/re/apple/results/metal_probe/
+src/re/apple/results/metal_probe_*/
+src/re/apple/results/*/metal_probe/
+src/re/apple/results/*/metal_probe_variants/
+src/re/apple/results/tranche1_manual_*/
+src/re/apple/results/tranche1_*/
+!src/re/apple/results/blessed/
+!src/re/apple/results/blessed/**
 
 # x130e / TeraScale imported and generated run artifacts (keep blessed snapshots)
 src/sass_re/results/x130e_terascale/imports/
 src/sass_re/results/x130e_terascale/workspace/
 !src/sass_re/results/x130e_terascale/blessed/
 !src/sass_re/results/x130e_terascale/blessed/**
+src/re/r600/results/x130e_terascale/imports/
+src/re/r600/results/x130e_terascale/workspace/
+!src/re/r600/results/x130e_terascale/blessed/
+!src/re/r600/results/x130e_terascale/blessed/**
+
+# Metal shader build intermediates
+*.air
+*.metallib
+
+# Compiled probe host binaries
+src/re/apple/host/metal_probe_host
+src/re/apple/host/sm_apple_*
 
 # CUDA compiled intermediates
 *.cubin
@@ -87,3 +114,5 @@ src/sass_re/results/x130e_terascale/workspace/
 *.synctex.gz
 src/sass_re/tex/build/
 src/sass_re/tex/test_*
+src/re/sass/tex/build/
+src/re/sass/tex/test_*
