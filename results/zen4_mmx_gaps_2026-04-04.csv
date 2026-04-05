@@ -1,0 +1,37 @@
+probe=mmx_gaps
+iterations=30000
+working_set_bytes=67108864
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+Measuring missing MMX register (mm) gap-fill instruction forms...
+
+mnemonic,operands,extension,latency_cycles,throughput_cycles,category
+PADDQ,mm,mm,MMX/SSE2,1.3221,1.1882,mmx_arith
+PSUBQ,mm,mm,MMX/SSE2,1.3225,1.1780,mmx_arith
+PSUBUSB,mm,mm,MMX,0.9617,0.7821,mmx_arith
+PSUBUSW,mm,mm,MMX,0.9619,0.7815,mmx_arith
+PSUBSB,mm,mm,MMX,0.9617,0.7815,mmx_arith
+PSUBSW,mm,mm,MMX,0.9623,0.7818,mmx_arith
+PMULHUW,mm,mm,MMX/SSE,2.2848,1.8932,mmx_mul
+PMULUDQ,mm,mm,MMX/SSE2,2.2869,1.2377,mmx_mul
+PSHUFW,mm,mm,$1B,MMX/SSE,0.0004,0.7833,mmx_shuf
+PEXTRW,r32,mm,$n,MMX/SSE,0.0156,0.1354,mmx_insert
+PINSRW,mm,r32,$n,MMX/SSE,0.0002,1.3389,mmx_insert
+PAVGB,mm,mm,MMX/SSE,0.9777,0.7799,mmx_stat
+PAVGW,mm,mm,MMX/SSE,1.0373,0.7802,mmx_stat
+PSADBW,mm,mm,MMX/SSE,1.4575,0.6871,mmx_stat
+PMAXUB,mm,mm,MMX/SSE,0.0156,0.7816,mmx_minmax
+PMINUB,mm,mm,MMX/SSE,0.0158,1.0071,mmx_minmax
+PMAXSW,mm,mm,MMX/SSE,0.0156,0.7814,mmx_minmax
+PMINSW,mm,mm,MMX/SSE,0.0158,0.7816,mmx_minmax
+PSLLW,mm,mm,MMX,1.8035,1.1496,mmx_shift
+PSLLD,mm,mm,MMX,1.8029,1.2532,mmx_shift
+PSLLQ,mm,mm,MMX,1.8031,1.1494,mmx_shift
+PSRLW,mm,mm,MMX,1.8031,1.1495,mmx_shift
+PSRLD,mm,mm,MMX,1.8027,1.1496,mmx_shift
+PSRLQ,mm,mm,MMX,1.8867,1.1440,mmx_shift
+PSRAW,mm,mm,MMX,1.7944,1.1439,mmx_shift
+PSRAD,mm,mm,MMX,1.7946,1.1440,mmx_shift
+PSHUFB,mm,mm,SSSE3,1.7944,1.1863,mmx_ssse3
+PALIGNR,mm,mm,$4,SSSE3,1.7944,1.6190,mmx_ssse3

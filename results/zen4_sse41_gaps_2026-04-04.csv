@@ -1,0 +1,26 @@
+probe=sse41_gaps
+iterations=30000
+working_set_bytes=67108864
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+Measuring missing SSE4.1 gap-fill instruction forms...
+
+mnemonic,operands,extension,latency_cycles,throughput_cycles,category
+BLENDPD,xmm,xmm,$0x1,SSE4.1,0.0342,0.2695,sse41_blend
+BLENDPS,xmm,xmm,$0x5,SSE4.1,0.0354,0.2694,sse41_blend
+BLENDVPD,xmm,xmm,xmm0,SSE4.1,0.0352,0.4577,sse41_blendv
+BLENDVPS,xmm,xmm,xmm0,SSE4.1,0.0342,0.2695,sse41_blendv
+PBLENDVB,xmm,xmm,xmm0,SSE4.1,0.0344,0.2695,sse41_blendv
+EXTRACTPS,r32,xmm,$n,SSE4.1,-1.0000,0.3032,sse41_insert
+INSERTPS,xmm,xmm,$0x10,SSE4.1,0.0342,0.4314,sse41_insert
+PBLENDW,xmm,xmm,$0x55,SSE4.1,0.0342,0.2697,sse41_blend
+PINSRB,xmm,r32,$n,SSE4.1,0.0344,1.0773,sse41_insert
+PINSRD,xmm,r32,$n,SSE4.1,0.0342,1.0776,sse41_insert
+PINSRQ,xmm,r64,$n,SSE4.1,0.0006,1.1610,sse41_insert
+PINSRW,xmm,r32,$n,SSE4.1,0.0342,0.9208,sse41_insert
+PTEST,xmm,xmm,SSE4.1,-1.0000,0.0906,sse41_test
+ROUNDPD,xmm,xmm,$0,SSE4.1,1.4496,0.2428,sse41_round
+ROUNDPS,xmm,xmm,$0,SSE4.1,1.4521,0.3448,sse41_round
+ROUNDSD,xmm,xmm,$0,SSE4.1,0.0458,0.2422,sse41_round
+ROUNDSS,xmm,xmm,$0,SSE4.1,0.0458,0.2419,sse41_round

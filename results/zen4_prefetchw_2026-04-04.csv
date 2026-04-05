@@ -1,0 +1,6 @@
+mnemonic,operands,latency_cycles,throughput_cycles,category
+PREFETCHW,[m8],-1.0000,0.3598,3dnow_prefetch
+PREFETCHT0,[m8],-1.0000,0.3601,sse_prefetch
+PREFETCHT1,[m8],-1.0000,0.3604,sse_prefetch
+PREFETCHT2,[m8],-1.0000,0.2780,sse_prefetch
+PREFETCHNTA,[m8],-1.0000,0.1598,sse_prefetch

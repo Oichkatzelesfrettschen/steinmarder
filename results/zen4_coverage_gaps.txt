@@ -1,0 +1,40 @@
+========================================================================
+Zen 4 Coverage Gap Report
+Generated from 1267 measured instruction forms
+Measured unique mnemonics: 850
+========================================================================
+
+--- AVX (10 missing / 93 known) ---
+  VBROADCASTF128
+  VMOVHPD
+  VMOVHPS
+  VMOVSD
+  VMOVSS
+  VMOVUPD
+  VMOVUPS
+  VTESTPD
+  VTESTPS
+  VZEROALL
+
+--- AVX-512F (2 missing / 152 known) ---
+  VFIXUPIMMPD
+  VFPCLASSPD
+
+--- FMA4 (8 missing / 20 known) ---
+  VFMADDPD
+  VFMADDPS
+  VFMADDSD
+  VFMADDSS
+  VFNMADDSD
+  VFNMADDSS
+  VFNMSUBSD
+  VFNMSUBSS
+
+--- SSSE3 (1 missing / 14 known) ---
+  PMULHRSW
+
+========================================================================
+Total known instruction mnemonics: 1011
+Total missing: 21
+Coverage: 97.9%
+========================================================================
