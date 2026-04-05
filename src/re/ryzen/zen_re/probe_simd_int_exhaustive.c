@@ -733,10 +733,10 @@ YMM_TP_BINARY(pmaxud_ymm_tp, _mm256_max_epu32, _mm256_set1_epi32, 10)
  * LOGIC -- PAND, PANDN, POR, PXOR
  * ======================================================================== */
 
-XMM_LAT_BINARY(pand_xmm_lat, _mm_and_si128, _mm_set1_epi32(0x7FFFFFFF))
-XMM_TP_BINARY(pand_xmm_tp, _mm_and_si128, _mm_set1_epi32, 0x7FFFFFFF)
-YMM_LAT_BINARY(pand_ymm_lat, _mm256_and_si256, _mm256_set1_epi32(0x7FFFFFFF))
-YMM_TP_BINARY(pand_ymm_tp, _mm256_and_si256, _mm256_set1_epi32, 0x7FFFFFFF)
+XMM_LAT_BINARY(pand_xmm_lat, _mm_and_si128, _mm_set1_epi32(0x7FFFFF00))
+XMM_TP_BINARY(pand_xmm_tp, _mm_and_si128, _mm_set1_epi32, 0x7FFFFF00)
+YMM_LAT_BINARY(pand_ymm_lat, _mm256_and_si256, _mm256_set1_epi32(0x7FFFFF00))
+YMM_TP_BINARY(pand_ymm_tp, _mm256_and_si256, _mm256_set1_epi32, 0x7FFFFF00)
 
 XMM_LAT_BINARY(pandn_xmm_lat, _mm_andnot_si128, _mm_set1_epi32(0x0F0F0F0F))
 XMM_TP_BINARY(pandn_xmm_tp, _mm_andnot_si128, _mm_set1_epi32, 0x0F0F0F0F)
