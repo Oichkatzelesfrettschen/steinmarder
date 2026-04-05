@@ -2,16 +2,16 @@ mnemonic,encoding_family,width_bits,operand_pattern,extension,mode_validity,sour
 PREFETCHW,gpr,0,[m8],3DNow!_PREFETCH,valid,zen4_prefetchw_2026-04-04.csv,direct_measurement,-1.0000,0.3598,,3dnow_prefetch,same_issue_cost_as_other_prefetch_hints_under_microbenchmark,measured
 LZCNT,gpr,0,"r64,r64",ABM,valid,zen4_scalar_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.4883,0.1374,,bit,,measured
 POPCNT,gpr,0,"r64,r64",ABM,valid,zen4_scalar_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.5046,0.1374,,bit,,measured
-VBROADCASTF128,vex,256,ymm m128,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,,,measured
-VMOVHPD,vex,128,xmm m64,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2370,filled_from_gap_probe,,,measured
-VMOVHPS,vex,128,xmm m64,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,,,measured
-VMOVSD,vex,128,xmm xmm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.1186,filled_from_gap_probe,,,measured
-VMOVSS,vex,128,xmm xmm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.1794,filled_from_gap_probe,,,measured
-VMOVUPD,vex,256,ymm m256,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2584,filled_from_gap_probe,,,measured
-VMOVUPS,vex,256,ymm m256,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,,,measured
-VTESTPD,vex,256,ymm ymm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4741,filled_from_gap_probe,,,measured
-VTESTPS,vex,256,ymm ymm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4740,filled_from_gap_probe,,,measured
-VZEROALL,vex,256,,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,2.8439,filled_from_gap_probe,,,measured
+VBROADCASTF128,vex,256,ymm m128,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,move,,measured
+VMOVHPD,vex,128,xmm m64,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2370,filled_from_gap_probe,move,,measured
+VMOVHPS,vex,128,xmm m64,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,move,,measured
+VMOVSD,vex,128,xmm xmm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.1186,filled_from_gap_probe,move,,measured
+VMOVSS,vex,128,xmm xmm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.1794,filled_from_gap_probe,move,,measured
+VMOVUPD,vex,256,ymm m256,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2584,filled_from_gap_probe,move,,measured
+VMOVUPS,vex,256,ymm m256,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.2371,filled_from_gap_probe,move,,measured
+VTESTPD,vex,256,ymm ymm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4741,filled_from_gap_probe,compare,,measured
+VTESTPS,vex,256,ymm ymm,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4740,filled_from_gap_probe,compare,,measured
+VZEROALL,vex,256,,AVX,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,2.8439,filled_from_gap_probe,state_control,,measured
 VANDNPD,vex,128,"xmm,xmm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.5006,0.1253,,bitwise,,measured
 VANDNPD,vex,256,"ymm,ymm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.5015,0.1256,,bitwise,,measured
 VANDNPS,vex,128,"xmm,xmm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.5010,0.1255,,bitwise,,measured
@@ -157,8 +157,8 @@ VUNPCKLPD,vex,128,"xmm,xmm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agn
 VUNPCKLPD,vex,256,"ymm,ymm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.4954,0.2105,,shuffle,,measured
 VUNPCKLPS,vex,128,"xmm,xmm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.4996,0.2401,,shuffle,,measured
 VUNPCKLPS,vex,256,"ymm,ymm",AVX,valid,zen4_simd_fp_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.4954,0.2105,,shuffle,,measured
-VPMADDUBSW,evex,512,,AVX-512BW,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.5013,0.4845,,,,measured
-VPMADDWD,evex,512,,AVX-512BW,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4409,0.4811,,,,measured
+VPMADDUBSW,evex,512,,AVX-512BW,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.5013,0.4845,,dot_product_building_block,,measured
+VPMADDWD,evex,512,,AVX-512BW,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4409,0.4811,,dot_product_building_block,,measured
 VPABSB,evex,512,zmm,AVX-512BW,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0003,0.4900,,arith_abs,,measured
 VPABSW,evex,512,zmm,AVX-512BW,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0003,0.4898,,arith_abs,,measured
 VPADDB,evex,512,"zmm,zmm",AVX-512BW,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0163,0.2669,,arith_add,,measured
@@ -218,8 +218,8 @@ VPMINSQ,evex,512,"zmm,zmm",AVX-512DQ,valid,zen4_avx512_int_exhaustive_2026-04-04
 VPMINUQ,evex,512,"zmm,zmm",AVX-512DQ,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0006,0.4895,,arith_minmax,,measured
 VPMULLQ,evex,512,"zmm,zmm",AVX-512DQ,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0459,0.5397,,arith_mul,,measured
 VPSRAQ,evex,512,"zmm,imm",AVX-512DQ,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0163,0.4800,,shift_imm,,measured
-VFIXUPIMMPD,evex,512,zmm zmm zmm imm,AVX-512F,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4741,filled_from_gap_probe,,,measured
-VFPCLASSPD,evex,512,k zmm imm,AVX-512F,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4743,filled_from_gap_probe,,,measured
+VFIXUPIMMPD,evex,512,zmm zmm zmm imm,AVX-512F,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4741,filled_from_gap_probe,fp_fixup,,measured
+VFPCLASSPD,evex,512,k zmm imm,AVX-512F,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4743,filled_from_gap_probe,fp_classify,,measured
 VPABSD,evex,512,zmm,AVX-512F,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0006,0.4900,,arith_abs,,measured
 VPADDD,evex,512,"zmm,zmm",AVX-512F,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0159,0.2698,,arith_add,,measured
 VPADDQ,evex,512,"zmm,zmm",AVX-512F,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0159,0.2672,,arith_add,,measured
@@ -463,9 +463,9 @@ VPDPWSSD,evex,512,"zmm,zmm,zmm",AVX-512_VNNI,valid,zen4_avx512_int_exhaustive_20
 VPDPWSSDS,evex,512,"zmm,zmm,zmm",AVX-512_VNNI,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,1.9272,0.4825,,dot_product_vnni_int,,measured
 VPOPCNTD,evex,512,zmm,AVX-512_VPOPCNTDQ,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.9631,0.4825,,bitmanip,,measured
 VPOPCNTQ,evex,512,zmm,AVX-512_VPOPCNTDQ,valid,zen4_avx512_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0003,0.4811,,bitmanip,,measured
-VMPSADBW,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,2.4116,1.0353,,,,measured
-VPMADDUBSW,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4591,0.3644,,,,measured
-VPMADDWD,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4359,0.3599,,,,measured
+VMPSADBW,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,2.4116,1.0353,,dot_product_building_block,,measured
+VPMADDUBSW,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4591,0.3644,,dot_product_building_block,,measured
+VPMADDWD,vex,256,,AVX2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4359,0.3599,,dot_product_building_block,,measured
 VPBLENDD,vex,256,"ymm,ymm,ymm,$0x55",AVX2,valid,zen4_avx2_gaps_2026-04-04.csv,agner_fog_zen4_table,0.0156,0.1199,filled_from_gap_probe,avx2_blend,,measured
 VPHADDD,vex,256,"ymm,ymm,ymm",AVX2,valid,zen4_avx2_gaps_2026-04-04.csv,agner_fog_zen4_table,2.1435,2.1439,filled_from_gap_probe,avx2_hadd,,measured
 VPHADDW,vex,256,"ymm,ymm,ymm",AVX2,valid,zen4_avx2_gaps_2026-04-04.csv,agner_fog_zen4_table,2.0806,0.9570,filled_from_gap_probe,avx2_hadd,,measured
@@ -821,7 +821,7 @@ PREFETCHNTA,gpr,0,[m8],SSE,valid,zen4_prefetchw_2026-04-04.csv,direct_measuremen
 PREFETCHT0,gpr,0,[m8],SSE,valid,zen4_prefetchw_2026-04-04.csv,direct_measurement,-1.0000,0.3601,,sse_prefetch,,measured
 PREFETCHT1,gpr,0,[m8],SSE,valid,zen4_prefetchw_2026-04-04.csv,direct_measurement,-1.0000,0.3604,,sse_prefetch,,measured
 PREFETCHT2,gpr,0,[m8],SSE,valid,zen4_prefetchw_2026-04-04.csv,direct_measurement,-1.0000,0.2780,,sse_prefetch,,measured
-PMADDWD,legacy,128,,SSE2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4359,0.3590,,,,measured
+PMADDWD,legacy,128,,SSE2,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4359,0.3590,,dot_product_building_block,,measured
 PADDB,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0160,0.1232,,arith_add,,measured
 PADDD,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0158,0.1222,,arith_add,,measured
 PADDQ,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0158,0.1224,,arith_add,,measured
@@ -977,7 +977,7 @@ PUNPCKLBW,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.cs
 PUNPCKLDQ,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0396,0.2075,,unpack,,measured
 PUNPCKLQDQ,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0288,0.4879,,unpack,,measured
 PUNPCKLWD,legacy,128,"xmm,xmm",SSE2,valid,zen4_simd_int_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.0565,0.2077,,unpack,,measured
-MPSADBW,legacy,128,,SSE4.1,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,2.4164,0.9691,,,,measured
+MPSADBW,legacy,128,,SSE4.1,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,2.4164,0.9691,,dot_product_building_block,,measured
 DPPD,legacy,128,,SSE4.1,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,3.3621,1.4966,,dot_product_legacy_fp,,measured
 DPPD,legacy,128,"xmm,xmm,$31",SSE4.1,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,3.4018,1.4492,,dot_product_legacy_fp,,measured
 DPPD,legacy,128,"xmm,xmm,$33",SSE4.1,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,3.3646,1.4296,,dot_product_legacy_fp,,measured
@@ -1015,8 +1015,8 @@ EXTRQ,legacy,128,"xmm,$8,$0",SSE4a,valid,zen4_legacy_exhaustive_2026-04-04.csv,a
 INSERTQ,legacy,128,"xmm,xmm,$8,$0",SSE4a,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,1.6178,0.3311,,sse4a,,measured
 MOVNTSD,legacy,128,"[m64],xmm",SSE4a,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,-1.0000,25.9926,,sse4a_nt,,measured
 MOVNTSS,legacy,128,"[m32],xmm",SSE4a,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,-1.0000,0.4897,,sse4a_nt,,measured
-PMADDUBSW,legacy,128,,SSSE3,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4512,0.4222,,,,measured
-PMULHRSW,legacy,128,xmm xmm,SSSE3,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,1.4229,0.2372,filled_from_gap_probe,,,measured
+PMADDUBSW,legacy,128,,SSSE3,valid,zen4_dotproduct_complete_2026-04-04.csv,direct_measurement,1.4512,0.4222,,dot_product_building_block,,measured
+PMULHRSW,legacy,128,xmm xmm,SSSE3,valid,zen4_final_gaps_2026-04-04.csv,agner_fog_zen4_table,1.4229,0.2372,filled_from_gap_probe,arith_mul,,measured
 PALIGNR,legacy,64,"mm,mm,$4",SSSE3,valid,zen4_mmx_gaps_2026-04-04.csv,agner_fog_zen4_table,1.7944,1.6190,filled_from_gap_probe,mmx_ssse3,,measured
 PSHUFB,legacy,64,"mm,mm",SSSE3,valid,zen4_mmx_gaps_2026-04-04.csv,agner_fog_zen4_table,1.7944,1.1863,filled_from_gap_probe,mmx_ssse3,,measured
 PSIGNB,legacy,128,"xmm,xmm",SSSE3,valid,zen4_legacy_exhaustive_2026-04-04.csv,agner_fog_zen4_table,0.9782,0.2675,,ssse3_sign,,measured
