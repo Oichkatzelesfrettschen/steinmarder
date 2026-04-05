@@ -320,7 +320,7 @@ static float sm_hsum256_ps(__m256 v) {
            lanes[4] + lanes[5] + lanes[6] + lanes[7];
 }
 
-static void sm_mlp_inference_single_prepacked_data(
+void sm_mlp_inference_single_prepacked_data(
     const float features_in[27],
     const NeRFData *nerf_data,
     float rgb_out[3],
@@ -404,7 +404,7 @@ static void sm_mlp_inference_single_prepacked_data(
  *   32 pairs * 4 ZMMs = 128 vdpbf16ps.
  *
  * Output layer (W_out, 64->4): kept as FP32 AVX2 (only 4% of work). */
-static void sm_mlp_inference_single_bf16(
+void sm_mlp_inference_single_bf16(
     const float features_in[27],
     const NeRFData *nerf_data,
     float rgb_out[3],

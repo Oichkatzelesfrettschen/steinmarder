@@ -199,4 +199,20 @@ float sm_nerf_get_bounds(void);
 SMNeRFMLPVariant sm_nerf_mlp_variant(void);
 const char *sm_nerf_mlp_variant_name(SMNeRFMLPVariant variant);
 
+/* Prepacked FP32 single-ray inference (AVX2 fmadd, aligned loads) */
+void sm_mlp_inference_single_prepacked_data(
+    const float features_in[27],
+    const NeRFData *nerf_data,
+    float rgb_out[3],
+    float *sigma_out
+);
+
+/* BF16 single-ray inference (AVX-512 vdpbf16ps, pair-interleaved weights) */
+void sm_mlp_inference_single_bf16(
+    const float features_in[27],
+    const NeRFData *nerf_data,
+    float rgb_out[3],
+    float *sigma_out
+);
+
 #endif  /* NERF_SIMD_H */
