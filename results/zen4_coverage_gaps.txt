@@ -1,21 +1,25 @@
 ========================================================================
 Zen 4 Coverage Gap Report
-Generated from 1280 measured instruction forms
-Measured unique mnemonics: 863
+Generated from 1280 denormalized instruction forms
 ========================================================================
 
---- FMA4 (8 missing / 20 known) ---
-  VFMADDPD
-  VFMADDPS
-  VFMADDSD
-  VFMADDSS
-  VFNMADDSD
-  VFNMADDSS
-  VFNMSUBSD
-  VFNMSUBSS
+--- Layer 1: Architectural Mnemonic Universe ---
+  Total unique mnemonics across all extensions (deduplicated): 837
+  Mnemonics only in deprecated extensions (FMA4/XOP/3DNow!): 20
+  Valid Zen 4 mnemonic universe: 817
+
+--- Layer 3: Measured Mnemonic Universe ---
+  Measured unique mnemonics: 863
+  Measured mnemonics in valid universe: 817
+
+Coverage: 817 / 817 valid Zen 4 mnemonics measured (100.0%)
+
+--- Deprecated Extensions (not present on Zen 4) ---
+  FMA4: 20 mnemonics (not_present_on_zen4)
 
 ========================================================================
-Total known instruction mnemonics: 1011
-Total missing: 8
-Coverage: 99.2%
+Valid Zen 4 universe: 817 mnemonics
+Measured: 817
+Missing: 0
+Coverage: 100.0%
 ========================================================================

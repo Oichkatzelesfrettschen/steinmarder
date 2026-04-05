@@ -31,16 +31,19 @@ GAP_REPORT = RESULTS_DIR / "zen4_coverage_gaps.txt"
 
 UNIFIED_COLUMNS = [
     "mnemonic",
-    "operands",
+    "encoding_family",
     "width_bits",
-    "element_type",
-    "latency_cycles",
-    "throughput_cycles",
-    "category",
+    "operand_pattern",
     "extension",
-    "source_file",
-    "mode_64bit",
-    "encoding",
+    "mode_validity",
+    "source_row",
+    "source_kind",
+    "measured_latency_cy",
+    "measured_throughput_cy",
+    "normalization_note",
+    "semantic_category",
+    "microarchitectural_note",
+    "measurement_status",
 ]
 
 # Instructions invalid in 64-bit mode (removed from AMD64)
@@ -400,6 +403,61 @@ KNOWN_ZEN4_INSTRUCTIONS = {
         "CLFLUSH", "CLFLUSHOPT", "CLWB", "MOVNTI",
         "REP MOVSB", "REP STOSB", "REP CMPSB",
     ],
+}
+
+# Extensions that are architecturally defined but not present on Zen 4.
+DEPRECATED_EXTENSIONS = frozenset([
+    "FMA4", "3DNow!", "XOP",
+    "AVX-512ER", "AVX-512PF",
+    "AVX-512_4VNNIW", "AVX-512_4FMAPS",
+    "AVX-512FP16", "AVX-512VP2INTERSECT", "AMX",
+])
+
+# Map from mnemonic to semantic category.  Entries here override the
+# category that was present in the source CSV.
+SEMANTIC_CATEGORY_MAP = {
+    # Legacy GP BCD (all illegal in 64-bit long mode)
+    "AAA": "legacy_gp_bcd", "AAS": "legacy_gp_bcd",
+    "AAD": "legacy_gp_bcd", "AAM": "legacy_gp_bcd",
+    "DAA": "legacy_gp_bcd", "DAS": "legacy_gp_bcd",
+    # x87 packed-BCD load/store
+    "FBLD": "x87_packed_bcd", "FBSTP": "x87_packed_bcd",
+    # Dot products — legacy FP
+    "DPPS": "dot_product_legacy_fp", "DPPD": "dot_product_legacy_fp",
+    "VDPPS": "dot_product_legacy_fp",
+    # Dot products — VNNI integer
+    "VPDPBUSD": "dot_product_vnni_int", "VPDPBUSDS": "dot_product_vnni_int",
+    "VPDPWSSD": "dot_product_vnni_int", "VPDPWSSDS": "dot_product_vnni_int",
+    # Dot products — BF16
+    "VDPBF16PS": "dot_product_bf16",
+}
+
+# Map from mnemonic to microarchitectural note.
+MICROARCHITECTURAL_NOTE_MAP = {
+    "PREFETCHW": "same_issue_cost_as_other_prefetch_hints_under_microbenchmark",
+}
+
+# Map from source CSV base name to source_kind.
+SOURCE_KIND_MAP = {
+    "zen4_scalar_exhaustive":        "agner_fog_zen4_table",
+    "zen4_scalar_memory_exhaustive": "agner_fog_zen4_table",
+    "zen4_legacy_exhaustive":        "agner_fog_zen4_table",
+    "zen4_prefetchw":                "direct_measurement",
+    "zen4_x87_exhaustive":           "amd_volume_5_x87",
+    "zen4_x87_complete":             "amd_volume_5_x87",
+    "zen4_simd_int_exhaustive":      "agner_fog_zen4_table",
+    "zen4_simd_fp_exhaustive":       "agner_fog_zen4_table",
+    "zen4_avx512_int_exhaustive":    "agner_fog_zen4_table",
+    "zen4_avx512_fp_exhaustive":     "agner_fog_zen4_table",
+    "zen4_avx512_mask_exhaustive":   "agner_fog_zen4_table",
+    "zen4_dotproduct_complete":      "direct_measurement",
+    "zen4_avx2_gaps":                "agner_fog_zen4_table",
+    "zen4_final_gaps":               "agner_fog_zen4_table",
+    "zen4_fma_gaps":                 "agner_fog_zen4_table",
+    "zen4_mmx_gaps":                 "agner_fog_zen4_table",
+    "zen4_sse2_gaps":                "agner_fog_zen4_table",
+    "zen4_sse41_gaps":               "agner_fog_zen4_table",
+    "zen4_x86_gaps":                 "agner_fog_zen4_table",
 }
 
 
@@ -1009,6 +1067,46 @@ def parse_row_with_schema(raw_columns, data_line, filepath):
     return result_mapping
 
 
+def infer_source_kind(filepath):
+    """Determine source_kind from the source CSV filename."""
+    base_key = source_key(filepath)
+    return SOURCE_KIND_MAP.get(base_key, "agner_fog_zen4_table")
+
+
+def infer_semantic_category(mnemonic, raw_category):
+    """Return the semantic category, applying the override map first."""
+    upper_mnemonic = mnemonic.upper()
+    if upper_mnemonic in SEMANTIC_CATEGORY_MAP:
+        return SEMANTIC_CATEGORY_MAP[upper_mnemonic]
+    return raw_category
+
+
+def infer_microarchitectural_note(mnemonic):
+    """Return a microarchitectural note for this mnemonic if one exists."""
+    return MICROARCHITECTURAL_NOTE_MAP.get(mnemonic.upper(), "")
+
+
+def infer_measurement_status(mnemonic, extension, mode_validity,
+                             has_measurement):
+    """Classify the measurement status of this row."""
+    upper_mnemonic = mnemonic.upper()
+    upper_extension = (extension or "").upper()
+
+    # Deprecated extensions not present on Zen 4
+    if upper_extension in DEPRECATED_EXTENSIONS:
+        return "not_present_on_zen4"
+
+    # Instructions illegal in 64-bit long mode
+    if mode_validity == "illegal_in_long_mode":
+        return "illegal_in_long_mode"
+
+    # We have actual measurement data
+    if has_measurement:
+        return "measured"
+
+    return "architecturally_present_not_measured"
+
+
 def normalize_row(raw_row, filepath):
     """Convert a raw parsed row dict into the unified schema."""
     mnemonic = raw_row.get("mnemonic", "").strip().upper()
@@ -1042,31 +1140,52 @@ def normalize_row(raw_row, filepath):
     extension = infer_extension(mnemonic, operands, width_bits, category,
                                 explicit_extension)
 
-    # Element type
-    element_type = infer_element_type(mnemonic, operands, category,
-                                      precision_hint)
+    # Encoding family (was "encoding")
+    encoding_family = infer_encoding(mnemonic, operands, width_bits, extension)
 
-    # Encoding
-    encoding = infer_encoding(mnemonic, operands, width_bits, extension)
-
-    # Mode
-    mode_64bit = infer_mode_64bit(mnemonic)
+    # Mode validity
+    mode_validity = "valid"
+    if mnemonic.upper() in INVALID_64BIT_MNEMONICS:
+        mode_validity = "illegal_in_long_mode"
 
     # Source file
     source_basename = os.path.basename(filepath)
 
+    # Source kind
+    source_kind = infer_source_kind(filepath)
+
+    # Semantic category (with override map)
+    semantic_category = infer_semantic_category(mnemonic, category)
+
+    # Microarchitectural note
+    microarchitectural_note = infer_microarchitectural_note(mnemonic)
+
+    # Normalization note: flag if source used compressed notation
+    normalization_note = ""
+    base_source_key = source_key(filepath)
+    if "gaps" in base_source_key:
+        normalization_note = "filled_from_gap_probe"
+
+    # Measurement status
+    has_measurement = (latency_cycles > 0 or throughput_cycles > 0)
+    measurement_status = infer_measurement_status(
+        mnemonic, extension, mode_validity, has_measurement)
+
     return {
         "mnemonic": mnemonic,
-        "operands": operands,
+        "encoding_family": encoding_family,
         "width_bits": str(width_bits),
-        "element_type": element_type,
-        "latency_cycles": f"{latency_cycles:.4f}",
-        "throughput_cycles": f"{throughput_cycles:.4f}",
-        "category": category,
+        "operand_pattern": operands,
         "extension": extension,
-        "source_file": source_basename,
-        "mode_64bit": mode_64bit,
-        "encoding": encoding,
+        "mode_validity": mode_validity,
+        "source_row": source_basename,
+        "source_kind": source_kind,
+        "measured_latency_cy": f"{latency_cycles:.4f}",
+        "measured_throughput_cy": f"{throughput_cycles:.4f}",
+        "normalization_note": normalization_note,
+        "semantic_category": semantic_category,
+        "microarchitectural_note": microarchitectural_note,
+        "measurement_status": measurement_status,
     }
 
 
@@ -1075,20 +1194,20 @@ def normalize_row(raw_row, filepath):
 # ---------------------------------------------------------------------------
 
 def dedup_key(row):
-    """Create a deduplication key from mnemonic + operands + width."""
-    return (row["mnemonic"], row["operands"], row["width_bits"])
+    """Create a deduplication key from mnemonic + operand_pattern + width."""
+    return (row["mnemonic"], row["operand_pattern"], row["width_bits"])
 
 
 def deduplicate_rows(all_rows):
-    """Keep the highest-priority row for each (mnemonic, operands, width) tuple."""
+    """Keep the highest-priority row for each (mnemonic, operand_pattern, width) tuple."""
     best_rows = {}
     for row in all_rows:
         key = dedup_key(row)
         if key not in best_rows:
             best_rows[key] = row
         else:
-            existing_priority = priority_of(best_rows[key]["source_file"])
-            new_priority = priority_of(row["source_file"])
+            existing_priority = priority_of(best_rows[key]["source_row"])
+            new_priority = priority_of(row["source_row"])
             if new_priority >= existing_priority:
                 best_rows[key] = row
     return list(best_rows.values())
@@ -1106,50 +1225,127 @@ def build_measured_mnemonics(rows):
     return measured_set
 
 
+def build_architectural_universe():
+    """Build the deduplicated set of all known Zen 4 mnemonics (Layer 1).
+
+    Returns (all_known, deprecated_known) where:
+      all_known       -- every mnemonic across all extension lists, deduped
+      deprecated_known -- mnemonics that belong ONLY to deprecated extensions
+    """
+    all_known_mnemonics = set()
+    per_extension_sets = {}
+    for extension_name, instruction_list in KNOWN_ZEN4_INSTRUCTIONS.items():
+        extension_set = set()
+        for instruction_name in instruction_list:
+            canonical_name = instruction_name.upper()
+            all_known_mnemonics.add(canonical_name)
+            extension_set.add(canonical_name)
+        per_extension_sets[extension_name] = extension_set
+
+    # A mnemonic is "deprecated" if it appears ONLY in deprecated extensions.
+    deprecated_only_mnemonics = set()
+    for mnemonic in all_known_mnemonics:
+        hosting_extensions = [
+            ext_name for ext_name, ext_set in per_extension_sets.items()
+            if mnemonic in ext_set
+        ]
+        if all(ext_name in DEPRECATED_EXTENSIONS for ext_name in hosting_extensions):
+            deprecated_only_mnemonics.add(mnemonic)
+
+    return all_known_mnemonics, deprecated_only_mnemonics
+
+
 def generate_gap_report(rows, output_path):
-    """Write a gap report listing known Zen 4 instructions not in our data."""
+    """Write a mathematically rigorous gap report.
+
+    Layer 1 (Architectural Universe): deduplicated set of all known mnemonics.
+    Layer 3 (Measured Universe): unique mnemonics from our data.
+    Coverage = |measured intersection universe| / |universe| * 100.
+    """
     measured_mnemonics = build_measured_mnemonics(rows)
+    all_known_mnemonics, deprecated_only_mnemonics = build_architectural_universe()
+
+    # The valid Zen 4 universe excludes mnemonics present ONLY in deprecated extensions
+    valid_zen4_universe = all_known_mnemonics - deprecated_only_mnemonics
+    measured_in_universe = measured_mnemonics & valid_zen4_universe
+    missing_from_universe = valid_zen4_universe - measured_mnemonics
+
+    universe_size = len(valid_zen4_universe)
+    measured_count = len(measured_in_universe)
+    missing_count = len(missing_from_universe)
+    coverage_percentage = (measured_count / universe_size * 100
+                           if universe_size > 0 else 0.0)
 
     with open(output_path, "w") as report_file:
         report_file.write("=" * 72 + "\n")
         report_file.write("Zen 4 Coverage Gap Report\n")
-        report_file.write(f"Generated from {len(rows)} measured instruction forms\n")
-        report_file.write(f"Measured unique mnemonics: {len(measured_mnemonics)}\n")
+        report_file.write(f"Generated from {len(rows)} denormalized instruction forms\n")
         report_file.write("=" * 72 + "\n\n")
+        report_file.write("--- Layer 1: Architectural Mnemonic Universe ---\n")
+        report_file.write(f"  Total unique mnemonics across all extensions "
+                          f"(deduplicated): {len(all_known_mnemonics)}\n")
+        report_file.write(f"  Mnemonics only in deprecated extensions "
+                          f"(FMA4/XOP/3DNow!): {len(deprecated_only_mnemonics)}\n")
+        report_file.write(f"  Valid Zen 4 mnemonic universe: {universe_size}\n\n")
+        report_file.write("--- Layer 3: Measured Mnemonic Universe ---\n")
+        report_file.write(f"  Measured unique mnemonics: "
+                          f"{len(measured_mnemonics)}\n")
+        report_file.write(f"  Measured mnemonics in valid universe: "
+                          f"{measured_count}\n\n")
+        report_file.write(f"Coverage: {measured_count} / {universe_size} "
+                          f"valid Zen 4 mnemonics measured "
+                          f"({coverage_percentage:.1f}%)\n\n")
 
-        total_known_count = 0
-        total_missing_count = 0
-
+        # Per-extension breakdown of missing instructions
         for extension_name in sorted(KNOWN_ZEN4_INSTRUCTIONS.keys()):
+            if extension_name in DEPRECATED_EXTENSIONS:
+                continue  # skip deprecated extensions from the gap listing
             known_instruction_list = KNOWN_ZEN4_INSTRUCTIONS[extension_name]
-            missing_instructions = []
-            for instruction_name in sorted(set(known_instruction_list)):
-                if instruction_name.upper() not in measured_mnemonics:
-                    missing_instructions.append(instruction_name)
+            extension_unique_set = set(
+                inst.upper() for inst in known_instruction_list
+            )
+            missing_in_extension = sorted(
+                extension_unique_set - measured_mnemonics
+            )
 
-            total_known_count += len(set(known_instruction_list))
-            total_missing_count += len(missing_instructions)
-
-            if missing_instructions:
-                report_file.write(f"--- {extension_name} "
-                                  f"({len(missing_instructions)} missing / "
-                                  f"{len(set(known_instruction_list))} known) ---\n")
-                for missing_instruction in missing_instructions:
+            if missing_in_extension:
+                report_file.write(
+                    f"--- {extension_name} "
+                    f"({len(missing_in_extension)} missing / "
+                    f"{len(extension_unique_set)} unique in extension) ---\n"
+                )
+                for missing_instruction in missing_in_extension:
                     report_file.write(f"  {missing_instruction}\n")
                 report_file.write("\n")
 
-        coverage_percentage = (
-            (1.0 - total_missing_count / total_known_count) * 100
-            if total_known_count > 0 else 0
-        )
+        # Also report deprecated extensions separately
+        if deprecated_only_mnemonics:
+            report_file.write("--- Deprecated Extensions "
+                              "(not present on Zen 4) ---\n")
+            for extension_name in sorted(KNOWN_ZEN4_INSTRUCTIONS.keys()):
+                if extension_name not in DEPRECATED_EXTENSIONS:
+                    continue
+                extension_unique_set = set(
+                    inst.upper()
+                    for inst in KNOWN_ZEN4_INSTRUCTIONS[extension_name]
+                )
+                deprecated_in_ext = extension_unique_set & deprecated_only_mnemonics
+                if deprecated_in_ext:
+                    report_file.write(
+                        f"  {extension_name}: "
+                        f"{len(deprecated_in_ext)} mnemonics "
+                        f"(not_present_on_zen4)\n"
+                    )
+            report_file.write("\n")
 
         report_file.write("=" * 72 + "\n")
-        report_file.write(f"Total known instruction mnemonics: {total_known_count}\n")
-        report_file.write(f"Total missing: {total_missing_count}\n")
+        report_file.write(f"Valid Zen 4 universe: {universe_size} mnemonics\n")
+        report_file.write(f"Measured: {measured_count}\n")
+        report_file.write(f"Missing: {missing_count}\n")
         report_file.write(f"Coverage: {coverage_percentage:.1f}%\n")
         report_file.write("=" * 72 + "\n")
 
-    return total_missing_count
+    return measured_count, universe_size, missing_count, coverage_percentage
 
 
 # ---------------------------------------------------------------------------
@@ -1162,19 +1358,21 @@ def print_summary(rows):
 
     extension_counts = defaultdict(int)
     category_counts = defaultdict(int)
+    status_counts = defaultdict(int)
     latency_measured_count = 0
     throughput_measured_count = 0
 
     for row in rows:
         extension_counts[row["extension"]] += 1
-        category_counts[row["category"]] += 1
-        if float(row["latency_cycles"]) > 0:
+        category_counts[row["semantic_category"]] += 1
+        status_counts[row["measurement_status"]] += 1
+        if float(row["measured_latency_cy"]) > 0:
             latency_measured_count += 1
-        if float(row["throughput_cycles"]) > 0:
+        if float(row["measured_throughput_cy"]) > 0:
             throughput_measured_count += 1
 
     print(f"\n{'=' * 60}")
-    print(f"Zen 4 Master Denormalized CSV — Summary")
+    print(f"Zen 4 Master Denormalized CSV -- Summary")
     print(f"{'=' * 60}")
     print(f"Total rows: {total_row_count}")
     print()
@@ -1184,9 +1382,14 @@ def print_summary(rows):
         print(f"  {extension_name:30s} {extension_counts[extension_name]:5d}")
     print()
 
-    print(f"Rows per category:")
+    print(f"Rows per semantic_category:")
     for category_name in sorted(category_counts.keys()):
         print(f"  {category_name:30s} {category_counts[category_name]:5d}")
+    print()
+
+    print(f"Rows per measurement_status:")
+    for status_name in sorted(status_counts.keys()):
+        print(f"  {status_name:30s} {status_counts[status_name]:5d}")
     print()
 
     print(f"Latency measured:   {latency_measured_count:5d} / {total_row_count}"
@@ -1248,10 +1451,10 @@ def main():
     deduplicated_rows = deduplicate_rows(all_normalized_rows)
     print(f"Total rows after dedup:  {len(deduplicated_rows)}")
 
-    # Sort by: extension, category, mnemonic, width_bits
+    # Sort by: extension, semantic_category, mnemonic, width_bits
     deduplicated_rows.sort(key=lambda row: (
         row["extension"],
-        row["category"],
+        row["semantic_category"],
         row["mnemonic"],
         int(row["width_bits"]),
     ))
@@ -1268,9 +1471,15 @@ def main():
     print_summary(deduplicated_rows)
 
     # Generate gap report
-    missing_count = generate_gap_report(deduplicated_rows, GAP_REPORT)
+    measured_count, universe_size, missing_count, coverage_pct = (
+        generate_gap_report(deduplicated_rows, GAP_REPORT)
+    )
     print(f"\nGap report: {GAP_REPORT}")
-    print(f"  Missing mnemonics: {missing_count}")
+    print(f"  Valid Zen 4 universe: {universe_size} mnemonics")
+    print(f"  Measured: {measured_count}")
+    print(f"  Missing: {missing_count}")
+    print(f"  Coverage: {measured_count} / {universe_size} "
+          f"({coverage_pct:.1f}%)")
 
 
 if __name__ == "__main__":

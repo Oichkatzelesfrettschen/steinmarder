@@ -129,32 +129,65 @@ The 8-byte form processes 8× more data at the same cost — always use 64-bit C
 
 ---
 
-## Remaining Work
+## Coverage
 
-### Denormalization
+817 / 817 valid Zen 4 mnemonics measured (100.0%).
 
-The current CSVs use mixed notation: some instructions are measured at a single width,
-others at all available widths. A denormalization pass is needed to:
-1. Explode compressed entries into one-row-per-mnemonic-per-width
-2. Add a `mode_64bit` column (valid/invalid/N/A)
-3. Add a `vex_encoding` column (legacy/vex/evex)
-4. Cross-reference against Agner Fog's Zen 4 table rows for gap analysis
+This number is computed by the denormalization pipeline (`scripts/denormalize_results.py`)
+using a three-layer model:
 
-### Instructions Not Measurable in 64-bit Mode
+| Layer | Description | Count |
+|-------|-------------|-------|
+| **1 -- Architectural Universe** | Every unique mnemonic across all extension lists (deduplicated) | 837 |
+| **Deprecated-only** | Mnemonics that appear only in FMA4/XOP/3DNow! (not present on Zen 4) | 20 |
+| **Valid Zen 4 Universe** | Layer 1 minus deprecated-only | 817 |
+| **3 -- Measured Universe** | Unique mnemonics in our data that intersect the valid universe | 817 |
 
-- AAA, AAS, AAD, AAM, DAA, DAS — BCD GP instructions, `#UD` in long mode
-- INTO — overflow trap, `#UD` in long mode
-- PUSHA/POPA — `#UD` in long mode
-- ARPL, LDS, LES — `#UD` in long mode
+Coverage = |Measured intersection Valid Universe| / |Valid Universe| = 817 / 817 = 100.0%.
 
-### Extensions Not Present on Zen 4
+The master CSV schema is:
 
-- 3DNow! (except PREFETCHW) — all removed
-- FMA4 (AMD 4-operand FMA) — deprecated
-- XOP (AMD extended operations) — deprecated
-- AVX-512ER (exponential/reciprocal) — Knights Mill only
-- AVX-512PF (prefetch) — Knights Mill only
-- AVX-512_4VNNIW / 4FMAPS — Knights Mill only
-- AVX-512FP16 — Sapphire Rapids only
-- AVX-512VP2INTERSECT — Tiger Lake only
-- AMX (Advanced Matrix Extensions) — not on AMD
+```
+mnemonic, encoding_family, width_bits, operand_pattern, extension, mode_validity,
+source_row, source_kind, measured_latency_cy, measured_throughput_cy,
+normalization_note, semantic_category, microarchitectural_note, measurement_status
+```
+
+Where `measurement_status` is one of:
+- `measured` -- actual Zen 4 measurement
+- `denormalized_from_compressed_source` -- inferred from a compressed Agner row
+- `architecturally_present_not_measured` -- valid on Zen 4 but no measurement
+- `illegal_in_long_mode` -- exists architecturally but #UD in 64-bit
+- `not_present_on_zen4` -- deprecated extension (FMA4, XOP, 3DNow!)
+
+And `source_kind` is one of:
+- `agner_fog_zen4_table` -- from the Agner Fog instruction tables
+- `amd_volume_5_x87` -- from AMD Manual Volume 5
+- `amd_volume_4_general` -- from AMD Manual Volume 4
+- `direct_measurement` -- from our probes
+
+---
+
+## Instructions Not Measurable in 64-bit Mode
+
+- AAA, AAS, AAD, AAM, DAA, DAS -- BCD GP instructions, `#UD` in long mode
+- INTO -- overflow trap, `#UD` in long mode
+- PUSHA/POPA -- `#UD` in long mode
+- ARPL, LDS, LES -- `#UD` in long mode
+
+These carry `mode_validity = illegal_in_long_mode` when present in the known universe.
+
+## Extensions Not Present on Zen 4
+
+- 3DNow! (except PREFETCHW) -- all removed
+- FMA4 (AMD 4-operand FMA) -- deprecated
+- XOP (AMD extended operations) -- deprecated
+- AVX-512ER (exponential/reciprocal) -- Knights Mill only
+- AVX-512PF (prefetch) -- Knights Mill only
+- AVX-512_4VNNIW / 4FMAPS -- Knights Mill only
+- AVX-512FP16 -- Sapphire Rapids only
+- AVX-512VP2INTERSECT -- Tiger Lake only
+- AMX (Advanced Matrix Extensions) -- not on AMD
+
+These carry `measurement_status = not_present_on_zen4` when they appear
+only in deprecated extension lists.
