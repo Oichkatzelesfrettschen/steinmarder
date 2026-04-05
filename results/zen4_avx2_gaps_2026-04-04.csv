@@ -1,0 +1,26 @@
+probe=avx2_gaps
+iterations=30000
+working_set_bytes=67108864
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+Measuring missing AVX2 (ymm) gap-fill instruction forms...
+
+mnemonic,operands,extension,latency_cycles,throughput_cycles,category
+VPAND,ymm,ymm,ymm,AVX2,0.0006,0.2681,avx2_logic
+VPANDN,ymm,ymm,ymm,AVX2,0.0006,0.2684,avx2_logic
+VPOR,ymm,ymm,ymm,AVX2,0.0006,0.2681,avx2_logic
+VPXOR,ymm,ymm,ymm,AVX2,0.0006,0.2681,avx2_logic
+VPHADDD,ymm,ymm,ymm,AVX2,2.1435,2.1439,avx2_hadd
+VPHADDW,ymm,ymm,ymm,AVX2,2.0806,0.9570,avx2_hadd
+VPHSUBD,ymm,ymm,ymm,AVX2,0.9577,1.0911,avx2_hsub
+VPHSUBW,ymm,ymm,ymm,AVX2,0.9575,0.9572,avx2_hsub
+VPBLENDD,ymm,ymm,ymm,$0x55,AVX2,0.0156,0.1199,avx2_blend
+VPALIGNR,ymm,ymm,ymm,$4,AVX2,0.0002,0.2395,avx2_shuf
+VPSHUFHW,ymm,ymm,$0x1B,AVX2,0.0002,0.2034,avx2_shuf
+VPSHUFLW,ymm,ymm,$0x1B,AVX2,0.0002,0.2035,avx2_shuf
+VEXTRACTI128,xmm,ymm,$n,AVX2,0.0602,0.1198,avx2_lane
+VINSERTI128,ymm,ymm,xmm,$n,AVX2,0.0002,0.1200,avx2_lane
+VPMOVMSKB,r32,ymm,AVX2,-1.0000,0.1349,avx2_mask
+VPMASKMOVD,ymm,[m256],ymm,AVX2,-1.0000,0.1199,avx2_mask
+VPMASKMOVQ,ymm,[m256],ymm,AVX2,-1.0000,0.0901,avx2_mask
