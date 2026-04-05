@@ -373,9 +373,9 @@ static double movsx_r64_r16_lat(uint64_t iteration_count)
 }
 THROUGHPUT_UNARY(movsx_r64_r16_tp, "movswq %w0, %0")
 
-/* MOVSXD r64,r32 */
-LATENCY_UNARY(movsxd_r64_r32_lat, "movsxd %k0, %0")
-THROUGHPUT_UNARY(movsxd_r64_r32_tp, "movsxd %k0, %0")
+/* MOVSXD r64,r32 -- AT&T mnemonic is movslq */
+LATENCY_UNARY(movsxd_r64_r32_lat, "movslq %k0, %0")
+THROUGHPUT_UNARY(movsxd_r64_r32_tp, "movslq %k0, %0")
 
 /* CMOVcc r64,r64 -- conditional move (CMOVNE used, flags pre-set) */
 static double cmovne_r64_r64_lat(uint64_t iteration_count)
@@ -1268,15 +1268,16 @@ static double setne_tp(uint64_t iteration_count)
     return (double)(tsc_stop - tsc_start) / (double)(iteration_count * 8);
 }
 
-/* LAHF -- load AH from flags */
+/* LAHF -- load AH from flags.
+ * Cannot use movzbq %%ah with REX prefix; extract AH via shr $8. */
 static double lahf_lat(uint64_t iteration_count)
 {
     uint64_t accumulator = 0xDEADBEEFCAFEBABEULL;
     uint64_t tsc_start = sm_zen_tsc_begin();
     for (uint64_t loop_idx = 0; loop_idx < iteration_count; loop_idx++) {
-        __asm__ volatile("test %0, %0\n\tlahf\n\tmovzbq %%ah, %0"
+        __asm__ volatile("test %0, %0\n\tlahf\n\tshr $8, %0\n\tand $0xFF, %0"
                          : "+a"(accumulator) :: "cc");
-        __asm__ volatile("test %0, %0\n\tlahf\n\tmovzbq %%ah, %0"
+        __asm__ volatile("test %0, %0\n\tlahf\n\tshr $8, %0\n\tand $0xFF, %0"
                          : "+a"(accumulator) :: "cc");
     }
     uint64_t tsc_stop = sm_zen_tsc_end();
