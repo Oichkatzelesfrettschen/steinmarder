@@ -318,6 +318,135 @@ lines from all probes. Creates a timestamped results directory.
 
 ---
 
+## AVX-512 Data Manipulation
+
+### 18. `probe_avx512_shuffle` — Cross-Lane Permute at 512-bit
+ZMM permutes are exactly 2× YMM cost (double-pumped). Byte-granularity `vpermb` has zero
+penalty vs 32-bit `vpermps`. All at ~0.47 cyc throughput.
+
+### 19. `probe_avx512_convert` — FP32↔BF16 Conversion
+`vcvtne2ps2bf16 zmm`: 0.82 cyc → 39 BF16/cycle. Manual BF16→FP32 expand: 1.24 cyc.
+
+### 20. `probe_avx512_mask` — Masked Operation Throughput
+Masked FMA is actually *faster* than unmasked (0.48 vs 0.66 cyc) — fewer writeback ports used.
+
+### 21. `probe_avx512_dq` — AVX-512DQ Extension
+`vpmullq zmm`: 3.28 cyc latency, ~1 op/cycle. **Native 64-bit SIMD multiply confirmed.**
+`vfpclassps zmm → k`: 0.06 cyc — mask-producing ops are essentially free.
+
+### 22. `probe_avx512_cd` — Conflict Detection
+`vpconflictd zmm`: 2.86 cyc latency, 0.88 cyc throughput. No data-dependent penalty.
+
+### 23. `probe_avx512_vbmi2` — Byte Compress/Expand + Variable Shift
+`vpcompressb` fast-path for all-1s mask: 0.06 cyc vs 0.86 cyc with real masks (~14× difference).
+`vpshldvd/vpshrdvd`: 0.48 cyc, direction and width independent.
+
+### 24. `probe_avx512_bw_extended` — Byte Shuffle, Min/Max, Pack, Compare
+`vpshufb zmm`: 0.48 cyc. Byte min/max: 0.26 cyc. Saturating pack: 0.12 cyc.
+`vpcmpub zmm → k`: 0.06 cyc.
+
+---
+
+## Crypto and Bit Manipulation
+
+### 25. `probe_vaes` — Vectorized AES
+zmm/xmm throughput ratio exactly 2.00× (double-pump). AES pipe is natively 256-bit.
+`vaesenc zmm`: 0.47 cyc throughput = 8.56 blocks/cycle.
+
+### 26. `probe_gfni` — Galois Field Instructions
+`vgf2p8affineqb zmm`: 0.48 cyc. Universal byte→byte LUT in one instruction.
+
+### 27. `probe_sha` — SHA-NI Hardware Acceleration
+`sha256rnds2`: 0.48 cyc throughput. `sha256msg2`: 1.22 cyc (bottleneck).
+SHA-1 message schedule ops have sub-cycle latency (~0.94 cyc).
+
+### 28. `probe_bmi` — BMI1/BMI2 Bit Manipulation
+**pdep/pext FIXED on Zen 4**: 1.44 cyc latency (was ~18 cyc on Zen 1–3). ~12× improvement.
+`tzcnt/lzcnt/popcnt`: 0.48 cyc latency, 0.14 cyc throughput.
+
+### 29. `probe_vpclmulqdq` — Carry-Less Multiplication
+Near-ideal width scaling: zmm/xmm throughput ratio only 1.05×. Latency identical at ~1.92 cyc.
+
+---
+
+## Memory and Synchronization
+
+### 30. `probe_atomic_contention` — Atomic Ops Under Thread Contention
+Single-threaded: `lock xadd` ~3.8 cyc/op. 16-thread contention: 87× slowdown.
+Aggregate throughput peaks at 8 threads, drops at 16 (cross-CCD coherence).
+
+### 31. `probe_streaming_bandwidth` — Non-Temporal Stores
+NT stores offer NO benefit on Zen 4 single-core (11.3 vs 11.4 B/cyc).
+NT loads give ~5% benefit (17.8 vs 17.0 B/cyc).
+
+### 32. `probe_false_sharing` — Cache Line Contention
+Same-CCD false sharing: **4–6× throughput penalty**. Cross-CCD: ~5.5×.
+
+### 33. `probe_tlb_reach` — TLB Miss and Page Walk Cost
+L1 dTLB: covers ~288 KB. L2 TLB: covers ~12 MB. Full page walk at 128+ MB: 174 cyc.
+
+### 34. `probe_store_forwarding` — Store-to-Load Forwarding
+Same-size: free (0.48 cyc). **Narrow-to-wide: FAILS with 9.22 cyc penalty.**
+
+---
+
+## Exhaustive Dependency Chains
+
+### 35. `probe_depchain_int` / `probe_depchain_integer` — Integer Type Chains
+All SIMD integer adds (8/16/32/64-bit) are width-uniform at 0.49 cyc (1-cycle latency).
+INT32 mul: 1.46 cyc. Signed/unsigned identical.
+
+### 36. `probe_depchain_float` — Floating-Point Type Chains
+FP32/FP64 add/mul/fma: ~3 cyc. FP80 x87: ~8 cyc. FP128 (__float128): ~80 cyc (software).
+BF16 vdpbf16ps: ~6 cyc. FP16 emulated: ~9 cyc. TF32 emulated: ~4 cyc.
+
+### 37. `probe_depchain_simd_width` — Width Scaling
+**512-bit latency equals 256-bit on Zen 4.** Double-pump halves throughput but adds zero latency.
+
+---
+
+## Compute Translations (from SASS/Apple/r600)
+
+### 38. `probe_transcendental` — Scalar and SIMD Transcendentals
+`vrcp14ps/vrsqrt14ps zmm`: 0.49 cyc throughput (free). `vsqrtps zmm`: 4.98 cyc.
+
+### 39. `probe_reduction` — Horizontal Reduction Patterns
+All 16-lane strategies converge to ~12.7 cyc latency. No shortcut.
+
+### 40. `probe_dot_product` — Multi-Width Dot Products
+`vpdpbusd zmm` (int8): 0.49 cyc throughput. Float dot products dominated by reduction cost.
+
+### 41. `probe_popcount_lzcnt` — Bit Manipulation
+`vpternlogd zmm`: 0.30 cyc (~3.3 ops/cycle). `vpopcntd zmm`: 1.10 cyc.
+
+---
+
+## Complete Coverage Probes
+
+### 42. `probe_dotproduct_complete` — All 9 Dot Product Mnemonics × All Widths
+VNNI is width-agnostic (~0.48 cyc at 128/256/512). DPPS is 5.5 cyc (microcoded). DPPD: 3.4 cyc.
+
+### 43. `probe_x87_complete` — AMD Volume 5 x87 Gap-Fill (44 forms)
+FBSTP m80: 131 cyc. FNSAVE: 143 cyc. FPREM1: 17.6 cyc. FCOMP anomaly at 48 cyc.
+
+### 44. `probe_prefetchw` — 3DNow! Survivor
+0.36 cyc throughput, matches PREFETCHT1/T2/NTA. Write-intent prefetch has no extra cost.
+
+### 45. `probe_legacy_exhaustive` — MMX/SSE4a/SSE4.2/CRC32/VEX-vs-Legacy
+**CRITICAL: Legacy SSE encoding has 6× throughput penalty vs VEX on Zen 4.**
+MOVNTSD (SSE4a): anomalously slow at 26 cyc. CRC32 is width-independent at 1.44 cyc.
+
+---
+
+## Exhaustive Measurement Probes (single-binary, hundreds of forms each)
+
+### 46–52. `probe_*_exhaustive` — Automated Measurement Suite
+Seven exhaustive probes, each measuring 58–227 instruction forms in a single binary.
+See `ZEN4_MEASUREMENT_CAMPAIGN_STATUS.md` for the full 1,096-form results table
+and `results/zen4_*.csv` for raw data.
+
+---
+
 ## Key Findings for NeRF MLP Optimization
 
 1. **BF16 is free 2× throughput** — `vdpbf16ps` matches FP32 FMA cycle cost but does 2× multiplies
@@ -327,3 +456,9 @@ lines from all probes. Creates a timestamped results directory.
 5. **ymm beats zmm for pure bandwidth** at L1 — but BF16's 2× compute win dominates for compute-bound kernels
 6. **VNNI offers 160+ int8 ops/cycle** — quantized inference is viable if accuracy permits
 7. **Cross-CCD scaling is ~1.4×** from 8 to 16 threads — diminishing returns beyond one CCD for compute-bound work
+8. **Legacy SSE is 6× slower** — always compile with `-mavx` or higher on Zen 4
+9. **pdep/pext are fast** — use freely for bit manipulation (1.44 cyc, was 18 cyc on Zen 1–3)
+10. **Narrow-to-wide store forwarding fails** — 9 cyc penalty; avoid mixed-width spill/reload
+11. **vpternlogd is the fastest logic op** — 0.30 cyc (~3.3/cycle), use as universal boolean
+12. **Mask-producing ops are free** — vpcmpub/vfpclassps at 0.06 cyc; use liberally for branchless
+13. **Native 64-bit multiply exists** — vpmullq 3.28 cyc via AVX-512DQ; no emulation needed
