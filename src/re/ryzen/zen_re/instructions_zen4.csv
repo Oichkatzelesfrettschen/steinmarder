@@ -1,0 +1,128 @@
+mnemonic,operand_types,simd_width,category,asm_template_latency,asm_template_throughput,notes
+# ============================================================================
+# Batch 1: Scalar Integer Instructions (~180 forms)
+# Source: Agner Fog instruction tables for AMD Zen 4
+# ============================================================================
+#
+# --- Move ---
+MOV,r64_r64,0,move,"mov %0, %0","mov %%r8, %%r9",register rename candidate
+MOV,r64_imm,0,move,SPECIAL,SPECIAL,immediate load - no dep chain
+MOV,r32_r32,0,move,"mov %k0, %k0","mov %%r8d, %%r9d",32-bit zero-extends to 64
+MOVZX,r64_r8,0,move,"movzx %b0, %0","movzx %%r8b, %%r9",zero-extend byte
+MOVZX,r64_r16,0,move,"movzx %w0, %0","movzx %%r8w, %%r9",zero-extend word
+MOVSX,r64_r8,0,move,"movsx %b0, %0","movsx %%r8b, %%r9",sign-extend byte
+MOVSX,r64_r16,0,move,"movsx %w0, %0","movsx %%r8w, %%r9",sign-extend word
+MOVSXD,r64_r32,0,move,"movsxd %k0, %0","movsxd %%r8d, %%r9",sign-extend dword
+CMOVcc,r64_r64,0,move,SPECIAL,SPECIAL,conditional move - flag dependent
+LEA,r64_m,0,move,SPECIAL,SPECIAL,load effective address - multiple forms
+XCHG,r64_r64,0,move,SPECIAL,SPECIAL,exchange - implicit lock on memory
+PUSH,r64,0,move,SPECIAL,SPECIAL,stack push
+POP,r64,0,move,SPECIAL,SPECIAL,stack pop
+# --- Arithmetic ---
+ADD,r64_r64,0,arith,"add %0, %0","add %%r8, %%r9",basic add
+ADD,r64_imm,0,arith,"add $1, %0","add $1, %%r8",add immediate
+SUB,r64_r64,0,arith,"sub %1, %0","sub %%r8, %%r9",basic sub
+SUB,r64_imm,0,arith,"sub $1, %0","sub $1, %%r8",sub immediate
+ADC,r64_r64,0,arith,"adc %1, %0","adc %%r8, %%r9",add with carry
+SBB,r64_r64,0,arith,"sbb %1, %0","sbb %%r8, %%r9",sub with borrow
+CMP,r64_r64,0,arith,SPECIAL,SPECIAL,compare - output is flags only
+INC,r64,0,arith,"inc %0","inc %%r8",increment
+DEC,r64,0,arith,"dec %0","dec %%r8",decrement
+NEG,r64,0,arith,"neg %0","neg %%r8",negate
+MUL,r64,0,arith,SPECIAL,SPECIAL,unsigned multiply - implicit rax:rdx
+IMUL,r64_r64,0,arith,"imul %0, %0","imul %%r8, %%r9",signed multiply 2-operand
+IMUL,r64_r64_imm,0,arith,SPECIAL,SPECIAL,signed multiply 3-operand with imm
+IMUL,r64,0,arith,SPECIAL,SPECIAL,signed multiply 1-operand implicit rax
+DIV,r64,0,arith,SPECIAL,SPECIAL,unsigned divide - implicit rax:rdx
+IDIV,r64,0,arith,SPECIAL,SPECIAL,signed divide - implicit rax:rdx
+# --- Logic ---
+AND,r64_r64,0,logic,"and %0, %0","and %%r8, %%r9",bitwise AND
+AND,r64_imm,0,logic,"and $0x7FFFFFFF, %0","and $0x7FFFFFFF, %%r8",AND immediate
+OR,r64_r64,0,logic,"or %1, %0","or %%r8, %%r9",bitwise OR
+OR,r64_imm,0,logic,"or $1, %0","or $1, %%r8",OR immediate
+XOR,r64_r64,0,logic,"xor %1, %0","xor %%r8, %%r9",bitwise XOR
+XOR,r64_imm,0,logic,"xor $1, %0","xor $1, %%r8",XOR immediate
+NOT,r64,0,logic,"not %0","not %%r8",bitwise NOT
+TEST,r64_r64,0,logic,SPECIAL,SPECIAL,test - output is flags only
+# --- Shift/Rotate ---
+SHL,r64_1,0,shift,"shl $1, %0","shl $1, %%r8",shift left by 1
+SHL,r64_imm,0,shift,"shl $7, %0","shl $7, %%r8",shift left by immediate
+SHL,r64_cl,0,shift,SPECIAL,SPECIAL,shift left by CL
+SHR,r64_1,0,shift,"shr $1, %0","shr $1, %%r8",shift right by 1
+SHR,r64_imm,0,shift,"shr $7, %0","shr $7, %%r8",shift right by immediate
+SHR,r64_cl,0,shift,SPECIAL,SPECIAL,shift right by CL
+SAR,r64_1,0,shift,"sar $1, %0","sar $1, %%r8",arith shift right by 1
+SAR,r64_imm,0,shift,"sar $7, %0","sar $7, %%r8",arith shift right by immediate
+SAR,r64_cl,0,shift,SPECIAL,SPECIAL,arith shift right by CL
+ROL,r64_1,0,shift,"rol $1, %0","rol $1, %%r8",rotate left by 1
+ROL,r64_imm,0,shift,"rol $7, %0","rol $7, %%r8",rotate left by immediate
+ROL,r64_cl,0,shift,SPECIAL,SPECIAL,rotate left by CL
+ROR,r64_1,0,shift,"ror $1, %0","ror $1, %%r8",rotate right by 1
+ROR,r64_imm,0,shift,"ror $7, %0","ror $7, %%r8",rotate right by immediate
+ROR,r64_cl,0,shift,SPECIAL,SPECIAL,rotate right by CL
+RCL,r64_1,0,shift,"rcl $1, %0","rcl $1, %%r8",rotate through carry left by 1
+RCL,r64_imm,0,shift,SPECIAL,SPECIAL,rotate through carry left - slow on AMD
+RCR,r64_1,0,shift,"rcr $1, %0","rcr $1, %%r8",rotate through carry right by 1
+RCR,r64_imm,0,shift,SPECIAL,SPECIAL,rotate through carry right - slow on AMD
+SHLD,r64_r64_imm,0,shift,SPECIAL,SPECIAL,double shift left
+SHRD,r64_r64_imm,0,shift,SPECIAL,SPECIAL,double shift right
+# --- Bit manipulation (BMI1/BMI2/ABM) ---
+BT,r64_r64,0,bit,SPECIAL,SPECIAL,bit test - output is CF
+BTS,r64_r64,0,bit,SPECIAL,SPECIAL,bit test and set
+BTR,r64_r64,0,bit,SPECIAL,SPECIAL,bit test and reset
+BTC,r64_r64,0,bit,SPECIAL,SPECIAL,bit test and complement
+BSF,r64_r64,0,bit,"bsf %0, %0","bsf %%r8, %%r9",bit scan forward
+BSR,r64_r64,0,bit,"bsr %0, %0","bsr %%r8, %%r9",bit scan reverse
+POPCNT,r64_r64,0,bit,"popcnt %0, %0","popcnt %%r8, %%r9",population count
+LZCNT,r64_r64,0,bit,"lzcnt %0, %0","lzcnt %%r8, %%r9",leading zero count
+TZCNT,r64_r64,0,bit,"tzcnt %0, %0","tzcnt %%r8, %%r9",trailing zero count
+BEXTR,r64_r64_r64,0,bit,"bextr %1, %0, %0","bextr %%r8, %%r9, %%r9",bit field extract
+BLSI,r64_r64,0,bit,"blsi %0, %0","blsi %%r8, %%r9",extract lowest set bit
+BLSR,r64_r64,0,bit,"blsr %0, %0","blsr %%r8, %%r9",reset lowest set bit
+BLSMSK,r64_r64,0,bit,"blsmsk %0, %0","blsmsk %%r8, %%r9",mask up to lowest set bit
+BZHI,r64_r64_r64,0,bit,"bzhi %1, %0, %0","bzhi %%r8, %%r9, %%r9",zero high bits
+PDEP,r64_r64_r64,0,bit,"pdep %1, %0, %0","pdep %%r8, %%r9, %%r9",parallel bit deposit
+PEXT,r64_r64_r64,0,bit,"pext %1, %0, %0","pext %%r8, %%r9, %%r9",parallel bit extract
+MULX,r64_r64_r64,0,bit,SPECIAL,SPECIAL,unsigned multiply no flags
+RORX,r64_r64_imm,0,bit,"rorx $17, %0, %0","rorx $17, %%r8, %%r9",rotate right no flags
+SARX,r64_r64_r64,0,bit,"sarx %1, %0, %0","sarx %%r8, %%r9, %%r9",shift arith right no flags
+SHLX,r64_r64_r64,0,bit,"shlx %1, %0, %0","shlx %%r8, %%r9, %%r9",shift left no flags
+SHRX,r64_r64_r64,0,bit,"shrx %1, %0, %0","shrx %%r8, %%r9, %%r9",shift right no flags
+ANDN,r64_r64_r64,0,bit,"andn %1, %0, %0","andn %%r8, %%r9, %%r9",and-not no flags
+# --- Flag manipulation ---
+SETcc,r8,0,flag,SPECIAL,SPECIAL,set byte on condition
+CLC,,0,flag,SPECIAL,SPECIAL,clear carry flag
+STC,,0,flag,SPECIAL,SPECIAL,set carry flag
+CMC,,0,flag,SPECIAL,SPECIAL,complement carry flag
+CLD,,0,flag,SPECIAL,SPECIAL,clear direction flag
+STD,,0,flag,SPECIAL,SPECIAL,set direction flag
+LAHF,,0,flag,SPECIAL,SPECIAL,load AH from flags
+SAHF,,0,flag,SPECIAL,SPECIAL,store AH to flags
+# --- Conversion ---
+CBW,,0,convert,"cbw","cbw",convert byte to word
+CWDE,,0,convert,"cwde","cwde",convert word to dword
+CDQE,,0,convert,"cdqe","cdqe",convert dword to qword
+CQO,,0,convert,"cqo","cqo",convert qword sign-extend to rdx:rax
+CDQ,,0,convert,"cdq","cdq",convert dword sign-extend to edx:eax
+CWD,,0,convert,"cwd","cwd",convert word sign-extend to dx:ax
+BSWAP,r64,0,convert,"bswap %0","bswap %%r8",byte swap
+BSWAP,r32,0,convert,"bswap %k0","bswap %%r8d",byte swap 32
+MOVBE,r64_m,0,convert,SPECIAL,SPECIAL,move with byte swap from memory
+# --- Misc/System ---
+NOP,,0,misc,"nop","nop",no operation
+NOP2,,0,misc,".byte 0x66, 0x90",".byte 0x66, 0x90",2-byte NOP
+NOP3,,0,misc,".byte 0x0F, 0x1F, 0x00",".byte 0x0F, 0x1F, 0x00",3-byte NOP
+MFENCE,,0,misc,SPECIAL,SPECIAL,memory fence
+LFENCE,,0,misc,SPECIAL,SPECIAL,load fence
+SFENCE,,0,misc,SPECIAL,SPECIAL,store fence
+RDTSC,,0,misc,SPECIAL,SPECIAL,read timestamp counter
+RDTSCP,,0,misc,SPECIAL,SPECIAL,read timestamp counter serializing
+CPUID,,0,misc,SPECIAL,SPECIAL,CPU identification - serializing
+RDRAND,r64,0,misc,SPECIAL,SPECIAL,hardware random number
+RDSEED,r64,0,misc,SPECIAL,SPECIAL,hardware random seed
+CLFLUSH,m,0,misc,SPECIAL,SPECIAL,cache line flush
+CLFLUSHOPT,m,0,misc,SPECIAL,SPECIAL,cache line flush optimized
+PREFETCHT0,m,0,misc,SPECIAL,SPECIAL,prefetch to L1
+PREFETCHT1,m,0,misc,SPECIAL,SPECIAL,prefetch to L2
+PREFETCHT2,m,0,misc,SPECIAL,SPECIAL,prefetch to L3
+PREFETCHNTA,m,0,misc,SPECIAL,SPECIAL,prefetch non-temporal
