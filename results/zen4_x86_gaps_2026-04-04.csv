@@ -1,0 +1,26 @@
+probe=x86_gaps
+iterations=30000
+working_set_bytes=67108864
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+Measuring missing x86 scalar gap-fill instruction forms...
+
+mnemonic,operands,extension,latency_cycles,throughput_cycles,category
+CLC,,x86,-1.0000,0.0960,flag
+STC,,x86,-1.0000,0.1436,flag
+CMC,,x86,0.5102,0.5102,flag
+CLD,,x86,-1.0000,1.6969,flag
+STD,(paired w/CLD),x86,-1.0000,56.5798,flag
+CMOVB,r64,r64,x86,0.4806,0.2706,cmov
+CMOVBE,r64,r64,x86,0.4810,0.2708,cmov
+CMOVE,r64,r64,x86,0.4808,0.2708,cmov
+CMOVL,r64,r64,x86,0.4813,0.2708,cmov
+CMOVLE,r64,r64,x86,0.4808,0.2705,cmov
+PUSH,r64,x86,-1.0000,0.2410,stack
+POP,r64,x86,-1.0000,0.1941,stack
+SETB,r8,x86,-1.0000,0.2706,setcc
+SETBE,r8,x86,-1.0000,0.2710,setcc
+SETE,r8,x86,-1.0000,0.2706,setcc
+SETL,r8,x86,-1.0000,0.2708,setcc
+SETLE,r8,x86,-1.0000,0.2708,setcc
