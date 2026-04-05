@@ -1,0 +1,49 @@
+probe=cache_split
+iterations=30000
+working_set_bytes=67108864
+cpu=4
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+measurement_iterations=6000000
+buffer=0x5a6cf96dc000 (page-aligned)
+
+test                 access_type        alignment             latency_cyc
+----                 -----------        ---------             -----------
+ymm_load             vmovdqu ymm        aligned                    0.6432
+ymm_load             vmovdqu ymm        cacheline_split            0.4913
+ymm_load             vmovdqu ymm        page_split                 0.4815
+ymm_store            vmovdqu ymm        aligned                    0.4845
+ymm_store            vmovdqu ymm        cacheline_split            0.9802
+ymm_store            vmovdqu ymm        page_split                16.4624
+zmm_load             vmovdqu32 zmm      aligned                    0.4826
+zmm_load             vmovdqu32 zmm      page_split                 0.4847
+zmm_aligned_insn     vmovaps zmm        aligned_addr               1.4590
+zmm_unaligned_insn   vmovups zmm        aligned_addr               1.4538
+lock_add             lock addq          aligned                    3.3768
+lock_add             lock addq          cacheline_split         1582.3908
+gather_zmm           vpgatherdd zmm     same_cacheline             8.6277
+gather_zmm           vpgatherdd zmm     cross_cacheline            8.5343
+
+--- split penalties (cycles above aligned baseline) ---
+  YMM load:  cacheline_split=+-0.15  page_split=+-0.16
+  YMM store: cacheline_split=+0.50  page_split=+15.98
+  ZMM load:  page_split=+0.00
+  VMOVAPS vs VMOVUPS (aligned addr): delta=-0.01 (expect ~0)
+  LOCK ADD:  cacheline_split=+1579.01
+  Gather:    cross_cacheline=+-0.09
+
+csv_header,test,access_type,alignment,latency_cycles
+ymm_load,vmovdqu ymm,aligned,0.6432
+ymm_load,vmovdqu ymm,cacheline_split,0.4913
+ymm_load,vmovdqu ymm,page_split,0.4815
+ymm_store,vmovdqu ymm,aligned,0.4845
+ymm_store,vmovdqu ymm,cacheline_split,0.9802
+ymm_store,vmovdqu ymm,page_split,16.4624
+zmm_load,vmovdqu32 zmm,aligned,0.4826
+zmm_load,vmovdqu32 zmm,page_split,0.4847
+zmm_aligned_insn,vmovaps zmm,aligned_addr,1.4590
+zmm_unaligned_insn,vmovups zmm,aligned_addr,1.4538
+lock_add,lock addq,aligned,3.3768
+lock_add,lock addq,cacheline_split,1582.3908
+gather_zmm,vpgatherdd zmm,same_cacheline,8.6277
+gather_zmm,vpgatherdd zmm,cross_cacheline,8.5343
