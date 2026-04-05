@@ -1,0 +1,69 @@
+probe=denormal_penalty
+iterations=30000
+working_set_bytes=67108864
+cpu=0
+avx2=1 fma=1 avx512f=1 bmi2=1 3dnow_prefetch=1
+
+Phase 1: FTZ=OFF DAZ=OFF (IEEE 754 denormal handling)
+  measurement_iterations=6000000
+
+Phase 2: FTZ=ON DAZ=ON (denormals flushed to zero)
+
+test             instruction          operand_class          ftz       latency_cyc
+----             -----------          -------------          ---       -----------
+addps_zmm        vaddps zmm           normal+normal          OFF            1.4540
+addps_zmm        vaddps zmm           normal+denormal        OFF            1.4597
+addps_zmm        vaddps zmm           denormal+denormal      OFF            1.4601
+mulps_zmm        vmulps zmm           normal*normal          OFF            1.4576
+mulps_zmm        vmulps zmm           normal*denormal        OFF            0.1218
+mulps_zmm        vmulps zmm           denormal*denormal      OFF            1.9457
+fmaddps_zmm      vfmadd231ps zmm      normal_fma             OFF            1.9437
+fmaddps_zmm      vfmadd231ps zmm      denormal_addend        OFF            1.9457
+fmaddps_zmm      vfmadd231ps zmm      all_denormal           OFF            1.9353
+addpd_zmm        vaddpd zmm           normal+normal          OFF            1.4520
+addpd_zmm        vaddpd zmm           denormal+denormal      OFF            1.4479
+addps_zmm        vaddps zmm           normal+normal          ON             1.4495
+addps_zmm        vaddps zmm           normal+denormal        ON             1.4527
+addps_zmm        vaddps zmm           denormal+denormal      ON             1.4493
+mulps_zmm        vmulps zmm           normal*normal          ON             1.4842
+mulps_zmm        vmulps zmm           normal*denormal        ON             0.1216
+mulps_zmm        vmulps zmm           denormal*denormal      ON             1.4496
+fmaddps_zmm      vfmadd231ps zmm      normal_fma             ON             1.9336
+fmaddps_zmm      vfmadd231ps zmm      denormal_addend        ON             1.9461
+fmaddps_zmm      vfmadd231ps zmm      all_denormal           ON             1.9469
+addpd_zmm        vaddpd zmm           normal+normal          ON             1.4549
+addpd_zmm        vaddpd zmm           denormal+denormal      ON             1.4558
+
+--- denormal penalty (cycles above normal baseline) ---
+  [FTZ=OFF] addps  normal+denormal: +0.01 cyc  denormal+denormal: +0.01 cyc
+  [FTZ=OFF] mulps  normal*denormal: +-1.34 cyc  denormal*denormal: +0.49 cyc
+  [FTZ=OFF] fmadd  denormal_addend: +0.00 cyc  all_denormal:      +-0.01 cyc
+  [FTZ=OFF] addpd  denormal+denormal: +-0.00 cyc
+  [FTZ=ON] addps  normal+denormal: +0.00 cyc  denormal+denormal: +-0.00 cyc
+  [FTZ=ON] mulps  normal*denormal: +-1.36 cyc  denormal*denormal: +-0.03 cyc
+  [FTZ=ON] fmadd  denormal_addend: +0.01 cyc  all_denormal:      +0.01 cyc
+  [FTZ=ON] addpd  denormal+denormal: +0.00 cyc
+
+csv_header,test,instruction,operand_class,ftz_daz,latency_cycles
+addps_zmm,vaddps zmm,normal+normal,OFF,1.4540
+addps_zmm,vaddps zmm,normal+denormal,OFF,1.4597
+addps_zmm,vaddps zmm,denormal+denormal,OFF,1.4601
+mulps_zmm,vmulps zmm,normal*normal,OFF,1.4576
+mulps_zmm,vmulps zmm,normal*denormal,OFF,0.1218
+mulps_zmm,vmulps zmm,denormal*denormal,OFF,1.9457
+fmaddps_zmm,vfmadd231ps zmm,normal_fma,OFF,1.9437
+fmaddps_zmm,vfmadd231ps zmm,denormal_addend,OFF,1.9457
+fmaddps_zmm,vfmadd231ps zmm,all_denormal,OFF,1.9353
+addpd_zmm,vaddpd zmm,normal+normal,OFF,1.4520
+addpd_zmm,vaddpd zmm,denormal+denormal,OFF,1.4479
+addps_zmm,vaddps zmm,normal+normal,ON,1.4495
+addps_zmm,vaddps zmm,normal+denormal,ON,1.4527
+addps_zmm,vaddps zmm,denormal+denormal,ON,1.4493
+mulps_zmm,vmulps zmm,normal*normal,ON,1.4842
+mulps_zmm,vmulps zmm,normal*denormal,ON,0.1216
+mulps_zmm,vmulps zmm,denormal*denormal,ON,1.4496
+fmaddps_zmm,vfmadd231ps zmm,normal_fma,ON,1.9336
+fmaddps_zmm,vfmadd231ps zmm,denormal_addend,ON,1.9461
+fmaddps_zmm,vfmadd231ps zmm,all_denormal,ON,1.9469
+addpd_zmm,vaddpd zmm,normal+normal,ON,1.4549
+addpd_zmm,vaddpd zmm,denormal+denormal,ON,1.4558
