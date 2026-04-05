@@ -1,7 +1,7 @@
 ========================================================================
 Zen 4 Coverage Gap Report
-Generated from 1055 measured instruction forms
-Measured unique mnemonics: 671
+Generated from 1267 measured instruction forms
+Measured unique mnemonics: 850
 ========================================================================
 
 --- AVX (10 missing / 93 known) ---
@@ -20,75 +20,6 @@ Measured unique mnemonics: 671
   VFIXUPIMMPD
   VFPCLASSPD
 
---- AVX2 (17 missing / 119 known) ---
-  VEXTRACTI128
-  VINSERTI128
-  VPALIGNR
-  VPAND
-  VPANDN
-  VPBLENDD
-  VPHADDD
-  VPHADDW
-  VPHSUBD
-  VPHSUBW
-  VPMASKMOVD
-  VPMASKMOVQ
-  VPMOVMSKB
-  VPOR
-  VPSHUFHW
-  VPSHUFLW
-  VPXOR
-
---- FMA (48 missing / 60 known) ---
-  VFMADD132PD
-  VFMADD132PS
-  VFMADD132SD
-  VFMADD132SS
-  VFMADD213PD
-  VFMADD213PS
-  VFMADD213SD
-  VFMADD213SS
-  VFMADDSUB132PD
-  VFMADDSUB132PS
-  VFMADDSUB213PD
-  VFMADDSUB213PS
-  VFMADDSUB231PD
-  VFMSUB132PD
-  VFMSUB132PS
-  VFMSUB132SD
-  VFMSUB132SS
-  VFMSUB213PD
-  VFMSUB213PS
-  VFMSUB213SD
-  VFMSUB213SS
-  VFMSUB231PD
-  VFMSUB231SD
-  VFMSUBADD132PD
-  VFMSUBADD132PS
-  VFMSUBADD213PD
-  VFMSUBADD213PS
-  VFMSUBADD231PD
-  VFNMADD132PD
-  VFNMADD132PS
-  VFNMADD132SD
-  VFNMADD132SS
-  VFNMADD213PD
-  VFNMADD213PS
-  VFNMADD213SD
-  VFNMADD213SS
-  VFNMADD231PD
-  VFNMADD231SD
-  VFNMSUB132PD
-  VFNMSUB132PS
-  VFNMSUB132SD
-  VFNMSUB132SS
-  VFNMSUB213PD
-  VFNMSUB213PS
-  VFNMSUB213SD
-  VFNMSUB213SS
-  VFNMSUB231PD
-  VFNMSUB231SD
-
 --- FMA4 (8 missing / 20 known) ---
   VFMADDPD
   VFMADDPS
@@ -99,123 +30,11 @@ Measured unique mnemonics: 671
   VFNMSUBSD
   VFNMSUBSS
 
---- SSE2 (72 missing / 122 known) ---
-  ADDPD
-  ADDSD
-  ADDSS
-  ANDNPD
-  ANDNPS
-  ANDPD
-  ANDPS
-  CMPPD
-  CMPPS
-  CMPSD
-  CMPSS
-  CVTDQ2PD
-  CVTDQ2PS
-  CVTPD2DQ
-  CVTPD2PS
-  CVTPS2DQ
-  CVTPS2PD
-  CVTSD2SI
-  CVTSI2SD
-  CVTSI2SS
-  CVTSS2SI
-  CVTTPD2DQ
-  CVTTPS2DQ
-  DIVPD
-  DIVPS
-  DIVSD
-  DIVSS
-  MAXPD
-  MAXPS
-  MAXSD
-  MAXSS
-  MINPD
-  MINPS
-  MINSD
-  MINSS
-  MOVAPD
-  MOVAPS
-  MOVHPD
-  MOVHPS
-  MOVLPD
-  MOVLPS
-  MOVMSKPD
-  MOVMSKPS
-  MOVSD
-  MOVSS
-  MOVUPD
-  MOVUPS
-  MULPD
-  MULSD
-  MULSS
-  ORPD
-  ORPS
-  RCPPS
-  RCPSS
-  RSQRTPS
-  RSQRTSS
-  SHUFPD
-  SHUFPS
-  SQRTPD
-  SQRTPS
-  SQRTSD
-  SQRTSS
-  SUBPD
-  SUBPS
-  SUBSD
-  SUBSS
-  UNPCKHPD
-  UNPCKHPS
-  UNPCKLPD
-  UNPCKLPS
-  XORPD
-  XORPS
-
---- SSE4.1 (17 missing / 53 known) ---
-  BLENDPD
-  BLENDPS
-  BLENDVPD
-  BLENDVPS
-  EXTRACTPS
-  INSERTPS
-  PBLENDVB
-  PBLENDW
-  PINSRB
-  PINSRD
-  PINSRQ
-  PINSRW
-  PTEST
-  ROUNDPD
-  ROUNDPS
-  ROUNDSD
-  ROUNDSS
-
 --- SSSE3 (1 missing / 14 known) ---
   PMULHRSW
 
---- x86 (17 missing / 75 known) ---
-  CLC
-  CLD
-  CMC
-  CMOVB
-  CMOVBE
-  CMOVE
-  CMOVL
-  CMOVLE
-  POP
-  PUSH
-  SETB
-  SETBE
-  SETE
-  SETL
-  SETLE
-  STC
-  STD
-
 ========================================================================
 Total known instruction mnemonics: 1011
-Total missing: 192
-Coverage: 81.0%
+Total missing: 21
+Coverage: 97.9%
 ========================================================================
