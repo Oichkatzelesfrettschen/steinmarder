@@ -2,7 +2,17 @@ mnemonic,operands,width_bits,element_type,latency_cycles,throughput_cycles,categ
 PREFETCHW,[m8],0,NA,-1.0000,0.3598,3dnow_prefetch,3DNow!_PREFETCH,zen4_prefetchw_2026-04-04.csv,valid,gpr
 LZCNT,"r64,r64",0,NA,0.4883,0.1374,bit,ABM,zen4_scalar_exhaustive_2026-04-04.csv,valid,gpr
 POPCNT,"r64,r64",0,NA,0.5046,0.1374,bit,ABM,zen4_scalar_exhaustive_2026-04-04.csv,valid,gpr
+VBROADCASTF128,ymm m128,256,NA,-1.0000,0.2371,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
 VDPPS,,256,fp32,5.4047,1.9144,,AVX,zen4_dotproduct_complete_2026-04-04.csv,valid,vex
+VMOVHPD,xmm m64,128,fp64,-1.0000,0.2370,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VMOVHPS,xmm m64,128,fp32,-1.0000,0.2371,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VMOVSD,xmm xmm,128,fp64,-1.0000,0.1186,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VMOVSS,xmm xmm,128,fp32,-1.0000,0.1794,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VMOVUPD,ymm m256,256,fp64,-1.0000,0.2584,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VMOVUPS,ymm m256,256,fp32,-1.0000,0.2371,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VTESTPD,ymm ymm,256,fp64,-1.0000,0.4741,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VTESTPS,ymm ymm,256,fp32,-1.0000,0.4740,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
+VZEROALL,,256,NA,-1.0000,2.8439,,AVX,zen4_final_gaps_2026-04-04.csv,valid,vex
 VANDNPD,"xmm,xmm",128,fp64,0.5006,0.1253,bitwise,AVX,zen4_simd_fp_exhaustive_2026-04-04.csv,valid,vex
 VANDNPD,"ymm,ymm",256,fp64,0.5015,0.1256,bitwise,AVX,zen4_simd_fp_exhaustive_2026-04-04.csv,valid,vex
 VANDNPS,"xmm,xmm",128,fp32,0.5010,0.1255,bitwise,AVX,zen4_simd_fp_exhaustive_2026-04-04.csv,valid,vex
@@ -208,6 +218,8 @@ VPMINSQ,"zmm,zmm",512,int64,0.0003,0.4894,arith_minmax,AVX-512DQ,zen4_avx512_int
 VPMINUQ,"zmm,zmm",512,int64,0.0006,0.4895,arith_minmax,AVX-512DQ,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
 VPMULLQ,"zmm,zmm",512,int64,0.0459,0.5397,arith_mul,AVX-512DQ,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
 VPSRAQ,"zmm,imm",512,int64,0.0163,0.4800,shift_imm,AVX-512DQ,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
+VFIXUPIMMPD,zmm zmm zmm imm,512,fp64,-1.0000,0.4741,,AVX-512F,zen4_final_gaps_2026-04-04.csv,valid,evex
+VFPCLASSPD,k zmm imm,512,fp64,-1.0000,0.4743,,AVX-512F,zen4_final_gaps_2026-04-04.csv,valid,evex
 VPABSD,zmm,512,fp64,0.0006,0.4900,arith_abs,AVX-512F,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
 VPADDD,"zmm,zmm",512,int32,0.0159,0.2698,arith_add,AVX-512F,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
 VPADDQ,"zmm,zmm",512,int64,0.0159,0.2672,arith_add,AVX-512F,zen4_avx512_int_exhaustive_2026-04-04.csv,valid,evex
@@ -1004,6 +1016,7 @@ INSERTQ,"xmm,xmm,$8,$0",128,NA,1.6178,0.3311,sse4a,SSE4a,zen4_legacy_exhaustive_
 MOVNTSD,"[m64],xmm",128,fp64,-1.0000,25.9926,sse4a_nt,SSE4a,zen4_legacy_exhaustive_2026-04-04.csv,valid,legacy
 MOVNTSS,"[m32],xmm",128,fp32,-1.0000,0.4897,sse4a_nt,SSE4a,zen4_legacy_exhaustive_2026-04-04.csv,valid,legacy
 PMADDUBSW,,128,int16,1.4512,0.4222,,SSSE3,zen4_dotproduct_complete_2026-04-04.csv,valid,legacy
+PMULHRSW,xmm xmm,128,int16,1.4229,0.2372,,SSSE3,zen4_final_gaps_2026-04-04.csv,valid,legacy
 PALIGNR,"mm,mm,$4",64,int32,1.7944,1.6190,mmx_ssse3,SSSE3,zen4_mmx_gaps_2026-04-04.csv,valid,legacy
 PSHUFB,"mm,mm",64,int8,1.7944,1.1863,mmx_ssse3,SSSE3,zen4_mmx_gaps_2026-04-04.csv,valid,legacy
 PSIGNB,"xmm,xmm",128,NA,0.9782,0.2675,ssse3_sign,SSSE3,zen4_legacy_exhaustive_2026-04-04.csv,valid,legacy
