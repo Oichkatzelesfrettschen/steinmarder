@@ -1,0 +1,50 @@
+#version 450
+/*
+ * terakan_cull_noatomic.comp — GPU-driven draw test WITHOUT global atomics.
+ *
+ * Each thread writes to a fixed slot (its global ID). Invisible objects
+ * get instanceCount=0, which the GPU skips as a zero-instance draw.
+ * This avoids the global atomic counter entirely while still proving
+ * the GPU-driven indirect draw pipeline end-to-end.
+ *
+ * Trade-off: the draw command buffer has N entries (one per object) even
+ * if most are invisible. But since PKT3_DRAW_INDIRECT with instanceCount=0
+ * is a hardware no-op, the GPU cost is minimal.
+ */
+
+layout(local_size_x = 64) in;
+
+layout(set = 0, binding = 0, std430) readonly buffer ObjectBuffer {
+    vec4 objects[];
+};
+
+layout(set = 0, binding = 1, std430) writeonly buffer DrawCommandBuffer {
+    uvec4 draw_commands[];
+};
+
+layout(push_constant) uniform CullParams {
+    vec4 frustum_plane;
+    uint vertex_count;
+    uint total_objects;
+};
+
+void main()
+{
+    uint gid = gl_GlobalInvocationID.x;
+    if (gid >= total_objects) return;
+
+    vec4 obj = objects[gid];
+    vec3 center = obj.xyz;
+    float radius = obj.w;
+
+    float dist = dot(center, frustum_plane.xyz) + frustum_plane.w;
+    bool visible = (dist + radius) > 0.0;
+
+    /* Write to fixed slot — instanceCount=0 for invisible objects */
+    draw_commands[gid] = uvec4(
+        vertex_count,
+        visible ? 1u : 0u,    /* instanceCount: 0 = GPU skips this draw */
+        gid * vertex_count,
+        0u
+    );
+}

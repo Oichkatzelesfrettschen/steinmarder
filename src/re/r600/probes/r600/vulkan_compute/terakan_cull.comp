@@ -1,0 +1,79 @@
+#version 450
+/*
+ * terakan_cull.comp — Synthetic GPU-driven draw parameter generator.
+ *
+ * This compute shader simulates a frustum culling pass: it evaluates
+ * N objects against a trivial visibility test and writes VkDrawIndirectCommand
+ * structs into an output buffer for each visible object.
+ *
+ * The CPU never touches the draw parameters. After this shader executes,
+ * the CPU issues a single vkCmdDrawIndirect that reads from the buffer
+ * this shader populated. The Command Processor (CP) fetches the parameters
+ * directly from VRAM.
+ *
+ * VkDrawIndirectCommand layout (16 bytes):
+ *   uint vertexCount;
+ *   uint instanceCount;
+ *   uint firstVertex;
+ *   uint firstInstance;
+ *
+ * Workgroup: 64 threads, each evaluates one object.
+ * Output buffer: N * 16 bytes of VkDrawIndirectCommand structs.
+ * Counter buffer: 1 uint32 atomic counter for visible object count.
+ */
+
+layout(local_size_x = 64) in;
+
+/* Object bounding sphere: (center.xyz, radius) */
+layout(set = 0, binding = 0, std430) readonly buffer ObjectBuffer {
+    vec4 objects[];  /* .xyz = center, .w = radius */
+};
+
+/* Output: VkDrawIndirectCommand per visible object */
+layout(set = 0, binding = 1, std430) writeonly buffer DrawCommandBuffer {
+    uvec4 draw_commands[];  /* vertexCount, instanceCount, firstVertex, firstInstance */
+};
+
+/* Atomic counter: number of visible objects (= number of valid draw commands) */
+layout(set = 0, binding = 2, std430) buffer CounterBuffer {
+    uint visible_count;
+};
+
+/* Push constants: frustum plane for trivial cull test */
+layout(push_constant) uniform CullParams {
+    vec4 frustum_plane;   /* .xyz = normal, .w = distance */
+    uint vertex_count;    /* vertices per object (e.g., 36 for a cube) */
+    uint total_objects;
+};
+
+void main()
+{
+    uint gid = gl_GlobalInvocationID.x;
+    if (gid >= total_objects) return;
+
+    vec4 obj = objects[gid];
+    vec3 center = obj.xyz;
+    float radius = obj.w;
+
+    /* Trivial frustum cull: signed distance from plane */
+    float dist = dot(center, frustum_plane.xyz) + frustum_plane.w;
+
+    /* Object is visible if its bounding sphere is not fully behind the plane */
+    bool visible = (dist + radius) > 0.0;
+
+    if (visible) {
+        /* Atomically allocate a slot in the draw command buffer.
+         * NOTE: This uses a global atomic increment. If the global atomic
+         * path is broken (Task #18), this will crash the SFN compiler.
+         * Fallback: use a fixed slot per thread (gid) without atomics. */
+        uint slot = atomicAdd(visible_count, 1u);
+
+        /* Write VkDrawIndirectCommand */
+        draw_commands[slot] = uvec4(
+            vertex_count,   /* vertexCount */
+            1u,             /* instanceCount */
+            gid * vertex_count, /* firstVertex (object's vertex offset) */
+            0u              /* firstInstance */
+        );
+    }
+}
